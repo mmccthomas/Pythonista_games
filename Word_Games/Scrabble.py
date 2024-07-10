@@ -100,29 +100,29 @@ class Scrabble(LetterGame):
     'box1': (45, h+h/8+45), 'box2': (45, h+45), 'box3': (2*w/3, h+45),
     'box4': (2*w/3, h+200), 'font': ('Avenir Next', 24) },
     
-    'ipad_landscape': {'rackpos': (30, 200), 'rackscale': 0.9, 'rackoff': h/8,
-    'button1': (w+20, h/6), 'button2': (w+250, h/6), 'button3': (w+140, h/6),
-    'button4': (w+250, h/6-50), 'button5': (w+140, h/6-50),
+    'ipad_landscape': {'rackpos': (10, 200), 'rackscale': 1.0, 'rackoff': h/8,
+    'button1': (w+10, h/6), 'button2': (w+230, h/6), 'button3': (w+120, h/6),
+    'button4': (w+230, h/6-50), 'button5': (w+120, h/6-50),
     'box1': (w+5, 200+h/8-6), 'box2': (w+5, 200-6), 'box3': (w+5, 2*h/3),
     'box4': (w+5, h-50), 'font': ('Avenir Next', 20) },
     
-    'ipad_portrait': {'rackpos': (10, 200), 'rackscale': 0.9, 'rackoff': h/8,
-    'button1': (w+20, h/6), 'button2': (w+250, h/6), 'button3': (w+140, h/6),
-    'button4': (w/2, h+100), 'button5': (w/2, h+150),
-    'box1': (w+5, 200+h/8-6), 'box2': (w+5, 200-6),'box3': (w+5, 2*h/3),
-    'box4': (w+5, h-50), 'font': ('Avenir Next', 20)},
+    'ipad_portrait': {'rackpos': (50-w, h+50), 'rackscale': 1.0, 'rackoff': h/8,
+    'button1': (9*w/15, h+190), 'button2': (9*w/15, h+30), 'button3': (9*w/15, h+150),
+    'button4': (9*w/15, h+70), 'button5': (9*w/15, h+110),
+    'box1': (45,h+h/8+45), 'box2': (45, h+45),'box3': (3*w/4, h+35),
+    'box4': (3*w/4, h+160), 'font': ('Avenir Next', 20)},
     
-    'iphone_landscape': {'rackpos': (10, 0), 'rackscale': 1.5, 'rackoff': h/4,
-    'button1': (w+300, h), 'button2': (w+300, h-50), 'button3': (w+300, h-100),
-    'button4': (w+300, h-150), 'button5': (w+300, h-200),
-    'box1': (w+5, h/4-6), 'box2': (w+5, -6), 'box3': (w+5, h/2),
-    'box4': (w+5, h), 'font': ('Avenir Next', 15)},
+    'iphone_landscape': {'rackpos': (10, 50), 'rackscale': 3, 'rackoff': h/4,
+    'button1': (w+10, 0), 'button2': (w+230, 0), 'button3': (w+120, 0),
+    'button4': (w+230, -50), 'button5': (w+120, -50),
+    'box1': (w+5, 50+h/4-6), 'box2': (w+5, 50-6), 'box3': (w+5, h-45),
+    'box4': (w+150, h-45), 'font': ('Avenir Next', 15) },
     
-    'iphone_portrait': {'rackpos': (10, 200), 'rackscale': 1.5, 'rackoff': h/8,
-    'button1': (w, h/6), 'button2': (w+250, h/6), 'button3': (w+140, h/6),
-    'button4': (w/2, h+100), 'button5': (w/2, h+150),
-    'box1': (5, h+h/8-6), 'box2': (5, h-6), 'box3': (5, h),
-    'box4': (5, h-50),  'font': ('Avenir Next', 15)}
+    'iphone_portrait': {'rackpos': (-w, h+50), 'rackscale': 2.0, 'rackoff': h/4,
+    'button1': (5, h+240), 'button2': (6*w/15, h+240), 'button3': (11*w/15, h+240),
+    'button4': (6*w/15, h+190), 'button5': (11*w/15, h+190),
+    'box1': (-5,h+h/4+45), 'box2': (-5, h+45),'box3': (0, h+280),
+    'box4': (w/2, h+280), 'font': ('Avenir Next', 16)},
      }
     self.posn = SimpleNamespace(**position_dict[self.gui.device])
     self.time_delay = 1
