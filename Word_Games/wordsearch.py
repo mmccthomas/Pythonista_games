@@ -52,7 +52,7 @@ class WordSearch(LetterGame):
     self.gui.set_pause_menu({'Continue': self.gui.dismiss_menu, 
                              'Reveal': self.reveal,
                              'Quit': self.quit})
-    self.gui.set_start_menu({'New Game': self.run, 
+    self.gui.set_start_menu({'New Game': self.restart, 
                             'Quit': self.quit})
     self.known_locs = []
     self.word_coords = {}
@@ -156,7 +156,13 @@ class WordSearch(LetterGame):
            print(word)
       sleep(5)
       self.gui.show_start_menu()
-          
+      
+  def restart(self):
+    """ reinitialise """ 
+    self.gui.gs.close()
+    self.__init__()
+    self.run()
+            
   def game_over(self):
     """
     Checks if the game is over
