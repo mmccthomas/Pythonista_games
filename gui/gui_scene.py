@@ -106,6 +106,8 @@ class Tile(SpriteNode):
     
         
 class GameBoard(Scene):
+  
+  global GRID_POS
 
   def __init__(self):  # board, player, response):
     ''' board is 2d list of characters
@@ -170,21 +172,27 @@ class GameBoard(Scene):
     
     match self.device:
       case 'ipad_landscape':
+         GRID_POS = (100, 85)
          grid_size = h - 150
          self.font_size = 24
       case 'ipad_portrait':
+         GRID_POS = (30, 85)
          grid_size = w - 50
          self.font_size = 24
       case 'iphone_landscape':
+         GRID_POS = (100, 85)
          grid_size = h - 150
          self.font_size = 16
       case 'iphone_portrait':
+         GRID_POS = (30, 85)
          grid_size = w - 50
          self.font_size = 16
       case 'ipad13_landscape':
+         GRID_POS = (100, 85)
          grid_size = h - 150
          self.font_size = 24
       case 'ipad13_portrait':
+         GRID_POS = (30, 85)
          grid_size = w - 50
          self.font_size = 24
          
@@ -877,6 +885,7 @@ class BoxedLabel():
       box follows text size
       text positions must follow box position
   """ 
+  global GRID_POS
   def __init__(self, text='text', title='boxed_label', min_size=(100, 50), position=(0,0), parent=parent):
       ''' position is rel to grid'''
       self.position = position
@@ -912,7 +921,7 @@ class BoxedLabel():
       self.l_box_name.stroke_color = 'white'
       x, y, w, h = self.l_box_name.bbox
       self.bounds = Rect(x + GRID_POS[0], y + GRID_POS[1], w, h)
-      self.l_box_title = LabelNode(self.title, position=(x, y+h+5), anchor_point=(0,0),font=self.font,
+      self.l_box_title = LabelNode(self.title, position=(x + 5, y+h), anchor_point=(0,0),font=self.font,
                                    parent=self.parent)
                                    
   def update_text_positions(self): 
@@ -923,6 +932,8 @@ class BoxedLabel():
         self.bounds = Rect(x + GRID_POS[0], y + GRID_POS[1], w, h)
         b_x, b_y = self.l_box_name.position
         self.l_name.position = position=(b_x + 5, b_y + 2)
+        self.l_box_title.position=(b_x + 5, b_y + h)
+        
                                               
   def set_text(self, text):
       """ sets box text and recomputes box"""
@@ -937,8 +948,7 @@ class BoxedLabel():
       y_scale = h / h1 if h > h1 else 1.0        
       self.l_box_name.x_scale = x_scale
       self.l_box_name.y_scale = y_scale
-      x, y, w, h = self.l_name.bbox
-      self.l_box_title.position=(x, y+h)
+      
       self.update_text_positions()
       
       
@@ -957,8 +967,7 @@ class BoxedLabel():
               setattr(self.l_name, k, v)                      
           except (AttributeError):
               print(traceback.format_exc())
-      if 'font' in kwargs:
-         
+      if 'font' in kwargs:         
          self.set_text(self.text)
             
   def set_box_props(self, **kwargs):

@@ -133,12 +133,14 @@ class Scrabble(LetterGame):
       """ add non responsive decoration boxes"""
       x, y, w, h = self.gui.grid.bbox 
       tsize = self.posn.rackscale * self.gui.gs.SQ_SIZE
-      self.gui.add_button(text='', title='Computer', position=self.posn.box1, 
+      box = self.gui.add_button(text='', title='Computer', position=self.posn.box1, 
                           min_size=(7 * tsize+10, tsize+10), 
                           fill_color='red')
-      self.gui.add_button(text='', title='Player', position=self.posn.box2, 
+      self.gui.set_props(box, font=self.posn.font)
+      box = self.gui.add_button(text='', title='Player', position=self.posn.box2, 
                           min_size=(7 * tsize+10, tsize+10), 
                           fill_color='blue')
+      self.gui.set_props(box, font=self.posn.font)
       self.scores = self.gui.add_button(text='', title='Scores', position=self.posn.box3, 
                                         min_size=(50, 50),
                                         fill_color='clear',
