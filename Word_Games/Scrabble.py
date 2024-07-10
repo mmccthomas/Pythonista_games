@@ -313,22 +313,22 @@ class Scrabble(LetterGame):
     """Takes in the user's input and performs that move on the board, returns the coordinates of the move
     Allows for movement over board"""
     move = LetterGame.get_player_move(self, self.board)
-    
     rack = self.rack_player1 if self.gamestate.current_player().name == 'Human' else self.rack_player2
     
     if move[0] == (-1, -1):
        return (None, None), 'Enter', None # pressed enter button
-    # deal with buttons. each returns the button text
-    elif move[0] < (0,0):
+       
+    # deal with buttons. each returns the button text    
+    elif move[0][0] < 0 and move[0][1] < 0:
       return (None, None), self.gui.gs.buttons[-move[0][0]].text, None
-    
+      
     point = self.gui.gs.start_touch - gscene.GRID_POS
     # get letter from rack
     for index, k in enumerate(rack):
-       if k.contains_point(point):
-          letter = rack[k]
-          rc = move[-2]
-          return rc, letter, index
+        if k.contains_point(point):
+            letter = rack[k]
+            rc = move[-2]
+            return rc, letter, index
     return (None, None), None, None    
     
   def restart(self):

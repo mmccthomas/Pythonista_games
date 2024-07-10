@@ -169,7 +169,7 @@ class GameBoard(Scene):
    
   def setup_gui(self, **kwargs):
     w, h = get_screen_size()
-    
+    global GRID_POS
     match self.device:
       case 'ipad_landscape':
          GRID_POS = (100, 85)
