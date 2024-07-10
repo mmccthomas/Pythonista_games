@@ -3,7 +3,7 @@ Kye version 2.0    -    Save the Children
 Copyright (c) 1992 Colin Garbutt.
 
 **NOTE**       
-  October 1992: Decided to waive the £7.50's and let Save the Children
+  October 1992: Decided to waive the Â£7.50's and let Save the Children
                 keep all of the registration fees (backdated).
 
 
