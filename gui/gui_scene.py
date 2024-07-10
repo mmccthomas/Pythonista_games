@@ -167,7 +167,7 @@ class GameBoard(Scene):
    
   def setup_gui(self, **kwargs):
     w, h = get_screen_size()
-    '''
+    
     match self.device:
       case 'ipad_landscape':
          grid_size = h - 150
@@ -181,11 +181,6 @@ class GameBoard(Scene):
          grid_size = h - 150
       case 'ipad13_portrait':
          grid_size = w - 50
-      '''
-    if self.device.endswith('_landscape'):
-         grid_size = h - 150
-    else:
-         grid_size = w - 30
          
     for k, v in kwargs.items():
       setattr(self, k, v)
