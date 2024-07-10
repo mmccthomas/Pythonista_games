@@ -171,16 +171,22 @@ class GameBoard(Scene):
     match self.device:
       case 'ipad_landscape':
          grid_size = h - 150
+         self.font_size = 24
       case 'ipad_portrait':
          grid_size = w - 50
+         self.font_size = 24
       case 'iphone_landscape':
          grid_size = h - 150
+         self.font_size = 16
       case 'iphone_portrait':
          grid_size = w - 50
+         self.font_size = 16
       case 'ipad13_landscape':
          grid_size = h - 150
+         self.font_size = 24
       case 'ipad13_portrait':
          grid_size = w - 50
+         self.font_size = 24
          
     for k, v in kwargs.items():
       setattr(self, k, v)
@@ -298,7 +304,7 @@ class GameBoard(Scene):
     self.grid = self.build_background_grid()
     self.game_field.add_child(self.grid)
     x, y, w, h = self.grid.bbox # was game_field
-    font = ('Avenir Next', 24)
+    font = ('Avenir Next', self.font_size)
     # all location relative to grid
     self.msg_label_t = LabelNode("top", font=font, position=(0, h + 10), parent=self.game_field)
     self.msg_label_t.anchor_point = (0, 0)
@@ -349,7 +355,8 @@ class GameBoard(Scene):
     self.enter_button = BoxedLabel('Enter', '', position=pos_button, min_size=(100, 32),parent=self.game_field)
     self.buttons[1] = self.enter_button
     self.buttons[1].set_index(1)
-  
+    self.enter_button.set_text_props(font=font)
+    
   def test_lines(self):
     rcs = [(0.5, 0.5),(0.5, 2.5), (3.5, 2.5), (3.5, 4.5), (4.5, 4.5), (4.5, 0.5), (0.5, 0.5)]    
     points = [self.rc_to_pos(r-1,c)  for r, c in rcs] 
