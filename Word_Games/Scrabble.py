@@ -14,6 +14,7 @@ import traceback
 from time import sleep
 from queue import Queue
 import requests
+from types import SimpleNamespace
 from random import shuffle
 from Letter_game import LetterGame
 import gui.gui_scene as gscene
@@ -123,7 +124,7 @@ class Scrabble(LetterGame):
     'box1': (5, h+h/8-6), 'box2': (5, h-6), 'box3': (5, h),
     'box4': (5, h-50),  'font': ('Avenir Next', 15)}
      }
-    self.posn = position_dict[self.gui.device] 
+    self.posn = SimpleNamespace(**position_dict[self.gui.device])
     self.time_delay = 1
 
     
@@ -131,46 +132,45 @@ class Scrabble(LetterGame):
   def add_boxes(self):
       """ add non responsive decoration boxes"""
       x, y, w, h = self.gui.grid.bbox 
-      tsize = self.posn['rackscale'] * self.gui.gs.SQ_SIZE
-      self.gui.add_button(text='', title='Computer', position=self.posn['box1'], 
+      tsize = self.posn.rackscale * self.gui.gs.SQ_SIZE
+      self.gui.add_button(text='', title='Computer', position=self.posn.box1, 
                           min_size=(7 * tsize+10, tsize+10), 
                           fill_color='red')
-      self.gui.add_button(text='', title='Player', position=self.posn['box2'], 
+      self.gui.add_button(text='', title='Player', position=self.posn.box2, 
                           min_size=(7 * tsize+10, tsize+10), 
                           fill_color='blue')
-      self.scores = self.gui.add_button(text='', title='Scores', position=self.posn['box3'], 
+      self.scores = self.gui.add_button(text='', title='Scores', position=self.posn.box3, 
                                         min_size=(50, 50),
                                         fill_color='clear',
-                                        font=self.posn['font'])
-      self.gui.set_props(self.scores, font=self.posn['font'])
-      self.turn = self.gui.add_button(text='Your Turn', title='Turn', position=self.posn['box4'], 
+                                        font=self.posn.font)
+      self.gui.set_props(self.scores, font=self.posn.font)
+      self.turn = self.gui.add_button(text='Your Turn', title='Turn', position=self.posn.box4, 
                                         min_size=(50, 50), 
-                                        fill_color='clear',
-                                        )
-      self.gui.set_props(self.turn, font=self.posn['font'])
+                                        fill_color='clear' )
+      self.gui.set_props(self.turn, font=self.posn.font)
     
   def set_buttons(self):
     """ install set of active buttons """ 
     x, y, w, h = self.gui.grid.bbox       
-    button = self.gui.set_enter('Play', position=self.posn['button1'],
+    button = self.gui.set_enter('Play', position=self.posn.button1,
                                 stroke_color='black', fill_color='yellow',
-                                color='black', font=self.posn['font'])   
-    button = self.gui.add_button(text='Autoplay', title='', position=self.posn['button2'], 
+                                color='black', font=self.posn.font)   
+    button = self.gui.add_button(text='Autoplay', title='', position=self.posn.button2, 
                                  min_size=(80, 32), reg_touch=True,
                                  stroke_color='black', fill_color='yellow',
-                                 color='black', font=self.posn['font']) 
-    button = self.gui.add_button(text='Shuffle', title='', position=self.posn['button3'],
+                                 color='black', font=self.posn.font) 
+    button = self.gui.add_button(text='Shuffle', title='', position=self.posn.button3,
                                  min_size=(100, 32), reg_touch=True,
                                  stroke_color='black', fill_color='yellow',
-                                 color='black', font=self.posn['font'])
-    button = self.gui.add_button(text='Swap', title='', position=self.posn['button4'],
+                                 color='black', font=self.posn.font)
+    button = self.gui.add_button(text='Swap', title='', position=self.posn.button4,
                                  min_size=(100, 32), reg_touch=True,
                                  stroke_color='black', fill_color='orange',
-                                 color='black', font=self.posn['font'])
-    button = self.gui.add_button(text='Options', title='', position=self.posn['button5'],
+                                 color='black', font=self.posn.font)
+    button = self.gui.add_button(text='Options', title='', position=self.posn.button5,
                                  min_size=(100, 32), reg_touch=True,
                                  stroke_color='black', fill_color='orange',
-                                 color='black', font=self.posn['font'])
+                                 color='black', font=self.posn.font)
 
     
   def display_rack(self, tiles, y_off=0):
@@ -179,12 +179,12 @@ class Scrabble(LetterGame):
     """   
     parent = self.gui.game_field
     _, _, w, h = self.gui.grid.bbox        
-    x, y = self.posn['rackpos']
+    x, y = self.posn.rackpos
     y = y + y_off
     rack = {}
     for n, tile in enumerate(tiles):    
-      t = Tile(Texture(Image.named(f'../gui/s_{tile}.png')), 0,  0, sq_size=self.gui.gs.SQ_SIZE*self.posn['rackscale'])   
-      t.position = (w + x + n * self.gui.gs.SQ_SIZE*self.posn['rackscale'], y)
+      t = Tile(Texture(Image.named(f'../gui/s_{tile}.png')), 0,  0, sq_size=self.gui.gs.SQ_SIZE*self.posn.rackscale)   
+      t.position = (w + x + n * self.gui.gs.SQ_SIZE*self.posn.rackscale, y)
       rack[t.bbox] = tile
       parent.add_child(t)     
             
@@ -200,7 +200,7 @@ class Scrabble(LetterGame):
     board = self.sync_board() 
     self.gui.update(board)        
     x, y, w, h = self.gui.grid.bbox     
-    self.display_rack(self.computer_rack, y_off=self.posn['rackoff'])
+    self.display_rack(self.computer_rack, y_off=self.posn.rackoff)
     self.display_rack(self.human_rack) 
     self.gui.set_text(self.scores, f'Computer score: {self.gamestate.player_2.score}\nHuman score: {self.gamestate.player_1.score}\nTiles left {self.gamestate.pouch.tiles_amount()}')   
     try:
