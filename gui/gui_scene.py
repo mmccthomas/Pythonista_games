@@ -180,7 +180,7 @@ class GameBoard(Scene):
          grid_size = w - 50
          self.font_size = 24
       case 'iphone_landscape':
-         GRID_POS = (100, 85)
+         GRID_POS = (30, 50)
          grid_size = h - 150
          self.font_size = 16
       case 'iphone_portrait':
