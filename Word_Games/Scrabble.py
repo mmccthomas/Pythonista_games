@@ -271,6 +271,8 @@ class Scrabble(LetterGame):
         self.sync_board()         
         if not result:
             self.human_rack = self.update_rack('human')
+            self.gameengine.clear_draft()
+            self.gameengine.reset_rack()
             return 0
         else:
             return no_pieces_used
