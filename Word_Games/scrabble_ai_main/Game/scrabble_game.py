@@ -117,15 +117,7 @@ class GameEngine:
           bad_word.append(test)
         if any(bad_word):
             self.logs.append(f'Not all formed words {all_words} are valid')
-            #clear word
-            for cell in played_cells:
-              r,c = cell.position
-              self.gamestate.board.board[r][c].tile = None
-            # set rack
-            current_player = self.gamestate.current_player()
-            for tile in current_player.rack.tiles:
-               tile.draft = False
-            return False
+            return
 
         # Calculate the score for each word
 
@@ -230,6 +222,12 @@ class GameEngine:
             if cell.tile is not None and cell.tile.draft:
                 cell.tile.draft = False
                 cell.tile = None
+                
+    def reset_rack(self):
+         # reset rack
+          current_player = self.gamestate.current_player()
+          for tile in current_player.rack.tiles:
+              tile.draft = False
 
     def simulate_option_point(self, option, sim_times = 1, half_depth = 1):
 
