@@ -14,8 +14,9 @@ SeaBattle
 Othello
 Connect4
 Chess (WIP)
+Kye
 
 Much of the  working engines of these games were provided by other developers.
-I added the gui front end for use on ios using Pythonista, along with any changes I saw fit.
+I have added the gui front end for use on ios using Pythonista, along with any changes I saw fit.
 
 
