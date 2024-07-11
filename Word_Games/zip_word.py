@@ -25,6 +25,7 @@ from queue import Queue
 from Letter_game import LetterGame, Player, Word
 import gui.gui_scene as gscene
 from gui.gui_interface import Gui, Squares
+from crossword_create import CrossWord
 
 #WordleList = [ '5000-more-common.txt', 'words_20000.txt'] 
 WordList = 'wordpuzzles.txt'
@@ -115,6 +116,7 @@ class ZipWord(LetterGame):
     """
     Main method that prompts the user for input
     """
+    cx = CrossWord(self.gui, self.word_locations, self.all_words)
     self.gui.clear_messages()
     self.gui.set_message2(f'{self.puzzle}')
     self.partition_word_list()
@@ -125,7 +127,9 @@ class ZipWord(LetterGame):
     self.delta_t()
     
     self.start_time = time()
-    self.populate_words_graph(max_iterations=1000, length_first=False)
+    cx.set_props(board=self.board, empty_board=self.empty_board, 
+                 all_word_dict=self.all_word_dict, max_depth=self.max_depth)
+    cx.populate_words_graph(max_iterations=1000, length_first=False)  
     self.delta_t('time to populate grid') 
     pass
     # self.print_board()
