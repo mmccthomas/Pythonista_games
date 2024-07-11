@@ -1,4 +1,5 @@
 """ Sliding tiles puzzle game
+requires pip install slidingpuzzle
 """
 import os
 import sys
