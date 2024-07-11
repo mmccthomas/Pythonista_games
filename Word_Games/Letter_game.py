@@ -29,6 +29,7 @@ import numpy as np
 import gui.gui_scene as gscene
 from gui.gui_interface import Gui, Squares
 
+
 # Board characters
 DESTROY = "D"
 EMPTY = "-"
@@ -240,6 +241,8 @@ class LetterGame():
     #self.gui.valid_moves(self.all, message=None)
     #self.toggle_density_chart = False # each call to density chart will switch on and off
     self.load_words(word_length=self.sizex)
+    self.word_locations = []
+    
   #.  Main Game loop #######s#  
   
   def delta_t(self, msg=None, do_print=True):
@@ -415,7 +418,7 @@ class LetterGame():
       self.max_length = max([t.length for t in self.word_locations])
       #self.delta_t('len matrix')       
     return self.min_length, self.max_length
-     
+    
   def get_possibles(self, match_pattern, max_possibles=None):
     ''' get a list of words matching match_pattern, if any
     from self.word_dict '''     
@@ -456,7 +459,7 @@ class LetterGame():
           if w.intersects(child) : # found one
             if w != word:
               word.children[child] = w   
-                
+             
   def compute_depths(self):
     """ find how many nodes to traverse before arriving  back at same word"""
     for node in self.word_locations:
@@ -465,7 +468,7 @@ class LetterGame():
         component = self.bfs(node, visited, stop=self.max_depth)  # Traverse to each node of a graph
         #path = [f'Node={node.index} item={item.index}, {item.start}' for item in component]  
     return component 
-                    
+                      
   def partition_word_list(self):
     ''' construct subsets of words for each required length
     Use dictionary keys for lengths. to construct named word sublists '''
@@ -491,7 +494,7 @@ class LetterGame():
        for coord, child in word_obj.children.items(): 
          #print(child.match_pattern, type(child.match_pattern))
          child.update_grid('', self.board, child.match_pattern)
-       
+        
   def known(self):
     """ Find all known words and letters """
     known = []
@@ -826,7 +829,7 @@ class LetterGame():
     finally:       
         return options # unplaced option   
                
-  def get_next_cross_word(self, iteration, length_first=True, max_possibles=None):
+  def get_next_cross_word(self, iteration,  max_possibles=None, length_first=True):
     """ computes the next word to be attempted """
     
     def log_return(word):
@@ -989,6 +992,7 @@ class LetterGame():
     self.gui.update(self.board) 
     
   
+  
   def get_word(self, wordlist, req_letters, wordlength):
     ''' get a word matching req_letters (letter, position) '''
     match =['.'] * wordlength
@@ -1007,7 +1011,7 @@ class LetterGame():
     else:
       # print(f'could find {match} for req_letters')
       return match, None                        
-      
+     
   def check_hit(self, rc):    
     pass    
   
