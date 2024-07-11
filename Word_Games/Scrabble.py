@@ -1,459 +1,506 @@
-""" This game is the classic Scrabble grid puzzle
-Chris Thomas July 2024
-
-The games uses a 20k word dictionary
-"""
 import os
 import sys
+import random
+import traceback
+from time import sleep, time
+from queue import Queue
+import numpy as np
+from Letter_game import LetterGame, Player
+import sudoko_solve
+from cages import Cages
 current = os.path.dirname(os.path.realpath(__file__))
 parent = os.path.dirname(current)
 sys.path.append(parent)
 grandparent = os.path.dirname(parent)
 sys.path.append(grandparent)
-import traceback
-from time import sleep
-from queue import Queue
-import requests
-from types import SimpleNamespace
-from random import shuffle
-from Letter_game import LetterGame
-import gui.gui_scene as gscene
-from ui import Image, Path, LINE_JOIN_ROUND, LINE_JOIN_MITER
-from gui.gui_scene import Tile, BoxedLabel
-from scene import Texture, Point
-from gui.gui_interface import Gui, Coord
-#from scrabble_ai_main.UI import scrabble_renderer
-import scrabble_ai_main.Game.scrabble_game as scrabble_game
-import scrabble_ai_main.Game.scrabble_objects as scrabble_objects
-wordlists =['scrabble.txt', # official scrabble dict
-            'scrabble_ai_main/Data/lang/en/3000_oxford_words.txt',
-            '5000-more-common.txt',
-            'words_10000.txt']
-# select wordlist by index
-wordlist = wordlists[0]
+from gui.gui_interface import Gui, Squares
 
+
+""" This game is the Sudoko grid puzzle
+both standard and Killer type are supported
+You have to guess the number
+Chris Thomas June 2024
+
+"""
 BLOCK = '#'
 SPACE = ' '
 FINISHED = (-10, -10)
+NOTE = (-1, -1)
+HINT = (-2, -2)
+SIZE = 9  # fixed for Sudoko
 
-def get_word_file(location, filename):
-  r = requests.get(location)
-  with open(filename, 'w') as f:
-    f.write(r.text)
-    
-def fn_piece(piece):
-      return f's_{piece}'  
-              
-class PPlayer():
-  def __init__(self):
-    self.PLAYER_1 = ' '
-    self.PLAYER_2 = '@'
-    self.EMPTY = ' '
-    self.PIECE_NAMES  =' abcdefghijklmnopqrstuvwxyz0123456789.'
-    self.PIECES = [f'../gui/s_{k}.png' for k in self.PIECE_NAMES]
-    self.PIECES.append('../gui/s_@.png')
-    self.PLAYERS = None
-    
-    
-class Scrabble(LetterGame):
+
+class Sudoko(LetterGame):
   
   def __init__(self):
     self.debug = False
+    self.sleep_time = 0.1
+    self.hints = 0
+    self.cage_colors = ['teal', 'salmon', 'dark turquiose', 'yellow']
+    # self.cage_colors = ['lunar green', 'desert brown', 'cashmere', 'linen']
+    # self.cage_colors = ['#D8D0CD', '#B46543', '#DF5587', '#C83F5F']
+    
     # allows us to get a list of rc locations
-    self.log_moves = True
-    self.SIZE = self.get_size('15,15') 
-     
+    self.log_moves = False
+    self.straight_lines_only = False
+    self.hint = False
+    self.hint_result = None
+    # create game_board and ai_board
+    self.SIZE = self.get_size(f'{SIZE},{SIZE}')
+    self.COLUMN_LABELS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'[:self.sizex]
     # load the gui interface
     self.q = Queue()
-    self.gui = Gui(self.board, PPlayer())
-    self.gui.gs.q = self.q # pass queue into gui
-    self.COLUMN_LABELS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'[:self.sizex]
-    self.gui.set_alpha(True) 
-    self.gui.set_grid_colors(grid='Scrabble.jpg') # background is classic board
+    self.gui = Gui(self.board, Player())
+    self.gui.gs.q = self.q  # pass queue into gui
+    self.gui.set_alpha(False)
+    self.gui.set_grid_colors(grid='black', highlight='lightblue')
     self.gui.require_touch_move(False)
     self.gui.allow_any_move(True)
-    self.gui.setup_gui(log_moves=True)
-    self.gamestate = scrabble_game.GameState('scrabble_ai_main/Data/multipliers.txt',
-                                             'scrabble_ai_main/Data/lang/en/tiles.txt')
-    self.gameengine = scrabble_game.GameEngine(self.gamestate, wordlist)
+    self.gui.setup_gui(log_moves=False)
+    
+    
     # menus can be controlled by dictionary of labels and functions without parameters
-    self.gui.set_pause_menu({'Continue': self.gui.dismiss_menu, 
-                              'New ....': self.restart,
-                              'Options': self.options,
-                              'Autoplay': self.ai_move,
-                              'Complete Game': self.complete_game,
-                              'Quit': self.quit})
-    self.gui.set_start_menu({'New Game': self.restart, 'Quit': self.quit})    
-    x, y, w, h = self.gui.grid.bbox    
+    self.gui.set_pause_menu({'Continue': self.gui.dismiss_menu,
+                             'New ....': self.restart,
+                             'Hint': self.perform_hint,
+                             'Reveal': self.reveal,
+                             'Quit': self.quit})
+    self.gui.set_start_menu({'New Game': self.restart, 'Quit': self.quit})
     
-    # positions of all objects for all devices
-    position_dict = {
-    'ipad13_landscape': {'rackpos': (10, 200), 'rackscale': 0.9, 'rackoff': h/8, 
-    'button1': (w+20, h/6), 'button2': (w+250, h/6), 'button3': (w+140, h/6),
-    'button4': (w+250, h/6-50), 'button5': (w+140, h/6-50),
-    'box1': (w+5, 200+h/8-6), 'box2': (w+5, 200-6), 'box3': (w+5, 2*h/3),
-    'box4': (w+5, h-50), 'font': ('Avenir Next', 24) },
-                                       
-    'ipad13_portrait': {'rackpos': (50-w, h+50), 'rackscale': 0.9, 'rackoff': h/8,
-    'button1': (w/2, h+200), 'button2': (w/2, h+50), 'button3': (w/2, h+250),
-    'button4': (w/2, h+100), 'button5': (w/2, h+150),
-    'box1': (45, h+h/8+45), 'box2': (45, h+45), 'box3': (2*w/3, h+45),
-    'box4': (2*w/3, h+200), 'font': ('Avenir Next', 24) },
+    '''.                 r c.           cols.                rows
+    board dict converts from alpha numeric grid location to (r, c)
+     '''
+    self.board_dict={k: (v,i) for i in range(SIZE) for v, k in enumerate(sudoko_solve.unitlist[i])}
     
-    'ipad_landscape': {'rackpos': (10, 200), 'rackscale': 1.0, 'rackoff': h/8,
-    'button1': (w+10, h/6), 'button2': (w+230, h/6), 'button3': (w+120, h/6),
-    'button4': (w+230, h/6-50), 'button5': (w+120, h/6-50),
-    'box1': (w+5, 200+h/8-6), 'box2': (w+5, 200-6), 'box3': (w+5, 2*h/3),
-    'box4': (w+5, h-50), 'font': ('Avenir Next', 20) },
-    
-    'ipad_portrait': {'rackpos': (50-w, h+50), 'rackscale': 1.0, 'rackoff': h/8,
-    'button1': (9*w/15, h+190), 'button2': (9*w/15, h+30), 'button3': (9*w/15, h+150),
-    'button4': (9*w/15, h+70), 'button5': (9*w/15, h+110),
-    'box1': (45,h+h/8+45), 'box2': (45, h+45),'box3': (3*w/4, h+35),
-    'box4': (3*w/4, h+160), 'font': ('Avenir Next', 20)},
-    
-    'iphone_landscape': {'rackpos': (10, 200), 'rackscale': 1.5, 'rackoff': h/4,
-    'button1': (w+10, h/6), 'button2': (w+230, h/6), 'button3': (w+120, h/6),
-    'button4': (w+230, h/6-50), 'button5': (w+120, h/6-50),
-    'box1': (w+5, 200+h/8-6), 'box2': (w+5, 200-6), 'box3': (w+5, 2*h/3),
-    'box4': (w+5, h-50), 'font': ('Avenir Next', 15) },
-    
-    #'iphone_landscape': {'rackpos': (10, 0), 'rackscale': 1.5, 'rackoff': h/4,
-    #'button1': (w+5, h), 'button2': (w+300, h-50), 'button3': (w+300, h-100),
-    #'button4': (w+300, h-150), 'button5': (w+300, h-200),
-    # 'box1': (w+5, h/4-6), 'box2': (w+5, -6), 'box3': (w+5, h/2),
-    # 'box4': (w+5, h), 'font': ('Avenir Next', 15)},
-    
-    #'iphone_portrait': {'rackpos': (10, 200), 'rackscale': 1.5, 'rackoff': h/8,
-    #'button1': (w, h/6), 'button2': (w+250, h/6), 'button3': (w+140, h/6),
-    #'button4': (w/2, h+100), 'button5': (w/2, h+150),
-    #'box1': (5, h+h/8-6), 'box2': (5, h-6), 'box3': (5, h),
-    #'box4': (5, h-50),  'font': ('Avenir Next', 15)}
-    'iphone_portrait': {'rackpos': (50-w, h+50), 'rackscale': 1.5, 'rackoff': h/8,
-    'button1': (9*w/15, h+190), 'button2': (9*w/15, h+30), 'button3': (9*w/15, h+150),
-    'button4': (9*w/15, h+70), 'button5': (9*w/15, h+110),
-    'box1': (45,h+h/8+45), 'box2': (45, h+45),'box3': (3*w/4, h+35),
-    'box4': (3*w/4, h+160), 'font': ('Avenir Next', 15)},
-     }
-    self.posn = SimpleNamespace(**position_dict[self.gui.device])
-    self.time_delay = 1
-
-    
-    
-  def add_boxes(self):
-      """ add non responsive decoration boxes"""
-      x, y, w, h = self.gui.grid.bbox 
-      tsize = self.posn.rackscale * self.gui.gs.SQ_SIZE
-      box = self.gui.add_button(text='', title='Computer', position=self.posn.box1, 
-                          min_size=(7 * tsize+10, tsize+10), 
-                          fill_color='red')
-      self.gui.set_props(box, font=self.posn.font)
-      box = self.gui.add_button(text='', title='Player', position=self.posn.box2, 
-                          min_size=(7 * tsize+10, tsize+10), 
-                          fill_color='blue')
-      self.gui.set_props(box, font=self.posn.font)
-      self.scores = self.gui.add_button(text='', title='Scores', position=self.posn.box3, 
-                                        min_size=(50, 50),
-                                        fill_color='clear',
-                                        font=self.posn.font)
-      self.gui.set_props(self.scores, font=self.posn.font)
-      self.turn = self.gui.add_button(text='Your Turn', title='Turn', position=self.posn.box4, 
-                                        min_size=(50, 50), 
-                                        fill_color='clear' )
-      self.gui.set_props(self.turn, font=self.posn.font)
-    
-  def set_buttons(self):
-    """ install set of active buttons """ 
-    x, y, w, h = self.gui.grid.bbox       
-    button = self.gui.set_enter('Play', position=self.posn.button1,
-                                stroke_color='black', fill_color='yellow',
-                                color='black', font=self.posn.font)   
-    button = self.gui.add_button(text='Autoplay', title='', position=self.posn.button2, 
-                                 min_size=(80, 32), reg_touch=True,
-                                 stroke_color='black', fill_color='yellow',
-                                 color='black', font=self.posn.font) 
-    button = self.gui.add_button(text='Shuffle', title='', position=self.posn.button3,
-                                 min_size=(100, 32), reg_touch=True,
-                                 stroke_color='black', fill_color='yellow',
-                                 color='black', font=self.posn.font)
-    button = self.gui.add_button(text='Swap', title='', position=self.posn.button4,
-                                 min_size=(100, 32), reg_touch=True,
-                                 stroke_color='black', fill_color='orange',
-                                 color='black', font=self.posn.font)
-    button = self.gui.add_button(text='Options', title='', position=self.posn.button5,
-                                 min_size=(100, 32), reg_touch=True,
-                                 stroke_color='black', fill_color='orange',
-                                 color='black', font=self.posn.font)
-
-    
-  def display_rack(self, tiles, y_off=0):
-    """ display players rack
-    y position offset is used to select player_1 or player_2
-    """   
-    parent = self.gui.game_field
-    _, _, w, h = self.gui.grid.bbox        
-    x, y = self.posn.rackpos
-    y = y + y_off
-    rack = {}
-    for n, tile in enumerate(tiles):    
-      t = Tile(Texture(Image.named(f'../gui/s_{tile}.png')), 0,  0, sq_size=self.gui.gs.SQ_SIZE*self.posn.rackscale)   
-      t.position = (w + x + n * self.gui.gs.SQ_SIZE*self.posn.rackscale, y)
-      rack[t.bbox] = tile
-      parent.add_child(t)     
-            
-    if y_off == 0:
-       self.rack_player1 = rack
-    else:
-       self.rack_player2 = rack    
-          
-  def update_board(self, hint=False, filter_placed=True):
-    """ requires solution_dict from generate_word_anagram_pairs
-                 solution_board from create_anagram_board 
-    """  
-    board = self.sync_board() 
-    self.gui.update(board)        
-    x, y, w, h = self.gui.grid.bbox     
-    self.display_rack(self.computer_rack, y_off=self.posn.rackoff)
-    self.display_rack(self.human_rack) 
-    self.gui.set_text(self.scores, f'Computer score: {self.gamestate.player_2.score}\nHuman score: {self.gamestate.player_1.score}\nTiles left {self.gamestate.pouch.tiles_amount()}')   
-    try:
-       self.gui.set_message2('\n'.join(self.gameengine.logs[-2:]))
-    except (IndexError):
-       pass   
-       
-  def update_rack(self, player='human'):
-    if player=='human':
-        return [tile.letter.lower() if tile else '@' for tile in self.gamestate.player_1.rack.tiles] 
-    else:
-        return [tile.letter.lower() if tile else '@' for tile in self.gamestate.player_2.rack.tiles ] 
+    self.display_squares(color='red')
+    match  self.gui.device:
+       case'ipad_landscape':
+           position = (800, 700)
+       case 'iphone_portrait':
+           position = (280, 470)
+       case 'ipad13_landscape':
+           position = (1000, 900)
+       case 'ipad13_portrait':
+           position = (700, 1100)
+    self.gui.set_enter('Note', fill_color='clear', position=position)
         
-  def shuffle_tiles(self):
-      """ shuffle tiles of human player"""
-      shuffle(self.human_rack)      
+  def display_squares(self, color=None):
+    """ render the empty grid with coloured and white squares """
+    self.gui.clear_numbers()
+    self.square_list = []
+    for r, row in enumerate(self.board):
+      for c, character in enumerate(row):
+        # every 3 in r and c direction
+        color_ = color if  ((r<3 or r>5) and (c<3 or c>5) or (2<r<6 and 2<c<6)) else 'white'
+        self.square_list.append(Squares((r, c), '' ,color_, z_position=30, 
+                                        alpha=.2, font=('Avenir Next', 20),
+                                        text_anchor_point=(-1, 1)))
+    self.gui.add_numbers(self.square_list)
+   
+  def create_number_board(self):
+    """ redraws the board with cleared items blank tiles for unknowns
+    and letters for known"""
+    # start with empty board
+    self.solution_board = self.copy_board(self.board)
          
-  def run(self):    
+  def process_wordlist(self,  sep=False):
+    puzzles = []
+    puzzle = ''
+    for line in self.wordlist:
+        if sep:
+            if '==' in line:
+                puzzles.append(puzzle+'\n')
+                puzzle = ''
+            else:
+                puzzle = puzzle + line.strip()
+        else:
+            puzzles.append(line)
+    return puzzles
+    
+  def killer_setup(self, grid, random_color=False, kenken=False):
+    """ setup grid for killer sudoko """
+    self.board = [[SPACE] * SIZE for row_num in range(SIZE)]
+    self.gui.update(self.board)
+    
+    self.gui.build_extra_grid(3,3, grid_width_x=3, grid_width_y=3, color='white', line_width=2)
+    # level controls which cages are used Easy is 2s and 3s
+    level = 'Easy' if self.puzzle in [ 'Killer', 'Killer_Harder', 'KenKen'] else  None
+    cg = Cages(level)
+    killer_board = np.zeros((SIZE, SIZE), dtype=int)
+    values = sudoko_solve.solve(grid)
+    if values:
+        self.calc_board(killer_board, values)
+    # fit cages to board
+    # might take several goes
+    self.start_time = time()
+    while True:
+      result = cg.check_cage(killer_board, kenken=kenken)
+      if result:
+        break
+        
+    # now to assign colours and numbers
+    self.cage_board = cg.cage_board_view()
+    # store coord and total for later display
+    self.totals = {k[0]: v for v, k in cg.cages}
+    if self.debug:
+        print('cage board\n', self.cage_board)
+    self.adj_matrix = cg.adj_matrix(self.cage_board)
+    color_map_dict = cg.color_4colors(colors=self.cage_colors)
+    self.delta_t('calculate cages')
+    self.square_list = []
+    self.start_time = time()
+    # add dotted lines around cages
+    for index, item in enumerate(cg.cages):
+      number_val, coords = item
+      
+      points = cg.dotted_lines(coords, delta=.45)
+      points = [self.gui.rc_to_pos(point) for point in points]
+      self.gui.draw_line(points, line_width=2, stroke_color='black', 
+                            set_line_dash=[10,10], z_position=50)
+                            
+      if random_color is False:
+         color = color_map_dict[index]
+      else:
+          color = self.random_color()
+      for  coord in coords:
+        text = self.totals[coord] if coord in self.totals else ''
+        self.square_list.append(Squares(coord, text, color, z_position=30,
+                                        alpha=0.5, font=('Avenir Next', 20),
+                                        text_anchor_point=(-1, 1)))
+    self.gui.add_numbers(self.square_list)
+    
+    self.delta_t('display cages')
+         
+  def calc_board(self, board, values):
+     [self.board_rc(self.board_dict[k], board, ' ' if v in ['.', '0'] else v) for k, v in values.items()]
+     return board
+  
+  #########################################################################
+  # main loop
+  def run(self):
     """
     Main method that prompts the user for input
-    """    
+    """
     self.gui.clear_messages()
-    self.set_buttons()
-    self.human_rack = self.update_rack('human')
-    self.computer_rack = self.update_rack('computer')          
-    self.add_boxes()
-    self.update_board()
-    self.letters_used = []  
-    while True:
-      self.gui.set_text(self.turn, 'Your Turn')
-      pieces_used = 0
-      while pieces_used == 0:
-        move = self.get_player_move(self.board)         
-        pieces_used = self.process_turn( move, self.board)         
-        self.update_board()
-      if self.game_over(): break      
-      self.human_rack = self.update_rack('human')
-      self.update_board()
-      self.gui.set_text(self.turn, 'AI Turn')
-      sleep(self.time_delay)
-      self.ai_move()      
-      if self.game_over(): break       
-   
-  def game_over(self):
-    """ check for finished game """
-    return self.gamestate.game_ended  
-    
-  def sync_board(self):
-    """ constuct board from gamestate"""
-    return [[cell.tile.letter.lower() if cell.tile else '-' for cell in row] for row in self.gamestate.board.board]
-    
-  def process_turn(self, move, board):
-    """ process the turn
-    move is coord, new letter, selection_row
-    """ 
-    rack = self.rack_player1 if self.gamestate.current_player().name == 'Human' else self.rack_player2
-    player = self.gamestate.current_player()
-    if move:
-      coord, letter, row = move
-      r,c = coord
-      if letter == 'Enter':
-        # confirm placement
-        result = self.gameengine.play_draft()
+    self.gui.set_enter('Note', fill_color='clear')
+    self.load_words_from_file("sudoko.txt")
+    self.create_number_board()
+    self.notes = {}
+    selected = self.select_list()
+    if selected:
+        #                             controls decode of puzzle spec
+        puzzles = self.process_wordlist(self.puzzle in ['Easy', 'Killer', 'Killer_Harder', 'KenKen'])
+        grid = random.choice(puzzles)
         
-        no_pieces_used = len(self.letters_used)
-        self.sync_board()         
-        if not result:
-            self.human_rack = self.update_rack('human')
-            return 0
+        if self.puzzle.startswith('Killer'):          
+            self.killer_setup(grid, random_color=False)            
+            self.board = [[SPACE for i in range(SIZE)] for j in range(SIZE)]
+        elif self.puzzle == 'KenKen':
+            self.killer_setup(grid, random_color=False, kenken=True)            
+            self.board = [[SPACE for i in range(SIZE)] for j in range(SIZE)]
         else:
-            return no_pieces_used
-            
-      elif letter == 'Autoplay':
-        self.ai_move()
-        
-      elif letter == 'Shuffle':
-        self.shuffle_tiles()
-      
-      elif letter == 'Swap':
-         self.handle_swap_button()
-         
-      elif letter == 'Options':
-         self.options()
+            self.display(sudoko_solve.grid_values(grid))
+        values = sudoko_solve.solve(grid)
+        if values:
+          self.calc_board(self.solution_board, values)
+    else:
+        self.gui.set_message2('No level selected')
+        sleep(1)
+        self.restart() 
           
-      elif coord == (None, None):
-        return 0
-        
-      elif letter == 'Finish':
-        return 0 
-           
-      elif letter != '':  # valid selection
-        try:
-            r,c = coord
-            cell = self.gamestate.board.board[r][c]
-            # get point value of selected tile
-            point = player.rack.tiles[row].point
-            cell.tile = scrabble_objects.Tile(letter.upper(),point=point) 
-            cell.tile.draft = True
-            self.gamestate.player_1.rack.tiles[row].draft = True
-            self.human_rack[row] = '@'
-            self.update_board()
-            self.letters_used.append(letter)            
-        except (IndexError):
-          pass 
-          
-      elif letter == '' and isinstance(coord, tuple) and isinstance(row, tuple):   
-            # swap  existing tile with new location
-            r1, c1 = coord
-            r2, c2 = row
-            self.gamestate.board.board[r1][c1].tile, self.gamestate.board.board[r2][c2].tile = self.gamestate.board.board[r2][c2].tile, self.gamestate.board.board[r1][c1].tile
-            self.update_board()
-            return 0  
-             
-    return 0   
-      
-  def get_player_move(self, board=None):
-    """Takes in the user's input and performs that move on the board, returns the coordinates of the move
-    Allows for movement over board"""
-    move = LetterGame.get_player_move(self, self.board)
-    rack = self.rack_player1 if self.gamestate.current_player().name == 'Human' else self.rack_player2
-    
-    if move[0] == (-1, -1):
-       return (None, None), 'Enter', None # pressed enter button
-       
-    # deal with buttons. each returns the button text    
-    elif move[0][0] < 0 and move[0][1] < 0:
-      return (None, None), self.gui.gs.buttons[-move[0][0]].text, None
-      
-    # allow moving of placed letter
-    elif self.check_in_board(move[0]) and  self.check_in_board(move[-2]):
-      # identify by null letter and row is end coordinate
-      return move[0], '', move[-2]     
-      
-    point = self.gui.gs.start_touch - gscene.GRID_POS
-    # get letter from rack
-    for index, k in enumerate(rack):
-        if k.contains_point(point):
-            letter = rack[k]
-            rc = move[-2]
-            return rc, letter, index
-    return (None, None), None, None    
-    
-  def restart(self):
-    """ reinitialise """ 
-    self.gui.gs.close()
-    self.__init__()
-    self.run() 
-    
-  def ai_move(self):
-    # find best move and play it
-    try:
-        if self.gamestate.current_player().name == 'Human':
-            self.gui.set_text(self.turn, 'Your Turn')
-            self.gameengine.ai_make_move(gui=self.gui) 
-            self.human_rack = self.update_rack('human')
-            self.update_board() 
-            if self.game_over():
-               self.gui.set_message2('Game Over')
-               return
-            self.gui.set_text(self.turn, 'AI Turn')
-            sleep(self.time_delay)
-            self.ai_move() # make computer move, not recursive
-        else:
-            self.gui.set_text(self.turn, 'AI Turn')
-            self.gameengine.ai_make_move(gui=self.gui) 
-            self.computer_rack = self.update_rack('computer')
-            self.update_board()
-            sleep(self.time_delay)
-            self.gui.set_text(self.turn, 'Your Turn')
-            return None
-    except (Exception):
-      print(traceback.format_exc())
-  
-  def complete_game(self):
+    self.gui.set_message2('')
     while True:
-      self.ai_move() # human then ai
+      self.gui.set_top(f'Sudoko\t\tLevel {self.puzzle}\t\t\t\t\tHints : {self.hints}',
+                       font=('Avenir Next', 20))
+      move = self.get_player_move(self.board)
+      sleep(1)
+      moves = self.select(move, self.board, text_list=False)
+      self.process_selection(moves)
+      
       if self.game_over():
-        self.gui.set_message2('Game Over')
         break
-    print('\n'.join(self.gameengine.logs))
+    
+    self.gui.set_message2('Game over')
+    self.gui.set_message('')
+    self.gui.set_prompt('')
+    sleep(4)
+    self.finished = True
+    self.gui.show_start_menu()
+  ######################################################################
   
-  def handle_swap_button(self):
-      '''will swap out letters placed on board
-      if none placed will swap out all tiles
-      ''' 
-      drafts = [tile.draft for  tile in self.gamestate.player_1.rack.tiles]
-      all_tiles = not any(drafts) 
-      self.gameengine.swap_draft(all_tiles)
-      self.sync_board() 
-      self.human_rack = self.update_rack('human')
-      self.update_board()
-      sleep(self.time_delay)
-      self.ai_move() 
- 
-  def options(self):
-      x, y, w, h = self.gui.grid.bbox   
-      self.gameengine.ai_handle_turn()
-      self.gui.input_text_list('Play options', items=self.gameengine.ai_possible_move_ids, position=(w,h))
-      while self.gui.text_box.on_screen:    
+  def select_list(self):
+      '''Choose which category'''
+      items = [s.capitalize() for s in self.word_dict.keys()] + ['Killer', 'Killer_Harder', 'KenKen']
+      self.gui.selection = ''
+      selection = ''
+      prompt = ' Select category'
+      while self.gui.selection == '':
+        if self.gui.device.endswith('_portrait'):
+            x, y, w, h = self.gui.game_field.bbox
+            position = (x + w, 40)
+        else:
+            position = None
+        self.gui.input_text_list(prompt=prompt, items=items, position=position)
+        
+        while self.gui.text_box.on_screen:
+          sleep(.2)
           try:
             selection = self.gui.selection
-            selection_row = self.gui.selection_row
           except (Exception) as e:
             print(e)
             print(traceback.format_exc())
-            
-      if selection_row is not None:      
-          idx = selection_row
-          self.gameengine.play_option(idx)
-          self.sync_board() 
-          self.human_rack = self.update_rack('human')
-          self.update_board()
-          sleep(self.time_delay)
-          self.ai_move() 
-          
-                  
-class Renderer():    
-
-
-
-
-    def on_change(self, option_item):
-        self.gameengine.clear_draft()
-        for cell, tile in self.gameengine.ai_possible_moves[option_item[1]].items():
-            cell.tile = tile
-            tile.draft = True
-
-    def handle_play_selection_button(self):
-        drop_down_widget = self.ai_possible_moves_sec.get_widget('poss_moves')
-        _, selected_idx = drop_down_widget.get_value()
-
-        if selected_idx != -1:
-            self.gameengine.play_option(selected_idx)
-        
-        drop_down_widget.reset_value()
-        drop_down_widget.update_items([])
-        
-if __name__ == '__main__':
-  g = Scrabble()
-  g.run()
-
+   
+        if selection == "Cancelled_":
+          return False
+        elif len(selection) > 1:
+          if selection in [ 'Killer', 'Killer_Harder', 'KenKen']:
+             self.wordlist = self.word_dict['Easy']
+          else:
+             self.wordlist = self.word_dict[selection]
+          self.puzzle = selection
+          self.gui.selection = ''
+          return True
+        else:
+            return False
+                
+  def game_over(self):
+    """ check for finished game
+    board matches solution"""
+    return self.board == self.solution_board  
+ 
+  def update_notes(self, coord):
+     """ update any related notes using known validated number"""
+     # remove note from validated cell
+     self.notes.pop(coord, None)
+     known_value = str(self.get_board_rc(coord, self.board))
+     
+     r, c = coord
+     # look along row
+     for col in range(SIZE):
+       try:
+         self.notes[(r, col)].remove(known_value)
+       except (KeyError, ValueError):
+         pass
+     # look along col
+     for row in range(SIZE):
+       try:
+         self.notes[(row, c)].remove(known_value)
+       except (KeyError, ValueError):
+         pass
+     # look in local 3x3 square
+     # gets start of enclosing 3x3 square
+     r_off = 3 * (r // 3)
+     c_off = 3 * (c // 3)
+ 
+     for r in range(3):
+       for c in range(3):
+         try:
+           self.notes[(r + r_off, c + c_off)].remove(known_value)
+         except (KeyError, ValueError):
+           pass
+     if self.debug:
+         print('removed note', coord, known_value, self.notes)
+     
+     # now update squares
+     for pos, item in self.notes.items():
+         self.add_note(pos, item)
+         
+  def add_note(self, pos, item):
+      """ add a note to a cell"""
+      msg = ''.join([f'{let}\n' if i % 4 == 3 else f'{let}  ' for i, let in enumerate(item)]).strip()
+      data = self.gui.get_numbers(pos)[pos]
+      data['text'] = msg
+      if self.puzzle.startswith('Killer'):
+         total = str(self.totals[pos]) if pos in self.totals else ''
+         data['text'] = total + '\n' + msg
+      self.gui.put_numbers({pos: data})
   
+  def process_selection(self, move):
+    """ process the turn
+    move is coord, new letter, selection_row
+    """
+    if move:
+      coord, letter, row = move
+      if self.debug:
+        print('received move', move)
+      r, c = coord
+      if not isinstance(letter, list):
+          if coord == (None, None):
+            return False
+          elif letter == 'Finish':
+            return True
+            
+          elif letter != '':
+            # if Killer mode, need to always display totals
+            if self.debug:
+              print('processing', letter, coord)
+            if self.get_board_rc(coord, self.board) != BLOCK:
+              self.board_rc(coord, self.board, letter)
+              self.gui.update(self.board)
+              
+              # test if correct
+              if self.get_board_rc(coord, self.board) != self.get_board_rc(coord, self.solution_board):
+                if self.debug:
+                   print('testing', letter, coord)
+                # make square flash yellow
+                temp = self.gui.get_numbers(coord)
+                data = temp[coord]
+                data_temp = data.copy()
+                data_temp['color'] = 'yellow'
+                data_temp['alpha'] = 0.7
+                self.gui.put_numbers({coord: data_temp})
+                sleep(1)
+                self.board_rc(coord, self.board, ' ')
+                if self.puzzle.startswith('Killer'):
+                   # reset
+                   self.gui.put_numbers(temp)
+                else:
+                   # clear note. should clear try value from note also
+                   try:
+                       self.notes[(coord)].remove(letter)
+                   except (KeyError, ValueError):
+                       pass
+                   data['text'] = ''
+                   self.gui.put_numbers({coord: data})
+                   
+                self.hints += 1
+                
+              else:  # correct (or lucky guess!)
+                temp = self.gui.get_numbers(coord)
+                data = temp[coord]
+                if self.puzzle.startswith('Killer'):
+                   data['text'] = str(self.totals[coord]) if coord in self.totals else ''
+                else:
+                   # clear trial numbers
+                   data['text'] = ''
+                self.gui.put_numbers({coord: data})
+              self.update_notes(coord)
+              self.gui.update(self.board)
+              return False
+            else:
+              return False
+              
+      else:  # we've  got a list
+        # add notes to square
+        self.notes[coord] = letter
+        if self.debug:
+            print('add note', coord, self.notes)
+        self.add_note(coord, letter)
+           
+      return True
+                  
+  def select(self, moves, board, text_list=True):
+      
+      long_press = self.gui.gs.long_touch
+      # toggle hint button
+      if moves == NOTE:
+        self.hint = not self.hint
+        if self.hint:
+            self.gui.set_enter('NOTE', fill_color='red')
+        else:
+            self.gui.set_enter('Note', fill_color='clear')
+        return (None, None), None, None
+        
+      if moves == HINT:
+        return self.hint_result[0], self.hint_result[1], None
+        
+      rc = moves
+      if self.get_board_rc(rc, self.board) == SPACE:
+          # now got rc as move
+          # now open list
+          if board is None:
+              board = self.board
+          possibles = list(sudoko_solve.digits)  # 1 thru 9
+          items = possibles
+          if long_press or self.hint:
+              prompt = "Select multiple"
+          else:
+              prompt = "Select a number"
+          if len(possibles) == 0:
+            raise (IndexError, "possible list is empty")
+               
+          self.gui.selection = ''
+          selection = ''
+          x, y, w, h = self.gui.game_field.bbox
+          while self.gui.selection == '':
+            if self.gui.device in ['ipad13_landscape']:
+                position = (950, h / 2)
+            
+            elif self.gui.device.endswith('_portrait'):               
+                position = (x, y)
+            else:
+                position = (x+w, h / 2)
+                
+            select_method = self.gui.input_text_list if text_list else self.gui.input_numbers
+                     
+            panel = select_method(prompt=prompt, items=items, position=position,
+                                      allows_multiple_selection = (long_press or self.hint))             
+            while panel.on_screen:
+                sleep(.2)
+                try:
+                  selection = self.gui.selection.lower()
+                  selection_row = self.gui.selection_row
+                except (AttributeError):  # got a list
+                  selection = self.gui.selection
+                  selection_row = self.gui.selection_row
+                except (Exception) as e:
+                  print(e)
+                  print(traceback.format_exc())           
+   
+            if selection in items:
+              self.gui.selection = ''
+              if self.debug:
+                  print('letter ', selection, 'row', selection_row)
+              return rc, selection, selection_row
+              
+            elif selection == "Cancelled_":
+              return (None, None), None, None
+              
+            elif all([sel in items for sel in selection]):
+              self.gui.selection = ''
+              if self.debug:
+                  print('letters ', selection, 'rows', selection_row)
+              return rc, selection, selection_row
+            else:
+              return (None, None), None, None
+      
+  def reveal(self):
+    ''' skip to the end and reveal the board '''
+    self.gui.update(self.solution_board)
+    # This skips the wait for new location and induces Finished boolean to
+    # halt the run loop
+    self.q.put(FINISHED)
+    sleep(4)
+    self.gui.show_start_menu()
+    
+  def perform_hint(self):
+    """ uncover a random empty square """
+    while True:
+      coord = (random.randint(0, 8), random.randint(0, 8))
+      if self.get_board_rc(coord, self.board) != SPACE:
+        continue
+      else:
+        break
+    letter = self.get_board_rc(coord, self.solution_board)
+    self.board_rc(coord, self.board, letter)
+    self.hint_result = (coord, letter)
+    self.hints += 2
+    self.q.put(HINT)
+    
+  def restart(self):
+    self.gui.gs.close()
+    self.finished = False
+    self.__init__()
+    self.run()
+     
+  def display(self, values):
+    """Display these values as a 2-D grid.
+    A1=(0,0), A2=(0,1), B1=(1,0) etc"""
+    [self.board_rc(self.board_dict[k], self.board, ' ' if v in ['.', '0'] else v) for k, v in values.items()]
+    self.gui.update(self.board)
+    sleep(self.sleep_time)
+    
+          
+if __name__ == '__main__':
+  Sudoko().run()
 

@@ -3,6 +3,7 @@
 # otherwise move on to next tile
 import numpy as np
 import random
+from math import prod
 SIZE = 9
 
 
@@ -284,7 +285,7 @@ class Cages:
             self.board_rc(coord, self.cage_board, index)
         return self.cage_board
         
-    def check_cage(self, board, display=False):
+    def check_cage(self, board, display=False, kenken=False):
       # get cage solution and see if it fits
         _, cages = self.run(display=display)
         if cages:
@@ -293,8 +294,33 @@ class Cages:
             coords = [(r, c) for r, c, _ in cage]
             numbers = [board[r][c] for r, c, _ in cage]
             if len(numbers) == len(set(numbers)):
-              # no duplicates
-              self.cages.append((sum(numbers), coords))
+              # no duplicates              
+              if not kenken:
+                  self.cages.append((sum(numbers), coords))
+              else:
+                pass
+                #kenken
+                # TODO  change this line to do kenken
+                # if cage = 2, can use +-* or /
+                # else + or  *
+                if len(numbers) == 2:
+                  operator = random.choice(['+', '-', 'x', '/'])
+                else:
+                  operator = random.choice(['+', 'x'])
+                match operator:
+                  case '+':
+                    self.cages.append((f'{sum(numbers)}{operator}', coords))
+                  case '-':
+                    self.cages.append((f'{max(numbers) - min(numbers)}{operator}', coords))
+                  case 'x':
+                    self.cages.append((f'{prod(numbers)}{operator}', coords))
+                  case '/':
+                    ratio = max(numbers)/min(numbers) 
+                    if ratio == int(ratio):
+                        self.cages.append((f'{int(ratio)}{chr(247)}', coords))
+                    else:
+                        self.cages.append((f'{sum(numbers)}+', coords))
+                        
             else:
               # need another cages set
               return False
