@@ -433,12 +433,11 @@ class Sudoko(LetterGame):
           x, y, w, h = self.gui.game_field.bbox
           while self.gui.selection == '':
             if self.gui.device in ['ipad13_landscape']:
-                position = (950, h / 2)
-            
+                position = (950, h / 2)           
             elif self.gui.device.endswith('_portrait'):               
                 position = (x, y)
             else:
-                position = (x+w, h / 2)
+                position = (x + w, h / 2)
                 
             select_method = self.gui.input_text_list if text_list else self.gui.input_numbers
                      
