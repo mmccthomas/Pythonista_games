@@ -73,16 +73,18 @@ class Sudoko(LetterGame):
     self.board_dict={k: (v,i) for i in range(SIZE) for v, k in enumerate(sudoko_solve.unitlist[i])}
     
     self.display_squares(color='red')
+    x, y, w, h = self.gui.grid.bbox
     match  self.gui.device:
        case'ipad_landscape':
-           position = (800, 700)
+           position = (w+10, 8*h/9)
        case 'iphone_portrait':
            position = (280, 470)
        case 'ipad13_landscape':
-           position = (1000, 900)
+           position = (w+10, 8*h/9)
        case 'ipad13_portrait':
-           position = (700, 1100)
-    self.gui.set_enter('Note', fill_color='clear', position=position)
+           position = (8*w/9, h+50)
+    self.gui.set_enter('Note ', fill_color='clear', font=('Avenir Next', 50),position=position)
+    self.gui.set_top('', position=(0, h+30))
         
   def display_squares(self, color=None):
     """ render the empty grid with coloured and white squares """
@@ -150,17 +152,16 @@ class Sudoko(LetterGame):
     self.square_list = []
     self.start_time = time()
     # add dotted lines around cages
-    for index, item in enumerate(cg.cages):
-      number_val, coords = item
-      if kenken:
+    if kenken:
         delta=0.49
         linewidth=6
         linedash=[20,1]
-      else:
+    else:
         delta=0.45
         linewidth=2
         linedash=[10,10]
-        
+    for index, item in enumerate(cg.cages):
+      number_val, coords = item              
       points = cg.dotted_lines(coords, delta=delta)
       points = [self.gui.rc_to_pos(point) for point in points]
       self.gui.draw_line(points, line_width=linewidth, stroke_color='black', 
@@ -406,7 +407,7 @@ class Sudoko(LetterGame):
         if self.hint:
             self.gui.set_enter('NOTE', fill_color='red')
         else:
-            self.gui.set_enter('Note', fill_color='clear')
+            self.gui.set_enter('Note ', fill_color='clear')
         return (None, None), None, None
         
       if moves == HINT:
