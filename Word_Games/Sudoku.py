@@ -117,14 +117,14 @@ class Sudoko(LetterGame):
             puzzles.append(line)
     return puzzles
     
-  def killer_setup(self, grid, random_color=False):
+  def killer_setup(self, grid, random_color=False, kenken=False):
     """ setup grid for killer sudoko """
     self.board = [[SPACE] * SIZE for row_num in range(SIZE)]
     self.gui.update(self.board)
     
     self.gui.build_extra_grid(3,3, grid_width_x=3, grid_width_y=3, color='white', line_width=2)
     # level controls which cages are used Easy is 2s and 3s
-    level = 'Easy' if self.puzzle == 'Killer' else None
+    level = 'Easy' if self.puzzle in [ 'Killer', 'Killer_Harder', 'KenKen'] else  None
     cg = Cages(level)
     killer_board = np.zeros((SIZE, SIZE), dtype=int)
     values = sudoko_solve.solve(grid)
@@ -134,7 +134,7 @@ class Sudoko(LetterGame):
     # might take several goes
     self.start_time = time()
     while True:
-      result = cg.check_cage(killer_board)
+      result = cg.check_cage(killer_board, kenken=kenken)
       if result:
         break
         
@@ -152,11 +152,19 @@ class Sudoko(LetterGame):
     # add dotted lines around cages
     for index, item in enumerate(cg.cages):
       number_val, coords = item
-      
-      points = cg.dotted_lines(coords, delta=.45)
+      if kenken:
+        delta=0.49
+        linewidth=6
+        linedash=[20,1]
+      else:
+        delta=0.45
+        linewidth=2
+        linedash=[10,10]
+        
+      points = cg.dotted_lines(coords, delta=delta)
       points = [self.gui.rc_to_pos(point) for point in points]
-      self.gui.draw_line(points, line_width=2, stroke_color='black', 
-                            set_line_dash=[10,10], z_position=50)
+      self.gui.draw_line(points, line_width=linewidth, stroke_color='black', 
+                            set_line_dash=linedash, z_position=50)
                             
       if random_color is False:
          color = color_map_dict[index]
@@ -189,11 +197,14 @@ class Sudoko(LetterGame):
     selected = self.select_list()
     if selected:
         #                             controls decode of puzzle spec
-        puzzles = self.process_wordlist(self.puzzle in ['Easy', 'Killer', 'Killer_Harder'])
+        puzzles = self.process_wordlist(self.puzzle in ['Easy', 'Killer', 'Killer_Harder', 'KenKen'])
         grid = random.choice(puzzles)
         
         if self.puzzle.startswith('Killer'):          
             self.killer_setup(grid, random_color=False)            
+            self.board = [[SPACE for i in range(SIZE)] for j in range(SIZE)]
+        elif self.puzzle == 'KenKen':
+            self.killer_setup(grid, random_color=False, kenken=True)            
             self.board = [[SPACE for i in range(SIZE)] for j in range(SIZE)]
         else:
             self.display(sudoko_solve.grid_values(grid))
@@ -227,7 +238,7 @@ class Sudoko(LetterGame):
   
   def select_list(self):
       '''Choose which category'''
-      items = [s.capitalize() for s in self.word_dict.keys()] + ['Killer', 'Killer_Harder']
+      items = [s.capitalize() for s in self.word_dict.keys()] + ['Killer', 'Killer_Harder', 'KenKen']
       self.gui.selection = ''
       selection = ''
       prompt = ' Select category'
@@ -250,7 +261,7 @@ class Sudoko(LetterGame):
         if selection == "Cancelled_":
           return False
         elif len(selection) > 1:
-          if selection.startswith('Killer'):
+          if selection in [ 'Killer', 'Killer_Harder', 'KenKen']:
              self.wordlist = self.word_dict['Easy']
           else:
              self.wordlist = self.word_dict[selection]
