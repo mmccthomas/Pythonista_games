@@ -1,6 +1,7 @@
 # module to fill crossword template
 # this involves finding words from a selected dictionary to
 # fill a selected template.
+# entry point is populate_words_graph
 
 from time import sleep, time
 import traceback
@@ -32,6 +33,10 @@ class CrossWord():
     self.empty_board = []
     self.all_word_dict = {}
     
+  def set_props(self, **kwargs):
+    for k, v in kwargs.items():
+      setattr(self, k, v)
+       
   def copy_board(self, board):
     return list(map(list, board)) 
      
