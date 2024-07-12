@@ -87,11 +87,12 @@ def combine_images(columns, space, images):
         if (i+1) % columns == 0:
             y += height_max + space
             x = 0
-    background.save('image.png')
+    background.save(IMAGE_NAME)
 
 
 def load_images():
-    '''open a single file containing all images'''
+    '''open a single file containing all images
+    allow single zip file to get names'''
     try:
        images = sorted(listdir('images'))
     except FileNotFoundError:
@@ -102,7 +103,8 @@ def load_images():
     for i in images:
         if i.split('.')[1] not in ['png', 'gif']:
           images.remove(i)
-    images = [i.split('/')[1] for i in images]
+    if '/' in images[0]:
+        images = [i.split('/')[1] for i in images]
     images2 = ['images/' + i for i in images]
     images = [i.split('.')[0] for i in images]
     # combine_images(10,0,images2)
