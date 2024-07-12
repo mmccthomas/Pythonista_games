@@ -1,3 +1,22 @@
+Kye.py
+This is a front end to Colin Phipps python port of Kye for Windows
+for use on ios devices. In practice it is only usable on the iPad due to screen size
+The python code runs under the Pythonista app and uses the Scene anf Ui modules to render
+the display. PyGtk is not available on ios.
+contributed by Chris Thomas mmccthomas@gmail.com
+github repo at https://github.com/mmccthomas/Pythonista_games/
+July 2024
+
+Modified files are renamed _scene.py
+
+Entry module is Kye.py
+
+The only major gameplay change is to allow skipping to next level from the menu selection.
+
+
+
+
+
 Kye 1.0
 =========
 
