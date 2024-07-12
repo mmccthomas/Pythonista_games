@@ -195,9 +195,10 @@ class Player():
     self.PLAYER_1 = ' '
     self.PLAYER_2 = '@'
     self.EMPTY = ' '
-    self.PIECE_NAMES  =' abcdefghijklmnopqrstuvwxyz0123456789.'
-    self.PIECES = [f'../gui/{k}.png' for k in self.PIECE_NAMES[:-1]]
+    self.PIECE_NAMES  ='abcdefghijklmnopqrstuvwxyz0123456789. '
+    self.PIECES = [f'../gui/{k}.png' for k in self.PIECE_NAMES[:-2]]
     self.PIECES.append(f'../gui/@.png')
+    self.PIECES.append(f'../gui/_.png')
     self.PLAYERS = None
 
                                                      
