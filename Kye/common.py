@@ -33,11 +33,13 @@ import codecs
 import numpy as np
 from scene import Texture, Rect
 from os import listdir
+import zipfile
+
 xsize = 30
 ysize = 20
 tsize = 16
 interval = 0.1  # 0.067
-image_name = 'image.png'
+IMAGE_NAME = 'image.png'
 
 
 def device_size():
@@ -90,18 +92,23 @@ def combine_images(columns, space, images):
 
 def load_images():
     '''open a single file containing all images'''
-    images = sorted(listdir('images'))
-
+    try:
+       images = sorted(listdir('images'))
+    except FileNotFoundError:
+        zip = zipfile.ZipFile('images.zip')
+        images = zip.namelist()[1:]
+        
     # remove any other files
     for i in images:
         if i.split('.')[1] not in ['png', 'gif']:
           images.remove(i)
+    images = [i.split('/')[1] for i in images]
     images2 = ['images/' + i for i in images]
     images = [i.split('.')[0] for i in images]
     # combine_images(10,0,images2)
 
     # combined image
-    combined = Texture(ui.Image.named(image_name))
+    combined = Texture(ui.Image.named(IMAGE_NAME))
     w, h = combined.size
     # now have images list and image.png
     # 10 x 8 array gap of 0
