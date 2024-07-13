@@ -63,7 +63,7 @@ class myListDialogController (_ListDialogController):
 class KFrame(Scene):
     """Class implementing the frame surrounging the game area,
        including the menus and status bar."""
-       
+    global sel_item
     def destroy(self, data=None):
         """Handle window destroy by exiting GUI."""
         self.view.close()
