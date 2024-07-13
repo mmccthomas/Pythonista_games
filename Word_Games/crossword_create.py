@@ -92,17 +92,17 @@ class CrossWord():
         known = self.known() # populates word objects with match_pattern
         self.hints = list(set([word for word in self.word_locations for k in known if word.intersects(k)]))
         try:
-          self.gui.set_moves('hints')
+          #self.gui.set_moves('hints')
           return  log_return(self.hints.pop())     
         except(ValueError, IndexError):
           pass        
         try: 
-          self.gui.set_moves('longest')
+          #self.gui.set_moves('longest')
           return  log_return(longest()[-1])
         except (ValueError, IndexError):
           pass
         try:
-          self.gui.set_moves('fixed')
+          #self.gui.set_moves('fixed')
           return  log_return([word for word in self.word_locations if word.fixed][0]) 
         except (ValueError):
           print('returned here')
