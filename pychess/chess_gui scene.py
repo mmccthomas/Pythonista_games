@@ -26,7 +26,7 @@ screen_width, screen_height = get_screen_size()
 current = os.path.dirname(os.path.realpath(__file__))
 parent = os.path.dirname(current)
 sys.path.append(parent)
-from game_menu import MenuScene
+from gui.game_menu import MenuScene
 import logging
 import gui.gui_scene as gscene
 from gui.gui_interface import Gui, Squares, Coord

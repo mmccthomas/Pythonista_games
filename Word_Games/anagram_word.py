@@ -163,7 +163,7 @@ class Anagram(LetterGame):
     # TODO whats the right object here?
     x, y, w, h = self.gui.grid.bbox
     if self.gui.device.endswith('_landscape'):        
-        position = ( w + 10, 0)
+        position = ( w + 10, 50)
         fontsize = 20
     else:
         position = (40, h )

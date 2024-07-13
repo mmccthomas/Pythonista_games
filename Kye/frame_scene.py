@@ -55,7 +55,6 @@ class myListDialogController (_ListDialogController):
       #global sel_item
       self.selected_item = self.items[ds.selected_row]
       sel_item = self.items[ds.selected_row]
-      print('sel_item_', sel_item)
       if sel_item['accessory_type'] != 'disclosure_indicator':
             self.fn(sel_item['title'])
       self.view.close()
@@ -63,7 +62,7 @@ class myListDialogController (_ListDialogController):
 class KFrame(Scene):
     """Class implementing the frame surrounging the game area,
        including the menus and status bar."""
-    global sel_item
+       
     def destroy(self, data=None):
         """Handle window destroy by exiting GUI."""
         self.view.close()
@@ -125,7 +124,7 @@ class KFrame(Scene):
        ''' a menu with 4 buttons '''
        buttons = [{'title': 'Restart', 'action': self.restart},
                   {'title': 'Select Level', 'action': self.startgoto},
-                  # {'title': 'Goto Level', 'action': self.gotolevel_name},
+                  # {'title': 'Goto Level', 'action': self.gotolevel_name}, # not working on ipad pro
                   {'title': 'Next level', 'action': self.nextlevel},
                   {'title': 'Save state', 'action': self.savestate},
                   {'title': 'Restore state', 'action': self.restorestate}
