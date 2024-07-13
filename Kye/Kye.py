@@ -33,6 +33,7 @@ from app import KyeApp
 from common import tsize, device_size
 
 
+
 def build_menu(view):
   """Build the menubar  menus"""
   frame = view['sceneview'].scene

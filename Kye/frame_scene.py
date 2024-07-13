@@ -26,20 +26,44 @@ import ui
 import defaults_cmt
 import console
 import dialogs
+from dialogs import _ListDialogController
 from scene import *
 from canvas_scene import KCanvas
 from input_ui import KMoveInput
 from stbar_ui import StatusBar
 from dialogs_ui import GotoDialog, KyeHelpDialog, KyeAboutDialog
 from dialogs_ui import getopendialog
+from queue import Queue
 
 """ menus has File, Level, View and Help"""
+#sel_item = None
 
+
+class myListDialogController (_ListDialogController):
+    """ This class should not be necessary, and is an attempt to overcome issue seen on ipad pro
+    where selection did not show in calling class.
+    This reimplements dialogs._ListDialogController and perform function on selected list item  in this class
+    potentially a threading issue?, selection did not activate until later
+    """
+    
+    def __init__(self, title, items, multiple=False, done_button_title='Done', function=None):
+       _ListDialogController.__init__(self, title, items, multiple=False, done_button_title='Done')
+       self.selected_item = None
+       self.fn = function
+       
+    def row_selected(self, ds):
+      #global sel_item
+      self.selected_item = self.items[ds.selected_row]
+      sel_item = self.items[ds.selected_row]
+      print('sel_item_', sel_item)
+      if sel_item['accessory_type'] != 'disclosure_indicator':
+            self.fn(sel_item['title'])
+      self.view.close()
 
 class KFrame(Scene):
     """Class implementing the frame surrounging the game area,
        including the menus and status bar."""
-
+    global sel_item
     def destroy(self, data=None):
         """Handle window destroy by exiting GUI."""
         self.view.close()
@@ -72,29 +96,18 @@ class KFrame(Scene):
              
     def open_file_menu(self, touch):
       """button open"""
-      while(True):
-        try:
-          print('opening file.123.')
-          item_list = self.prepare_file_list()
-          c = dialogs._ListDialogController('Open  File.. \t\t\t\t\t\t\t\t Recent files',
-                                    item_list)
-          c.view.present('popover')
-          c.view.wait_modal()
-          sel = c.selected_item
-          # sel = dialogs.list_dialog('Open  File.. \t\t\t\t\t\t\t\t Recent files',
-          #                         item_list)
-          print('sel', sel)
-        except (KeyboardInterrupt):
-          return
-        if sel:
-          
-          if sel['accessory_type'] == 'disclosure_indicator':
-            continue
-          else:
-            self.doopen(sel['title'])
-            return
-        else: 
-          return
+      item_list = self.prepare_file_list()
+      c = myListDialogController('Open  File.. \t\t\t\t\t\t\t\t Recent files',
+                                    item_list, function=self.doopen)
+      c.view.present('popover')              
+      c.view.wait_modal()
+      c.view.close()
+      #sel = sel_item
+      # sel = dialogs.list_dialog('Open  File.. \t\t\t\t\t\t\t\t Recent files',
+      #                         item_list)
+      # doopen is invoked in row_selected method of myListDialogController
+      # this us a hack fix to issue experienced on ipad pro, where sel in above function always returned None
+         
       
     def setup_view(self, v, buttons):
       ''' a list of buttons in a frame'''
@@ -112,11 +125,11 @@ class KFrame(Scene):
        ''' a menu with 4 buttons '''
        buttons = [{'title': 'Restart', 'action': self.restart},
                   {'title': 'Select Level', 'action': self.startgoto},
-                  {'title': 'Goto Level', 'action': self.gotolevel_name},
-    	            {'title': 'Next level', 'action': self.nextlevel},
-    	            {'title': 'Save state', 'action': self.savestate},
-    	            {'title': 'Restore state', 'action': self.restorestate}
-    	            ]
+                  # {'title': 'Goto Level', 'action': self.gotolevel_name},
+                  {'title': 'Next level', 'action': self.nextlevel},
+                  {'title': 'Save state', 'action': self.savestate},
+                  {'title': 'Restore state', 'action': self.restorestate}
+                  ]
        l = len(buttons)
        v = ui.View(bg_color='white',frame=(0,0,120, (50 + len(buttons) * 50)))
        self.setup_view(v, buttons)
@@ -142,7 +155,7 @@ class KFrame(Scene):
        elif txt == 'Small':
          self.settilesize(16)
        elif txt == 'Large':
-         self.settilesize(32)
+         self.settilesize(self.tilesize_original)
        else:
          pass
        responder.superview.close() 
@@ -159,6 +172,7 @@ class KFrame(Scene):
         self.recent_levels = recentlevels
         self.set_recent(recentlevels)
         self.tilesize = tilesize
+        self.tilesize_original = tilesize
         self.__title = ['KYE   ', '']
         # if "Size" in self.settings:
         #   self.tilesize = int(self.settings["Size"])
@@ -241,14 +255,26 @@ class KFrame(Scene):
       for i in self.app.known_levels():
         icon = 'checkmark' if i in self.app.completed_levels() else 'none'
         level_list.append({'title': i,  'accessory_type': icon })
-      sel = dialogs.list_dialog("Known levels\t\t\t\t\t\t\t\tCompleted", level_list)
+      #sel = dialogs.list_dialog("Known levels\t\t\t\t\t\t\t\tCompleted", level_list)
+      # fix for selection not working on ipad pro
+      c = myListDialogController("Known levels\t\t\t\t\t\t\t\tCompleted", level_list,
+                                 function=self.app.goto)
+      c.view.present('popover')              
+      c.view.wait_modal()
+      c.view.close()
+      responder.superview.close()
+      #sel = sel_item
+      # sel = dialogs.list_dialog('Open  File.. \t\t\t\t\t\t\t\t Recent files',
+      #                         item_list)
+      '''
       try:
-      	if sel:
+        if sel:
           self.saved_state = None
           self.app.goto(sel['title'])
       except (Exception) as e:
         print(e, sel)
-      responder.superview.close()
+      '''
+      
 
     def settilesize(self, ts):
         """Set the tile size based on the selected menu item,
@@ -290,5 +316,6 @@ class KFrame(Scene):
         """Show an error message in a dialog box."""
         print('error message', message)
         # console.alert(message)
+
 
 

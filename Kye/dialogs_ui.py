@@ -71,6 +71,7 @@ class KyeHelpDialog(ui.View):
         {'title': "You can load a new set of levels by opening it via the File menu."},
         {'title': "Credit"},
         {'title': "http://games.moria.org.uk/kye/pygtk"},
+        {'title': "Chris Thomas <mmccthomas@gmail.com> for the ios frontend"},
         {'title': "Colin Phipps <cph@moria.org.uk>"},
         {'title': "Copyright (C) 2004-2007, 2010 Colin Phipps <cph@moria.org.uk>"},
         {'title': "Based on the original Kye for Windows, by Colin Garbutt"},
