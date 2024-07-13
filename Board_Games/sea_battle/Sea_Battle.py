@@ -1,3 +1,5 @@
+# ios front end Chris Thomas 12.7.24
+# refactored to use classes Ship and Ships
 # Kyle Gerner
 # Started 9.5.2021
 # Sea Battle AI (Battleship clone)
