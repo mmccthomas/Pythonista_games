@@ -3,6 +3,7 @@
 #
 from scene import *
 from scene import Vector2, get_screen_size
+import sound
 from ui import Path, Image
 from copy import copy
 import console
@@ -685,6 +686,7 @@ class GameBoard(Scene):
   
   def touch_began(self, touch):
     self.touch_time = time()
+    self.beep = False
     self.start_touch = touch.location
     button_touch= [button.bounds.contains_point(touch.location) for button in self.buttons.values()]
     
@@ -721,6 +723,11 @@ class GameBoard(Scene):
           self.q.put(rc)
 
   def touch_moved(self, touch):
+    touch_length = time() - self.touch_time
+    if touch_length > 1.0 and not self.beep:
+      sound.play_effect('digital:TwoTone2')
+      self.beep = True
+      
     if self.touch_indicator:
       self.touch_indicator.set_pos(self.point_to_rc(touch.location))
       rc = self.point_to_rc(touch.location)
@@ -741,6 +748,7 @@ class GameBoard(Scene):
   def touch_ended(self, touch):
     touch_length = time() - self.touch_time
     self.long_touch = touch_length > 1.0
+    self.beep = False
     if self.touch_indicator:
       self.touch_indicator.remove_from_parent()
       self.touch_indicator = None

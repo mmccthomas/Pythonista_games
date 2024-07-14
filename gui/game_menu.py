@@ -44,7 +44,6 @@ class MenuScene (Scene):
     return x_widths, x_indexes, y_indexes
     
   def setup(self):
-    print('show pause menu')
     button_font = ('Avenir Next', 15)
     title_font = ('Avenir Next', 36)
     num_buttons = len(self.button_titles)
