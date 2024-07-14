@@ -512,6 +512,11 @@ class Coord(tuple):
     
     def r(self):
       return self.val[0]
+      
+    def all_neighbours(self):
+      dirs = [(-1, 0), (-1, 1), (0, 1),  (1, 1), (1, 0), (1, -1), (0, -1), (-1, -1)]
+      return [self.__add__(d) for d in dirs]
+    
     
 class Squares():
   ''' holds parameters for coloured squares'''

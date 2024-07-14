@@ -275,6 +275,10 @@ class LetterGame():
       return board[rc[0]][rc[1]]
     except(IndexError):
       return None
+      
+  def flatten(self, list_of_lists):
+    """ nice simple metthod to flatten a nested 2d list """
+    return sum(list_of_lists, [])
     
   def run(self):
     """
