@@ -36,10 +36,10 @@ class Player():
     self.PLAYER_1 = ' '
     self.PLAYER_2 = '@'
     self.EMPTY = ' '
-    self.PIECE_NAMES  ='01234567-#x'
+    self.PIECE_NAMES  ='01234567-#xX'
     self.PIECES = ['pzl:Green3', 'pzl:Blue3', 'pzl:Yellow3',
                    'pzl:Red3', 'pzl:Red3', 'pzl:Red3',
-                   'pzl:Red3', 'pzl:Red3', 'pzl:Gray3','pzl:Gray3', 'emj:Cross_Mark']
+                   'pzl:Red3', 'pzl:Red3', 'pzl:Gray3','pzl:Gray3', 'emj:Cross_Mark', 'emj:Cross_Mark']
   
     self.PLAYERS = None
 
@@ -47,21 +47,20 @@ class App(LetterGame):
   
   def __init__(self):
     self.debug = True
-    self.cheat = False
+    self.cheat = True
     self.background_color = '#828adb'
     self.sleep_time = 0.1
     # allows us to get a list of rc locations
     self.log_moves = False
     self.straight_lines_only = False
-    self.hint = False
     # create game_board and ai_board
-    self.SIZE = self.get_size('9x9') 
-    
+    #self.SIZE = self.get_size('9x9') 
+    self.board = [['-' for col in range(9)]for row in range(9)] # initial size, change later
     # load the gui interface
     self.q = Queue()
     self.gui = Gui(self.board, Player())
     self.gui.gs.q = self.q # pass queue into gui
-    self.COLUMN_LABELS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'[:self.sizex]
+    self.COLUMN_LABELS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'[:9]
     self.gui.set_alpha(False) 
     self.gui.set_grid_colors(grid='black', highlight='lightblue')
     self.gui.require_touch_move(False)
@@ -69,8 +68,8 @@ class App(LetterGame):
     self.select_list()
     self.setup(self.puzzle)
     self.gui.gs.DIMENSION_X, self.gui.gs.DIMENSION_Y  = self.wordlist[1], self.wordlist[2]
-    #self.gui.gs.board=self.board_obj
-    self.gui.setup_gui(log_moves=False, board=self.board_obj)
+    #self.gui.gs.board=self.board
+    self.gui.setup_gui(log_moves=False, board=self.board)
     
     
     # menus can be controlled by dictionary of labels and functions without parameters
@@ -78,8 +77,7 @@ class App(LetterGame):
                               'New ....': self.restart,
                               'Reveal': self.reveal,
                               'Quit': self.quit})
-    self.gui.set_start_menu({'New Game': self.run, 'Quit': self.quit})
-    #self.setup()
+    self.gui.set_start_menu({'New Game': self.restart, 'Quit': self.quit})
     
   def setup(self, level=None):
     # turn cheat to True to see the mines while playing
@@ -114,24 +112,21 @@ class App(LetterGame):
     self.start = True
     self.game_status = ''
     self.run_time = 0
-    self.update_timer = UPDATE
-    
-    self.board_obj = self.set_mines()
-    self.board = self.board_obj
-    #self.setup_board()
+    self.update_timer = UPDATE    
+    self.board = self.set_mines()
            
   def hint(self):
     """uncover adjacent tiles"""
-    for r, row  in enumerate(self.board_obj):
+    for r, row  in enumerate(self.board):
       for c, t  in enumerate(row):
-        if t == 'x':
+        if t == 'x' or t == 'X':
           continue
         else:
           # check surrounding tiles, only reveal if next to other tiles
-          coord = Coord((r, c))
+          coord = Coord((r, c))          
           for dxdy in coord.all_neighbours():
-              t = lg.get_board_rc(dxdy, self.board_obj)
-              if t in '0123456':
+              t = self.get_board_rc(dxdy, self.board)
+              if t and t in '0123456':
                 self.marked.append(coord)                
                 return
     console.hud_alert('No more hints','error',1)    
@@ -141,18 +136,28 @@ class App(LetterGame):
     '-' = empty space and '#' = mine
     assume a square board
     """
-    self.board_obj = [['-' for col in range(self.BSIZEX)]for row in range(self.BSIZEY)]
-    for i in range(self.no_mines):
-      lg.board_rc((randint(0, self.BSIZEY-1), randint(0, self.BSIZEX-1)), self.board_obj, '#')
-    return self.board_obj
-  
-   
+    self.board = [['-' for col in range(self.BSIZEX)]for row in range(self.BSIZEY)]
+    i = 0
+    while i < self.no_mines:
+        # not the corners
+        r = randint(0, self.BSIZEY -1)
+        c = randint(0, self.BSIZEX -1)
+        if (r, c) in [(0,0), (0, self.BSIZEX -1), (self.BSIZEY - 1, 0), (self.BSIZEY - 1, self.BSIZEX -1)]:
+            continue
+        else:
+            self.board_rc((randint(0, self.BSIZEY-1), randint(0, self.BSIZEX-1)), self.board, '#')
+            i = i + 1
+    return self.board 
   
   def long_touch(self, coord):
-    # implement guess of bomb position
-        r,c = coord
-        self.grid.add_child(Tile('emj:Cross_Mark', r,c, scale=0.5))
-        self.marked.append((r, c))
+      # implement guess of bomb position
+      # change board to X if bomb, else x
+      self.gui.set_prompt('long touch')
+      t = self.get_board_rc(coord, self.board)
+      mark = 'X' if t == '#' else 'x'      
+      self.board_rc(coord, self.board, mark)
+      self.marked.append(coord)
+      self.gui.update(self.board)
         
   def select_list(self):
       '''Choose which category'''
@@ -185,29 +190,28 @@ class App(LetterGame):
             return False   
             
   def run(self):
-    #selected = self.select_list()
-    self.gui.update(self.board_obj)
+    self.gui.clear_messages()
+    self.gui.update(self.board)
     while True:
       move = self.get_player_move()
       self.update_all(move)
-    
-  
+     
     
   def update_board(self):
-      """ called on every key press """
+      """ called on every key press
+      add mine proximity numbers """
       self.gui.clear_numbers()
       square_list = []
-      for r, row in enumerate(self.board_obj):
-        for c, t in enumerate(row):
-          if self.cheat and t == '#':
-              self.gui.game_field.add_child(Tile('emj:Bomb', r,c, scale=0.5))
-  
-          elif t != "-" and t != "#":
-            square_list.append(Squares((r,c), t , 'clear' , 
-                                       z_position=30, alpha = .5,
-                                       text_anchor_point=(-0.25, 0.25)))
+      if self.cheat:
+          self.gui.gs.IMAGES['#'] = 'emj:Bomb'           
+      for r, row in enumerate(self.board):
+          for c, t_str in enumerate(row):
+              if t_str in '01234567':
+                  square_list.append(Squares((r,c), t_str, 
+                                           z_position=30,
+                                           text_anchor_point=(-0.25, 0.25)))
       self.gui.add_numbers(square_list)  
-      self.gui.update(self.board_obj) 
+      self.gui.update(self.board) 
         
   def status_label(self, label, color):
       """display time"""
@@ -215,71 +219,73 @@ class App(LetterGame):
 
   def update_all(self, move):
       # check for touch input. is touch input on the board
+
       if move == ENTER:
          self.hint()
          return
-      r, c = move
-      item = lg.get_board_rc(move, self.board_obj)
+         
+      item = self.get_board_rc(move, self.board)
       sound.play_effect('8ve:8ve-beep-shinymetal')
           
-      if self.gui.long_touch:
+      if self.gui.gs.long_touch:
            self.long_touch(move)
                    
-      elif item == '#':
+      elif item in '#X':
            # check if user touched on the mine
-           self.gui.update(self.board_obj) 
+           self.gui.update(self.board) 
            self.start = False
            self.game_status = 'LOSE!'
       else:
            # else reveal the number of mines that surround the tile        
-           self.board_obj = self.zero_scanning(Coord(move))
+           self.board = self.zero_scanning(Coord(move))
   
            # if there is no empty tile left = win!
-           if not '-' in self.flatten(self.board_obj) :
+           if not '-' in self.flatten(self.board) :
                 self.game_status = 'WIN!'
                 self.start = False
-           if self.start:
-                self.update_board()
-              # if game ends
-           else:
-                # reveals the mine
-                self.cheat = True
-                self.start = False
-                self.update_board()
-                if self.game_status:
-                  self.gui.show_start_menu()
+      if self.start:
+          self.update_board()
+      # if game ends
+      else:
+          # reveals the mine
+          self.cheat = True
+          self.start = False
+          self.update_board()
+          if self.game_status:
+              self.gui.show_start_menu()
 
-  def count_mines(self, pos):
+  def count_mines(self, current):
       """return number of mines around current tile"""
       count = 0
+      coord = Coord(current)
       # check surrounding tiles
-      for y in range(-1, 2):
-        for x in range(-1, 2):
-          try:
-              t = lg.get_board_rc((pos[0] + y, pos[1] + x), self.board_obj)
-          except IndexError:
+      for dxdy in coord.all_neighbours():
+          if not self.check_in_board(dxdy):
               continue
-          if t == '#':
-            count += 1
+          t = self.get_board_rc(dxdy, self.board)
+          if t in '#X':
+              count += 1
       return str(count)
 
   def zero_scanning(self, start_pos):
       """ recursive routine to uncover adjacent zeros
       startpos is Coord type that allows addition and has neighbours method"""
+      start_pos = Coord(start_pos)
       start_tile = self.count_mines(start_pos)
-      lg.board_rc(start_pos, self.board_obj, start_tile)
+      self.board_rc(start_pos, self.board, start_tile)
       if start_tile == '0':
+        dd = start_pos.all_neighbours()
         for t in start_pos.all_neighbours():
             try:
               if not self.check_in_board(t):
                   continue
-              if self.count_mines(t) == "0" and lg.get_board_rc(t, self.board_obj) != '0':
-                self.zero_scanning(t)
+              if self.count_mines(t) == '0' and self.get_board_rc(t, self.board) != '0':
+                self.zero_scanning(t) # recursion
               else:
-                lg.board_rc(t, self.board_obj,self.count_mines(t))
+                self.board_rc(t, self.board, self.count_mines(t))
             except (IndexError,AttributeError):
               continue
-      return self.board_obj
+      return self.board
           
   def clear(self):
     for t in self.grid.children:
@@ -288,7 +294,7 @@ class App(LetterGame):
   def get_player_move(self, board=None):
     """Takes in the user's input and performs that move on the board, returns the coordinates of the move
     """
-    prompt = (f"Select  position (A1 - {self.COLUMN_LABELS[-1]}{self.sizey})")
+    #prompt = (f"Select  position (A1 - {self.COLUMN_LABELS[-1]}{self.sizey})")
     # sit here until piece place on board         
     move = self.wait_for_gui()  
     return move
