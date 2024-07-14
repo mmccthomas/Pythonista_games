@@ -179,31 +179,37 @@ class GameBoard(Scene):
          GRID_POS = (100, 85)
          grid_size = h - 150
          self.font_size = 24
+     
       case 'ipad_portrait':
          GRID_POS = (30, 85)
          grid_size = w - 50
          self.font_size = 24
+         
       case 'iphone_landscape':
          GRID_POS = (30, 50)
          grid_size = h - 150
          self.font_size = 16
+         
       case 'iphone_portrait':
          GRID_POS = (30, 85)
          grid_size = w - 50
          self.font_size = 16
+         
       case 'ipad13_landscape':
          GRID_POS = (100, 85)
          grid_size = h - 150
          self.font_size = 24
+         
       case 'ipad13_portrait':
          GRID_POS = (30, 85)
          grid_size = w - 50
          self.font_size = 24
+
          
     for k, v in kwargs.items():
       setattr(self, k, v)
       
-    self.SQ_SIZE = grid_size // max(self.DIMENSION_X, self.DIMENSION_Y)
+    self.SQ_SIZE = grid_size // ((self.DIMENSION_X + self.DIMENSION_Y) / 2)
     self.smaller_tile = 0  # was 20
     self.current_player = self.Player.PLAYER_1
     # Root node for all game elements

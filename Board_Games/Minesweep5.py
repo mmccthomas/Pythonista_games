@@ -3,7 +3,6 @@ The game of minesweeper using Pythonista
 uses Tile objects to store options
 long press on tile more than 0.5 sec to mark bomb
 
-modified to all ui with buttons
 This version uses gui_interface Gui framework
 """
 import os
@@ -36,10 +35,10 @@ class Player():
     self.PLAYER_1 = ' '
     self.PLAYER_2 = '@'
     self.EMPTY = ' '
-    self.PIECE_NAMES  ='01234567-#xX'
+    self.PIECE_NAMES  ='01234567-#xXB'
     self.PIECES = ['pzl:Green3', 'pzl:Blue3', 'pzl:Yellow3',
                    'pzl:Red3', 'pzl:Red3', 'pzl:Red3',
-                   'pzl:Red3', 'pzl:Red3', 'pzl:Gray3','pzl:Gray3', 'emj:Cross_Mark', 'emj:Cross_Mark']
+                   'pzl:Red3', 'pzl:Red3', 'pzl:Gray3','pzl:Gray3', 'emj:Cross_Mark', 'emj:Cross_Mark', 'emj:Bomb']
   
     self.PLAYERS = None
 
@@ -67,7 +66,8 @@ class App(LetterGame):
     self.gui.allow_any_move(True) 
     self.select_list()
     self.setup(self.puzzle)
-    self.gui.gs.DIMENSION_X, self.gui.gs.DIMENSION_Y  = self.wordlist[1], self.wordlist[2]
+    
+    self.gui.gs.DIMENSION_X, self.gui.gs.DIMENSION_Y  = self.BSIZEX, self.BSIZEY
     #self.gui.gs.board=self.board
     self.gui.setup_gui(log_moves=False, board=self.board)
     
@@ -83,20 +83,13 @@ class App(LetterGame):
     # turn cheat to True to see the mines while playing
     self.cheat = False
     self.background_color = '#828adb'
-    self.grid = None
     
-    
-    # tile color according values
-    self.tileColor = {
-    "0": 'pzl:Green3', "1": 'pzl:Blue3', "2": 'pzl:Yellow3',
-    "3": 'pzl:Red3', "4": 'pzl:Red3', "5": 'pzl:Red3',
-    "6": 'pzl:Red3', "7": 'pzl:Red3', "-": 'pzl:Gray3', "#": 'pzl:Gray3'}
  
     # TSIZE BSIZEX BSIZEY no mines
     if self.gui.get_device().endswith('_landscape'):
       self.size_dict = {"Beginner": (48, 9, 9, 10), 
-      "Intermediate": (40, 16, 16, 40),
-      "Expert": (40, 30, 16, 99)}
+      "Intermediate": (25, 16, 16, 40),
+      "Expert": (15, 30, 16, 99)}
     else:
       self.size_dict = {"Beginner": (48, 9, 9, 10), 
       "Intermediate": (28, 16, 16, 40),
@@ -121,14 +114,17 @@ class App(LetterGame):
       for c, t  in enumerate(row):
         if t == 'x' or t == 'X':
           continue
-        else:
+        elif t == '#':
           # check surrounding tiles, only reveal if next to other tiles
           coord = Coord((r, c))          
           for dxdy in coord.all_neighbours():
-              t = self.get_board_rc(dxdy, self.board)
-              if t and t in '0123456':
-                self.marked.append(coord)                
-                return
+              if self.check_in_board(dxdy):
+                  n = self.get_board_rc(dxdy, self.board)           
+                  if n and n in '0123456':
+                       self.marked.append(coord)     
+                       self.board_rc(coord, self.board, 'B')      
+                       self.gui.update(self.board)    
+                       return
     console.hud_alert('No more hints','error',1)    
       
   def set_mines(self):
@@ -161,11 +157,7 @@ class App(LetterGame):
         
   def select_list(self):
       '''Choose which category'''
-      
-      self.size_dict = {"Beginner": (48, 9, 9, 10), 
-      "Intermediate": (40, 16, 16, 40),
-      "Expert": (30, 30, 16, 99)}
-      items =  list(self.size_dict)
+      items =  ["Beginner", "Intermediate",  "Expert"]
       #return selection
       self.gui.selection = ''
       selection = ''
@@ -180,7 +172,7 @@ class App(LetterGame):
             print(traceback.format_exc())
             
         if len(selection) > 1:
-          self.wordlist = self.size_dict[selection]
+          #self.wordlist = self.size_dict[selection]
           self.puzzle = selection
           self.gui.selection = ''
           return True
@@ -190,11 +182,14 @@ class App(LetterGame):
             return False   
             
   def run(self):
+    start_time = time()
     self.gui.clear_messages()
+    self.gui.set_enter('Hint')
     self.gui.update(self.board)
     while True:
       move = self.get_player_move()
       self.update_all(move)
+      self.gui.set_top(str(int(time() - start_time)))
      
     
   def update_board(self):
@@ -208,8 +203,8 @@ class App(LetterGame):
           for c, t_str in enumerate(row):
               if t_str in '01234567':
                   square_list.append(Squares((r,c), t_str, 
-                                           z_position=30,
-                                           text_anchor_point=(-0.25, 0.25)))
+                                           z_position=30, font=self.labelFont,
+                                           text_anchor_point=(-0.25, 0.5)))
       self.gui.add_numbers(square_list)  
       self.gui.update(self.board) 
         
@@ -230,7 +225,7 @@ class App(LetterGame):
       if self.gui.gs.long_touch:
            self.long_touch(move)
                    
-      elif item in '#X':
+      elif item in '#XB':
            # check if user touched on the mine
            self.gui.update(self.board) 
            self.start = False
@@ -263,7 +258,7 @@ class App(LetterGame):
           if not self.check_in_board(dxdy):
               continue
           t = self.get_board_rc(dxdy, self.board)
-          if t in '#X':
+          if t in '#XB':
               count += 1
       return str(count)
 
@@ -286,10 +281,13 @@ class App(LetterGame):
             except (IndexError,AttributeError):
               continue
       return self.board
-          
-  def clear(self):
-    for t in self.grid.children:
-      t.remove_from_parent()
+   
+  def reveal(self):
+      # reveals the mine
+          self.cheat = True
+          self.start = False
+          self.update_board()
+          self.gui.show_start_menu()    
  
   def get_player_move(self, board=None):
     """Takes in the user's input and performs that move on the board, returns the coordinates of the move
