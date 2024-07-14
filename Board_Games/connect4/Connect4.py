@@ -23,20 +23,11 @@ from gui.game_base import Game
 import gui.gui_scene as gscene
 from gui.gui_interface import Gui, Squares
 
-
-
-
-
 EMPTY, RED, YELLOW = '.', 'o', '@'
+gameBoard_init = [[EMPTY for _ in range(7)] for _ in range(6)]
 
-gameBoard_init = [[EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY],  # top row
-             [EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY],
-             [EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY],
-             [EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY],
-             [EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY],
-             [EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY]]  # top row
-
-
+def get_board_rc(coord, board):
+  return board[coord[0]][coord[1]]
 
 class Player():
   def __init__(self):
@@ -78,16 +69,15 @@ class Connect4(Game):
   def __init__(self):
     
     print("\nWelcome to Kyle's Connect 4 AI!")
-    self.printAsciiTitleArt()
-      
-    self.gameBoard = copyOfBoard(gameBoard_init)
-    
+    self.printAsciiTitleArt()      
+    self.gameBoard = copyOfBoard(gameBoard_init)   
     # load the gui interface
     self.q = Queue(maxsize=10)
     self.gui = Gui(self.gameBoard, Player())
     self.gui.set_alpha(False) 
     self.gui.set_grid_colors(grid='othello.jpg', highlight='clear')
     self.gui.require_touch_move(False)
+    self.gui.allow_any_move(True)
     self.gui.setup_gui()
     self.gui.gs.q = self.q
     
@@ -98,11 +88,14 @@ class Connect4(Game):
     self.loaded_file = False # used to skip player selection
     
     # menus can be controlled by dictionary of labels and functions without parameters
-    self.gui.gs.pause_menu = {'Continue': self.gui.gs.dismiss_modal_scene, 'Save': self.save, 
-                         'Load': self.load, 'Show Game': self.getBoardHistory, 'Quit': self.quit}
-    self.gui.gs.start_menu = {'New Game': self.run, 'Replay': self.getBoardHistory,  'Quit': self.quit}
-    
-    self.gui.setup_gui() 
+    self.gui.gs.pause_menu = {'Continue': self.gui.gs.dismiss_modal_scene, 
+                              'Save': self.save, 
+                              'Load': self.load, 
+                              'Show Game': self.getBoardHistory,
+                              'Quit': self.quit}
+    self.gui.gs.start_menu = {'New Game': self.run, 
+                              'Replay': self.getBoardHistory,  
+                              'Quit': self.quit}
      
     if "-d" in sys.argv or "-aiDuel" in sys.argv:
           self.UserPlayerClass = get_dueling_ai_class(Connect4Player, "Connect4Strategy")
@@ -110,19 +103,15 @@ class Connect4(Game):
           AI_DUEL_MODE = True
     else:
           self.UserPlayerClass = HumanPlayer
-          AI_DUEL_MODE = False 
-           
+          AI_DUEL_MODE = False           
       
     self.userPlayerName = "Your AI" if AI_DUEL_MODE else "You"
     self.aiPlayerName = "My AI" if AI_DUEL_MODE else "AI"                         
-
+    self.gui.clear_messages()
+    
   def printBoard(self, recentMove=None):
       """Prints the given game board"""
-      # all non empty tiles
-      highlightedCoordinates = [[j,i] for i in range(7) for j in range(6) if self.gameBoard[j][i] == EMPTY]
       self.gui.update(self.gameBoard)
-      self.gui.valid_moves(highlightedCoordinates, message=None)
-
   
   def getBoardHistory(self):
       """
@@ -137,32 +126,38 @@ class Connect4(Game):
         NUM_COLS = len(self.gameBoard[0])
         NUM_ROWS = len(self.gameBoard)
         board = self.gameBoard
-        # TODO this stinks a bit    
+   
       	# Check horizontal
         for c in range(NUM_COLS - 3):
           for r in range(NUM_ROWS):
-            #if [board[r][c] == board[r][c + i] for i in range(1,3) if 
-            if board[r][c] == board[r][c + 1] == board[r][c + 2] == board[r][c + 3] != EMPTY:
-              return [[r, c], [r, c + 1], [r, c + 2], [r, c + 3]]
+            seq = [(r, c + i) for i in range(4)]
+            if all([get_board_rc(seq[0], board) == get_board_rc(coord, board) 
+                    if get_board_rc(coord, board) != EMPTY else False for coord in seq]):
+                return seq                      
       
         # Check vertical
         for c in range(NUM_COLS):
           for r in range(NUM_ROWS - 3):
-            if board[r][c] == board[r + 1][c] == board[r + 2][c] == board[r + 3][c] != EMPTY:
-              return [[r, c], [r + 1, c], [r + 2, c], [r + 3, c]]
+            seq = [(r + i, c) for i in range(4)]
+            if all([get_board_rc(seq[0], board) == get_board_rc(coord, board) 
+                    if get_board_rc(coord, board) != EMPTY else False for coord in seq]):
+                return seq
       
         # Check diagonal from bottom left to top right
         for c in range(NUM_COLS - 3):
           for r in range(NUM_ROWS - 3):
-            if board[r][c] == board[r + 1][c + 1] == board[r + 2][c + 2] == board[r + 3][c + 3] != EMPTY:
-              return [[r, c], [r + 1, c + 1], [r + 2, c + 2], [r + 3, c + 3]]
+            seq = [(r + i, c + i) for i in range(4)]
+            if all([get_board_rc(seq[0], board) == get_board_rc(coord, board) 
+                    if get_board_rc(coord, board) != EMPTY else False for coord in seq]):
+                return seq
       
         # Check diagonal from bottom right to top left
         for c in range(NUM_COLS - 3):
           for r in range(3, NUM_ROWS):
-            if board[r][c] == board[r - 1][c + 1] == board[r - 2][c + 2] == board[r - 3][c + 3] != EMPTY:
-              return [[r, c], [r + 1, c + 1], [r + 2, c + 2], [r + 3, c + 3]]
-  
+            seq = [(r - i, c + i) for i in range(4)]
+            if all([get_board_rc(seq[0], board) == get_board_rc(coord, board) 
+                    if get_board_rc(coord, board) != EMPTY else False for coord in seq]):
+                return seq
         return None
         
   def endGame(self):
@@ -175,11 +170,8 @@ class Connect4(Game):
       self.gui.set_prompt("Thanks for playing!")
       self.gui.set_grid_colors(None, "orange")
       self.gui.valid_moves(self.highlight_winning(), False)        
-      self.gui.set_grid_colors(grid='othello.jpg', highlight='clear') 
       time.sleep(3)
-      self.gui.set_grid_colors(grid='othello.jpg', highlight='clear') 
       self.gui.gs.clear_highlights()    
-
 
   def save(self):
     SAVE_FILENAME = "connect4_save.txt"
@@ -238,6 +230,7 @@ class Connect4(Game):
       
   def select_player(self):
       selection = self.gui.input_message("Would you like to be RED ('r') or YELLOW ('y')?\n (yellow goes first!):")
+      x, y, w, h = self.gui.grid.bbox
       try:
         selection = selection.strip().lower()
       except:
@@ -246,11 +239,11 @@ class Connect4(Game):
       if selection == 'y':
         self.userPiece = YELLOW
         self.opponentPiece = RED
-        self.gui.set_top(f"{self.userPlayerName} are YELLOW")
+        self.gui.set_top(f"{self.userPlayerName} are YELLOW", position=(x, h+50))
       else:
         self.userPiece = RED
         self.opponentPiece = YELLOW
-        self.gui.set_top(f"{self.userPlayerName} are RED")
+        self.gui.set_top(f"{self.userPlayerName} are RED", position=(x, h+50))
         
   def win(self, winner):
     
@@ -265,6 +258,7 @@ class Connect4(Game):
   
   def run(self):
       """main method that prompts the user for input"""
+      
       if not self.loaded_file:                                    
         self.turn = YELLOW
         self.gameBoard = copyOfBoard(gameBoard_init)
@@ -276,7 +270,7 @@ class Connect4(Game):
           self.opponentPiece: [self.aiPlayerName, 0, 0]
       }
       
-      print(f"{self.userPlayerName}: {self.userPiece}\t{self.aiPlayerName}: {self.opponentPiece}")
+      # self.gui.set_moves(f"{self.userPlayerName}: {self.userPiece}\t{self.aiPlayerName}: {self.opponentPiece}")
       playerNames = {self.opponentPiece: self.aiPlayerName, self.userPiece: self.userPlayerName}
       players = {self.opponentPiece: Connect4Strategy(self.opponentPiece), self.userPiece: self.UserPlayerClass(self.userPiece)}
       
@@ -285,8 +279,7 @@ class Connect4(Game):
       
       self.printBoard()
       
-      while not gameOver:
-          
+      while not gameOver:         
                 
           nameOfCurrentPlayer = playerNames[self.turn]
           currentPlayer = players[self.turn]
@@ -302,15 +295,6 @@ class Connect4(Game):
             column = currentPlayer.getMove(self.gameBoard, self.gui)
                             
           endTime = time.time()
-          if not self.q.empty():
-            fn_ = self.q.get(block=False)
-            if fn_:
-              try:
-                print('queued item', fn_)
-                fn_()
-              except(Exception) as e:
-                print(e)
-          # time.sleep(1) 
           totalTimeTakenForMove = endTime - startTime
           self.time_taken_per_player[self.turn][1] += totalTimeTakenForMove
           self.time_taken_per_player[self.turn][2] += 1
@@ -318,8 +302,6 @@ class Connect4(Game):
           performMove(self.gameBoard, column, self.turn)
           
           self.board_history.append([copyOfBoard(self.gameBoard), column])
-          
-          self.gui.gs.clear_highlights()
           self.printBoard()
           
           self.gui.set_message(f"{nameOfCurrentPlayer} played in spot {column + 1}")
