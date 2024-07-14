@@ -148,7 +148,6 @@ class App(LetterGame):
   def long_touch(self, coord):
       # implement guess of bomb position
       # change board to X if bomb, else x
-      self.gui.set_prompt('long touch')
       t = self.get_board_rc(coord, self.board)
       mark = 'X' if t == '#' else 'x'      
       self.board_rc(coord, self.board, mark)
@@ -182,14 +181,19 @@ class App(LetterGame):
             return False   
             
   def run(self):
+    x,y, w, h = self.gui.grid.bbox
+    if self.gui.get_device().endswith('_landscape'):
+      hintpos = (w + 30, 0)
+    else:
+      hintpos = (w-100, h + 40)
     start_time = time()
     self.gui.clear_messages()
-    self.gui.set_enter('Hint')
+    self.gui.set_enter('Hint', position=hintpos)
     self.gui.update(self.board)
     while True:
       move = self.get_player_move()
       self.update_all(move)
-      self.gui.set_top(str(int(time() - start_time)))
+      self.gui.set_top(f'Minesweeper\t\tTime:{(int(time() - start_time))}', position=(0, h+30))
      
     
   def update_board(self):
