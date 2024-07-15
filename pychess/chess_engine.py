@@ -23,7 +23,10 @@ from types import SimpleNamespace
 
 COORDS = [Coord((r,c)) for r in range(8) for c in range(8)]
 
-
+WR = 7
+WP = 6
+BR = 0
+BP = 1
 
 '''
 r \ c     0           1           2           3           4           5           6           7 
@@ -60,54 +63,54 @@ class game_state:
         self._is_check = False
 
         # TODO: REMOVE THESE TWO LATER
-        self._white_king_location = Coord((0, 3))
-        self._black_king_location = Coord((7, 3))
+        self._white_king_location = Coord((WR, 3))
+        self._black_king_location = Coord((0, 3))
 
         # Has king not moved, has Rook1(col=0) not moved, has Rook2(col=7) not moved
         self.white_king_can_castle = [True, True, True]  
         self.black_king_can_castle = [True, True, True]
 
         # Initialize White pieces
-        white_rook_1 = Rook('r', 0, 0, self.P1)
-        white_rook_2 = Rook('r', 0, 7, self.P1)
-        white_knight_1 = Knight('n', 0, 1, self.P1)
-        white_knight_2 = Knight('n', 0, 6, self.P1)
-        white_bishop_1 = Bishop('b', 0, 2, self.P1)
-        white_bishop_2 = Bishop('b', 0, 5, self.P1)
-        white_queen = Queen('q', 0, 4, self.P1)
-        white_king = King('k', 0, 3, self.P1)
-        white_pawn_1 = Pawn('p', 1, 0, self.P1)
-        white_pawn_2 = Pawn('p', 1, 1, self.P1)
-        white_pawn_3 = Pawn('p', 1, 2, self.P1)
-        white_pawn_4 = Pawn('p', 1, 3, self.P1)
-        white_pawn_5 = Pawn('p', 1, 4, self.P1)
-        white_pawn_6 = Pawn('p', 1, 5, self.P1)
-        white_pawn_7 = Pawn('p', 1, 6, self.P1)
-        white_pawn_8 = Pawn('p', 1, 7, self.P1)
+        white_rook_1 = Rook('r', WR, 0, self.P1)
+        white_rook_2 = Rook('r', WR, 7, self.P1)
+        white_knight_1 = Knight('n', WR, 1, self.P1)
+        white_knight_2 = Knight('n', WR, 6, self.P1)
+        white_bishop_1 = Bishop('b', WR, 2, self.P1)
+        white_bishop_2 = Bishop('b', WR, 5, self.P1)
+        white_queen = Queen('q', WR, 4, self.P1)
+        white_king = King('k', WR, 3, self.P1)
+        white_pawn_1 = Pawn('p', WP, 0, self.P1)
+        white_pawn_2 = Pawn('p', WP, 1, self.P1)
+        white_pawn_3 = Pawn('p', WP, 2, self.P1)
+        white_pawn_4 = Pawn('p', WP, 3, self.P1)
+        white_pawn_5 = Pawn('p', WP, 4, self.P1)
+        white_pawn_6 = Pawn('p', WP, 5, self.P1)
+        white_pawn_7 = Pawn('p', WP, 6, self.P1)
+        white_pawn_8 = Pawn('p', WP, 7, self.P1)
 
         # Initialize Black Pieces
-        black_rook_1 = Rook('r', 7, 0, self.P2)
-        black_rook_2 = Rook('r', 7, 7, self.P2)
-        black_knight_1 = Knight('n', 7, 1, self.P2)
-        black_knight_2 = Knight('n', 7, 6, self.P2)
-        black_bishop_1 = Bishop('b', 7, 2, self.P2)
-        black_bishop_2 = Bishop('b', 7, 5, self.P2)
-        black_queen = Queen('q', 7, 4, self.P2)
-        black_king = King('k', 7, 3, self.P2)
-        black_pawn_1 = Pawn('p', 6, 0, self.P2)
-        black_pawn_2 = Pawn('p', 6, 1, self.P2)
-        black_pawn_3 = Pawn('p', 6, 2, self.P2)
-        black_pawn_4 = Pawn('p', 6, 3, self.P2)
-        black_pawn_5 = Pawn('p', 6, 4, self.P2)
-        black_pawn_6 = Pawn('p', 6, 5, self.P2)
-        black_pawn_7 = Pawn('p', 6, 6, self.P2)
-        black_pawn_8 = Pawn('p', 6, 7, self.P2)
+        black_rook_1 = Rook('r', BR, 0, self.P2)
+        black_rook_2 = Rook('r', BR, 7, self.P2)
+        black_knight_1 = Knight('n', BR, 1, self.P2)
+        black_knight_2 = Knight('n', BR, 6, self.P2)
+        black_bishop_1 = Bishop('b', BR, 2, self.P2)
+        black_bishop_2 = Bishop('b', BR, 5, self.P2)
+        black_queen = Queen('q', BR, 4, self.P2)
+        black_king = King('k', BR, 3, self.P2)
+        black_pawn_1 = Pawn('p', BP, 0, self.P2)
+        black_pawn_2 = Pawn('p', BP, 1, self.P2)
+        black_pawn_3 = Pawn('p', BP, 2, self.P2)
+        black_pawn_4 = Pawn('p', BP, 3, self.P2)
+        black_pawn_5 = Pawn('p', BP, 4, self.P2)
+        black_pawn_6 = Pawn('p', BP, 5, self.P2)
+        black_pawn_7 = Pawn('p', BP, 6, self.P2)
+        black_pawn_8 = Pawn('p', BP, 7, self.P2)
 
         self.board = [
-            [white_rook_1, white_knight_1, white_bishop_1, white_king, white_queen, white_bishop_2, white_knight_2,
-             white_rook_2],
-            [white_pawn_1, white_pawn_2, white_pawn_3, white_pawn_4, white_pawn_5, white_pawn_6, white_pawn_7,
-             white_pawn_8],
+            [black_rook_1, black_knight_1, black_bishop_1, black_king, black_queen, black_bishop_2, black_knight_2,
+             black_rook_2],
+             [black_pawn_1, black_pawn_2, black_pawn_3, black_pawn_4, black_pawn_5, black_pawn_6, black_pawn_7,
+             black_pawn_8],     
             [self.EMPTY, self.EMPTY, self.EMPTY, self.EMPTY, self.EMPTY, self.EMPTY, self.EMPTY,
              self.EMPTY],
             [self.EMPTY, self.EMPTY, Player.EMPTY, self.EMPTY, Player.EMPTY, self.EMPTY, self.EMPTY,
@@ -116,10 +119,10 @@ class game_state:
              self.EMPTY],
             [self.EMPTY, self.EMPTY, self.EMPTY, self.EMPTY, self.EMPTY, self.Player.EMPTY, self.EMPTY,
              self.EMPTY],
-            [black_pawn_1, black_pawn_2, black_pawn_3, black_pawn_4, black_pawn_5, black_pawn_6, black_pawn_7,
-             black_pawn_8],
-            [black_rook_1, black_knight_1, black_bishop_1, black_king, black_queen, black_bishop_2, black_knight_2,
-             black_rook_2]
+             [white_pawn_1, white_pawn_2, white_pawn_3, white_pawn_4, white_pawn_5, white_pawn_6, white_pawn_7,
+             white_pawn_8],
+            [white_rook_1, white_knight_1, white_bishop_1, white_king, white_queen, white_bishop_2, white_knight_2,
+             white_rook_2]        
         ]
         
     def whose_turn(self):
@@ -301,15 +304,15 @@ class game_state:
                    self.get_piece((0, 1)) is self.EMPTY and self.get_piece((0, 2) )is self.EMPTY and not self._is_check
         else:
             return self.black_king_can_castle[0] and self.black_king_can_castle[1] and \
-                   self.get_piece((7, 1)) is self.EMPTY and self.get_piece((7, 2)) is self.EMPTY and not self._is_check
+                   self.get_piece((BR, 1)) is self.EMPTY and self.get_piece((BR, 2)) is self.EMPTY and not self._is_check
 
     def king_can_castle_right(self, player):
         if player is self.P1:
             return self.white_king_can_castle[0] and self.white_king_can_castle[2] and \
-                   self.get_piece((0, 6)) is self.EMPTY and self.get_piece((0, 5) )is self.EMPTY and not self._is_check
+                   self.get_piece((WR, 6)) is self.EMPTY and self.get_piece((WR, 5) )is self.EMPTY and not self._is_check
         else:
             return self.black_king_can_castle[0] and self.black_king_can_castle[2] and \
-                   self.get_piece((7, 6) )is self.EMPTY and self.get_piece((7, 5)) is self.EMPTY and not self._is_check
+                   self.get_piece((BR, 6) )is self.EMPTY and self.get_piece((BR, 5)) is self.EMPTY and not self._is_check
 
     def promote_pawn(self, starting_square, moved_piece, ending_square):
         while True:
@@ -360,27 +363,27 @@ class game_state:
              if all((moved_to_piece == self.EMPTY, next_square.c == 1, 
                     self.king_can_castle_left(moving_piece.get_player()))):
                   move = chess_move(starting_square, ending_square, self, self._is_check)
-                  move.castling_move((0, 0), (0, 2), self)
+                  move.castling_move((BR, 0), (BR, 2), self)
                   self.move_log.append(move)
 
                   # move rook
-                  self.get_piece(0, 0).change_col_number(2)
+                  self.get_piece(BR, 0).change_col_number(2)
 
-                  self.board[0][2] = self.board[0][0]
-                  self.board[0][0] = self.EMPTY
+                  self.board[BR][2] = self.board[BR][0]
+                  self.board[BR][0] = self.EMPTY
 
                   self.white_king_can_castle[0] = False
                   self.white_king_can_castle[1] = False
              elif all((moved_to_piece == self.EMPTY, next_square.c == 5, 
                      self.king_can_castle_right(moving_piece.get_player()))):
                   move = chess_move(starting_square, ending_square, self, self._is_check)
-                  move.castling_move((0, 7), (0, 4), self)
+                  move.castling_move((WR, 7), (WR, 4), self)
                   self.move_log.append(move)
                   # move rook
-                  self.get_piece(0, 7).change_col_number(4)
+                  self.get_piece(WR, 7).change_col_number(4)
 
-                  self.board[0][4] = self.board[0][7]
-                  self.board[0][7] = self.EMPTY
+                  self.board[WR][4] = self.board[0][7]
+                  self.board[WR][7] = self.EMPTY
 
                   self.white_king_can_castle[0] = False
                   self.white_king_can_castle[2] = False
@@ -393,27 +396,27 @@ class game_state:
              if moved_to_piece == self.EMPTY and next_square.c == 1 and self.king_can_castle_left(
                                 moving_piece.get_player()):
                   move = chess_move(starting_square, ending_square, self, self._is_check)
-                  move.castling_move((7, 0), (7, 2), self)
+                  move.castling_move((BR, 0), (BR, 2), self)
                   self.move_log.append(move)
 
-                  self.get_piece(7, 0).change_col_number(2)
+                  self.get_piece(BR, 0).change_col_number(2)
                   # move rook
-                  self.board[7][2] = self.board[7][0]
-                  self.board[7][0] = self.EMPTY
+                  self.board[BR][2] = self.board[BR][0]
+                  self.board[BR][0] = self.EMPTY
 
                   self.black_king_can_castle[0] = False
                   self.black_king_can_castle[1] = False
              elif moved_to_piece == self.EMPTY and next_square.c == 5 and self.king_can_castle_right(
                                 moving_piece.get_player()):
                   move = chess_move(starting_square, ending_square, self, self._is_check)
-                  move.castling_move((7, 7), (7, 4), self)
+                  move.castling_move((WR, 7), (WR, 4), self)
                   self.move_log.append(move)
 
-                  self.get_piece((0, 7)).change_col_number(4)
+                  self.get_piece((BR, 7)).change_col_number(4)
 
                   # move rook
-                  self.board[7][4] = self.board[7][7]
-                  self.board[7][7] = self.EMPTY
+                  self.board[WR][4] = self.board[WR][7]
+                  self.board[WR][7] = self.EMPTY
 
                   self.black_king_can_castle[0] = False
                   self.black_king_can_castle[2] = False
@@ -431,7 +434,7 @@ class game_state:
         #print('moving pawn')
         next_square = ending_square
         
-        if (moving_piece.is_player(self.P1) and next_square.r == 7) or moving_piece.is_player(self.P2) and next_square.r == 0:
+        if (moving_piece.is_player(self.P1) and next_square.r == BR) or moving_piece.is_player(self.P2) and next_square.r == WR:
             # Promoting pawn
             # print("promoting pawn")
             if is_ai:
@@ -453,7 +456,7 @@ class game_state:
                 self.can_en_passant(starting_square))):
             # en passant
             # print("en passant")
-            incr = (-1, 0) if moving_piece.is_player(self.P1) else (1, 0)
+            incr = (1, 0) if moving_piece.is_player(self.P1) else (-1, 0)
             move = chess_move(starting_square, ending_square, self, self._is_check)
             move.en_passant_move(self.get_board_rc(next_square + incr), next_square + incr)
             self.move_log.append(move)

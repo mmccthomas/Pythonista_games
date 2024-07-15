@@ -137,6 +137,7 @@ class GameBoard(Scene):
     self.grid_z_position = 10
     self.highlight_fill = '#00bc10'
     self.use_alpha = False
+    self.column_labels = None
     self.require_touch_move = False
     self.allow_any_square = False
     self.last_board = list(map(list, self.board))
@@ -284,7 +285,10 @@ class GameBoard(Scene):
       row_labels = 'A B C D E F G H I J K L M N O P Q R S T U V W X Y Z AAABACAD'
     else:
       row_labels = '0 1 2 3 4 5 6 7 8 9 101112131415161718192021222324252627282930'
-    column_labels = '0 1 2 3 4 5 6 7 8 9 101112131415161718192021222324252627282930'
+    if self.column_labels:
+        column_labels = self.column_labels
+    else:
+        column_labels = '0 1 2 3 4 5 6 7 8 9 101112131415161718192021222324252627282930'
     # Parameters to pass to the creation of ShapeNode
     params = {
       "path": Path.rect(0, 0, self.SQ_SIZE, self.SQ_SIZE * self.DIMENSION_Y),
