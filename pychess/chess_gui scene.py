@@ -165,7 +165,10 @@ class ChessGame(gscene.GameBoard):
     self.tile_selected = self.tile_at(rc) 
     valid_moves = self.gs.get_valid_moves(rc)
     self.highlight_square(valid_moves, rc)
-      
+    
+  def touch_moved(self, touch):
+    pass
+        
   def touch_ended(self, touch):
     logger.debug('touch ended')
   

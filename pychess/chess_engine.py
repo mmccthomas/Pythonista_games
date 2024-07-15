@@ -19,6 +19,7 @@ sys.path.append(parent)
 grandparent = os.path.dirname(parent)
 sys.path.append(grandparent)
 from gui.gui_interface import Coord
+from types import SimpleNamespace
 
 COORDS = [Coord((r,c)) for r in range(8) for c in range(8)]
 
@@ -180,7 +181,10 @@ class game_state:
         remove move from valid moves if the move falls within a check piece's valid move
         if the moving piece is a king, the ending square cannot be in a check
         '''
-        current = starting_square
+        if not isinstance( starting_square, Coord):
+            current = Coord(starting_square)
+        else:
+            current = starting_square
         #print('valid', self.is_valid_piece(current))
         if self.is_valid_piece(current):
             #print('valid piece', current)
@@ -420,7 +424,7 @@ class game_state:
                   self._black_king_location = next_square
                   # self.can_en_passant_bool = False  WHAT IS THIS
     
-    def move_pawn(self, starting_square, ending_square, moving_piece):
+    def move_pawn(self, starting_square, ending_square, moving_piece, is_ai):
         row = 0
         col = 1
         temp = True
@@ -472,7 +476,7 @@ class game_state:
           self.white_king_can_castle[1] = False
       elif moving_piece.is_player(self.P2) and starting_square.c == 7:
           self.white_king_can_castle[2] = False
-          self.move_log.append(chess_move(starting_square, ending_square, self, self._is_check))
+          self.move_log.append(chess_move(starting_square, next_square, self, self._is_check))
           self.can_en_passant_bool = False
                                               
                                                                                                                               
@@ -521,7 +525,7 @@ class game_state:
                     self.move_rook(starting_square, next_square, moving_piece)                   
                 # Add move class here
                 elif moving_piece.get_name() == "p":
-                    temp = self.move_pawn(starting_square, ending_square, moving_piece)                    
+                    temp = self.move_pawn(starting_square, ending_square, moving_piece, is_ai)                    
                 else:
                     self.move_log.append(chess_move(starting_square, ending_square, self, self._is_check))
                     self.can_en_passant_bool = False
@@ -693,5 +697,68 @@ class chess_move():
 
     def get_moving_piece(self):
         return self.moving_piece
+
+        
+def main():
+  # testing all functions
+  import ai_engine
+  def copy_board(board):
+      return list(map(list, board)) 
+  p_dict = {'PLAYER_1':  'white', 'PLAYER_2': 'black',
+                        'EMPTY': -9, 'PLAYERS': ['white', 'black']}
+  Player = SimpleNamespace(**p_dict)  
+  pass
+  gs = game_state(Player)
+  ai = ai_engine.chess_ai(Player)
+  board = gs.board
+  gs.white_turn = True
+  #white pawn
+  moves = gs.get_valid_moves(Coord((1, 3)))
+  print('valid moves', moves)
+  gs.move_piece(starting_square=Coord((1, 3)), ending_square=Coord((2, 3)), is_ai=False)
+  gs.board_print()
+  
+  def black_play():
+      # now ai move for black
+      copied_board = copy_board(gs.board)
+      start, end = ai.minimax(gs, 3, -100000, 100000, True, Player.PLAYER_1)      
+      print(f'ai moves from {start} to {end}')      
+      gs.white_turn = False
+      gs.board = copied_board
+      board = gs.board
+      gs.move_piece(starting_square=Coord(start), ending_square=Coord(end), is_ai=True, debug=True)
+      print('after ai move')
+      gs.board_print() 
+      
+  def white_play():
+      # now ai move for white
+      copied_board = copy_board(gs.board)
+      start, end = ai.minimax(gs, 3, -100000, 100000, True, Player.PLAYER_2)      
+      print(f'ai moves from {start} to {end}')  
+      gs.white_turn = True    
+      gs.board = copied_board
+      board = gs.board
+      gs.move_piece(starting_square=Coord(start), ending_square=Coord(end), is_ai=True, debug=True)
+      print('after player move')
+      gs.board_print()
+      
+  for i in range(20): 
+     print('ITERATION ', i)
+     white_play() 
+     black_play()
+     
+  #black_play()
+  
+  # move white queen
+  moves = gs.get_valid_moves((0, 4))
+  print('valid moves', moves)
+  gs.move_piece(starting_square=Coord((0, 4)), ending_square=Coord((2, 2)), is_ai=False)
+  gs.board_print()   
+      
+  
+    
+  
+if __name__ == '__main__':
+  main()
         
     

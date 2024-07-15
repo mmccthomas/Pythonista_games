@@ -10,7 +10,7 @@ class Bishop(Piece):
             row, col = current_row + row_step, current_col + col_step
             while 0 <= row < 8 and 0 <= col < 8:
                 piece = game_state.get_piece(row, col)
-                if piece is Player.EMPTY:
+                if piece == Player.EMPTY:
                     moves.append((row, col))
                 elif game_state.is_valid_piece(row, col) and not piece.is_player(self.get_player()):
                     moves.append((row, col))
