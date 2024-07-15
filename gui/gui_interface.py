@@ -494,28 +494,30 @@ class Coord(tuple):
     
     def __init__(self, val):
         self.val = val
+        self.r = self.val[0]
+        self.c = self.val[1]
+        self.row = self.r
+        self.col = self.c
+        
+        
+    def __repr__(self):
+        return f'Coord({self.row}, {self.col})'
         
     def __add__(self, other):
-       return tuple(p+q for p, q in zip(self.val, other))
+       return Coord(tuple(p+q for p, q in zip(self.val, other)))
        
     def __sub__(self, other):
-        return tuple(p-q for p, q in zip(self.val, other))
-        
-    def col(self):
-      return self.val[1]
-    
-    def row(self):
-      return self.val[0]
-      
-    def c(self):
-      return self.val[1]
-    
-    def r(self):
-      return self.val[0]
+        return Coord(tuple(p-q for p, q in zip(self.val, other)))
       
     def all_neighbours(self):
       dirs = [(-1, 0), (-1, 1), (0, 1),  (1, 1), (1, 0), (1, -1), (0, -1), (-1, -1)]
       return [Coord(self.__add__(d)) for d in dirs]
+      
+    def nsew(self):
+        """ up, down, left, right """
+        dirs = [(-1, 0), (0, 1),  (1, 0), (0, -1)]
+        return [Coord(self.__add__(d)) for d in dirs]
+      
     
     
 class Squares():

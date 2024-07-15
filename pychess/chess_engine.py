@@ -167,6 +167,8 @@ class game_state:
     def is_valid_piece(self, coord, col=None):
         if isinstance(coord, tuple):         
             row, col = coord
+        elif isinstance(coord, Coord):
+            row, col = coord.r, coord.c
         else:
             row = coord
         evaluated_piece = self.get_piece((row, col))
@@ -179,8 +181,9 @@ class game_state:
         if the moving piece is a king, the ending square cannot be in a check
         '''
         current = starting_square
-
+        #print('valid', self.is_valid_piece(current))
         if self.is_valid_piece(current):
+            #print('valid piece', current)
             valid_moves = []
             moving_piece = self.get_piece(current)
             if self.get_piece(current).is_player(self.P1):
@@ -189,7 +192,7 @@ class game_state:
                 king_location = self._black_king_location 
             checking_pieces, pinned_pieces, pinned_checks = self.check_for_check(king_location, moving_piece.get_player())
             initial_valid_piece_moves = moving_piece.get_valid_piece_moves(self)
-
+            
             # immediate check
             if checking_pieces:
                 for move in initial_valid_piece_moves:
@@ -233,7 +236,7 @@ class game_state:
                         temp = self.get_board_rc(move)
                         self.set_board_rc(move, moving_piece)                       
                         self.set_board_rc(current, self.EMPTY)                      
-                        if not self.check_for_check(king_location, moving_piece.get_player())[0]:
+                        if not self.check_for_check(Coord(king_location), moving_piece.get_player())[0]:
                             valid_moves.append(move)
                         self.set_board_rc(current, moving_piece)                      
                         self.set_board_rc(move, temp)                        
@@ -244,7 +247,7 @@ class game_state:
                         temp2 = self.get_board_rc(move)
                         self.set_board_rc(current, self.EMPTY)                       
                         self.set_board_rc(move, temp)                        
-                        if not self.check_for_check(move, moving_piece.get_player())[0]:
+                        if not self.check_for_check(Coord(move), moving_piece.get_player())[0]:
                             valid_moves.append(move)
                         self.set_board_rc(current, temp)                        
                         self.set_board_rc(move, temp2)                       
@@ -475,6 +478,12 @@ class game_state:
                                                                                                                               
     # Move a piece
     def move_piece(self, starting_square, ending_square, is_ai, debug=False):
+        # need Coord type to allow addition and r,c subscripting
+        if not isinstance(starting_square, Coord):
+          starting_square = Coord(starting_square)
+        if not isinstance(ending_square, Coord):
+          ending_square = Coord(ending_square)  
+
         if debug:
           print('moving piece', starting_square, ending_square)
         next_square = ending_square
@@ -491,7 +500,7 @@ class game_state:
                       self.P2))))
         a = v and (b or c)
         if debug:
-          print(f'test a={a} v={v} b={b} c={c} turn={self.whose_turn()}')
+          print(f'turn={self.whose_turn()}')
         if a:
             # The chess piece at the starting square
             
@@ -601,7 +610,7 @@ class game_state:
         _checks = []
         _pins = []
         _pins_check = []
-
+        king_location = Coord(king_location)
         all_directions = [Coord((r, c)) for r in range(-1,2) for c in range(-1,2) if (r,c) != (0,0)]
         
         for loc in all_directions:
