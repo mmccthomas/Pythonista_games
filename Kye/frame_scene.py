@@ -17,7 +17,9 @@
 #    Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #
 """kye.frame - classes and data for the frame and menus for the Kye game.
-frame contains menubar, statusbar and canvas"""
+frame contains menubar, statusbar and canvas
+very important to add @ui.in_background decorator"""
+
 from common import image_dict, interval, xsize, ysize, kyepaths
 from os.path import basename, join
 from os import listdir
@@ -36,28 +38,7 @@ from dialogs_ui import getopendialog
 from queue import Queue
 
 """ menus has File, Level, View and Help"""
-#sel_item = None
 
-
-class myListDialogController (_ListDialogController):
-    """ This class should not be necessary, and is an attempt to overcome issue seen on ipad pro
-    where selection did not show in calling class.
-    This reimplements dialogs._ListDialogController and perform function on selected list item  in this class
-    potentially a threading issue?, selection did not activate until later
-    """
-    
-    def __init__(self, title, items, multiple=False, done_button_title='Done', function=None):
-       _ListDialogController.__init__(self, title, items, multiple=False, done_button_title='Done')
-       self.selected_item = None
-       self.fn = function
-       
-    def row_selected(self, ds):
-      #global sel_item
-      self.selected_item = self.items[ds.selected_row]
-      sel_item = self.items[ds.selected_row]
-      if sel_item['accessory_type'] != 'disclosure_indicator':
-            self.fn(sel_item['title'])
-      self.view.close()
 
 class KFrame(Scene):
     """Class implementing the frame surrounging the game area,
@@ -92,21 +73,16 @@ class KFrame(Scene):
                  for i in reversed(recent)]
       others = [{'title': i,  'accessory_type': 'disclosure_indicator' if i.endswith(':') else 'None'} for i in levels]
       return recents + others
-             
+      
+    @ui.in_background      
     def open_file_menu(self, touch):
       """button open"""
       item_list = self.prepare_file_list()
-      c = myListDialogController('Open  File.. \t\t\t\t\t\t\t\t Recent files',
-                                    item_list, function=self.doopen)
-      c.view.present('popover')              
-      c.view.wait_modal()
-      c.view.close()
-      #sel = sel_item
-      # sel = dialogs.list_dialog('Open  File.. \t\t\t\t\t\t\t\t Recent files',
-      #                         item_list)
-      # doopen is invoked in row_selected method of myListDialogController
-      # this us a hack fix to issue experienced on ipad pro, where sel in above function always returned None
-         
+      sel = dialogs.list_dialog('Open  File.. \t\t\t\t\t\t\t\t Recent files',
+                              item_list)
+      if sel:
+          if sel['accessory_type'] != 'disclosure_indicator':
+                self.doopen(sel['title'])   
       
     def setup_view(self, v, buttons):
       ''' a list of buttons in a frame'''
@@ -119,12 +95,12 @@ class KFrame(Scene):
         b.frame=(10,0,100,50)
         b.y = index * 55
         v.add_subview(b)
-      
+            
     def open_level_menu(self, touch):
        ''' a menu with 4 buttons '''
        buttons = [{'title': 'Restart', 'action': self.restart},
                   {'title': 'Select Level', 'action': self.startgoto},
-                  # {'title': 'Goto Level', 'action': self.gotolevel_name}, # not working on ipad pro
+                  {'title': 'Goto Level', 'action': self.gotolevel_name}, # not working on ipad pro
                   {'title': 'Next level', 'action': self.nextlevel},
                   {'title': 'Save state', 'action': self.savestate},
                   {'title': 'Restore state', 'action': self.restorestate}
@@ -134,8 +110,8 @@ class KFrame(Scene):
        self.setup_view(v, buttons)
        #print(v['Restore state'])
        v.present('popover', popover_location = (220, 40))
-       v.close()     
-        
+       v.close()         
+                 
     def open_view_menu(self, touch):
        buttons = [{'title': 'Tiny', 'action': self.selsize},
                   {'title': 'Small', 'action': self.selsize},
@@ -147,6 +123,7 @@ class KFrame(Scene):
        v.present('popover', popover_location = (330, 40))
        v.close()
        
+    @ui.in_background         
     def selsize(self, responder):
        txt = responder.title
        if txt == 'Tiny':  
@@ -221,16 +198,16 @@ class KFrame(Scene):
         """Menu requested restart of the current level."""
         r.superview.close()
         # self.saved_state = None
-        self.app.restart()
-        
+        self.app.restart()       
 
     def doopen(self, filename):
         """Tell the game to open the given level set."""
         self.app.open(filename)
         print('attemption open ', filename)
         
+    @ui.in_background   
     def gotolevel_name(self, responder):
-      # responder.superview.close()
+      responder.superview.close()
       responder.superview.hidden = True
       sel = dialogs.input_alert('Level Name')
       try:
@@ -238,42 +215,32 @@ class KFrame(Scene):
         self.app.goto(sel)
       except (Exception) as e:
         dialogs.hud_alert(f'Level {sel} not known')
-      responder.superview.close()
+      #responder.superview.close()
       
     def nextlevel(self, responder):
       responder.superview.close()
       self.saved_state = None
       self.app.goto(self.app._KyeApp__game.nextlevel)
       
+    @ui.in_background    
     def startgoto(self, responder):
       """Let the user select or type a level to go to,
          and jump to that level."""
+      #responder.superview.close()
       responder.superview.hidden = True
       """ add a tick to levels already completed """
       level_list = []
       for i in self.app.known_levels():
         icon = 'checkmark' if i in self.app.completed_levels() else 'none'
         level_list.append({'title': i,  'accessory_type': icon })
-      #sel = dialogs.list_dialog("Known levels\t\t\t\t\t\t\t\tCompleted", level_list)
-      # fix for selection not working on ipad pro
-      c = myListDialogController("Known levels\t\t\t\t\t\t\t\tCompleted", level_list,
-                                 function=self.app.goto)
-      c.view.present('popover')              
-      c.view.wait_modal()
-      c.view.close()
-      responder.superview.close()
-      #sel = sel_item
-      # sel = dialogs.list_dialog('Open  File.. \t\t\t\t\t\t\t\t Recent files',
-      #                         item_list)
-      '''
+      sel = dialogs.list_dialog("Known levels\t\t\t\t\t\t\t\tCompleted", level_list)    
+      responder.superview.close()  
       try:
         if sel:
           self.saved_state = None
           self.app.goto(sel['title'])
       except (Exception) as e:
-        print(e, sel)
-      '''
-      
+        print(e, sel)           
 
     def settilesize(self, ts):
         """Set the tile size based on the selected menu item,
@@ -295,7 +262,8 @@ class KFrame(Scene):
       if self.saved_state:
         self.app._KyeApp__game = self.saved_state
         self.app.do_tick()
-
+        
+    @ui.in_background   
     def endleveldialog(self, nextlevel, endmsg):
         """Call when the level ends, to give the between-level messages."""
         if nextlevel != "":
