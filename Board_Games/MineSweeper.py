@@ -69,7 +69,7 @@ class App(LetterGame):
     
     self.gui.gs.DIMENSION_X, self.gui.gs.DIMENSION_Y  = self.BSIZEX, self.BSIZEY
     #self.gui.gs.board=self.board
-    self.gui.setup_gui(log_moves=False, board=self.board)
+    self.gui.setup_gui(log_moves=False, board=self.board) #, grid_label_color='black')
     
     
     # menus can be controlled by dictionary of labels and functions without parameters

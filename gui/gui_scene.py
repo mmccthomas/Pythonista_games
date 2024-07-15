@@ -131,6 +131,7 @@ class GameBoard(Scene):
     self.DIMENSION_X = len(self.board[0])
     self.background_color = "#232323"
     self.background_image = None
+    self.grid_label_color = 'white'
     self.grid = None
     self.grid_fill = 'lightgreen'
     self.grid_z_position = 10
@@ -280,10 +281,10 @@ class GameBoard(Scene):
       background.anchor_point = (0, 0)
       parent.add_child(background)
     if self.use_alpha:
-      row_labels = 'A B C D E F G H I J K L M N O P Q R S T U V W X Y Z '
+      row_labels = 'A B C D E F G H I J K L M N O P Q R S T U V W X Y Z AAABACAD'
     else:
-      row_labels = '0 1 2 3 4 5 6 7 8 9 1011121314151617181920212223242526'
-    column_labels = '0 1 2 3 4 5 6 7 8 9 1011121314151617181920212223242526'
+      row_labels = '0 1 2 3 4 5 6 7 8 9 101112131415161718192021222324252627282930'
+    column_labels = '0 1 2 3 4 5 6 7 8 9 101112131415161718192021222324252627282930'
     # Parameters to pass to the creation of ShapeNode
     params = {
       "path": Path.rect(0, 0, self.SQ_SIZE, self.SQ_SIZE * self.DIMENSION_Y),
@@ -301,7 +302,7 @@ class GameBoard(Scene):
       parent.add_child(n)
       n = LabelNode(row_labels[2 * i: 2 * i + 2], parent=self.game_field)
       n.position = (pos.x + self.SQ_SIZE / 2, pos.y + self.DIMENSION_Y * self.SQ_SIZE + 20)
-    
+      n.color = self.grid_label_color
     # Building the rows
     params["path"] = Path.rect(0, 0, self.SQ_SIZE * self.DIMENSION_X, self.SQ_SIZE)
     params['fill_color'] = 'clear'
@@ -314,7 +315,7 @@ class GameBoard(Scene):
       idx = self.DIMENSION_Y - 1 - i
       n = LabelNode(column_labels[2 * idx: 2 * idx + 2], parent=self.game_field)
       n.position = (pos.x - 20, pos.y + self.SQ_SIZE/2)
-          
+      n.color = self.grid_label_color    
     return parent
     
   def setup_ui(self):
