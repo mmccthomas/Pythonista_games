@@ -213,7 +213,7 @@ class LetterGame():
     self.debug = False
     # allows us to get a list of rc locations
     self.log_moves = True
-    self.straight_lines_only = True
+    self.straight_lines_only = False
     self.word_dict = None
     self.remaining_ships =[[]]
     # create game_board and ai_board
@@ -363,7 +363,7 @@ class LetterGame():
     #self.all_words = self.wordlist
     self.word_dict = w_dict      
         
-  def load_words(self, word_length, file_list=None):
+  def load_words(self, word_length=None, file_list=None):
     # get subset of words
     # letter weighting
     # computed from 5000 common words
@@ -381,8 +381,12 @@ class LetterGame():
       with open(f'{word_file}', 'r') as f:
         words = [line.strip() for line in f]
       all_word_list.extend(words)
-        
-    word_list = [line for line in all_word_list  if len(line) == word_length]
+    
+    
+    if word_length:
+        word_list = [line for line in all_word_list if len(line) == word_length]
+    else:
+        word_list = all_word_list
       
     self.wordlist = word_list
     self.wordset = set(word_list) # for fast search
