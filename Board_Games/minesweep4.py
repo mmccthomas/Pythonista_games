@@ -340,6 +340,6 @@ if __name__ == '__main__':
 		
 		v['sceneview'].scene = App()
 		w,h = get_screen_size()
-		v['sceneview'].frame=(0,0, 0.8*w, 0.8*h)
+		v['sceneview'].frame=(0,0, 0.6*w, 0.6*h)
 		v.present('sheet')
 
