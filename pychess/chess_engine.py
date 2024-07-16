@@ -717,7 +717,7 @@ def main():
   gs.white_turn = True
   #white pawn
   moves = gs.get_valid_moves(Coord((1, 3)))
-  print('valid moves', moves)
+  print(f'{moves = }')
   gs.move_piece(starting_square=Coord((1, 3)), ending_square=Coord((2, 3)), is_ai=False)
   gs.board_print()
   
@@ -754,7 +754,7 @@ def main():
   
   # move white queen
   moves = gs.get_valid_moves((0, 4))
-  print('valid moves', moves)
+  print(f'{moves = }')
   gs.move_piece(starting_square=Coord((0, 4)), ending_square=Coord((2, 2)), is_ai=False)
   gs.board_print()   
       

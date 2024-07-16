@@ -80,6 +80,7 @@ class ChessGame(gscene.GameBoard):
     self.require_touch_move = False
     self.allow_any_move = True
     self.Player = Player()
+    self.i = 0
     self.setup_gui(log_moves=True)
     
     
@@ -93,18 +94,19 @@ class ChessGame(gscene.GameBoard):
                        'AI play': self.ai_play,
                        'Quit': self.quit}
 
-                               
+    x,y,w,h = self.grid.bbox                          
     #self.all = [[j,i] for i in range(self.sizex) for j in range(self.sizey) if self.board[j][i] == SPACE]
     self.ai = ai_engine.chess_ai(self.Player)
-    self.paused = True
+    self.paused = False
     self.smaller_tile = 30      
     self.redraw_board(fn_piece=fn_piece) 
     self.msg_label_b2.text = ''
     self.msg_label_b.text = ''
     self.msg_label_r.text = ''
     self.msg_label_prompt.text = ''
-    self.history = ['White\tBlack\n']
-  
+    self.history = ['White Black\n']
+    self.msg_label_t.position = (0, h+30)
+    self.line_timer = 0.5
     #self.show_start_menu() 
     self.turn = True 
     # self.play_ai()       
@@ -145,16 +147,19 @@ class ChessGame(gscene.GameBoard):
     for t in tiles:
       if t.name != f"{piece.player}_{piece.name}":
         t.remove_from_parent()
-          
+        
+  @ui.in_background     
   def update(self):
     # dt is provided by Scene t is time since start
-     
+  
     self.line_timer -= self.dt
     self.go = True
     if self.line_timer <= 0:
+      a = "+X"
       self.line_timer = 0.5
-      self.turn_status(self.gs.whose_turn())
+      self.turn_status(False, self.Player.PLAYERS[int(not self.gs.whose_turn())] + '\t' + a[self.i % 2])
       self.go = True
+      self.i += 1
   
   def touch_began(self, touch):
     if touch.location.x < 48 and touch.location.y > self.size.h - 48:
@@ -183,7 +188,7 @@ class ChessGame(gscene.GameBoard):
       
       if rc in self.gs.get_valid_moves(Coord(self.last_rc)):
           self.msg_label_b.text = self.standard_notation(self.last_rc, rc)
-          self.history.append(self.msg_label_b.text.split(' ')[1] + '\t\t')
+          self.history.append(f'{self.msg_label_b.text.split(" ")[1] :8}')
           self.gs.move_piece(starting_square=Coord(self.last_rc), ending_square=Coord(rc), is_ai=False)
         
           self.redraw_board(fn_piece=fn_piece)   
@@ -206,10 +211,10 @@ class ChessGame(gscene.GameBoard):
       self.gs.board = copied_board
       self.board = self.gs.board
       self.msg_label_b2.text = self.standard_notation(start, end)
-      self.history.append(self.msg_label_b2.text.split(' ')[1] + '\n')
+      self.history.append(f'{self.msg_label_b2.text.split(" ")[1] :8}\n')
       self.gs.move_piece(starting_square=Coord(start), ending_square=Coord(end), is_ai=True, debug=True)
       self.gs.board_print() 
-      self.turn_status(self.gs.whose_turn())
+      #self.turn_status(self.gs.whose_turn())
       self.redraw_board(fn_piece=fn_piece)         
       self.clear_highlights()
       print('after ai move')

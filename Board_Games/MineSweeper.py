@@ -64,7 +64,8 @@ class App(LetterGame):
     self.gui.set_grid_colors(grid='black', highlight='lightblue')
     self.gui.require_touch_move(False)
     self.gui.allow_any_move(True) 
-    self.select_list()
+    if not self.select_list():
+      self.quit()
     self.setup(self.puzzle)
     
     self.gui.gs.DIMENSION_X, self.gui.gs.DIMENSION_Y  = self.BSIZEX, self.BSIZEY
@@ -169,14 +170,15 @@ class App(LetterGame):
           except (Exception) as e:
             print(e)
             print(traceback.format_exc())
-            
-        if len(selection) > 1:
+          
+        if selection == "Cancelled_":
+          return False  
+        elif len(selection) > 1:
           #self.wordlist = self.size_dict[selection]
           self.puzzle = selection
           self.gui.selection = ''
           return True
-        elif selection == "Cancelled_":
-          return False
+        
         else:
             return False   
             

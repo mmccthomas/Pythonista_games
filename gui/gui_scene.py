@@ -674,8 +674,11 @@ class GameBoard(Scene):
     print()
           
     
-  def turn_status(self, turn):
-      self.msg_label_t.text = "white turn" if turn else "black turn"
+  def turn_status(self, turn, custom_message=None):
+      if custom_message:
+         self.msg_label_t.text = custom_message
+      else: 
+          self.msg_label_t.text = "white turn" if turn else "black turn"
       
   def will_close(self):
     print('closing')
@@ -729,7 +732,7 @@ class GameBoard(Scene):
 
   def touch_moved(self, touch):
     touch_length = time() - self.touch_time
-    if touch_length > 1.0 and not self.beep:
+    if touch_length > 0.5 and not self.beep:
       sound.play_effect('digital:TwoTone2')
       self.beep = True
       
@@ -752,7 +755,7 @@ class GameBoard(Scene):
    
   def touch_ended(self, touch):
     touch_length = time() - self.touch_time
-    self.long_touch = touch_length > 1.0
+    self.long_touch = touch_length > 0.5
     self.beep = False
     if self.touch_indicator:
       self.touch_indicator.remove_from_parent()
