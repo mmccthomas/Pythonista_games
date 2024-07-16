@@ -330,7 +330,7 @@ class GameBoard(Scene):
     x, y, w, h = self.grid.bbox # was game_field
     font = ('Avenir Next', self.font_size)
     # all location relative to grid
-    self.msg_label_t = LabelNode("top", font=font, position=(0, h + 10), parent=self.game_field)
+    self.msg_label_t = LabelNode("top", font=font, position=(0, h + 30), parent=self.game_field)
     self.msg_label_t.anchor_point = (0, 0)
     
     self.msg_label_b = LabelNode("bottom", font=font, position=(0, -30), parent=self.game_field)
