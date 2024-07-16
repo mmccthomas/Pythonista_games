@@ -70,7 +70,7 @@ class WordCircle(LetterGame):
     self.gui.set_pause_menu({'Continue': self.gui.dismiss_menu, 
                               'Reveal ....': self.reveal,
                               'Quit': self.quit})
-    self.req_size = 6
+    self.req_size = 8
     
   def print_board(self):
     """
@@ -86,17 +86,14 @@ class WordCircle(LetterGame):
     # set list to dashes for each letter       
     msg_list = [word if word in self.known_words else '-' * len(word) for word in self.display_words]
   
+    
+    for i in range(self.min_length, self.max_length+1):
+        b = getattr(self, f'box{i}')
+        msg =[m for m in msg_list if len(m) == i]
+        self.gui.set_text(b, '\n'.join(msg), font=('Avenir Next', 25))        
+            
     if self.gui.gs.device.endswith('_landscape'):
-        self.gui.set_text(self.box3, '\n'.join(msg_list), font=('Avenir Next', 25))        
-        #self.gui.set_moves('\n'.join(msg_list), font=('Avenir Next', 25))
-    elif self.gui.gs.device.endswith('_portrait'):
-        msg = []
-        for i, word in enumerate(msg_list):
-          msg.append(f'{word}')
-          msg.append('\n' if i % 3 == 0 else ' '*2)    
-        msg = ''.join(msg)
-        self.gui.set_text(self.box1, msg, font=('Avenir Next', 20))
-        #self.gui.set_moves(msg, font=('Avenir Next', 20))
+      pass
     self.gui.update(self.board)  
     
   def get_size(self):
@@ -131,9 +128,18 @@ class WordCircle(LetterGame):
        self.board_rc(rc, self.board, letters.pop())
     
     self.word_selection = selected_words
+    if self.gui.gs.device.endswith('_landscape'):
+      pass
     x, y, w, h = self.gui.grid.bbox
     for i in range(self.min_length, self.max_length+1):
-      setattr(self, f'box{i}', self.gui.add_button(text='', title=f'Word {i}', position=(w+20 + (i-3)*80, 0), min_size=(80, h/4)))
+      if self.gui.gs.device.endswith('_landscape'):
+          position = (10 + w +  (i-self.min_length)*90, h/2)
+      else:
+          position = (w/4+ (i-self.min_length)*90, h)
+      setattr(self, f'box{i}', self.gui.add_button(text='', title=f'Word {i}', 
+                                                   position=position, 
+                                                   min_size=(90, h/4), 
+                                                   font=('Avenir Next', 20)))
     
   def get_words(self):
     ''' construct subsets of words for each required length
