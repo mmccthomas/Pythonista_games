@@ -204,7 +204,7 @@ class Ships(Ship):
         self.remaining_ships[ship.length] += 1
       total = []
       for l, no in reversed(self.remaining_ships.items()):
-        total.append(f'{no}x  {"S" * l}\n' if no > 0 else '\t----\n')
+        total.append(f'{no}x  {chr(896) * l}\n' if no > 0 else '\t----\n')
       return ''.join(total).strip()
       
       
