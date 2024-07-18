@@ -45,7 +45,7 @@ class Player():
     self.PLAYER_2 = '@'
     self.EMPTY = '-'
     
-    self.PIECES = ['emj:Question_Mark_1','emj:Fire','emj:Explosion','iow:help_buoy_24']
+    self.PIECES = ['emj:Question_Mark_1','emj:Fire','emj:Explosion','iow:close_32']
     self.PIECE_NAMES ={POSSIBLE: '?',HIT: 'H', DESTROY: 'D',  MISS: '^', }
     self.PLAYERS =['?', 'H', 'D', '^']
 

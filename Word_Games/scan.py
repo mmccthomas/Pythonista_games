@@ -2,6 +2,9 @@ import numpy as np
 from PIL import Image
 from matplotlib import pyplot as plt   
 from statistics import mode
+""" scan a crossword image to detect squares and blocks (black squares) to produce a 
+text representation in the for ' / /#/ / '
+"""
     
 def rle(inarray):
   """ run length encoding. Partial credit to R rle function. 

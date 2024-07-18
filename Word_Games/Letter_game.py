@@ -710,7 +710,7 @@ class LetterGame():
     # sit here until piece place on board   
     items = 0
     
-    while items < 200: # stop lockup
+    while items < 1000: # stop lockup
       #self.gui.set_prompt(prompt, font=('Avenir Next', 25))
       
       move = self.wait_for_gui()
