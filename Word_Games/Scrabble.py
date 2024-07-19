@@ -30,7 +30,7 @@ wordlists =['scrabble.txt', # official scrabble dict
             '5000-more-common.txt',
             'words_10000.txt']
 # select wordlist by index
-wordlist = wordlists[0]
+wordlist = wordlists[2]
 
 BLOCK = '#'
 SPACE = ' '

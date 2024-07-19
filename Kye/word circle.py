@@ -6,23 +6,14 @@ parent = os.path.dirname(current)
 sys.path.append(parent)
 grandparent = os.path.dirname(parent)
 sys.path.append(grandparent)
-#sys.path.append(f'{parent}/gui')
-from queue import Queue
-from datetime import datetime
-from time import sleep, time
-import math
+from time import sleep
 import random
-import re
 import traceback
 import numpy as np
-from  collections import Counter
-from Letter_game import LetterGame, Word
-import Letter_game as lg
-import gui.gui_scene as gscene
-from gui.gui_interface import Gui, Squares
+from Letter_game import LetterGame
 BLOCK = '#'
 SPACE = ' '
-WORDLIST = ["letters3_common.txt", "5000-more-common.txt"]
+WORDLIST = ['letters3_common.txt', '5000-more-common.txt']
 GRIDSIZE ='4,4'
 HINT = (-1, -1)    
 
@@ -48,8 +39,8 @@ class Player():
     self.EMPTY = ' '
     self.PIECE_NAMES  ='abcdefghijklmnopqrstuvwxyz0123456789. '
     self.PIECES = [f'../gui/{k}.png' for k in self.PIECE_NAMES[:-2]]
-    self.PIECES.append(f'../gui/@.png')
-    self.PIECES.append(f'../gui/s_.png')
+    self.PIECES.append('../gui/@.png')
+    self.PIECES.append('../gui/s_.png')
     self.PLAYERS = None    
     
     
@@ -232,7 +223,8 @@ class WordCircle(LetterGame):
     return  self.known_words == self.display_words
     
   def hint(self):
-      """ illuminate the start letter of a random unplaced word """ 
+      """ reveal  a random unplaced word
+      TODO could do better """ 
       self.known_words.append(random.choice(self.display_words))
       self.print_board()
              
@@ -247,7 +239,7 @@ class WordCircle(LetterGame):
     self.gui.set_enter('Hint')
     self.word_locations = []
     #success = self.select_list()
-    process = self.initialise_board() 
+    self.initialise_board() 
     self.print_board()
     while True:
       move = self.get_player_move(self.board)  
@@ -270,8 +262,4 @@ if __name__ == '__main__':
   g = WordCircle()
   g.run()
  
-  while(True):
-    quit = g.wait()
-    if quit:
-      break
   

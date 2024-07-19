@@ -93,11 +93,14 @@ def combine_images(columns, space, images):
 def load_images():
     '''open a single file containing all images
     allow single zip file to get names'''
+  
     try:
-       images = sorted(listdir('images'))
+       with open('imagelis.txt', 'r') as f:
+         images = f.readlines()
+       images = [image.strip() for image in images]  
     except FileNotFoundError:
         zip = zipfile.ZipFile('images.zip')
-        images = zip.namelist()[1:]
+        images = sorted(zip.namelist()[1:])
         
     # remove any other files
     for i in images:
@@ -122,6 +125,7 @@ def load_images():
         h1 = tsize / h
         t = combined.subtexture(Rect(x, y, w1, h1))
         image_dict.setdefault(image, t)
+    print(f'{image_dict =}')
     return image_dict
 
 
