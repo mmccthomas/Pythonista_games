@@ -233,15 +233,19 @@ class GameBoard(Scene):
                          'New Game': self.dismiss_modal_scene, 'Quit': self.close}
       self.start_menu =  {'New Game': self.dismiss_modal_scene, 'Quit': self.close}
   
-  def build_extra_grid(self, grids_x, grids_y, grid_width_x=None, grid_width_y=None, color=None, line_width=2, z_position=100):
-    """ define a grid to overlay on top of everything else"""
+  def build_extra_grid(self, grids_x, grids_y, grid_width_x=None, grid_width_y=None, color=None, line_width=2, offset=None, z_position=100):
+    """ define a grid to overlay on top of everything else 
+    allow offset to place grid at centre of square (e.g. go game)"""
     if grid_width_x is None:
       grid_width_x = grids_x
     if grid_width_y is None:
       grid_width_y = grids_y
-       
+    if offset is None:  
+      offx, offy = 0,0
+    else:
+      offx, offy = offset
     # Parameters to pass to the creation of ShapeNode
-    x = Path.rect(0, 0, self.SQ_SIZE * grid_width_x, self.SQ_SIZE * self.DIMENSION_Y)
+    x = Path.rect(offx, offy, self.SQ_SIZE * grid_width_x, self.SQ_SIZE * self.DIMENSION_Y)
     x.line_width = line_width
     params = {
       "path": x,
@@ -259,7 +263,7 @@ class GameBoard(Scene):
       n.anchor_point = anchor
     
     # Building the rows
-    y = Path.rect(0, 0, self.SQ_SIZE * self.DIMENSION_X, self.SQ_SIZE * grid_width_y)
+    y = Path.rect(offx, offy, self.SQ_SIZE * self.DIMENSION_X, self.SQ_SIZE * grid_width_y)
     y.line_width = line_width
     params["path"] = y
     

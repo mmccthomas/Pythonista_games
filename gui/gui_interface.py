@@ -412,7 +412,7 @@ class Gui():
     x = changed[1]
         
     msg = c[2* x: 2*x+2] + r[2*y:2*y+2]
-    msg = msg.replace(' ', '')
+    #msg = msg.replace(' ', '')
     return  msg
     
   def wait_for_gui(self, board):
@@ -478,10 +478,10 @@ class Gui():
   def set_start_menu(self, menu_dict):
     self.gs.start_menu = menu_dict 
     
-  def build_extra_grid(self, grids_x, grids_y, grid_width_x=None, grid_width_y=None, color=None, line_width=2, z_position=100):
+  def build_extra_grid(self, grids_x, grids_y, grid_width_x=None, grid_width_y=None, color=None, line_width=2, offset=None, z_position=100):
      self.gs.build_extra_grid(grids_x, grids_y, 
                               grid_width_x=grid_width_x, grid_width_y=grid_width_y, 
-                              color=color, line_width=line_width, z_position=z_position)
+                              color=color, line_width=line_width, offset=offset, z_position=z_position)
                               
   def draw_line(self, coords, **kwargs):
     self.gs.draw_line(coords, **kwargs)
