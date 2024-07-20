@@ -89,11 +89,17 @@ class ZipWord(LetterGame):
          if filter_placed is True:
            # sort unplaced words
            w = sorted([word for word in v if word not in words_placed])
+           self.word_display = w
          elif filter_placed is False:
            # sort placed words
            w = sorted([word for word in v if word in words_placed])  
-         else:
-           w =  sorted([word for word in v]) 
+           self.word_display = w
+         else: # None
+           if hasattr(self, 'word_display'):
+               # previous displayed list
+               w = self.word_display
+           else:
+               w =  sorted([word for word in v]) 
          if self.gui.device.endswith('landscape'):        
                words.extend([f'{word}\n' if i %3 ==2 else f'{word}  ' for i, word in enumerate(w)])     
                position = (width + 10, -20)
@@ -119,6 +125,8 @@ class ZipWord(LetterGame):
     cx = CrossWord(self.gui, self.word_locations, self.all_words)
     self.gui.clear_messages()
     self.gui.set_message2(f'{self.puzzle}')
+    x, y, w, h = self.gui.grid.bbox
+    self.gui.set_enter('Hint', position=(w, -75))
     self.partition_word_list()
     self.compute_intersections()
     self.max_depth = 3
@@ -192,7 +200,7 @@ class ZipWord(LetterGame):
       if letter == 'Enter':
         # show all incorrect squares
         self.gui.set_prompt('Incorrect squares marked orange')
-        self.update_board(hint=True)
+        self.update_board(hint=True, filter_placed=False)
         # now turn off marked squares
         sleep(2)
         for r, row in enumerate(self.board):
@@ -252,7 +260,7 @@ class ZipWord(LetterGame):
     """Takes in the user's input and performs that move on the board, returns the coordinates of the move
     Allows for movement over board"""
     #self.delta_t('start get move')
-    self.gui.set_enter('Hint')
+    
     if board is None:
         board = self.board
     prompt = (f"Select  position on board")

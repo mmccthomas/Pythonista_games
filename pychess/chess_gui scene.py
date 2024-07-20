@@ -26,7 +26,7 @@ screen_width, screen_height = get_screen_size()
 current = os.path.dirname(os.path.realpath(__file__))
 parent = os.path.dirname(current)
 sys.path.append(parent)
-from game_menu import MenuScene
+from gui.game_menu import MenuScene
 import logging
 import gui.gui_scene as gscene
 from gui.gui_interface import Gui, Squares, Coord
@@ -71,7 +71,8 @@ class ChessGame(gscene.GameBoard):
     # load the gui interface
     self.q = Queue()
     self.COLUMN_LABELS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'[:self.sizex]
-    self.use_alpha = False
+    self.column_labels = '8 7 6 5 4 3 2 1 '
+    self.use_alpha = True
     image = ui.Image.named('board_grey.jpg')
     self.grid_fill = 'clear'          
     self.background_image = image
@@ -79,6 +80,7 @@ class ChessGame(gscene.GameBoard):
     self.require_touch_move = False
     self.allow_any_move = True
     self.Player = Player()
+    self.i = 0
     self.setup_gui(log_moves=True)
     
     
@@ -92,17 +94,19 @@ class ChessGame(gscene.GameBoard):
                        'AI play': self.ai_play,
                        'Quit': self.quit}
 
-                               
+    x,y,w,h = self.grid.bbox                          
     #self.all = [[j,i] for i in range(self.sizex) for j in range(self.sizey) if self.board[j][i] == SPACE]
     self.ai = ai_engine.chess_ai(self.Player)
-    self.paused = True
+    self.paused = False
     self.smaller_tile = 30      
     self.redraw_board(fn_piece=fn_piece) 
     self.msg_label_b2.text = ''
     self.msg_label_b.text = ''
     self.msg_label_r.text = ''
     self.msg_label_prompt.text = ''
-  
+    self.history = ['White Black\n']
+    self.msg_label_t.position = (0, h+30)
+    self.line_timer = 0.5
     #self.show_start_menu() 
     self.turn = True 
     # self.play_ai()       
@@ -143,16 +147,19 @@ class ChessGame(gscene.GameBoard):
     for t in tiles:
       if t.name != f"{piece.player}_{piece.name}":
         t.remove_from_parent()
-          
+        
+  @ui.in_background     
   def update(self):
     # dt is provided by Scene t is time since start
-     
+  
     self.line_timer -= self.dt
     self.go = True
     if self.line_timer <= 0:
+      a = "+X"
       self.line_timer = 0.5
-      self.turn_status(self.gs.whose_turn())
+      self.turn_status(False, self.Player.PLAYERS[int(not self.gs.whose_turn())] + '\t' + a[self.i % 2])
       self.go = True
+      self.i += 1
   
   def touch_began(self, touch):
     if touch.location.x < 48 and touch.location.y > self.size.h - 48:
@@ -165,7 +172,10 @@ class ChessGame(gscene.GameBoard):
     self.tile_selected = self.tile_at(rc) 
     valid_moves = self.gs.get_valid_moves(rc)
     self.highlight_square(valid_moves, rc)
-      
+    
+  def touch_moved(self, touch):
+    pass
+        
   def touch_ended(self, touch):
     logger.debug('touch ended')
   
@@ -175,15 +185,19 @@ class ChessGame(gscene.GameBoard):
       if rc == self.last_rc:
         self.clear_highlights()
         return
+      
       if rc in self.gs.get_valid_moves(Coord(self.last_rc)):
-        self.gs.move_piece(starting_square=Coord(self.last_rc), ending_square=Coord(rc), is_ai=False)
-        self.redraw_board(fn_piece=fn_piece)   
-        self.clear_highlights()             
+          self.msg_label_b.text = self.standard_notation(self.last_rc, rc)
+          self.history.append(f'{self.msg_label_b.text.split(" ")[1] :8}')
+          self.gs.move_piece(starting_square=Coord(self.last_rc), ending_square=Coord(rc), is_ai=False)
+        
+          self.redraw_board(fn_piece=fn_piece)   
+          self.clear_highlights()             
       else:
-        print('invalid move')
+          print('invalid move')
       if self.single:
-        self.black_play() 
-              
+          self.black_play() 
+      self.msg_label_r.text = ''.join(self.history)        
       if self.check_endgame():
           self.show_start_menu()
           
@@ -196,9 +210,11 @@ class ChessGame(gscene.GameBoard):
       self.gs.white_turn = False
       self.gs.board = copied_board
       self.board = self.gs.board
+      self.msg_label_b2.text = self.standard_notation(start, end)
+      self.history.append(f'{self.msg_label_b2.text.split(" ")[1] :8}\n')
       self.gs.move_piece(starting_square=Coord(start), ending_square=Coord(end), is_ai=True, debug=True)
       self.gs.board_print() 
-      self.turn_status(self.gs.whose_turn())
+      #self.turn_status(self.gs.whose_turn())
       self.redraw_board(fn_piece=fn_piece)         
       self.clear_highlights()
       print('after ai move')
@@ -258,7 +274,39 @@ class ChessGame(gscene.GameBoard):
   def ai_play(self):
     self.single = False
     self.restart(False)
-    self.play_ai()    
+    self.play_ai()  
+      
+  #@ui.in_background
+  def standard_notation(self, start, finish):
+      """ convert rc coordinates to standard notation
+      e.g Ngf3 means Knight from g row moves to square f3
+      """
+      if not isinstance( start, Coord):
+        start = Coord(start)
+      if not isinstance(finish, Coord):
+        finish = Coord(finish)
+        
+      piece = self.gs.get_piece(start).name.upper()  
+      player = self.gs.get_piece(start).player.capitalize()       
+      end_row =  'abcdefgh'[finish.c] 
+      end_col = str(8 - finish.r)          
+            
+      if self.gs.get_piece(finish) == self.Player.EMPTY:
+          # normnal move          
+          start_row = 'abcdefgh'[start.c]
+          if piece == 'P':
+             piece = ''   
+             start_row = ''             
+      else:
+          # capture move         
+          start_row = 'x'
+          if piece == 'P':
+              piece = 'e'
+        
+      ident = ''.join([player,' ',str(piece), start_row, end_row, end_col])
+      print(ident)
+      return ident
+      
       
 
 if __name__ == "__main__":

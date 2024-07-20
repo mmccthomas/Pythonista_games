@@ -97,10 +97,10 @@ class Wordle(LetterGame):
     # first move insert common starting words
     if len(self.possibles) == len(self.wordlist):
       items = ['soare', 'roate', 'raise'] + items
-      
+    x, y, w, h = self.gui.grid.bbox 
     #return selection
     while self.gui.selection == '':
-      self.gui.input_text_list(prompt=prompt, items=items, position=(800,0))
+      self.gui.input_text_list(prompt=prompt, items=items, position=(w+250, 0))
       while self.gui.text_box.on_screen:
         try:
           selection = self.gui.selection

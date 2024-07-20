@@ -1,6 +1,13 @@
 from tetris_config import *
 from scene import *
-from game_menu import MenuScene
+import os
+import sys
+current = os.path.dirname(os.path.realpath(__file__))
+parent = os.path.dirname(current)
+sys.path.append(parent)
+grandparent = os.path.dirname(parent)
+sys.path.append(grandparent)
+from gui.game_menu import MenuScene
 from ui import Path
 import sound
 import random

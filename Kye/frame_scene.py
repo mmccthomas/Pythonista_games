@@ -17,7 +17,9 @@
 #    Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #
 """kye.frame - classes and data for the frame and menus for the Kye game.
-frame contains menubar, statusbar and canvas"""
+frame contains menubar, statusbar and canvas
+very important to add @ui.in_background decorator"""
+
 from common import image_dict, interval, xsize, ysize, kyepaths
 from os.path import basename, join
 from os import listdir
@@ -26,12 +28,14 @@ import ui
 import defaults_cmt
 import console
 import dialogs
+from dialogs import _ListDialogController
 from scene import *
 from canvas_scene import KCanvas
 from input_ui import KMoveInput
 from stbar_ui import StatusBar
 from dialogs_ui import GotoDialog, KyeHelpDialog, KyeAboutDialog
 from dialogs_ui import getopendialog
+from queue import Queue
 
 """ menus has File, Level, View and Help"""
 
@@ -39,7 +43,7 @@ from dialogs_ui import getopendialog
 class KFrame(Scene):
     """Class implementing the frame surrounging the game area,
        including the menus and status bar."""
-
+       
     def destroy(self, data=None):
         """Handle window destroy by exiting GUI."""
         self.view.close()
@@ -69,32 +73,16 @@ class KFrame(Scene):
                  for i in reversed(recent)]
       others = [{'title': i,  'accessory_type': 'disclosure_indicator' if i.endswith(':') else 'None'} for i in levels]
       return recents + others
-             
+      
+    @ui.in_background      
     def open_file_menu(self, touch):
       """button open"""
-      while(True):
-        try:
-          print('opening file.123.')
-          item_list = self.prepare_file_list()
-          c = dialogs._ListDialogController('Open  File.. \t\t\t\t\t\t\t\t Recent files',
-                                    item_list)
-          c.view.present('popover')
-          c.view.wait_modal()
-          sel = c.selected_item
-          # sel = dialogs.list_dialog('Open  File.. \t\t\t\t\t\t\t\t Recent files',
-          #                         item_list)
-          print('sel', sel)
-        except (KeyboardInterrupt):
-          return
-        if sel:
-          
-          if sel['accessory_type'] == 'disclosure_indicator':
-            continue
-          else:
-            self.doopen(sel['title'])
-            return
-        else: 
-          return
+      item_list = self.prepare_file_list()
+      sel = dialogs.list_dialog('Open  File.. \t\t\t\t\t\t\t\t Recent files',
+                              item_list)
+      if sel:
+          if sel['accessory_type'] != 'disclosure_indicator':
+                self.doopen(sel['title'])   
       
     def setup_view(self, v, buttons):
       ''' a list of buttons in a frame'''
@@ -107,23 +95,23 @@ class KFrame(Scene):
         b.frame=(10,0,100,50)
         b.y = index * 55
         v.add_subview(b)
-      
+            
     def open_level_menu(self, touch):
        ''' a menu with 4 buttons '''
        buttons = [{'title': 'Restart', 'action': self.restart},
                   {'title': 'Select Level', 'action': self.startgoto},
-                  {'title': 'Goto Level', 'action': self.gotolevel_name},
-    	            {'title': 'Next level', 'action': self.nextlevel},
-    	            {'title': 'Save state', 'action': self.savestate},
-    	            {'title': 'Restore state', 'action': self.restorestate}
-    	            ]
+                  {'title': 'Goto Level', 'action': self.gotolevel_name}, # not working on ipad pro
+                  {'title': 'Next level', 'action': self.nextlevel},
+                  {'title': 'Save state', 'action': self.savestate},
+                  {'title': 'Restore state', 'action': self.restorestate}
+                  ]
        l = len(buttons)
        v = ui.View(bg_color='white',frame=(0,0,120, (50 + len(buttons) * 50)))
        self.setup_view(v, buttons)
        #print(v['Restore state'])
        v.present('popover', popover_location = (220, 40))
-       v.close()     
-        
+       v.close()         
+                 
     def open_view_menu(self, touch):
        buttons = [{'title': 'Tiny', 'action': self.selsize},
                   {'title': 'Small', 'action': self.selsize},
@@ -135,6 +123,7 @@ class KFrame(Scene):
        v.present('popover', popover_location = (330, 40))
        v.close()
        
+    @ui.in_background         
     def selsize(self, responder):
        txt = responder.title
        if txt == 'Tiny':  
@@ -142,7 +131,7 @@ class KFrame(Scene):
        elif txt == 'Small':
          self.settilesize(16)
        elif txt == 'Large':
-         self.settilesize(32)
+         self.settilesize(self.tilesize_original)
        else:
          pass
        responder.superview.close() 
@@ -159,6 +148,7 @@ class KFrame(Scene):
         self.recent_levels = recentlevels
         self.set_recent(recentlevels)
         self.tilesize = tilesize
+        self.tilesize_original = tilesize
         self.__title = ['KYE   ', '']
         # if "Size" in self.settings:
         #   self.tilesize = int(self.settings["Size"])
@@ -208,16 +198,16 @@ class KFrame(Scene):
         """Menu requested restart of the current level."""
         r.superview.close()
         # self.saved_state = None
-        self.app.restart()
-        
+        self.app.restart()       
 
     def doopen(self, filename):
         """Tell the game to open the given level set."""
         self.app.open(filename)
         print('attemption open ', filename)
         
+    @ui.in_background   
     def gotolevel_name(self, responder):
-      # responder.superview.close()
+      responder.superview.close()
       responder.superview.hidden = True
       sel = dialogs.input_alert('Level Name')
       try:
@@ -225,30 +215,32 @@ class KFrame(Scene):
         self.app.goto(sel)
       except (Exception) as e:
         dialogs.hud_alert(f'Level {sel} not known')
-      responder.superview.close()
+      #responder.superview.close()
       
     def nextlevel(self, responder):
       responder.superview.close()
       self.saved_state = None
       self.app.goto(self.app._KyeApp__game.nextlevel)
       
+    @ui.in_background    
     def startgoto(self, responder):
       """Let the user select or type a level to go to,
          and jump to that level."""
+      #responder.superview.close()
       responder.superview.hidden = True
       """ add a tick to levels already completed """
       level_list = []
       for i in self.app.known_levels():
         icon = 'checkmark' if i in self.app.completed_levels() else 'none'
         level_list.append({'title': i,  'accessory_type': icon })
-      sel = dialogs.list_dialog("Known levels\t\t\t\t\t\t\t\tCompleted", level_list)
+      sel = dialogs.list_dialog("Known levels\t\t\t\t\t\t\t\tCompleted", level_list)    
+      responder.superview.close()  
       try:
-      	if sel:
+        if sel:
           self.saved_state = None
           self.app.goto(sel['title'])
       except (Exception) as e:
-        print(e, sel)
-      responder.superview.close()
+        print(e, sel)           
 
     def settilesize(self, ts):
         """Set the tile size based on the selected menu item,
@@ -270,7 +262,8 @@ class KFrame(Scene):
       if self.saved_state:
         self.app._KyeApp__game = self.saved_state
         self.app.do_tick()
-
+        
+    @ui.in_background   
     def endleveldialog(self, nextlevel, endmsg):
         """Call when the level ends, to give the between-level messages."""
         if nextlevel != "":
@@ -290,5 +283,6 @@ class KFrame(Scene):
         """Show an error message in a dialog box."""
         print('error message', message)
         # console.alert(message)
+
 
 

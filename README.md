@@ -13,6 +13,7 @@ Demolition (my own from 1983!)
 SeaBattle
 Othello
 Connect4
+Minesweeper
 Chess (WIP)
 Kye
 

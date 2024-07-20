@@ -5,7 +5,7 @@ from piece import Piece
 
 class Pawn(Piece):
     def get_valid_piece_moves(self, game_state):
-        if self.is_player(Player.PLAYER_1):
+        if self.is_player(Player.PLAYER_2):
             original_row_num, move_one_row, move_two_row = 1, 1, 2
         else:
             original_row_num, move_one_row, move_two_row = 6, -1, -2

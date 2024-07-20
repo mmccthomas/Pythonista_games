@@ -3,6 +3,7 @@
 #
 from scene import *
 from scene import Vector2, get_screen_size
+import sound
 from ui import Path, Image
 from copy import copy
 import console
@@ -127,11 +128,13 @@ class GameBoard(Scene):
     self.DIMENSION_X = len(self.board[0])
     self.background_color = "#232323"
     self.background_image = None
+    self.grid_label_color = 'white'
     self.grid = None
     self.grid_fill = 'lightgreen'
     self.grid_z_position = 10
     self.highlight_fill = '#00bc10'
     self.use_alpha = False
+    self.column_labels = None
     self.require_touch_move = False
     self.allow_any_square = False
     self.last_board = list(map(list, self.board))
@@ -176,31 +179,37 @@ class GameBoard(Scene):
          GRID_POS = (50, 85)
          grid_size = h - 150
          self.font_size = 24
+         self.SQ_SIZE = grid_size // ((self.DIMENSION_X + self.DIMENSION_Y) / 2)
       case 'ipad_portrait':
          GRID_POS = (30, 85)
          grid_size = w - 50
          self.font_size = 24
+         self.SQ_SIZE = grid_size // ((self.DIMENSION_X + self.DIMENSION_Y) / 2)
       case 'iphone_landscape':
          GRID_POS = (30, 50)
          grid_size = h - 150
          self.font_size = 16
+         self.SQ_SIZE = grid_size // ((self.DIMENSION_X + self.DIMENSION_Y) / 2)
       case 'iphone_portrait':
          GRID_POS = (30, 85)
          grid_size = w - 50
          self.font_size = 16
+         self.SQ_SIZE = grid_size // ((self.DIMENSION_X + self.DIMENSION_Y) / 2)
       case 'ipad13_landscape':
          GRID_POS = (100, 85)
          grid_size = h - 150
          self.font_size = 24
+         self.SQ_SIZE = grid_size // ((self.DIMENSION_X + self.DIMENSION_Y) / 2)
       case 'ipad13_portrait':
          GRID_POS = (30, 85)
          grid_size = w - 50
          self.font_size = 24
+         self.SQ_SIZE = grid_size // ((self.DIMENSION_X + self.DIMENSION_X) / 2)
+
          
     for k, v in kwargs.items():
       setattr(self, k, v)
       
-    self.SQ_SIZE = grid_size // max(self.DIMENSION_X, self.DIMENSION_Y)
     self.smaller_tile = 0  # was 20
     self.current_player = self.Player.PLAYER_1
     # Root node for all game elements
@@ -270,10 +279,13 @@ class GameBoard(Scene):
       background.anchor_point = (0, 0)
       parent.add_child(background)
     if self.use_alpha:
-      row_labels = 'A B C D E F G H I J K L M N O P Q R S T U V W X Y Z '
+      row_labels = 'A B C D E F G H I J K L M N O P Q R S T U V W X Y Z AAABACAD'
     else:
-      row_labels = '0 1 2 3 4 5 6 7 8 9 1011121314151617181920212223242526'
-    column_labels = '0 1 2 3 4 5 6 7 8 9 1011121314151617181920212223242526'
+      row_labels = '0 1 2 3 4 5 6 7 8 9 101112131415161718192021222324252627282930'
+    if self.column_labels:
+        column_labels = self.column_labels
+    else:
+        column_labels = '0 1 2 3 4 5 6 7 8 9 101112131415161718192021222324252627282930'
     # Parameters to pass to the creation of ShapeNode
     params = {
       "path": Path.rect(0, 0, self.SQ_SIZE, self.SQ_SIZE * self.DIMENSION_Y),
@@ -291,7 +303,7 @@ class GameBoard(Scene):
       parent.add_child(n)
       n = LabelNode(row_labels[2 * i: 2 * i + 2], parent=self.game_field)
       n.position = (pos.x + self.SQ_SIZE / 2, pos.y + self.DIMENSION_Y * self.SQ_SIZE + 20)
-    
+      n.color = self.grid_label_color
     # Building the rows
     params["path"] = Path.rect(0, 0, self.SQ_SIZE * self.DIMENSION_X, self.SQ_SIZE)
     params['fill_color'] = 'clear'
@@ -304,7 +316,7 @@ class GameBoard(Scene):
       idx = self.DIMENSION_Y - 1 - i
       n = LabelNode(column_labels[2 * idx: 2 * idx + 2], parent=self.game_field)
       n.position = (pos.x - 20, pos.y + self.SQ_SIZE/2)
-          
+      n.color = self.grid_label_color    
     return parent
     
   def setup_ui(self):
@@ -315,7 +327,7 @@ class GameBoard(Scene):
     x, y, w, h = self.grid.bbox # was game_field
     font = ('Avenir Next', self.font_size)
     # all location relative to grid
-    self.msg_label_t = LabelNode("top", font=font, position=(0, h + 10), parent=self.game_field)
+    self.msg_label_t = LabelNode("top", font=font, position=(0, h + 30), parent=self.game_field)
     self.msg_label_t.anchor_point = (0, 0)
     
     self.msg_label_b = LabelNode("bottom", font=font, position=(0, -30), parent=self.game_field)
@@ -659,8 +671,11 @@ class GameBoard(Scene):
     print()
           
     
-  def turn_status(self, turn):
-      self.msg_label_t.text = "white turn" if turn else "black turn"
+  def turn_status(self, turn, custom_message=None):
+      if custom_message:
+         self.msg_label_t.text = custom_message
+      else: 
+          self.msg_label_t.text = "white turn" if turn else "black turn"
       
   def will_close(self):
     print('closing')
@@ -676,6 +691,7 @@ class GameBoard(Scene):
   
   def touch_began(self, touch):
     self.touch_time = time()
+    self.beep = False
     self.start_touch = touch.location
     button_touch= [button.bounds.contains_point(touch.location) for button in self.buttons.values()]
     
@@ -712,6 +728,11 @@ class GameBoard(Scene):
           self.q.put(rc)
 
   def touch_moved(self, touch):
+    touch_length = time() - self.touch_time
+    if touch_length > 0.5 and not self.beep:
+      sound.play_effect('digital:TwoTone2')
+      self.beep = True
+      
     if self.touch_indicator:
       self.touch_indicator.set_pos(self.point_to_rc(touch.location))
       rc = self.point_to_rc(touch.location)
@@ -731,7 +752,8 @@ class GameBoard(Scene):
    
   def touch_ended(self, touch):
     touch_length = time() - self.touch_time
-    self.long_touch = touch_length > 1.0
+    self.long_touch = touch_length > 0.5
+    self.beep = False
     if self.touch_indicator:
       self.touch_indicator.remove_from_parent()
       self.touch_indicator = None

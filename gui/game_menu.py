@@ -44,7 +44,6 @@ class MenuScene (Scene):
     return x_widths, x_indexes, y_indexes
     
   def setup(self):
-    print('show pause menu')
     button_font = ('Avenir Next', 15)
     title_font = ('Avenir Next', 36)
     num_buttons = len(self.button_titles)
@@ -70,14 +69,14 @@ class MenuScene (Scene):
     # updated to allow layout spec
     # create list of row indexes
     x_widths, x_indexes, y_indexes = self.process_layout(layout)
-    print(x_widths, x_indexes, y_indexes)
+    #print(x_widths, x_indexes, y_indexes)
     for i, title in enumerate(reversed(self.button_titles)):
       btn = ButtonNode(title, parent=self.menu_bg)
       btn.size = (btn.size.w // x_widths[i], btn.size.h)
       btn.anchor_point =(0.5, 0.5)
       x = x_indexes[i] * btn.size.w - (x_widths[i]-1) * btn.size.w / 2
       y = (max(y_indexes) - y_indexes[i]) * 64   - (max(y_indexes)-0.5) * btn.size.h 
-      print(title, y, btn.size.h)
+      # print(title, y, btn.size.h)
       btn.position = x, y
   
       self.buttons.append(btn)
