@@ -15,9 +15,10 @@ import logging
 import traceback
 current = os.path.dirname(os.path.realpath(__file__))
 parent = os.path.dirname(current)
+sys.path.append(parent)
 grandparent = os.path.dirname(parent)
 sys.path.append(grandparent)
-from game_menu import MenuScene
+from gui.game_menu import MenuScene
 screen_width, screen_height = get_screen_size()
 
 logging.basicConfig(format='%(asctime)s  %(funcName)s %(message)s',level=logging.INFO)
@@ -172,7 +173,7 @@ class GameBoard(Scene):
     global GRID_POS
     match self.device:
       case 'ipad_landscape':
-         GRID_POS = (100, 85)
+         GRID_POS = (50, 85)
          grid_size = h - 150
          self.font_size = 24
       case 'ipad_portrait':
