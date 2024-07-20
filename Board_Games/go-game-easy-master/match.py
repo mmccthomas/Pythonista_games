@@ -133,10 +133,7 @@ class Match:
         
     def _move_by_human(self):
         while True:
-           coord = self.ui.gui.wait_for_gui(self.ui.board.copy())
-           rc  = (int(coord[:2]), int(coord[2:])) 
-           point = g_ui.rc_to_point(rc)
-           self.ui.gui.set_prompt(f'{point =}')
+           point = self.ui.human_move()
            stone = self.board.exist_stone(point)
            if not stone:
                return point

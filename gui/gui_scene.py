@@ -245,7 +245,7 @@ class GameBoard(Scene):
     else:
       offx, offy = offset
     # Parameters to pass to the creation of ShapeNode
-    x = Path.rect(offx, offy, self.SQ_SIZE * grid_width_x, self.SQ_SIZE * self.DIMENSION_Y)
+    x = Path.rect(0, 0, self.SQ_SIZE * grid_width_x, self.SQ_SIZE * grids_y)
     x.line_width = line_width
     params = {
       "path": x,
@@ -258,18 +258,18 @@ class GameBoard(Scene):
     # Building the columns
     for i in range(grids_x):
       n = ShapeNode(**params)
-      pos = Vector2(0 + i * self.SQ_SIZE * grid_width_x, 0)
+      pos = Vector2(offx + i * self.SQ_SIZE * grid_width_x, offy)
       n.position = pos
       n.anchor_point = anchor
     
     # Building the rows
-    y = Path.rect(offx, offy, self.SQ_SIZE * self.DIMENSION_X, self.SQ_SIZE * grid_width_y)
+    y = Path.rect(0, 0, self.SQ_SIZE * grids_x, self.SQ_SIZE * grid_width_y)
     y.line_width = line_width
     params["path"] = y
     
     for i in range(grids_y):
       n = ShapeNode(**params)
-      pos = Vector2(0, 0 + i * self.SQ_SIZE * grid_width_y)
+      pos = Vector2(offx, offy + i * self.SQ_SIZE * grid_width_y)
       n.position = pos
       n.anchor_point = anchor
     return parent

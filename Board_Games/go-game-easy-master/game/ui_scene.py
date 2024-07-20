@@ -18,7 +18,7 @@ modified for ios using Pythonista by CMT using my gui framework
 BACKGROUND = 'game/images/ramin.jpg'
 BOARD_SIZE = (820, 820)
 BLACK = (0, 0, 0)
-SIZE = 16
+SIZE = 19
 
 def get_rbg(color):
     if color == 'WHITE':
@@ -65,8 +65,8 @@ class UI:
         self.gui.set_grid_colors(grid=BACKGROUND, highlight='lightblue', z_position=30)
         self.gui.require_touch_move(False)
         self.gui.allow_any_move(True)
-        self.gui.setup_gui(log_moves=False, SQ_SIZE=40)
-        self.gui.build_extra_grid(grids_x=SIZE, grids_y=SIZE, grid_width_x=1, grid_width_y=1, color='black', line_width=1, offset=(self.gui.gs.SQ_SIZE/2,self.gui.gs.SQ_SIZE/2), z_position=100) 
+        self.gui.setup_gui(log_moves=False)
+        self.gui.build_extra_grid(grids_x=SIZE-1, grids_y=SIZE-1, grid_width_x=1, grid_width_y=1, color='black', line_width=1, offset=(self.gui.gs.SQ_SIZE/2,self.gui.gs.SQ_SIZE/2), z_position=100) 
         # menus can be controlled by dictionary of labels and functions without parameters
         #self.gui.pause_menu = {'Continue': self.gui.dismiss_menu,  'Save': save, 
         #                 'Load': load,  'Quit': self.gui.gs.close}
@@ -105,6 +105,7 @@ class UI:
         piece = '.'
         r,c = point_to_rc(point)
         self.board[r][c] = piece
+        self.gui.update(self.board)
         #color = get_rbg(color)
         #pygame.draw.circle(self.screen, color, coords(point), size, 0)
         #pygame.display.update()
@@ -118,6 +119,14 @@ class UI:
         #area_rect = pygame.Rect(blit_coords, (40, 40))
         #self.screen.blit(self.background, blit_coords, area_rect)
         #pygame.display.update()
+        
+    def human_move(self):
+        while True:
+           coord = self.gui.wait_for_gui(self.board.copy())
+           rc  = (int(coord[:2]), int(coord[2:])) 
+           point = rc_to_point(rc)
+           self.gui.set_prompt(f'{point =}')
+           return point
 
     def save_image(self, path_to_save):
         pass
