@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-from game.go import Board, opponent_color
+from game.go import Board, opponent_color, BOARD_SIZE
 from game.ui_scene import UI
 import game.ui_scene as g_ui
 #import pygame
@@ -58,7 +58,7 @@ class Match:
         self.time_elapsed = time.time()
 
         # First move is fixed on the center of board
-        first_move = (10, 10)
+        first_move = (BOARD_SIZE//2, BOARD_SIZE//2)
         self.board.put_stone(first_move, check_legal=False)
         self.ui.update_board()
 
@@ -78,10 +78,10 @@ class Match:
             # Apply action
             prev_legal_actions = self.board.legal_actions.copy()
             self.board.put_stone(point, check_legal=False)
+            self.ui.update_board()
             # Remove previous legal actions on board
             self.ui.remove(prev_legal_actions)
-            # Draw new point
-            self.ui.update_board()
+            
             
             # Update new legal actions and any removed groups
             if self.board.winner:
@@ -200,7 +200,7 @@ def main():
 
 if __name__ == '__main__':
     #match = Match()
-    match = Match(agent_black=RandomAgent('BLACK'))
+    match = Match(agent_white=RandomAgent('WHITE'))
     #match = Match(agent_black=ExpectimaxAgent('BLACK', depth=2), agent_white=AlphaBetaAgent('WHITE', depth=2), gui=True)
     #match = Match(agent_black=RandomAgent('BLACK'), agent_white=RandomAgent('WHITE'), gui=True)
     #match = Match(agent_black=RandomAgent('BLACK'), agent_white=RandomAgent('WHITE'), gui=False)
