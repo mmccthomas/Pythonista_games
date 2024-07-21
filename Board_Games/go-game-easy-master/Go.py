@@ -28,6 +28,7 @@ class Match:
 
         gui = gui if agent_black and agent_white else True
         self.ui = UI() if gui else None
+        self.ui.board = self.board
         self.dir_save = dir_save
 
         # Metadata
@@ -65,9 +66,11 @@ class Match:
         # Take turns to play move
         while self.board.winner is None:
             if self.board.next == 'BLACK':
+                self.ui.gui.set_top('Black move')
                 point = self.perform_one_move(self.agent_black)
             else:
                 point = self.perform_one_move(self.agent_white)
+                self.ui.gui.set_top('White move')
 
             # Check if action is legal
             if point not in self.board.legal_actions:
@@ -128,8 +131,9 @@ class Match:
 
     def _move_by_agent(self, agent):
         if self.ui:
-            pygame.time.wait(100)
-            pygame.event.get()
+            time.sleep(0.1)
+            
+            #pygame.event.get()
         return agent.get_action(self.board)
         
     def _move_by_human(self):
@@ -200,10 +204,11 @@ def main():
 
 
 if __name__ == '__main__':
-    match = Match()
+    #match = Match()
     # match = Match(agent_black=RandomAgent('BLACK'))
-    # match = Match(agent_black=RandomAgent('BLACK'), agent_white=RandomAgent('WHITE'), gui=True)
-    # match = Match(agent_black=RandomAgent('BLACK'), agent_white=RandomAgent('WHITE'), gui=False)
+    match = Match(agent_black=ExpectimaxAgent('BLACK', depth=2), agent_white=AlphaBetaAgent('WHITE', depth=2), gui=True)
+    #match = Match(agent_black=RandomAgent('BLACK'), agent_white=RandomAgent('WHITE'), gui=True)
+    #match = Match(agent_black=RandomAgent('BLACK'), agent_white=RandomAgent('WHITE'), gui=False)
     match.start()
     # print(match.winner + ' wins!')
     # print('Match ends in ' + str(match.time_elapsed) + ' seconds')
