@@ -50,9 +50,9 @@ class Player():
     self.PLAYER_1 = WHITE = 'O'
     self.PLAYER_2 = BLACK = '0'
     self.EMPTY = ' '
-    self.PLAYERS = [self.PLAYER_1, self.PLAYER_2, '.']
-    self.PIECES = ['emj:White_Circle', 'emj:Black_Circle', 'iow:close_circled_24']
-    self.PIECE_NAMES = {BLACK: 'Black', WHITE: 'White'}
+    self.PLAYERS = [self.PLAYER_1, self.PLAYER_2]
+    self.PIECES = ['emj:White_Circle', 'emj:Black_Circle']
+    self.PIECE_NAMES = {'0': 'Black', 'O': 'White'}
     
 class UI:
     def __init__(self):
@@ -98,17 +98,21 @@ class UI:
     def initialize(self):
         """This method should only be called once, when initializing the board."""
         # Apply marker dots to board, use bold 'o' 
+        self.gui.clear_messages()
         self.square_list =[]
         for i in range(3):
             for j in range(3):
-                self.square_list.append(Squares((3 + (i*6), 3 + (j*6)), chr(664), 'clear', z_position=30, stroke_color='clear', text_anchor_point=(-.45, .9), alpha =1, text_color='grey', font=('Arial Rounded MT Bold', 24)))     
-        self.gui.add_numbers(self.square_list)   
+                self.square_list.append(Squares((3.5 + (i*6), 3.5 + (j*6)), '', 'black', z_position=30, stroke_color='clear', text_anchor_point=(-.45, .9), alpha =1, text_color='grey', radius=5, sqsize=10, anchor_point=(0.5, 0.5), font=('Arial Rounded MT Bold', 24)))     
+        self.gui.add_numbers(self.square_list )   
 
     def draw(self, point, color, size=20):
         """ place color at point, need to convert to rc 
         10,10 is centre of board"""
         #piece = 'o' if color == 'WHITE' else '0' 
         #piece = '.'
+        r,c = point_to_rc(point)
+        self.square_list.append(Squares((0.5 + r, 0.5 + c), '', '#2470ff', z_position=5, stroke_color='clear',  radius=5, sqsize=15, anchor_point=(0.5, 0.5)))     
+        self.gui.add_numbers(self.square_list )   
         self.update_board()
         #r,c = point_to_rc(point)
         #self.display_board[r][c] = piece
@@ -117,10 +121,13 @@ class UI:
     def remove(self, point):
         """ remove piece at point """
         self.update_board()
-        r,c = point_to_rc(point)
-        if self.display_board[r][c] == '.':
-            self.display_board[r][c] = ' '   
-        self.gui.update(self.display_board)
+        if isinstance(point, list):
+            points = [(point_to_rc(p)[0] + 0.5, point_to_rc(p)[1] + 0.5) for p in point]
+            self.gui.clear_numbers(points)
+        else:
+            r,c = point_to_rc(point)
+            self.gui.clear_numbers([(0.5 + r, 0.5 + c)])
+        #self.gui.update(self.display_board)
         
     def human_move(self):
         while True:

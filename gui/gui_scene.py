@@ -602,18 +602,26 @@ class GameBoard(Scene):
     if clear_previous:
         self.clear_numbers()
     
+    
     def add(a, b):
         return tuple(p + q for p, q in zip(a, b))
 
     for item in items:
+        if hasattr(item, 'sqsize'):
+           sqsize = item.sqsize
+        else:
+           sqsize = self.SQ_SIZE
         r, c = item.position
-        t=ShapeNode(ui.Path.rounded_rect(0, 0, self.SQ_SIZE, self.SQ_SIZE, item.radius), 
+        t=ShapeNode(ui.Path.rounded_rect(0, 0, sqsize, sqsize, item.radius), 
                     fill_color=item.color,  position=self.rc_to_pos(r, c), 
                     stroke_color=item.stroke_color,
                     z_position=item.z_position,
                     alpha=item.alpha,
                     parent=self.game_field)
-        t.anchor_point = (0, 0)
+        if hasattr(item, 'anchor_point'):
+            t.anchor_point = item.anchor_point
+        else:
+            t.anchor_point = (0, 0)
         self.numbers.append(t)
         #  unmodified text point is centre of cell
         # text anchor point will be -1 to +1

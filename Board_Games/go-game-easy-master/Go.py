@@ -80,8 +80,7 @@ class Match:
             prev_legal_actions = self.board.legal_actions.copy()
             self.board.put_stone(point, check_legal=False)
             # Remove previous legal actions on board
-            for action in prev_legal_actions:
-                self.ui.remove(action)
+            self.ui.remove(prev_legal_actions)
             # Draw new point
             self.ui.draw(point, opponent_color(self.board.next))
             # Update new legal actions and any removed groups
@@ -205,8 +204,8 @@ def main():
 
 if __name__ == '__main__':
     #match = Match()
-    # match = Match(agent_black=RandomAgent('BLACK'))
-    match = Match(agent_black=ExpectimaxAgent('BLACK', depth=2), agent_white=AlphaBetaAgent('WHITE', depth=2), gui=True)
+    match = Match(agent_black=RandomAgent('BLACK'))
+    #match = Match(agent_black=ExpectimaxAgent('BLACK', depth=2), agent_white=AlphaBetaAgent('WHITE', depth=2), gui=True)
     #match = Match(agent_black=RandomAgent('BLACK'), agent_white=RandomAgent('WHITE'), gui=True)
     #match = Match(agent_black=RandomAgent('BLACK'), agent_white=RandomAgent('WHITE'), gui=False)
     match.start()
