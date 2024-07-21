@@ -124,7 +124,7 @@ class Sudoko(LetterGame):
     self.board = [[SPACE] * SIZE for row_num in range(SIZE)]
     self.gui.update(self.board)
     
-    self.gui.build_extra_grid(3,3, grid_width_x=3, grid_width_y=3, color='white', line_width=2)
+    self.gui.build_extra_grid(3, 3, grid_width_x=3, grid_width_y=3, color='white', line_width=2)
     # level controls which cages are used Easy is 2s and 3s
     level = 'Easy' if self.puzzle in [ 'Killer', 'Killer_Harder', 'KenKen'] else  None
     cg = Cages(level)

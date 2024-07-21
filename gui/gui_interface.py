@@ -246,7 +246,7 @@ class Gui():
     self.v.add_subview(self.letter_panel)
     return self.letter_panel
          
-  def set_grid_colors(self, grid=None, highlight=None, z_position=10):
+  def set_grid_colors(self, grid=None, highlight=None, z_position=10, grid_stroke_color=None):
     if grid is not None:
       try:          
           image = ui.Image.named(grid)
@@ -256,7 +256,7 @@ class Gui():
           print('error in set_grid_colors', e)
           if grid.startswith('#') or ui.parse_color(grid)!=(0.0,0.0,0.0,0.0):
             self.gs.grid_fill = grid
-            
+    self.gs.grid_stroke_color = grid_stroke_color       
     self.gs.grid_z_position = z_position   
     if highlight is not None:
        self.gs.highlight_fill = highlight
@@ -532,6 +532,7 @@ class Squares():
     self.alpha = .5
     self.text_anchor_point = (0.5, 0.5)
     
+    self.offset = (0, 0)
     self.stroke_color = 'black'
     self.text_color = 'black'
     self.font_size = 24

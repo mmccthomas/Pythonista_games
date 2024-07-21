@@ -131,6 +131,7 @@ class GameBoard(Scene):
     self.grid_label_color = 'white'
     self.grid = None
     self.grid_fill = 'lightgreen'
+    self.grid_stroke_color = None
     self.grid_z_position = 10
     self.highlight_fill = '#00bc10'
     self.use_alpha = False
@@ -241,11 +242,11 @@ class GameBoard(Scene):
     if grid_width_y is None:
       grid_width_y = grids_y
     if offset is None:  
-      offx, offy = 0,0
+      offx, offy = 0, 0
     else:
       offx, offy = offset
     # Parameters to pass to the creation of ShapeNode
-    x = Path.rect(0, 0, self.SQ_SIZE * grid_width_x, self.SQ_SIZE * grids_y)
+    x = Path.rect(0, 0, self.SQ_SIZE * grid_width_x, self.SQ_SIZE * grids_y * grid_width_y)
     x.line_width = line_width
     params = {
       "path": x,
@@ -263,7 +264,7 @@ class GameBoard(Scene):
       n.anchor_point = anchor
     
     # Building the rows
-    y = Path.rect(0, 0, self.SQ_SIZE * grids_x, self.SQ_SIZE * grid_width_y)
+    y = Path.rect(0, 0, self.SQ_SIZE * grids_x * grid_width_x, self.SQ_SIZE * grid_width_y)
     y.line_width = line_width
     params["path"] = y
     
@@ -294,7 +295,7 @@ class GameBoard(Scene):
     params = {
       "path": Path.rect(0, 0, self.SQ_SIZE, self.SQ_SIZE * self.DIMENSION_Y),
       "fill_color": self.grid_fill,
-      "stroke_color": "darkgrey",
+      "stroke_color": "darkgrey" if self.grid_stroke_color is None else self.grid_stroke_color,
       "z_position": self.grid_z_position
     }
     anchor = Vector2(0, 0)
@@ -600,9 +601,8 @@ class GameBoard(Scene):
     for k, v in kwargs.items():
       setattr(self, k, v)
     if clear_previous:
-        self.clear_numbers()
-    
-    
+        self.clear_numbers()    
+            
     def add(a, b):
         return tuple(p + q for p, q in zip(a, b))
 
@@ -612,8 +612,9 @@ class GameBoard(Scene):
         else:
            sqsize = self.SQ_SIZE
         r, c = item.position
+        x, y = item.offset
         t=ShapeNode(ui.Path.rounded_rect(0, 0, sqsize, sqsize, item.radius), 
-                    fill_color=item.color,  position=self.rc_to_pos(r, c), 
+                    fill_color=item.color,  position=self.rc_to_pos(r+ y, c + x), 
                     stroke_color=item.stroke_color,
                     z_position=item.z_position,
                     alpha=item.alpha,

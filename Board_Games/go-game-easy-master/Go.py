@@ -55,13 +55,12 @@ class Match:
     def _start_with_ui(self):
         """Start the game with GUI."""
         self.ui.initialize()
-        self.ui.stonedict = self.board.stonedict
         self.time_elapsed = time.time()
 
         # First move is fixed on the center of board
         first_move = (10, 10)
         self.board.put_stone(first_move, check_legal=False)
-        self.ui.draw(first_move, opponent_color(self.board.next))
+        self.ui.update_board()
 
         # Take turns to play move
         while self.board.winner is None:
@@ -82,17 +81,16 @@ class Match:
             # Remove previous legal actions on board
             self.ui.remove(prev_legal_actions)
             # Draw new point
-            self.ui.draw(point, opponent_color(self.board.next))
+            self.ui.update_board()
+            
             # Update new legal actions and any removed groups
             if self.board.winner:
                 for group in self.board.removed_groups:
-                    for point in group.points:
-                        self.ui.remove(point)
+                    self.ui.remove(group.points)
                 if self.board.end_by_no_legal_actions:
                     print('Game ends early (no legal action is available for %s)' % self.board.next)
             else:
-                for action in self.board.legal_actions:
-                    self.ui.draw(action, 'BLUE', 8)
+                self.ui.draw(self.board.legal_actions, 'BLUE', 8)
 
         self.time_elapsed = time.time() - self.time_elapsed
         if self.dir_save:
@@ -131,8 +129,6 @@ class Match:
     def _move_by_agent(self, agent):
         if self.ui:
             time.sleep(0.1)
-            
-            #pygame.event.get()
         return agent.get_action(self.board)
         
     def _move_by_human(self):

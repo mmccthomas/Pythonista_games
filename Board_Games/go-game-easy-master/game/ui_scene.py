@@ -62,7 +62,7 @@ class UI:
         self.gui = Gui(self.display_board, Player())
         #self.COLUMN_LABELS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'[:self.sizex]
         self.gui.set_alpha(False) 
-        self.gui.set_grid_colors(grid=BACKGROUND, highlight='lightblue', z_position=5)
+        self.gui.set_grid_colors(grid=BACKGROUND, highlight='lightblue', z_position=5, grid_stroke_color='clear')
         self.gui.require_touch_move(False)
         self.gui.allow_any_move(True)
         self.gui.setup_gui(log_moves=False)
@@ -102,39 +102,43 @@ class UI:
         self.square_list =[]
         for i in range(3):
             for j in range(3):
-                self.square_list.append(Squares((3.5 + (i*6), 3.5 + (j*6)), '', 'black', z_position=30, stroke_color='clear', text_anchor_point=(-.45, .9), alpha =1, text_color='grey', radius=5, sqsize=10, anchor_point=(0.5, 0.5), font=('Arial Rounded MT Bold', 24)))     
+                self.square_list.append(Squares((2 + (i*6), 3 + (j*6)), '', 'black', z_position=5, stroke_color='clear',alpha =1, radius=5, sqsize=10, offset=(0.5,0.5), anchor_point=(0.5, 0.5)))     
         self.gui.add_numbers(self.square_list )   
 
     def draw(self, point, color, size=20):
         """ place color at point, need to convert to rc 
         10,10 is centre of board"""
-        #piece = 'o' if color == 'WHITE' else '0' 
-        #piece = '.'
-        r,c = point_to_rc(point)
-        self.square_list.append(Squares((0.5 + r, 0.5 + c), '', '#2470ff', z_position=5, stroke_color='clear',  radius=5, sqsize=15, anchor_point=(0.5, 0.5)))     
-        self.gui.add_numbers(self.square_list )   
+        if isinstance(point, list):
+            points = [(point_to_rc(p)[0], point_to_rc(p)[1]) for p in point]
+            squares = [Squares((r, c), '', '#2470ff', z_position=5, stroke_color='clear',  radius=5, sqsize=15, offset = (0.5, 0.5), anchor_point=(0.5, 0.5)) for r,c in points]
+            self.gui.replace_numbers(squares)
+        else:
+             r,c = point_to_rc(point)      
+             self.gui.replace_numbers([Squares((r, c), '', '#2470ff', z_position=5, stroke_color='clear',  radius=5, sqsize=15, offset = (0.5, 0.5), anchor_point=(0.5, 0.5))])    
         self.update_board()
         #r,c = point_to_rc(point)
         #self.display_board[r][c] = piece
+        self.gui.set_moves(str(len(self.gui.gs.numbers)))
       
 
     def remove(self, point):
         """ remove piece at point """
         self.update_board()
         if isinstance(point, list):
-            points = [(point_to_rc(p)[0] + 0.5, point_to_rc(p)[1] + 0.5) for p in point]
+            points = [(point_to_rc(p)[0], point_to_rc(p)[1]) for p in point]
             self.gui.clear_numbers(points)
         else:
             r,c = point_to_rc(point)
-            self.gui.clear_numbers([(0.5 + r, 0.5 + c)])
-        #self.gui.update(self.display_board)
+            self.gui.clear_numbers([(r, c)])
+        self.gui.set_moves(str(len(self.gui.gs.numbers)))
+        #.gui.update(self.display_board)
         
     def human_move(self):
         while True:
            coord = self.gui.wait_for_gui(self.display_board)
            rc  = (int(coord[:2]), int(coord[2:])) 
            point = rc_to_point(rc)
-           self.gui.set_prompt(f'{rc =}')
+           #self.gui.set_prompt(f'{rc =}')
            return point
 
     def save_image(self, path_to_save):
