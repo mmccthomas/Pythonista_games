@@ -76,32 +76,35 @@ class ZipWord(LetterGame):
     
     
   def update_board(self, hint=False, filter_placed=None):   
-    LetterGame.update_board(self,hint, filter_placed)     
-    # create text list    
-   
+    LetterGame.update_board(self,hint, filter_placed)  
+       
+    # create text list       
     msg = []
     # TODO this needs some work
+    # confusion between filter_placed
+    
     # if filter_placed list only those words not yet on the board, else those words on the board
     words_placed = [word.word for word in self.word_locations if  word.fixed]    
     words = []
     x, y, width, height = self.gui.grid.bbox
-    for k, v in self.all_word_dict.items():
-      if v:
+    # iterate over word lengths
+    for k, wordlist in self.all_word_dict.items():
+      if wordlist:
          words.append(f'\nLEN={k}\n')
          if filter_placed is True:
            # sort unplaced words
-           w = sorted([word for word in v if word not in words_placed])
+           w = sorted([word for word in wordlist if word not in words_placed])
            self.word_display = w
          elif filter_placed is False:
            # sort placed words
-           w = sorted([word for word in v if word in words_placed])  
+           w = sorted([word for word in wordlist if word in words_placed])  
            self.word_display = w
          else: # None
            if hasattr(self, 'word_display'):
                # previous displayed list
                w = self.word_display
            else:
-               w =  sorted([word for word in v]) 
+               w =  sorted([word for word in wordlist]) 
          if self.gui.device.endswith('landscape'):        
                words.extend([f'{word}\n' if i %3 ==2 else f'{word}  ' for i, word in enumerate(w)])     
                position = (width + 10, -20)
@@ -115,9 +118,7 @@ class ZipWord(LetterGame):
       
     msg = ''.join(words)
     # set message box to be anchored at bottom left
-    self.gui.set_moves(msg, font=('Avenir Next',fontsize), anchor_point=anchor,position=position)
-    # now have numbers in number board   
-    #self.gui.add_numbers(square_list)  
+    self.gui.set_moves(msg, font=('Avenir Next',fontsize), anchor_point=anchor, position=position) 
     self.gui.update(self.board)  
   
   def run(self):
@@ -136,15 +137,17 @@ class ZipWord(LetterGame):
     self.delta_t()
     
     self.start_time = time()
-    cx.set_props(board=self.board, empty_board=self.empty_board, 
-                 all_word_dict=self.all_word_dict, max_depth=self.max_depth, debug=False)
+    cx.set_props(board=self.board,
+                 empty_board=self.empty_board, 
+                 all_word_dict=self.all_word_dict, 
+                 max_depth=self.max_depth, 
+                 debug=False)
     cx.populate_words_graph(max_iterations=1000, length_first=False)  
     self.delta_t('time to populate grid') 
-    pass
-    # self.print_board()
     self.check_words()
     self.create_number_board()
     self.gui.build_extra_grid(self.gui.gs.DIMENSION_X, self.gui.gs.DIMENSION_Y, grid_width_x=1, grid_width_y=1,color='grey', line_width=1)
+    
     while True:
       move = self.get_player_move(self.board)               
       finish = self.process_turn( move, self.board) 
