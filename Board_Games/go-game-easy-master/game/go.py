@@ -5,7 +5,7 @@ from game.util import PointDict
 This file is the full backend environment of the game.
 """
 
-BOARD_SIZE = 10  # number of rows/cols = BOARD_SIZE - 1
+BOARD_SIZE = 20  # number of rows/cols = BOARD_SIZE - 1
 
 
 def opponent_color(color):

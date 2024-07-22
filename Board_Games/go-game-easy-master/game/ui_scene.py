@@ -28,7 +28,15 @@ def point_to_rc(point):
 def rc_to_point(rc):
   x, y = rc[0], rc[1]
   return x, y
-    
+
+def get_rbg(color):
+    if color == 'WHITE':
+        return 255, 255, 255
+    elif color == 'BLACK':
+        return 0, 0, 0
+    else:
+        return 0, 133, 211
+            
 class Player():
   def __init__(self):
     self.PLAYER_1 = WHITE = 'O'
@@ -52,28 +60,11 @@ class UI:
         self.gui.build_extra_grid(grids_x=SIZE-1, grids_y=SIZE-1, 
                                   grid_width_x=1, grid_width_y=1, color='black', 
                                   line_width=2, offset=(self.gui.gs.SQ_SIZE/2, self.gui.gs.SQ_SIZE/2), 
-                                  z_position=10) 
+                                  z_position=5) 
         # menus can be controlled by dictionary of labels and functions without parameters
         #self.gui.pause_menu = {'Continue': self.gui.dismiss_menu,  'Save': save, 
         #                 'Load': load,  'Quit': self.gui.gs.close}
         #self.gui.start_menu = {'New Game': run, 'Quit': self.gui.gs.close} 
-               
-    def update_board(self):
-        for color_, item in self.board.stonedict.d.items():          
-            for position, group in item.items():
-              
-              if group != []:
-                  print(f'{group = }')
-                  # structure is [BLACK - stones: [(10, 10)]; liberties: [(9, 10), ...(11, 10)]]              
-                  group = group[0]
-                  points = group.points
-                  liberties = group.liberties
-                  color = group.color
-                  for point in points:
-                      r,c = point_to_rc(point)
-                      self.display_board[r][c] = '0' if color == 'BLACK' else 'O'     
-                  self.draw(list(liberties), color=None)                 
-        self.gui.update(self.display_board)
                      
     def initialize(self):
         """This method should only be called once, when initializing the board."""
@@ -93,26 +84,32 @@ class UI:
                                                 radius=5, sqsize=10, offset=(0.5,0.5), anchor_point=(0.5, 0.5)))     
         self.gui.add_numbers(self.square_list )   
 
-    def draw(self, point, color, size=20):
+    def draw(self, point, color, size=None):
         """ place color at point, need to convert to rc 
-        10,10 is centre of board"""
-        if isinstance(point, list):
-            points = [(point_to_rc(p)[0]-1, point_to_rc(p)[1]) for p in point]
-            squares = [Squares((r, c), '', '#2470ff', z_position=5, 
-                               stroke_color='clear',  radius=5, sqsize=15, 
-                               offset = (0.5, 0.5), anchor_point=(0.5, 0.5)) 
-                               for r,c in points]
-            self.gui.replace_numbers(squares)
-        else:
-             r,c = point_to_rc(point)      
-             self.gui.replace_numbers([Squares((r, c), '', '#2470ff', z_position=5, 
-                                       stroke_color='clear',  radius=5, sqsize=15, 
-                                       offset = (0.5, 0.5), anchor_point=(0.5, 0.5))])    
-        self.gui.set_moves(str(len(self.gui.gs.numbers)))     
+        """
+        if size is None:
+            # place tile
+            r,c = point_to_rc(point)
+            self.display_board[r][c] = '0' if color == 'BLACK' else 'O'
+            self.gui.update(self.display_board)
+        else:          
+            color = get_rbg(color)
+            if isinstance(point, list):
+                points = [(point_to_rc(p)[0]-1, point_to_rc(p)[1]) for p in point]
+                squares = [Squares((r, c), '', color, z_position=8, alpha=1,
+                                   stroke_color='clear',  radius=5, sqsize=size, 
+                                   offset = (0.5, 0.5), anchor_point=(0.5, 0.5)) 
+                                   for r,c in points]
+                self.gui.replace_numbers(squares)
+            else:
+                 r,c = point_to_rc(point)      
+                 self.gui.replace_numbers([Squares((r, c), '', color, z_position=8, alpha=1,
+                                           stroke_color='clear',  radius=5, sqsize=size, 
+                                           offset = (0.5, 0.5), anchor_point=(0.5, 0.5))])    
+            self.gui.set_moves(str(len(self.gui.gs.numbers)))     
 
     def remove(self, point):
         """ remove liberties at point """
-        self.update_board()
         if isinstance(point, list):
             points = [(point_to_rc(p)[0]-1, point_to_rc(p)[1]) for p in point]
             self.gui.clear_numbers(points)
@@ -120,7 +117,6 @@ class UI:
             r,c = point_to_rc(point)
             self.gui.clear_numbers([(r, c)])
         self.gui.set_moves(str(len(self.gui.gs.numbers)))
-        #.gui.update(self.display_board)
         
     def human_move(self):
         while True:

@@ -41,6 +41,8 @@ class ZipWord(LetterGame):
     self.debug = False
     # allows us to get a list of rc locations
     self.log_moves = True
+    self.word_dict = {}
+    self.word_locations = []
     self.load_words_from_file(WordList)
     self.initialise_board() 
     # create game_board and ai_board
@@ -55,7 +57,7 @@ class ZipWord(LetterGame):
     self.gui.set_grid_colors(grid='white', highlight='lightblue')
     self.gui.require_touch_move(False)
     self.gui.allow_any_move(True)
-    self.gui.setup_gui(log_moves=False) # SQ_SIZE=45)
+    self.gui.setup_gui(log_moves=False)
     
     # menus can be controlled by dictionary of labels and functions without parameters
     self.gui.set_pause_menu({'Continue': self.gui.dismiss_menu, 
@@ -78,7 +80,7 @@ class ZipWord(LetterGame):
     # create text list    
    
     msg = []
-    #words=self.all_words
+    # TODO this needs some work
     # if filter_placed list only those words not yet on the board, else those words on the board
     words_placed = [word.word for word in self.word_locations if  word.fixed]    
     words = []
@@ -131,12 +133,11 @@ class ZipWord(LetterGame):
     self.compute_intersections()
     self.max_depth = 3
     self.start_time = time()
-    component = self.compute_depths()
     self.delta_t()
     
     self.start_time = time()
     cx.set_props(board=self.board, empty_board=self.empty_board, 
-                 all_word_dict=self.all_word_dict, max_depth=self.max_depth)
+                 all_word_dict=self.all_word_dict, max_depth=self.max_depth, debug=False)
     cx.populate_words_graph(max_iterations=1000, length_first=False)  
     self.delta_t('time to populate grid') 
     pass
@@ -148,8 +149,6 @@ class ZipWord(LetterGame):
       move = self.get_player_move(self.board)               
       finish = self.process_turn( move, self.board) 
       sleep(1)
-      #if finish:
-      #  break
       if self.game_over():
         break
     
@@ -173,13 +172,12 @@ class ZipWord(LetterGame):
       for key, v in self.word_dict.items():
         if '_frame' in key:
          board = [row.replace("'", "") for row in v]
-         #board = [row.replace('"', '') for row in board]
          board =  [row.split('/') for row in board]   
          name  = key.split('_')[0]         
          word_lists[name]  = [self.word_dict[name], board]
          
     self.puzzle = random.choice(list(word_lists))
-    self.puzzle = 'Puzzle1'
+    #self.puzzle = 'Puzzle11 38'
     self.all_words, self.board = word_lists[self.puzzle]
     self.all_words = [word.lower() for word in self.all_words]
     # parse board to get word objects
@@ -229,9 +227,10 @@ class ZipWord(LetterGame):
             if w.intersects(coord) and w.direction == dirn:
               w.update_grid(coord, self.board, letter)
               break
-          w.fixed = (w == letter)
+          if (w == letter):
+              w.fixed = False
           #self.known_dict[no] = [letter, correct]
-          self.update_board(filter_placed=None)
+          self.update_board(filter_placed=False)
           return False 
         else:
           return False     
@@ -311,8 +310,8 @@ class ZipWord(LetterGame):
           return (None, None), None, None     
        
   def restart(self):
+    # TODO this does not always work. Find why
     self.gui.gs.close()
-    self.finished = False
     self.__init__()
     self.run()   
       

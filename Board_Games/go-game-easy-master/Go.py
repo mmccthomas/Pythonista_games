@@ -60,7 +60,7 @@ class Match:
         # First move is fixed on the center of board
         first_move = (BOARD_SIZE//2, BOARD_SIZE//2)
         self.board.put_stone(first_move, check_legal=False)
-        self.ui.update_board()
+        self.ui.draw(first_move, opponent_color(self.board.next))
 
         # Take turns to play move
         while self.board.winner is None:
@@ -72,13 +72,16 @@ class Match:
                 self.ui.gui.set_top('White move')
 
             # Check if action is legal
+            #print(f'{point = }, {self.board.legal_actions = }')
             if point not in self.board.legal_actions:
-                continue
+                pass
+                #continue
 
             # Apply action
             prev_legal_actions = self.board.legal_actions.copy()
             self.board.put_stone(point, check_legal=False)
-            self.ui.update_board()
+            # Draw new point
+            self.ui.draw(point, opponent_color(self.board.next))
             # Remove previous legal actions on board
             self.ui.remove(prev_legal_actions)
             
@@ -90,7 +93,7 @@ class Match:
                 if self.board.end_by_no_legal_actions:
                     print('Game ends early (no legal action is available for %s)' % self.board.next)
             else:
-                self.ui.draw(self.board.legal_actions, 'BLUE', 8)
+                self.ui.draw(self.board.legal_actions, 'BLUE', 15)
 
         self.time_elapsed = time.time() - self.time_elapsed
         if self.dir_save:
@@ -200,7 +203,7 @@ def main():
 
 if __name__ == '__main__':
     #match = Match()
-    match = Match(agent_white=RandomAgent('WHITE'))
+    match = Match(agent_black=RandomAgent('BLACK'))
     #match = Match(agent_black=ExpectimaxAgent('BLACK', depth=2), agent_white=AlphaBetaAgent('WHITE', depth=2), gui=True)
     #match = Match(agent_black=RandomAgent('BLACK'), agent_white=RandomAgent('WHITE'), gui=True)
     #match = Match(agent_black=RandomAgent('BLACK'), agent_white=RandomAgent('WHITE'), gui=False)
