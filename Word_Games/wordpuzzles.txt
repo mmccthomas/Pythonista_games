@@ -1268,3 +1268,94 @@ Puzzle14-135_frame:
 ' / / /#/#/#/ /#/#/ /#/#/ /#/#/ /#/#/ /#/#/#/ / / '
 ' /#/ /#/#/#/ /#/#/ /#/#/ /#/#/ /#/#/ /#/#/#/ /#/ '
 ' / / / / / / /#/#/ / / / / / / /#/#/ / / / / / / '
+
+Puzzle15-21:  
+AMMO
+JIBE
+LAMA
+LEAN
+LIMO
+MALL
+MUNG
+NANA
+NODE
+OURS
+PACY
+PEAT
+POSY
+PUPA
+RACE
+SCRY
+SIGN
+SLIM
+STAY
+TRAM
+TYPE
+TYRE
+BIKER
+BOOTH
+CLASP
+CORAL
+COVET
+ELECT
+EMOJI
+LIKEN
+PEARL
+TREND
+UNITY
+ARTERY
+ARTFUL
+BIKINI
+BONSAI
+EXTANT
+LACTIC
+LUSTRE
+MARBLE
+NITWIT
+PEDALO
+PRAISE
+REGENT
+SALINE
+TANNIN
+ASHAMED
+BURN OUT
+CHAPATI
+INSIPID
+KETCHUP
+LEGROOM
+SCOURER
+SMARTEN
+SUBEDIT
+SYMPTOM
+TRELLIS
+ALOPECIA
+EARPIECE
+INDEBTED
+SUNSHINE
+CHARGRILL
+CLEARANCE
+PERISCOPE
+TRAPEZIUM
+
+Puzzle15-21_frame:
+'#/#/#/#/#/ / / / / / / /#/ /#/#/#/ / / / '
+'#/#/#/#/#/ /#/#/#/#/ /#/ / / / / /#/ /#/#'
+'#/#/#/#/#/ /#/ / / / / / / /#/#/#/#/ /#/ '
+'#/#/#/#/#/ /#/ /#/#/ /#/ / / / / / / /#/ '
+'#/#/#/#/#/ /#/ /#/ / / / /#/ /#/#/#/ /#/ '
+'s/u/n/s/h/i/n/e/#/ /#/#/ /#/ / / / / /#/ '
+' /#/#/ /#/#/#/ /#/ /#/ /#/#/ /#/#/ / / / '
+' /#/#/ /#/ /#/ / / / / / /#/ / / / /#/#/ '
+' / / / / / / / /#/ /#/ /#/#/ /#/#/ / / / '
+' /#/#/ /#/ /#/ /#/#/ / / / / / / / / /#/#'
+' /#/#/ / / / /#/#/ / / / /#/#/ /#/#/ /#/ '
+' / / / /#/ / / / / / /#/ / / / / / / / / '
+'#/#/ /#/ /#/ /#/#/ / / / /#/#/ /#/#/#/#/ '
+' / / / / /#/ /#/#/ /#/ /#/ /#/ /#/ / / / '
+' /#/ /#/ / / / / / /#/ / / / / / / /#/#/ '
+' /#/ /#/ /#/ /#/ / / / /#/ /#/ /#/ / / / '
+' /#/ /#/#/#/#/#/ /#/ /#/ / / / /#/ /#/ /#'
+' /#/ /#/ /#/ /#/ / / / / / /#/ / / / / / '
+' / / / / / / / / /#/ /#/ /#/#/#/#/ /#/ /#'
+'#/#/#/#/ /#/ /#/ /#/ / / / / / /#/#/#/ /#'
+' / / / / / / /#/ /#/ /#/#/#/#/#/ / / / / '
