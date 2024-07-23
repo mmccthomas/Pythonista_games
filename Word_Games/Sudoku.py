@@ -124,7 +124,7 @@ class Sudoko(LetterGame):
     self.board = [[SPACE] * SIZE for row_num in range(SIZE)]
     self.gui.update(self.board)
     
-    self.gui.build_extra_grid(3,3, grid_width_x=3, grid_width_y=3, color='white', line_width=2)
+    self.gui.build_extra_grid(3, 3, grid_width_x=3, grid_width_y=3, color='white', line_width=2)
     # level controls which cages are used Easy is 2s and 3s
     level = 'Easy' if self.puzzle in [ 'Killer', 'Killer_Harder', 'KenKen'] else  None
     cg = Cages(level)
@@ -430,10 +430,12 @@ class Sudoko(LetterGame):
                
           self.gui.selection = ''
           selection = ''
-          x, y, w, h = self.gui.game_field.bbox
+          x, y, w, h = self.gui.grid.bbox
           while self.gui.selection == '':
             if self.gui.device in ['ipad13_landscape']:
-                position = (950, h / 2)           
+                position = (950, h / 2)       
+            elif self.gui.device == 'ipad_landscape':
+                position = (x+w+50, h / 2)    
             elif self.gui.device.endswith('_portrait'):               
                 position = (x, y)
             else:

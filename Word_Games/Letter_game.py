@@ -347,6 +347,7 @@ class LetterGame():
     data_list = data.split('\n')
     w_dict = {}
     w_list = []
+  
     key = None
     for word in data_list:
       word = word.strip()

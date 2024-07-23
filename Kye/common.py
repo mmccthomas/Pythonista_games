@@ -98,8 +98,7 @@ def combine_images(columns, space, images):
 
 def load_images():
     '''open a single file containing all images
-    allow single zip file to get names'''
-  
+    allow single zip file to get names'''  
     try:
        with open('imagelist.txt', 'r') as f:
          images = f.readlines()
@@ -131,7 +130,7 @@ def load_images():
         h1 = tsize / h
         t = combined.subtexture(Rect(x, y, w1, h1))
         image_dict.setdefault(image, t)
-    print(f'{image_dict =}')
+    
     return image_dict
 
 

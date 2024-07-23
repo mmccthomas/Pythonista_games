@@ -385,6 +385,7 @@ class BattleShip():
     try: 
       self.gui.gs.clear_numbers()
     except (AttributeError):
+      
       pass
       
     ships_list = []

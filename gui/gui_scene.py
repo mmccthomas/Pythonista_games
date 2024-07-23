@@ -16,13 +16,10 @@ import logging
 import traceback
 current = os.path.dirname(os.path.realpath(__file__))
 parent = os.path.dirname(current)
+sys.path.append(parent)
 grandparent = os.path.dirname(parent)
 sys.path.append(grandparent)
-try:
-   from .game_menu import MenuScene
-except ImportError:
-   from game_menu import MenuScene
-
+from gui.game_menu import MenuScene
 screen_width, screen_height = get_screen_size()
 
 logging.basicConfig(format='%(asctime)s  %(funcName)s %(message)s',level=logging.INFO)
@@ -134,6 +131,7 @@ class GameBoard(Scene):
     self.grid_label_color = 'white'
     self.grid = None
     self.grid_fill = 'lightgreen'
+    self.grid_stroke_color = None
     self.grid_z_position = 10
     self.highlight_fill = '#00bc10'
     self.use_alpha = False
@@ -179,7 +177,7 @@ class GameBoard(Scene):
     global GRID_POS
     match self.device:
       case 'ipad_landscape':
-         GRID_POS = (100, 85)
+         GRID_POS = (50, 85)
          grid_size = h - 150
          self.font_size = 24
          self.SQ_SIZE = grid_size // ((self.DIMENSION_X + self.DIMENSION_Y) / 2)
@@ -236,15 +234,19 @@ class GameBoard(Scene):
                          'New Game': self.dismiss_modal_scene, 'Quit': self.close}
       self.start_menu =  {'New Game': self.dismiss_modal_scene, 'Quit': self.close}
   
-  def build_extra_grid(self, grids_x, grids_y, grid_width_x=None, grid_width_y=None, color=None, line_width=2, z_position=100):
-    """ define a grid to overlay on top of everything else"""
+  def build_extra_grid(self, grids_x, grids_y, grid_width_x=None, grid_width_y=None, color=None, line_width=2, offset=None, z_position=100):
+    """ define a grid to overlay on top of everything else 
+    allow offset to place grid at centre of square (e.g. go game)"""
     if grid_width_x is None:
       grid_width_x = grids_x
     if grid_width_y is None:
       grid_width_y = grids_y
-       
+    if offset is None:  
+      offx, offy = 0, 0
+    else:
+      offx, offy = offset
     # Parameters to pass to the creation of ShapeNode
-    x = Path.rect(0, 0, self.SQ_SIZE * grid_width_x, self.SQ_SIZE * self.DIMENSION_Y)
+    x = Path.rect(0, 0, self.SQ_SIZE * grid_width_x, self.SQ_SIZE * grids_y * grid_width_y)
     x.line_width = line_width
     params = {
       "path": x,
@@ -257,18 +259,18 @@ class GameBoard(Scene):
     # Building the columns
     for i in range(grids_x):
       n = ShapeNode(**params)
-      pos = Vector2(0 + i * self.SQ_SIZE * grid_width_x, 0)
+      pos = Vector2(offx + i * self.SQ_SIZE * grid_width_x, offy)
       n.position = pos
       n.anchor_point = anchor
     
     # Building the rows
-    y = Path.rect(0, 0, self.SQ_SIZE * self.DIMENSION_X, self.SQ_SIZE * grid_width_y)
+    y = Path.rect(0, 0, self.SQ_SIZE * grids_x * grid_width_x, self.SQ_SIZE * grid_width_y)
     y.line_width = line_width
     params["path"] = y
     
     for i in range(grids_y):
       n = ShapeNode(**params)
-      pos = Vector2(0, 0 + i * self.SQ_SIZE * grid_width_y)
+      pos = Vector2(offx, offy + i * self.SQ_SIZE * grid_width_y)
       n.position = pos
       n.anchor_point = anchor
     return parent
@@ -293,7 +295,7 @@ class GameBoard(Scene):
     params = {
       "path": Path.rect(0, 0, self.SQ_SIZE, self.SQ_SIZE * self.DIMENSION_Y),
       "fill_color": self.grid_fill,
-      "stroke_color": "darkgrey",
+      "stroke_color": "darkgrey" if self.grid_stroke_color is None else self.grid_stroke_color,
       "z_position": self.grid_z_position
     }
     anchor = Vector2(0, 0)
@@ -599,20 +601,28 @@ class GameBoard(Scene):
     for k, v in kwargs.items():
       setattr(self, k, v)
     if clear_previous:
-        self.clear_numbers()
-    
+        self.clear_numbers()    
+            
     def add(a, b):
         return tuple(p + q for p, q in zip(a, b))
 
     for item in items:
+        if hasattr(item, 'sqsize'):
+           sqsize = item.sqsize
+        else:
+           sqsize = self.SQ_SIZE
         r, c = item.position
-        t=ShapeNode(ui.Path.rounded_rect(0, 0, self.SQ_SIZE, self.SQ_SIZE, item.radius), 
-                    fill_color=item.color,  position=self.rc_to_pos(r, c), 
+        x, y = item.offset
+        t=ShapeNode(ui.Path.rounded_rect(0, 0, sqsize, sqsize, item.radius), 
+                    fill_color=item.color,  position=self.rc_to_pos(r+ y, c + x), 
                     stroke_color=item.stroke_color,
                     z_position=item.z_position,
                     alpha=item.alpha,
                     parent=self.game_field)
-        t.anchor_point = (0, 0)
+        if hasattr(item, 'anchor_point'):
+            t.anchor_point = item.anchor_point
+        else:
+            t.anchor_point = (0, 0)
         self.numbers.append(t)
         #  unmodified text point is centre of cell
         # text anchor point will be -1 to +1
