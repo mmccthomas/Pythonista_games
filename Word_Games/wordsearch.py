@@ -77,14 +77,15 @@ class WordSearch(LetterGame):
     self.gui.update(self.board)  
     
   def get_size(self):
-   try:
-       if len(self.wordlist) > 40:
-            gridsize = '20,20'
-       else:
-           gridsize = GRIDSIZE
-   except (AttributeError):
-       gridsize = GRIDSIZE
-   return  LetterGame.get_size(self, gridsize)
+     # note 20x20 is largest before tile image size is too small
+     try:
+         if len(self.wordlist) > 40:
+              gridsize = '20,20'
+         else:
+             gridsize = GRIDSIZE
+     except (AttributeError):
+         gridsize = GRIDSIZE
+     return  LetterGame.get_size(self, gridsize)
   
   def initialise_board(self):        
     [self.board_rc((r,c,), self.board, SPACE) for c in range(self.sizex) for r in range(self.sizey)]
@@ -206,7 +207,8 @@ class WordSearch(LetterGame):
     self.gui.clear_numbers()    
     self.gui.clear_messages()
     self.gui.set_top('Wordsearch')
-    self.gui.set_enter('Hint')
+    _, _, w, h = self.gui.grid.bbox
+    self.gui.set_enter('Hint', position=(w + 150, 50))
     self.word_locations = []
     
     process = self.initialise_board() 
