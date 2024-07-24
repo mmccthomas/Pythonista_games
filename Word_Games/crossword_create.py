@@ -221,7 +221,7 @@ class CrossWord():
     msg = f'Filled {len(fixed)}/ {len(self.word_locations)} words in {index} iterations, {ptime}secs'
     words=len([w for w in self.word_locations if w.word])
     print('no words', words)
-    print(msg)   
+    # print(msg)   
     self.gui.set_prompt(msg)
     self.gui.update(self.board) 
     

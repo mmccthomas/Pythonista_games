@@ -143,7 +143,7 @@ class ZipWord(LetterGame):
                  max_depth=self.max_depth, 
                  debug=False)
     cx.populate_words_graph(max_iterations=1000, length_first=False)  
-    self.delta_t('time to populate grid') 
+    # self.delta_t('time to populate grid') 
     self.check_words()
     self.create_number_board()
     self.gui.build_extra_grid(self.gui.gs.DIMENSION_X, self.gui.gs.DIMENSION_Y, grid_width_x=1, grid_width_y=1,color='grey', line_width=1)
@@ -230,7 +230,7 @@ class ZipWord(LetterGame):
             if w.intersects(coord) and w.direction == dirn:
               w.update_grid(coord, self.board, letter)
               break
-          if (w == letter):
+          if (w.word == letter):
               w.fixed = False
           #self.known_dict[no] = [letter, correct]
           self.update_board(filter_placed=False)
