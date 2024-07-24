@@ -110,7 +110,7 @@ class ZipWord(LetterGame):
          else: # self.gui.device == 'ipad_portrait':  
                words.extend([f'{word}\n' if i %10 ==2 else f'{word}  ' for i, word in enumerate(w)])  
                anchor = (0,0)
-               position = (40, height)
+               position = (40, height+20)
                fontsize = 15
       
     msg = ''.join(words)
@@ -131,7 +131,7 @@ class ZipWord(LetterGame):
     self.gui.set_enter('Hint', position=(w, -75))
     self.partition_word_list()
     self.compute_intersections()
-    self.max_depth = 3
+    self.max_depth = 1
     self.start_time = time()
     self.delta_t()
     
