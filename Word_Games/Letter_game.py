@@ -550,13 +550,14 @@ class LetterGame():
 
     
   def get_size(self, size=None):
-    if hasattr(self, 'board'):
-      selection = f'{len(self.board)},{len(self.board[0])}'
+    # size can override board size
+    if size is not None:
+         selection = size
+    elif hasattr(self, 'board'):
+        selection = f'{len(self.board)},{len(self.board[0])}'
+        return len(self.board), len(self.board[0])
     else:
-      if size is None:
         selection = console.input_alert("What is the dimension of the board (X, Y)? (Default is 5x5)\nEnter 2 numbers:")
-      else:
-        selection = size
     try:
       selection = selection.strip() 
       size = selection.split(',')
@@ -571,16 +572,13 @@ class LetterGame():
        self.sizex = self.sizey= 5
        board_dimension = (5,5)
        print(f"Invalid input. The board will be 5x5!")
-    if hasattr(self, 'board'):
-      pass
-    else:
-      self.create_game_board(board_dimension)
+    self.create_game_board(board_dimension)
     return board_dimension
       
   def create_game_board(self, dimension):
     """Creates the gameBoard with the specified number of rows and columns"""   
     self.board = [[EMPTY] * dimension[1] for row_num in range(dimension[0])]
-                               
+                  
   def check_in_board(self, coord):
     r,c = coord 
     try:
