@@ -35,8 +35,8 @@ class WordSearch(LetterGame):
     self.log_moves = True
     self.debug = False
     self.straight_lines_only = True
-    self.SIZE = self.get_size() 
-     
+    self.load_words_from_file(WORDLIST)    
+    self.get_size()      
     # load the gui interface
     self.q = Queue()
     self.gui = Gui(self.board, Player())
@@ -45,7 +45,10 @@ class WordSearch(LetterGame):
     self.gui.set_alpha(True) 
     self.gui.set_grid_colors(grid='lightgrey', highlight='lightblue')
     self.gui.require_touch_move(False)
-    self.gui.allow_any_move(True)
+    self.gui.allow_any_move(True)   
+    self.select_list()
+    self.SIZE = self.get_size()
+    self.gui.gs.DIMENSION_Y, self.gui.gs.DIMENSION_X = self.SIZE
     self.gui.setup_gui(log_moves=True)
     
     # menus can be controlled by dictionary of labels and functions without parameters
@@ -62,23 +65,39 @@ class WordSearch(LetterGame):
     Display the  players game board, we neve see ai
     """  
     display_words = [word.capitalize() for word in self.wordlist]
-    if self.gui.gs.device.endswith('_landscape'):        
-        self.gui.set_moves('\n'.join(display_words), font=('Avenir Next', 25))
+    
+    if self.gui.gs.device.endswith('_landscape'):  
+        msg = self.format_cols(display_words, columns=3, width=10)
+        self.gui.set_moves(msg, font=('Avenir Next', 25))
     elif self.gui.gs.device.endswith('_portrait'):
-        msg = []
-        for i, word in enumerate(display_words):
-          msg.append(f'{word}')
-          msg.append('\n' if i % 3 == 0 else ' '*2)    
-        msg = ''.join(msg)
+        msg = self.format_cols(display_words, columns=5, width=10)
         self.gui.set_moves(msg, font=('Avenir Next', 20))
     self.gui.update(self.board)  
     
   def get_size(self):
-   return  LetterGame.get_size(self, GRIDSIZE)
+     # note 20x20 is largest before tile image size is too small
+     try:
+         if len(self.wordlist) > 40:
+              gridsize = '20,20'
+         else:
+             gridsize = GRIDSIZE
+     except (AttributeError):
+         gridsize = GRIDSIZE
+     return  LetterGame.get_size(self, gridsize)
   
   def initialise_board(self):        
     [self.board_rc((r,c,), self.board, SPACE) for c in range(self.sizex) for r in range(self.sizey)]
-    self.board, words_placed, self.word_coords = create_word_search(self.wordlist, size=self.sizex)       
+    no_words_placed = 0
+    for i in range(30):
+        self.board, words_placed, self.word_coords = create_word_search(self.wordlist, size=self.sizex)     
+        print(f'{i =}, {len(words_placed)}/{len(self.wordlist)}') 
+        if len(words_placed) > no_words_placed:
+            best = self.board, words_placed, self.word_coords
+            no_words_placed = len(words_placed)
+            if len(words_placed) == len(self.wordlist):   
+                 break 
+    self.board, words_placed, self.word_coords = best
+    self.gui.set_prompt(f'Placed {len(words_placed)}/{len(self.wordlist)} words') 
     self.wordlist = words_placed    
     self.all_words = [word.replace(' ', '') for word in self.wordlist]
     return 
@@ -153,7 +172,7 @@ class WordSearch(LetterGame):
            color = self.random_color()
            self.print_square(coords, color=color, clear=False, alpha=.5)           
          else:
-           print(word)
+           print('unplaced word', word)
       sleep(5)
       self.gui.show_start_menu()
       
@@ -186,11 +205,10 @@ class WordSearch(LetterGame):
     self.gui.clear_numbers()    
     self.gui.clear_messages()
     self.gui.set_top('Wordsearch')
-    self.gui.set_enter('Hint')
+    _, _, w, h = self.gui.grid.bbox
+    self.gui.set_enter('Hint', position=(w + 150, 50))
     self.word_locations = []
-    self.load_words_from_file(WORDLIST)
-    self.get_size()
-    success = self.select_list()
+    
     process = self.initialise_board() 
     self.print_board()
     while True:

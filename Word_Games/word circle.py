@@ -123,9 +123,14 @@ class WordCircle(LetterGame):
     selected_words[self.max_length].append(base_word)
     letters = list(base_word)   
     # place baseword in grid     
-    random.shuffle(letters)  
-    for rc in [(0, 1), (0, 3), (1, 0), (2, 3), (3, 1)]:
-       self.board_rc(rc, self.board, letters.pop())
+    random.shuffle(letters) 
+    positions = [(0, 0), (0, 1), (0, 2), (0, 3),
+                 (1, 0),                 (1, 3), 
+                 (2, 0),                 (2, 3), 
+                 (3, 0), (3, 1), (3, 2), (3, 3)]
+    pos = random.choices(positions, k=self.max_length)
+    for rc  in pos:
+        self.board_rc(rc, self.board, letters.pop())
     
     self.word_selection = selected_words
     if self.gui.gs.device.endswith('_landscape'):
