@@ -65,14 +65,12 @@ class WordSearch(LetterGame):
     Display the  players game board, we neve see ai
     """  
     display_words = [word.capitalize() for word in self.wordlist]
-    if self.gui.gs.device.endswith('_landscape'):        
-        self.gui.set_moves('\n'.join(display_words), font=('Avenir Next', 25))
+    
+    if self.gui.gs.device.endswith('_landscape'):  
+        msg = self.format_cols(display_words, columns=3, width=10)
+        self.gui.set_moves(msg, font=('Avenir Next', 25))
     elif self.gui.gs.device.endswith('_portrait'):
-        msg = []
-        for i, word in enumerate(display_words):
-          msg.append(f'{word}')
-          msg.append('\n' if i % 3 == 0 else ' '*2)    
-        msg = ''.join(msg)
+        msg = self.format_cols(display_words, columns=5, width=10)
         self.gui.set_moves(msg, font=('Avenir Next', 20))
     self.gui.update(self.board)  
     
