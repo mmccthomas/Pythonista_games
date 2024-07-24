@@ -172,7 +172,7 @@ class ZipWord(LetterGame):
          word_lists[name] = [self.word_dict[name], board]
          
     self.puzzle = random.choice(list(word_lists))
-    # self.puzzle = 'Puzzle11 38'
+    #self.puzzle = 'Puzzle16 89'
     self.all_words, self.board = word_lists[self.puzzle]
     self.all_words = [word.lower() for word in self.all_words]
     # parse board to get word objects
@@ -212,11 +212,9 @@ class ZipWord(LetterGame):
         possibles = self.selection_items
         # get keys to establish down/across
         directions = list(possibles)
-        a, d = directions
         if self.get_board_rc(coord, board) != BLOCK:
           # selected across or down?
-          dirn = a if row < len(possibles[a]) else d
-          
+          dirn = directions[0] if row < len(possibles[directions[0]]) else directions[1]     
           for w in self.word_locations:
             if w.intersects(coord) and w.direction == dirn:
               w.update_grid(coord, self.board, letter)
