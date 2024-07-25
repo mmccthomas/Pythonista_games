@@ -97,8 +97,8 @@ class dotsboxes(object):
         player = "A" if player_a else "B"
         
        
-        taken_set = {i for i in self.play_dict if self.play_dict[i] == 1}
-        open_scores = [i for i in self.score_dict if self.score_dict[i] == 0]
+        taken_set = {k for k, v in self.play_dict.items() if v == 1}
+        open_scores = [k for k, v in self.score_dict.items() if v == 0]
         
         score_counter = 0
         
@@ -131,7 +131,8 @@ class dotsboxes(object):
         return(True)
             
     def get_open_plays(self):
-        return([i for i in self.play_dict if self.play_dict[i] == 0])
+        #return([i for i in self.play_dict if self.play_dict[i] == 0])
+        return([k for k, v  in self.play_dict.items() if v == 0])
         
     def isover(self):
     
