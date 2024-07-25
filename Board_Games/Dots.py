@@ -254,7 +254,9 @@ class DotAndBox():
        
        move_nos = self.convert_move(move)
        if move_nos[0] is not None:
-            self.gameplay.player_a.make_play(self.dotsandboxes, move_nos)    
+            valid = self.gameplay.player_a.make_play(self.dotsandboxes, move_nos)    
+            if not valid:
+              self.gui.set_prompt(f'{move_nos} = {move} is not valid')
         
        for k, v in self.boxes.items():
          if v == 4:
@@ -271,18 +273,19 @@ class DotAndBox():
 
     def run(self):
         while True:
+            self.gui.set_top('Human move')
             additional_move = True
             while additional_move:
-                move = self.human_move()
-                self.gui.set_prompt(str(move))
-                additional_move = self.process_move(move)
+                move = self.human_move()               
+                additional_move = self.process_move(move, color='red')
+                self.gui.set_message(f'You played {self.convert_move(move)} = {move} {additional_move = }')
+            self.gui.set_top('Computer move')
             additional_move = True
             while additional_move:    
                 nos = self.computer_move()
-                move = self.convert_numbers(nos)
-                self.gui.set_message(f'ai plays {nos} = {move}')
+                move = self.convert_numbers(nos)            
                 additional_move = self.process_move(move, color='blue')
-            
+                self.gui.set_message2(f'ai plays {nos} = {move} {additional_move = }')
       
       
         

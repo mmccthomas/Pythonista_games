@@ -161,7 +161,7 @@ class human_player(object):
     
     def make_play(self, game, move=None):
       
-        while True:
+            #while True:
             if move is None:
                 move = input("Player {}, make your move (start point end point):"\
                              .format(self.playername))
@@ -173,18 +173,19 @@ class human_player(object):
             
             except NameError: 
                 print("Error. Input must be of form start point, endpoint")
-                continue
+                #continue
             except IndexError: 
                 print("Error. Input must be of form start point, endpoint")
-                continue
+                #continue
             except ValueError:
                 print("Error. Input must be of form start point, endpoint")
-                continue
+                #continue
             move.sort() 
             valid_move = game.make_play(*move, self.player_a)
             if valid_move:
-                return()
+                return valid_move
             print("Error. That move does not exist. Try again")
+            return valid_move
         
         
 class alphabeta_player(object):
