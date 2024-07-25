@@ -42,48 +42,6 @@ class Player():
     self.PIECES = ['emj:White_Circle', 'emj:Black_Circle']
     self.PIECE_NAMES = {'0': 'Black', 'O': 'White'}
     
-    
-class Game(game):
-    def __init__(self, player_a_type = "random" , player_b_type = "random", 
-                 rows = 5, columns = 5):
-       super().__init__(player_a_type , player_b_type, rows, columns)
-                 
-    def play_game(self):
-        
-        game = dg.dotsboxes(self.rows, self.columns)
-      
-        coin_toss = random.randint(1, 2)
-        seprint("The coin landed on {}".\
-              format("heads" if coin_toss == 1 else "tails"))
-        print("Player {} goes first".format("A" if coin_toss == 1 else "B"))
-        print()
-            
-        while not(game.isover()):                       
-            while not(game.isover()):             
-                if coin_toss == 2:
-                    coin_toss = 3
-                    break
-                old_score = game.a_score
-                self.player_a.make_play(game)
-                
-                #    game.render()
-                if old_score == game.a_score:
-                    break
-    
-            while not(game.isover()):
-                old_score = game.b_score
-                self.player_b.make_play(game)
-                
-                #    game.render()
-                if old_score == game.b_score:
-                    break
-      
-        if game.a_score == game.b_score:
-            print("It's a tie!")
-        elif game.a_score >= game.b_score:
-            print("A wins!")
-        else:
-            print("B wins!")
                 
 class DotAndBox():
     def __init__(self):
@@ -100,16 +58,12 @@ class DotAndBox():
         self.gui.allow_any_move(True)
         
         self.gui.setup_gui(log_moves=False, grid_fill='lightgrey')
-        #self.gui.build_extra_grid(grids_x=BOARDSIZE-1, grids_y=BOARDSIZE-1, 
-        #                          grid_width_x=1, grid_width_y=1, color='grey', 
-        #                          line_width=2, offset=(self.gui.gs.SQ_SIZE/2, self.gui.gs.SQ_SIZE/2), 
-        #                          z_position=5) 
         # menus can be controlled by dictionary of labels and functions without parameters
         #self.gui.pause_menu = {'Continue': self.gui.dismiss_menu,  'Save': save, 
         #                 'Load': load,  'Quit': self.gui.gs.close}
         self.gui.start_menu = {'New Game': self.restart, 'Quit': self.gui.gs.close} 
         self.size =  (BOARDSIZE+1) // 2
-        self.gameplay = Game('Human',  "alphabeta", self.size, self.size)
+        self.gameplay = game('Human',  "alphabeta", self.size, self.size)
         self.db = dg.dotsboxes(self.size, self.size)
         self.initialize()
                      
@@ -118,26 +72,18 @@ class DotAndBox():
         # Apply marker dots to board
         self.gui.clear_messages()
         self.square_list =[]
+        # place dots
         ix = 0
         for i in range(0, BOARDSIZE, 2):
             for j in range(0, BOARDSIZE, 2):
-                self.square_list.append(Squares((i, j), ix, 'black', text_color='black',
+                self.square_list.append(Squares((i, j), ix, 'black', text_color='white',
                                                 z_position=5, stroke_color='clear',alpha =1, 
-                                                radius=5, sqsize=10, offset=(0.5, -0.5), font = ('Avenir', 15), anchor_point=(0.5, 0.5)))     
+                                                radius=5, sqsize=15, offset=(0.5, -0.5), font = ('Avenir', 15), anchor_point=(0.5, 0.5)))     
                 ix += 1
         self.gui.add_numbers(self.square_list )
         
         self.sq = self.gui.gs.SQ_SIZE //2  
         self.boxes = []
-        
-    def convert_rc(self, rc):
-      r, c = rc
-      
-    
-    def draw(self, point, color, size=None):
-        """ place color at point, need to convert to rc 
-        """
-        pass
     
     def wait_for_gui(self):
         # loop until dat received over queue
@@ -162,23 +108,6 @@ class DotAndBox():
                 print(traceback.format_exc())
                 print(f'Error in received data {data}  is {e}')
         return coord
-    
-    def process_turn(self, move, board):
-        """ process the turn
-        move is coord, new letter, selection_row
-        """             
-        if move:
-          coord, letter, row = move
-          r,c = coord
-          if letter == 'Enter':            
-            return False
-          elif coord == (None, None):
-            return False        
-          elif letter != '':  # valid selection                               
-              return False 
-          else:
-              return False     
-          return False
            
     def human_move(self):
         while True:
@@ -224,8 +153,12 @@ class DotAndBox():
        elif row % 2 == 0 and col % 2 == 1:
            # horizontal
            self.gui.draw_line([xy - (self.sq, -self.sq), xy + (3 * self.sq, self.sq)], 
-                              stroke_color=color, line_width=5)             
+                              stroke_color=color, line_width=5)   
+       else:
+           pass  # dont draw the line
+                   
     def validate(self, move):
+       # check that location is between lines
        row, col = move
        # if col is even, it is a vertical line
        if col % 2 == 0 and row % 2 == 1:
@@ -241,6 +174,7 @@ class DotAndBox():
          boxes = {k:v for k, v in self.db.score_dict.items() if v != 0 }
          for k, v in boxes.items():
               moves = [self.convert_numbers(loc) for loc in k]
+              # find centre of lines
               box_loc = tuple(np.mean(np.array(moves), axis=0, dtype=int))
               if box_loc in self.boxes:
                   continue
@@ -253,8 +187,7 @@ class DotAndBox():
                                          clear_previous=False) 
                    self.boxes.append(box_loc)
                    return True
-         return False
-       
+         return False      
                                                                                       
     def process_move(self, move, color='red'):
        # process selection
@@ -281,21 +214,22 @@ class DotAndBox():
     def restart(self):
        self.gui.gs.close()
        self.__init__()
-       self.run()                
-
+       self.run() 
+                      
+    def show_score(self):
+        self.gui.set_moves(f'Player: {self.db.a_score}\nComputer: {self.db.b_score}')
+        
     def run(self):
         while True:
-            color = 'red'
             self.gui.set_top('Human move')
             additional_move = True
             while additional_move:
                 move = self.human_move()
                 if self.validate(move):         
-                    additional_move = self.process_move(move, color)
-                    self.gui.set_message(f'You played {self.convert_move(move)} = {move} ')
-                    
-            self.gui.set_moves(f'Player: {self.db.a_score}\nComputer: {self.db.b_score}')
-            color = 'blue'
+                    additional_move = self.process_move(move, 'red')
+                    self.gui.set_message(f'You played {self.convert_move(move)} = {move} ')                 
+            self.show_score()
+    
             self.gui.set_top('Computer move')
             additional_move = True
             while additional_move:    
@@ -304,10 +238,10 @@ class DotAndBox():
                    self.game_over()
                 else:
                     move = self.convert_numbers(nos)    
-                    self.draw_lines(move, color)     
-                    additional_move = self.fill_box(color)   
+                    self.draw_lines(move, 'blue')     
+                    additional_move = self.fill_box('blue')   
                     self.gui.set_message2(f'ai plays {nos} = {move}')
-            self.gui.set_moves(f'Player: {self.db.a_score}\nComputer: {self.db.b_score}')
+            self.show_score()
             
         
 def main():
