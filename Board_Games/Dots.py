@@ -95,10 +95,11 @@ class DotAndBox():
         self.gui = Gui(self.display_board, Player())
         self.gui.gs.q = self.q # pass queue into gui
         self.gui.set_alpha(False) 
-        self.gui.set_grid_colors(grid='clear', highlight='lightblue', z_position=5, grid_stroke_color='clear')
+        self.gui.set_grid_colors(grid='lightgrey', highlight='lightblue', z_position=5, grid_stroke_color='lightgrey')
         self.gui.require_touch_move(False)
         self.gui.allow_any_move(True)
-        self.gui.setup_gui(log_moves=False)
+        
+        self.gui.setup_gui(log_moves=False, grid_fill='lightgrey')
         #self.gui.build_extra_grid(grids_x=BOARDSIZE-1, grids_y=BOARDSIZE-1, 
         #                          grid_width_x=1, grid_width_y=1, color='grey', 
         #                          line_width=2, offset=(self.gui.gs.SQ_SIZE/2, self.gui.gs.SQ_SIZE/2), 
@@ -120,7 +121,7 @@ class DotAndBox():
         ix = 0
         for i in range(0, BOARDSIZE, 2):
             for j in range(0, BOARDSIZE, 2):
-                self.square_list.append(Squares((i, j), ix, 'white', text_color='white',
+                self.square_list.append(Squares((i, j), ix, 'black', text_color='black',
                                                 z_position=5, stroke_color='clear',alpha =1, 
                                                 radius=5, sqsize=10, offset=(0.5, -0.5), font = ('Avenir', 15), anchor_point=(0.5, 0.5)))     
                 ix += 1
@@ -224,7 +225,18 @@ class DotAndBox():
            # horizontal
            self.gui.draw_line([xy - (self.sq, -self.sq), xy + (3 * self.sq, self.sq)], 
                               stroke_color=color, line_width=5)             
-           
+    def validate(self, move):
+       row, col = move
+       # if col is even, it is a vertical line
+       if col % 2 == 0 and row % 2 == 1:
+           # vertical
+           return True
+       elif row % 2 == 0 and col % 2 == 1:
+           # horizontal
+           return True
+       else:
+           return False
+                       
     def fill_box(self, color):
          boxes = {k:v for k, v in self.db.score_dict.items() if v != 0 }
          for k, v in boxes.items():
@@ -255,12 +267,15 @@ class DotAndBox():
        return self.fill_box(color)   
        
     def game_over(self):
+        self.gui.set_message('')
+        self.gui.set_message2('')
+        self.gui.set_prompt('')
         if self.db.a_score == self.db.b_score:
-            print("It's a tie!")
+            self.gui.set_message("It's a tie!")
         elif self.db.a_score >= self.db.b_score:
-            print("A wins!")
+            self.gui.set_message("A wins!")
         else:
-            print("B wins!")
+            self.gui.set_message("B wins!")
         self.gui.show_start_menu()
      
     def restart(self):
@@ -274,21 +289,24 @@ class DotAndBox():
             self.gui.set_top('Human move')
             additional_move = True
             while additional_move:
-                move = self.human_move()               
-                additional_move = self.process_move(move, color)
-                self.gui.set_message(f'You played {self.convert_move(move)} = {move} ')
+                move = self.human_move()
+                if self.validate(move):         
+                    additional_move = self.process_move(move, color)
+                    self.gui.set_message(f'You played {self.convert_move(move)} = {move} ')
+                    
             self.gui.set_moves(f'Player: {self.db.a_score}\nComputer: {self.db.b_score}')
             color = 'blue'
             self.gui.set_top('Computer move')
             additional_move = True
             while additional_move:    
                 nos = self.computer_move()
-                if nos is None:
+                if nos ==  None:
                    self.game_over()
-                move = self.convert_numbers(nos)    
-                self.draw_lines(move, color)     
-                additional_move = self.fill_box(color)   
-                self.gui.set_message2(f'ai plays {nos} = {move}')
+                else:
+                    move = self.convert_numbers(nos)    
+                    self.draw_lines(move, color)     
+                    additional_move = self.fill_box(color)   
+                    self.gui.set_message2(f'ai plays {nos} = {move}')
             self.gui.set_moves(f'Player: {self.db.a_score}\nComputer: {self.db.b_score}')
             
         
