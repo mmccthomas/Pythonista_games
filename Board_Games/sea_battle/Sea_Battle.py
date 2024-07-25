@@ -273,10 +273,16 @@ class BattleShip():
     #self.gui.valid_moves(self.all, message=None)
     self.toggle_density_chart = False # each call to density chart will switch on and off
     x, y, w, h = self.gui.grid.bbox
-    self.human_ships_status = self.gui.add_button(text='', title='Human Ships', position=(w+10, h/2), 
+    if self.gui.get_device().endswith('_portrait'):
+      posn1 = (0, h+60)
+      posn2 = (w/2, h+60)
+    else:
+      posn1 = (w+10, h/2)
+      posn2 = (w+10, h/6)
+    self.human_ships_status = self.gui.add_button(text='', title='Human Ships', position=posn1, 
                                         min_size=(50, 50),
                                         fill_color='clear')
-    self.ai_ships_status = self.gui.add_button(text='', title='AI Ships', position=(w+10, h/5), 
+    self.ai_ships_status = self.gui.add_button(text='', title='AI Ships', position=posn2, 
                                         min_size=(50, 50),
                                         fill_color='clear' )
   #.  Main Game loop #######s#  
@@ -386,7 +392,7 @@ class BattleShip():
     for ship in whose_ships.ships:
       for i, rc in enumerate(ship.coordinates):
         ships_list.append(Squares(rc, int(ship.length), ship.color_of_sections[i], 
-                                  font=('Marker Felt',32), radius=10, stroke_color='black'))
+                                  font=('Marker Felt',20), text_anchor_point=(0,1),radius=10, stroke_color='black'))
     self.gui.add_numbers(ships_list)  
 
     

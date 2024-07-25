@@ -182,19 +182,19 @@ class GameBoard(Scene):
          self.font_size = 24
          self.SQ_SIZE = grid_size // ((self.DIMENSION_X + self.DIMENSION_Y) / 2)
       case 'ipad_portrait':
-         GRID_POS = (30, 85)
+         GRID_POS = (60, 60)
          grid_size = w - 50
          self.font_size = 24
          self.SQ_SIZE = grid_size // ((self.DIMENSION_X + self.DIMENSION_Y) / 2)
       case 'iphone_landscape':
-         GRID_POS = (30, 50)
-         grid_size = h - 150
+         GRID_POS = (30, 40)
+         grid_size = h - 80
          self.font_size = 16
          self.SQ_SIZE = grid_size // ((self.DIMENSION_X + self.DIMENSION_Y) / 2)
       case 'iphone_portrait':
-         GRID_POS = (30, 85)
+         GRID_POS = (30, 60)
          grid_size = w - 50
-         self.font_size = 16
+         self.font_size = 12
          self.SQ_SIZE = grid_size // ((self.DIMENSION_X + self.DIMENSION_Y) / 2)
       case 'ipad13_landscape':
          GRID_POS = (100, 85)
@@ -277,6 +277,7 @@ class GameBoard(Scene):
         
   def build_background_grid(self):
     parent = Node()
+    font = ('Avenir Next', self.font_size)
     if self.background_image:
       background = SpriteNode(Texture(self.background_image))
       background.size = (self.SQ_SIZE * self.DIMENSION_X, self.SQ_SIZE * self.DIMENSION_Y)
@@ -309,6 +310,7 @@ class GameBoard(Scene):
       n = LabelNode(row_labels[2 * i: 2 * i + 2], parent=self.game_field)
       n.position = (pos.x + self.SQ_SIZE / 2, pos.y + self.DIMENSION_Y * self.SQ_SIZE + 20)
       n.color = self.grid_label_color
+      n.font = font
     # Building the rows
     params["path"] = Path.rect(0, 0, self.SQ_SIZE * self.DIMENSION_X, self.SQ_SIZE)
     params['fill_color'] = 'clear'
@@ -321,7 +323,8 @@ class GameBoard(Scene):
       idx = self.DIMENSION_Y - 1 - i
       n = LabelNode(column_labels[2 * idx: 2 * idx + 2], parent=self.game_field)
       n.position = (pos.x - 20, pos.y + self.SQ_SIZE/2)
-      n.color = self.grid_label_color    
+      n.color = self.grid_label_color   
+      n.font = font 
     return parent
     
   def setup_ui(self):

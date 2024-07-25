@@ -34,6 +34,12 @@ import numpy as np
 from scene import Texture, Rect
 from os import listdir
 import zipfile
+import os
+import sys
+
+current = os.path.dirname(os.path.realpath(__file__))
+parent = os.path.dirname(current)
+sys.path.append(parent)
 
 xsize = 30
 ysize = 20
