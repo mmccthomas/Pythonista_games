@@ -256,11 +256,13 @@ class alphabeta_player(object):
         start_time = time.time()
 
         play_space_size = len(game.get_open_plays())
+        if play_space_size == 0:
+            return None # finished  
         if play_space_size == 1:
             play = random.choice(game.get_open_plays())
             game.make_play(*play, self.player)
             return play
-   
+        
         depth = math.floor(math.log(19000, play_space_size))
         
        
@@ -268,15 +270,16 @@ class alphabeta_player(object):
                               self.player)[1]
         elapsed = time.time() - start_time
         
- 
-        if play == (0, 0): 
+        print('play =', play)
+        if play == (0, 0):
+            
             play = random.choice(game.get_open_plays())
         game.make_play(*play, self.player)
         
       
         player = "A" if self.player else "B"
         print("Player {}'s move: {} {}".format(player, *play))
-        print("Time elapsed to make move: {}".format(elapsed))
+        print(f"Time elapsed to make move: {elapsed:,.2f}")
         return play
         
 

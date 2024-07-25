@@ -15,11 +15,12 @@ from gui.gui_interface import Gui, Squares
 from scene import Point
 from collections import Counter
 from time import sleep
+import numpy as np
 """
 This file is the GUI on top of the game backend.
 modified for ios using Pythonista by CMT using my gui framework
 """
-BOARDSIZE = 31
+BOARDSIZE = 15
 
 def point_to_rc(point):
   #point is 1 based
@@ -94,7 +95,7 @@ class DotAndBox():
         self.gui = Gui(self.display_board, Player())
         self.gui.gs.q = self.q # pass queue into gui
         self.gui.set_alpha(False) 
-        self.gui.set_grid_colors(grid='grey', highlight='lightblue', z_position=5, grid_stroke_color='lightgrey')
+        self.gui.set_grid_colors(grid='clear', highlight='lightblue', z_position=5, grid_stroke_color='clear')
         self.gui.require_touch_move(False)
         self.gui.allow_any_move(True)
         self.gui.setup_gui(log_moves=False)
@@ -105,27 +106,28 @@ class DotAndBox():
         # menus can be controlled by dictionary of labels and functions without parameters
         #self.gui.pause_menu = {'Continue': self.gui.dismiss_menu,  'Save': save, 
         #                 'Load': load,  'Quit': self.gui.gs.close}
-        #self.gui.start_menu = {'New Game': run, 'Quit': self.gui.gs.close} 
-        self.score = {'red':0, 'blue':0}
+        self.gui.start_menu = {'New Game': self.restart, 'Quit': self.gui.gs.close} 
         self.size =  (BOARDSIZE+1) // 2
         self.gameplay = Game('Human',  "alphabeta", self.size, self.size)
-        self.dotsandboxes = dg.dotsboxes(self.size, self.size)
+        self.db = dg.dotsboxes(self.size, self.size)
+        self.initialize()
                      
     def initialize(self):
         """This method should only be called once, when initializing the board."""
         # Apply marker dots to board
         self.gui.clear_messages()
         self.square_list =[]
-        
+        ix = 0
         for i in range(0, BOARDSIZE, 2):
             for j in range(0, BOARDSIZE, 2):
-                self.square_list.append(Squares((i, j), '', 'white', 
+                self.square_list.append(Squares((i, j), ix, 'white', text_color='white',
                                                 z_position=5, stroke_color='clear',alpha =1, 
-                                                radius=5, sqsize=10, offset=(0.5, -0.5), anchor_point=(0.5, 0.5)))     
+                                                radius=5, sqsize=10, offset=(0.5, -0.5), font = ('Avenir', 15), anchor_point=(0.5, 0.5)))     
+                ix += 1
         self.gui.add_numbers(self.square_list )
         
         self.sq = self.gui.gs.SQ_SIZE //2  
-        self.boxes = Counter({(r, c): 0 for c in range(1, BOARDSIZE, 2) for r in range(1, BOARDSIZE, 2)})
+        self.boxes = []
         
     def convert_rc(self, rc):
       r, c = rc
@@ -134,27 +136,7 @@ class DotAndBox():
     def draw(self, point, color, size=None):
         """ place color at point, need to convert to rc 
         """
-        if size is None:
-            # place tile
-            r,c = point_to_rc(point)
-            self.display_board[r][c] = '0' if color == 'BLACK' else 'O'
-            self.gui.update(self.display_board)
-        else:          
-            color = get_rbg(color)
-            if isinstance(point, list):
-                points = [(point_to_rc(p)[0]-1, point_to_rc(p)[1]) for p in point]
-                squares = [Squares((r, c), '', color, z_position=8, alpha=1,
-                                   stroke_color='clear',  radius=5, sqsize=size, 
-                                   offset = (0.5, 0.5), anchor_point=(0.5, 0.5)) 
-                                   for r,c in points]
-                self.gui.replace_numbers(squares)
-            else:
-                 r,c = point_to_rc(point)      
-                 self.gui.replace_numbers([Squares((r, c), '', color, z_position=8, alpha=1,
-                                           stroke_color='clear',  radius=5, sqsize=size, 
-                                           offset = (0.5, 0.5), anchor_point=(0.5, 0.5))])    
-            self.gui.set_moves(str(len(self.gui.gs.numbers)))     
-
+        pass
     
     def wait_for_gui(self):
         # loop until dat received over queue
@@ -203,19 +185,19 @@ class DotAndBox():
            return  coord
            
     def computer_move(self):
-       nos = self.gameplay.player_b.make_play(self.dotsandboxes)          
+       nos = self.gameplay.player_b.make_play(self.db)          
        return nos 
        
     def convert_move(self, move):
        row, col = move
        if col % 2 == 0 and row % 2 == 1:      
           #vertical
-          start_number = int((row - 1) * self.size + col)
-          end_number = int(row  * self.size + col)
+          start_number = (row - 1)//2 * self.size + col//2
+          end_number = (row +1)//2 * self.size + col//2
        elif row % 2 == 0:  
           #horizontal
-          start_number = int(row * self.size + col - 1)
-          end_number = int(row * self.size + col)
+          start_number = row//2 * self.size + (col - 1)//2
+          end_number = row//2 * self.size + (col+1)//2
        else:
           start_number, end_number  = None, None
        return [start_number, end_number]
@@ -225,8 +207,8 @@ class DotAndBox():
        start, end = numbers
        c1, r1 = start % self.size, int(start // self.size)
        c2, r2 = end % self.size, int(end // self.size)
-       r = 2 * r1 + (r2 - r1)
-       c = 2 * c1 + (c2 - c1)
+       r =  r2 + r1
+       c =  c2 + c1
        return r, c
     
     def draw_lines(self, move, color):
@@ -237,61 +219,81 @@ class DotAndBox():
        if col % 2 == 0 and row % 2 == 1:
            # vertical
            self.gui.draw_line([xy - (-self.sq, self.sq), xy + (self.sq, 3 * self.sq)], 
-                              stroke_color=color, line_width=5)
-           
-           inc = Counter({(row, col + dx):1 for dx in [-1,1] if self.gui.gs.check_in_board((row, col + dx))})
-           self.boxes = self.boxes + inc
-       elif row % 2 == 0:
+                              stroke_color=color, line_width=5)          
+       elif row % 2 == 0 and col % 2 == 1:
            # horizontal
            self.gui.draw_line([xy - (self.sq, -self.sq), xy + (3 * self.sq, self.sq)], 
-                              strike_color=color, line_width=5)   
-           inc = Counter({(row+dy, col):1 for dy in [-1,1] if self.gui.gs.check_in_board((row+dy, col))})
-           self.boxes = self.boxes + inc
-                              
-    def process_move(self, move, color='red'):
-       # process selection
-       self.draw_lines(move, color)
-       
-       move_nos = self.convert_move(move)
-       if move_nos[0] is not None:
-            valid = self.gameplay.player_a.make_play(self.dotsandboxes, move_nos)    
-            if not valid:
-              self.gui.set_prompt(f'{move_nos} = {move} is not valid')
-        
-       for k, v in self.boxes.items():
-         if v == 4:
-           # fill box
-           self.gui.add_numbers([Squares(k, '', color, z_position=30, 
+                              stroke_color=color, line_width=5)             
+           
+    def fill_box(self, color):
+         boxes = {k:v for k, v in self.db.score_dict.items() if v != 0 }
+         for k, v in boxes.items():
+              moves = [self.convert_numbers(loc) for loc in k]
+              box_loc = tuple(np.mean(np.array(moves), axis=0, dtype=int))
+              if box_loc in self.boxes:
+                  continue
+              else:        
+                   # fill box
+                   self.gui.add_numbers([Squares(box_loc, '', color, z_position=30, 
                                          sqsize=4*self.sq,
                                          anchor_point=(0.5, 0.5), 
                                          offset=(0.5, -0.5), alpha = .5)], 
                                          clear_previous=False) 
-           self.boxes[k] = 0 # to avoid double counting
-           self.score[color] += 1
-           return True
-       return False                                                    
+                   self.boxes.append(box_loc)
+                   return True
+         return False
+       
+                                                                                      
+    def process_move(self, move, color='red'):
+       # process selection
+       self.draw_lines(move, color)       
+       move_nos = self.convert_move(move)
+       if move_nos[0] is not None:
+            valid = self.gameplay.player_a.make_play(self.db, move_nos)    
+            if not valid:
+              self.gui.set_prompt(f'{move_nos} = {move} is not valid')
+       return self.fill_box(color)   
+       
+    def game_over(self):
+        if self.db.a_score == self.db.b_score:
+            print("It's a tie!")
+        elif self.db.a_score >= self.db.b_score:
+            print("A wins!")
+        else:
+            print("B wins!")
+        self.gui.show_start_menu()
+     
+    def restart(self):
+       self.gui.gs.close()
+       self.__init__()
+       self.run()                
 
     def run(self):
         while True:
+            color = 'red'
             self.gui.set_top('Human move')
             additional_move = True
             while additional_move:
                 move = self.human_move()               
-                additional_move = self.process_move(move, color='red')
-                self.gui.set_message(f'You played {self.convert_move(move)} = {move} {additional_move = }')
+                additional_move = self.process_move(move, color)
+                self.gui.set_message(f'You played {self.convert_move(move)} = {move} ')
+            self.gui.set_moves(f'Player: {self.db.a_score}\nComputer: {self.db.b_score}')
+            color = 'blue'
             self.gui.set_top('Computer move')
             additional_move = True
             while additional_move:    
                 nos = self.computer_move()
-                move = self.convert_numbers(nos)            
-                additional_move = self.process_move(move, color='blue')
-                self.gui.set_message2(f'ai plays {nos} = {move} {additional_move = }')
-      
-      
+                if nos is None:
+                   self.game_over()
+                move = self.convert_numbers(nos)    
+                self.draw_lines(move, color)     
+                additional_move = self.fill_box(color)   
+                self.gui.set_message2(f'ai plays {nos} = {move}')
+            self.gui.set_moves(f'Player: {self.db.a_score}\nComputer: {self.db.b_score}')
+            
         
 def main():
   game = DotAndBox()
-  game.initialize()
   game.run()
   
 if __name__ == '__main__':
