@@ -21,17 +21,6 @@ This file is the GUI on top of the game backend.
 modified for ios using Pythonista by CMT using my gui framework
 """
 BOARDSIZE = 15
-
-def point_to_rc(point):
-  #point is 1 based
-  r, c = point[1] - 1, point[0] - 1
-  return  r, c
-
-def rc_to_point(rc):
-  x, y = rc[0], rc[1]
-  return Point(x, y)
-
-
             
 class Player():
   def __init__(self):
@@ -78,7 +67,8 @@ class DotAndBox():
             for j in range(0, BOARDSIZE, 2):
                 self.square_list.append(Squares((i, j), ix, 'black', text_color='white',
                                                 z_position=5, stroke_color='clear',alpha =1, 
-                                                radius=5, sqsize=15, offset=(0.5, -0.5), font = ('Avenir', 15), anchor_point=(0.5, 0.5)))     
+                                                radius=5, sqsize=15, offset=(0.5, -0.5), 
+                                                font = ('Avenir', 15), anchor_point=(0.5, 0.5)))     
                 ix += 1
         self.gui.add_numbers(self.square_list )
         
@@ -190,7 +180,7 @@ class DotAndBox():
          return False      
                                                                                       
     def process_move(self, move, color='red'):
-       # process selection
+       # process human  selection
        self.draw_lines(move, color)       
        move_nos = self.convert_move(move)
        if move_nos[0] is not None:
