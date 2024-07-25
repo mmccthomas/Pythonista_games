@@ -9,6 +9,7 @@ sys.path.append(grandparent)
 greatgrandparent = os.path.dirname(grandparent)
 sys.path.append(greatgrandparent)
 import Dots_Boxes.DotAndBoxGame as dg
+from Dots_Boxes.DotAndBoxGame import game
 import gui.gui_scene as gscene
 from gui.gui_interface import Gui, Squares
 from scene import Point
@@ -40,6 +41,49 @@ class Player():
     self.PIECES = ['emj:White_Circle', 'emj:Black_Circle']
     self.PIECE_NAMES = {'0': 'Black', 'O': 'White'}
     
+    
+class Game(game):
+    def __init__(self, player_a_type = "random" , player_b_type = "random", 
+                 rows = 5, columns = 5):
+       super().__init__(player_a_type , player_b_type, rows, columns)
+                 
+    def play_game(self):
+        
+        game = dg.dotsboxes(self.rows, self.columns)
+      
+        coin_toss = random.randint(1, 2)
+        seprint("The coin landed on {}".\
+              format("heads" if coin_toss == 1 else "tails"))
+        print("Player {} goes first".format("A" if coin_toss == 1 else "B"))
+        print()
+            
+        while not(game.isover()):                       
+            while not(game.isover()):             
+                if coin_toss == 2:
+                    coin_toss = 3
+                    break
+                old_score = game.a_score
+                self.player_a.make_play(game)
+                
+                #    game.render()
+                if old_score == game.a_score:
+                    break
+    
+            while not(game.isover()):
+                old_score = game.b_score
+                self.player_b.make_play(game)
+                
+                #    game.render()
+                if old_score == game.b_score:
+                    break
+      
+        if game.a_score == game.b_score:
+            print("It's a tie!")
+        elif game.a_score >= game.b_score:
+            print("A wins!")
+        else:
+            print("B wins!")
+                
 class DotAndBox():
     def __init__(self):
         """Create, initialize and draw an empty board."""
@@ -63,7 +107,9 @@ class DotAndBox():
         #                 'Load': load,  'Quit': self.gui.gs.close}
         #self.gui.start_menu = {'New Game': run, 'Quit': self.gui.gs.close} 
         self.score = {'red':0, 'blue':0}
-        self.gameplay = dg.game('Human',  "alphabeta", (BOARDSIZE+1) / 2, (BOARDSIZE+1) / 2)
+        self.size =  (BOARDSIZE+1) // 2
+        self.gameplay = Game('Human',  "alphabeta", self.size, self.size)
+        self.dotsandboxes = dg.dotsboxes(self.size, self.size)
                      
     def initialize(self):
         """This method should only be called once, when initializing the board."""
@@ -78,9 +124,13 @@ class DotAndBox():
                                                 radius=5, sqsize=10, offset=(0.5, -0.5), anchor_point=(0.5, 0.5)))     
         self.gui.add_numbers(self.square_list )
         
-        self.sq = self.gui.gs.SQ_SIZE /2  
+        self.sq = self.gui.gs.SQ_SIZE //2  
         self.boxes = Counter({(r, c): 0 for c in range(1, BOARDSIZE, 2) for r in range(1, BOARDSIZE, 2)})
-
+        
+    def convert_rc(self, rc):
+      r, c = rc
+      
+    
     def draw(self, point, color, size=None):
         """ place color at point, need to convert to rc 
         """
@@ -118,11 +168,8 @@ class DotAndBox():
           sleep(0.01)
           if not self.q.empty():
             data = self.q.get(block=False)
-            
-            #self.delta_t('get')
-            #self.q.task_done()
             if isinstance(data, (tuple, list, int)):
-              coord = data # self.gui.ident(data)
+              coord = data
               break
             else:
               try:
@@ -136,22 +183,14 @@ class DotAndBox():
     def process_turn(self, move, board):
         """ process the turn
         move is coord, new letter, selection_row
-        """ 
-        def key_from_value(dict_, val):
-          for k, v in dict_.items():
-            if v == val:
-              return k
-          return None
-             
+        """             
         if move:
           coord, letter, row = move
           r,c = coord
-          if letter == 'Enter':
-            
+          if letter == 'Enter':            
             return False
           elif coord == (None, None):
-            return False
-        
+            return False        
           elif letter != '':  # valid selection                               
               return False 
           else:
@@ -163,8 +202,35 @@ class DotAndBox():
            coord = self.wait_for_gui()
            return  coord
            
-    def process_move(self, move, color='red'):
-       # process selection
+    def computer_move(self):
+       nos = self.gameplay.player_b.make_play(self.dotsandboxes)          
+       return nos 
+       
+    def convert_move(self, move):
+       row, col = move
+       if col % 2 == 0 and row % 2 == 1:      
+          #vertical
+          start_number = int((row - 1) * self.size + col)
+          end_number = int(row  * self.size + col)
+       elif row % 2 == 0:  
+          #horizontal
+          start_number = int(row * self.size + col - 1)
+          end_number = int(row * self.size + col)
+       else:
+          start_number, end_number  = None, None
+       return [start_number, end_number]
+       
+    def convert_numbers(self, numbers):
+       # convert tuple of numbers back to row, col
+       start, end = numbers
+       c1, r1 = start % self.size, int(start // self.size)
+       c2, r2 = end % self.size, int(end // self.size)
+       r = 2 * r1 + (r2 - r1)
+       c = 2 * c1 + (c2 - c1)
+       return r, c
+    
+    def draw_lines(self, move, color):
+       # draw line and count lines around each box
        row, col = move
        xy = self.gui.rc_to_pos(move)
        # if col is even, it is a vertical line
@@ -178,11 +244,18 @@ class DotAndBox():
        elif row % 2 == 0:
            # horizontal
            self.gui.draw_line([xy - (self.sq, -self.sq), xy + (3 * self.sq, self.sq)], 
-                              strike_color=color, line_width=5)
+                              strike_color=color, line_width=5)   
            inc = Counter({(row+dy, col):1 for dy in [-1,1] if self.gui.gs.check_in_board((row+dy, col))})
            self.boxes = self.boxes + inc
-           
-       print(f'{self.boxes = }')
+                              
+    def process_move(self, move, color='red'):
+       # process selection
+       self.draw_lines(move, color)
+       
+       move_nos = self.convert_move(move)
+       if move_nos[0] is not None:
+            self.gameplay.player_a.make_play(self.dotsandboxes, move_nos)    
+        
        for k, v in self.boxes.items():
          if v == 4:
            # fill box
@@ -194,11 +267,7 @@ class DotAndBox():
            self.boxes[k] = 0 # to avoid double counting
            self.score[color] += 1
            return True
-       return False
-        
-                              
-       
-       
+       return False                                                    
 
     def run(self):
         while True:
@@ -207,6 +276,13 @@ class DotAndBox():
                 move = self.human_move()
                 self.gui.set_prompt(str(move))
                 additional_move = self.process_move(move)
+            additional_move = True
+            while additional_move:    
+                nos = self.computer_move()
+                move = self.convert_numbers(nos)
+                self.gui.set_message(f'ai plays {nos} = {move}')
+                additional_move = self.process_move(move, color='blue')
+            
       
       
         

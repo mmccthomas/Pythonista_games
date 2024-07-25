@@ -150,6 +150,7 @@ class random_player(object):
         game.make_play(*play, self.player)
         player = "A" if self.player else "B"
         print("Player {}'s move: {} {}".format(player, *play))
+        return play
 
 class human_player(object):
    
@@ -158,12 +159,13 @@ class human_player(object):
         self.player_a = player_a
         self.playername = "A" if player_a else "B"
     
-    def make_play(self, game):
+    def make_play(self, game, move=None):
       
         while True:
-            move = input("Player {}, make your move (start point end point):"\
-                         .format(self.playername))
-            move = move.split()
+            if move is None:
+                move = input("Player {}, make your move (start point end point):"\
+                             .format(self.playername))
+                move = move.split()
             try:
                 move[0], move[1] = int(move[0]), int(move[1])
                 if len(move) != 2: 
@@ -256,7 +258,7 @@ class alphabeta_player(object):
         if play_space_size == 1:
             play = random.choice(game.get_open_plays())
             game.make_play(*play, self.player)
-            return()
+            return play
    
         depth = math.floor(math.log(19000, play_space_size))
         
@@ -274,6 +276,7 @@ class alphabeta_player(object):
         player = "A" if self.player else "B"
         print("Player {}'s move: {} {}".format(player, *play))
         print("Time elapsed to make move: {}".format(elapsed))
+        return play
         
 
 class game(object):
@@ -282,7 +285,7 @@ class game(object):
     def __init__(self, player_a_type = "random" , player_b_type = "random", \
                  rows = 5, columns = 5):
      
-        
+        self.show_render = True
         self.rows = rows
         self.columns = columns
         
@@ -308,7 +311,8 @@ class game(object):
         game = dotsboxes(self.rows, self.columns)
         
         print()
-        game.render()
+        if self.show_render:
+            game.render()
         print()
       
         coin_toss = random.randint(1, 2)
@@ -327,14 +331,16 @@ class game(object):
                     break
                 old_score = game.a_score
                 self.player_a.make_play(game)
-                game.render()
+                if self.show_render:
+                    game.render()
                 if old_score == game.a_score:
                     break
     
             while not(game.isover()):
                 old_score = game.b_score
                 self.player_b.make_play(game)
-                game.render()
+                if self.show_render:
+                    game.render()
                 if old_score == game.b_score:
                     break
       
