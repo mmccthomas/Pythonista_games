@@ -403,10 +403,10 @@ class Gui():
   def ident(self, changed):
     # change rc to ident A1 or 11
     if self.use_alpha:
-      c = 'A B C D E F G H I J K L M N O P Q R S T U V W X Y Z '
+      c = 'A B C D E F G H I J K L M N O P Q R S T U V W X Y Z AAABACADAEAFAGAHAIAJAKALAMANAO'
     else:
-      c =  '1 2 3 4 5 6 7 8 9 1011121314151617181920'
-    r = '1 2 3 4 5 6 7 8 9 1011121314151617181920'
+      c =  '1 2 3 4 5 6 7 8 9 10111213141516171819202122232425262728293031323334353637383940'
+    r = '1 2 3 4 5 6 7 8 9 10111213141516171819202122232425262728293031323334353637383940'
            
     y = changed[0]
     x = changed[1]
