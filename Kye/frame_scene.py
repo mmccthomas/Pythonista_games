@@ -36,7 +36,7 @@ from stbar_ui import StatusBar
 from dialogs_ui import GotoDialog, KyeHelpDialog, KyeAboutDialog
 from dialogs_ui import getopendialog
 from queue import Queue
-
+from copy import deepcopy
 """ menus has File, Level, View and Help"""
 
 
@@ -211,7 +211,7 @@ class KFrame(Scene):
       responder.superview.hidden = True
       sel = dialogs.input_alert('Level Name')
       try:
-        self.saved_state = None
+        # self.saved_state = None
         self.app.goto(sel)
       except (Exception) as e:
         dialogs.hud_alert(f'Level {sel} not known')
@@ -219,7 +219,7 @@ class KFrame(Scene):
       
     def nextlevel(self, responder):
       responder.superview.close()
-      self.saved_state = None
+      # self.saved_state = None
       self.app.goto(self.app._KyeApp__game.nextlevel)
       
     @ui.in_background    
@@ -237,7 +237,7 @@ class KFrame(Scene):
       responder.superview.close()  
       try:
         if sel:
-          self.saved_state = None
+          # self.saved_state = None
           self.app.goto(sel['title'])
       except (Exception) as e:
         print(e, sel)           
@@ -253,14 +253,14 @@ class KFrame(Scene):
         
     def savestate(self, responder):
       responder.superview.close()
-      self.saved_state = self.app._KyeApp__game
+      self.saved_state = deepcopy(self.app._KyeApp__game)
       print(self.saved_state)
       
     def restorestate(self, responder):      
       responder.superview.close()
       print('restored', self.saved_state)
       if self.saved_state:
-        self.app._KyeApp__game = self.saved_state
+        self.app._KyeApp__game = deepcopy(self.saved_state)
         self.app.do_tick()
         
     @ui.in_background   
