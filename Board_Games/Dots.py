@@ -149,6 +149,13 @@ class DotAndBox():
                    
     def validate(self, move):
        # check that location is between lines
+       start_point, end_point = self.convert_move(move)
+       if start_point is None:
+          return False
+       if self.db.play_dict[(start_point, end_point)] == 1:
+            return False
+       else:
+           return True
        row, col = move
        # if col is even, it is a vertical line
        if col % 2 == 0 and row % 2 == 1:
@@ -217,8 +224,9 @@ class DotAndBox():
                 move = self.human_move()
                 if self.validate(move):         
                     additional_move = self.process_move(move, 'red')
+                    self.show_score()
                     self.gui.set_message(f'You played {self.convert_move(move)} = {move} ')                 
-            self.show_score()
+            
     
             self.gui.set_top('Computer move')
             additional_move = True
@@ -229,9 +237,10 @@ class DotAndBox():
                 else:
                     move = self.convert_numbers(nos)    
                     self.draw_lines(move, 'blue')     
-                    additional_move = self.fill_box('blue')   
+                    additional_move = self.fill_box('blue') 
+                    self.show_score()  
                     self.gui.set_message2(f'ai plays {nos} = {move}')
-            self.show_score()
+            
             
         
 def main():
