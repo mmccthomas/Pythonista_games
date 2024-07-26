@@ -68,14 +68,17 @@ VERY simple ball drop program in the style of breakout
 SeaBattle
 ---------
 Modified from Game-Pigeon-Solvers by Kyle Gerner
+https://github.com/k-gerner/Game-Pigeon-Solvers
 
 Othello
 -------
 Modified from Game-Pigeon-Solvers by Kyle Gerner
+https://github.com/k-gerner/Game-Pigeon-Solvers
 
 Connect4
 --------
 Modified from Game-Pigeon-Solvers by Kyle Gerner
+https://github.com/k-gerner/Game-Pigeon-Solvers
 
 Minesweeper
 -----------
