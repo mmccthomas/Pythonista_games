@@ -225,6 +225,9 @@ class DotAndBox():
                 if self.validate(move):         
                     additional_move = self.process_move(move, 'red')
                     self.show_score()
+                    if self.db.isover():
+                        self.game_over()
+                        break
                     self.gui.set_message(f'You played {self.convert_move(move)} = {move} ')                 
             
     
@@ -232,8 +235,9 @@ class DotAndBox():
             additional_move = True
             while additional_move:    
                 nos = self.computer_move()
-                if nos ==  None:
-                   self.game_over()
+                if self.db.isover():
+                        self.game_over()
+                        break
                 else:
                     move = self.convert_numbers(nos)    
                     self.draw_lines(move, 'blue')     
