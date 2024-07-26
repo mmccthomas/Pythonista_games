@@ -257,27 +257,30 @@ class alphabeta_player(object):
         start_time = time.time()
 
         play_space_size = len(game.get_open_plays())
-        if play_space_size == 0:
-            return None # finished  
-        if play_space_size == 1:
-            play = random.choice(game.get_open_plays())
-            game.make_play(*play, self.player)
-            return play
+        total_plays = len(game.play_dict)
+        values = range(total_plays// 2, total_plays)
         
-        depth = math.floor(math.log(19000, play_space_size))
+        match play_space_size:
+          case 0:
+              return None # finished  
+          case 1:
+              play = random.choice(game.get_open_plays())
+              game.make_play(*play, self.player)
+              return play
+          # random until half way through
+          case val if  play_space_size in values:
+              play = random.choice(game.get_open_plays())             
+              game.make_play(*play, self.player)
+          case _:
+              depth = math.floor(math.log(19000, play_space_size))                       
+              play = self.alphabeta(game, (0, 0), depth, -math.inf, math.inf, \
+                                    self.player)[1]             
+              print('play =', play)
+              if play == (0, 0):                 
+                  play = random.choice(game.get_open_plays())
+              game.make_play(*play, self.player)
         
-       
-        play = self.alphabeta(game, (0, 0), depth, -math.inf, math.inf, \
-                              self.player)[1]
         elapsed = time.time() - start_time
-        
-        print('play =', play)
-        if play == (0, 0):
-            
-            play = random.choice(game.get_open_plays())
-        game.make_play(*play, self.player)
-        
-      
         player = "A" if self.player else "B"
         print("Player {}'s move: {} {}".format(player, *play))
         print(f"Time elapsed to make move: {elapsed:,.2f}")
@@ -285,8 +288,7 @@ class alphabeta_player(object):
         
 
 class game(object):
-   
-    
+      
     def __init__(self, player_a_type = "random" , player_b_type = "random", \
                  rows = 5, columns = 5):
      
@@ -310,8 +312,7 @@ class game(object):
         else:
             self.player_b = human_player(False)
         
-    def play_game(self):
-      
+    def play_game(self):      
   
         game = dotsboxes(self.rows, self.columns)
         
