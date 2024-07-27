@@ -170,7 +170,8 @@ class WordSearch(LetterGame):
       for word, coords in self.word_coords.items():
          if coords:
            color = self.random_color()
-           self.print_square(coords, color=color, clear=False, alpha=.5)           
+           self.gui.draw_line([self.gui.rc_to_pos(lg.add(coords[i], (-.5, .5))) for i in [0, -1]], line_width=8, color='red', alpha=0.5)
+           #self.print_square(coords, color=color, clear=False, alpha=.5)           
          else:
            print('unplaced word', word)
       sleep(5)
