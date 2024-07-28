@@ -98,6 +98,7 @@ class WordSearch(LetterGame):
             if len(words_placed) == len(self.wordlist):   
                  break 
     self.board, words_placed, self.word_coords = best
+    [self.board_rc((r,c,), self.board, SPACE) for c in range(self.sizex) for r in range(self.sizey)]
     self.fill()
     words_placed = self.wordlist
     self.gui.set_prompt(f'Placed {len(words_placed)}/{len(self.wordlist)} words') 
@@ -238,55 +239,47 @@ class WordSearch(LetterGame):
     self.gui.show_start_menu()
     
   def find_word(self, word):
+        print('SEARCHING  for        ', word)
+        word = word.lower()
         word = list(word)
         wordlen = len(word)
         np_board = np.array(self.board)
         first_letter = word[0]
         locs = np.argwhere(np_board == first_letter)
-        for rc in locs:            
-              rc = Coord(rc)
-              r,c = rc
-              bd_r, bd_c = np_board.shape
-              # numpy slicing
-              right = np_board[r, c:c+wordlen]
-              down = np_board[r:r+wordlen, c]
-              ldown = np_board.diagonal(c)[:wordlen]
-              left = np_board[r, c-wordlen+1:c+1]
-              up = np_board[r-wordlen+1:r+1, c]
-              rdown = np.fliplr(np_board).diagonal(bd_r - r)[:wordlen]
-              lup = np.flipud(np_board).diagonal(r)[:wordlen]
-              rup = np.flipud(np.fliplr(np_board)).diagonal(bd_r - r)[:wordlen]
-              
-              print(f'found {word[0]} at {rc}')
-              self.moves = []
-              self.moves.append(rc)
-              for dir in rc.all_dirs:
-                   rc_next = rc + dir
-                   if not self.check_in_board(rc_next):
-                     continue
-                   next = self.get_board_rc(rc_next, self.board)
-                   if next != word[1].lower():
-                        continue
-                   else:
-                       # try same direction for rest of word
-                       print(f'found {word[1]} at {rc_next}')
+        for rc in locs:      
+          rc = Coord(rc)
+          r,c = rc
+          #print(f'found {word[0]} at {rc}')
+          self.moves = [rc]
+          for dir in rc.all_dirs:
+               rc_next = rc + dir
+               if not self.check_in_board(rc_next):
+                   continue            
+               next = self.get_board_rc(rc_next, self.board)
+               if next != word[1]:
+                    continue
+               else:
+                   # try same direction for rest of word
+                   #print(f'found {word[1]} at {rc_next}')
                        
-                       self.moves.append(rc_next)
-                       for letter in word[2:]:
-                           rc_next = rc_next + dir
-                           if not self.check_in_board(rc_next):
-                              print('off board')
-                              break                   
-                           if self.get_board_rc(rc_next, self.board) == letter:
-                             print(f'found {letter} at {rc_next}')
-                             self.moves.append(rc_next)
-                           else:
-                             print('next direction')
-                             break # next direction
-                       # success, draw line
-                       self.match_word(self.moves)
-                       print('found ', ''.join(word))
-                       return
+                   self.moves.append(rc_next)
+                   for letter in word[2:]:
+                       rc_next = rc_next + dir
+                       if not self.check_in_board(rc_next):
+                          self.moves=[rc]
+                          break
+                       next = self.get_board_rc(rc_next, self.board)          
+                       if next == letter:
+                           self.moves.append(rc_next)
+                       else:
+                           self.moves = [rc]
+                           break # next direction
+                   l = len(self.moves)
+                   if len(self.moves) == wordlen:
+                          # success, draw line
+                          self.match_word(self.moves)
+                          print('FOUND.          ', ''.join(word))
+                          return
     
   def solve(self):
     # solve the wordsearch below':
@@ -295,7 +288,7 @@ class WordSearch(LetterGame):
     # if ok, keep going in that direction until word is complete or letter is wrong.
     # then try other directions and then next occurence of letter
     
-    for word in self.wordlist:
+    for word in self.wordlist.copy():
       self.gui.set_prompt(f'finding {word}')
       self.find_word(word)    
       sleep(1)
@@ -330,11 +323,7 @@ class WordSearch(LetterGame):
     letters = np.array([list(i.lower()) for i in table])
     r, c = letters.shape
     self.board = np.array(self.board)
-    bd = self.board.shape
     self.board[:r, :c] = letters
-    #for r, row in enumerate(table):
-    #  for c, letter in enumerate(list(row)):
-    #     self.board[r][c] = letter.lower()
     self.gui.update(self.board)
 
 
