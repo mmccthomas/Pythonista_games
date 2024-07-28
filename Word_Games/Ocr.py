@@ -74,9 +74,11 @@ class OcrCrossword(LetterGame):
       scaled_h = box[3] * self.h
       return (scaled_x, scaled_y, scaled_w, scaled_h)
       
-    def filter(self, max_length=15, min_length=1, sort_length=True, remove_numbers=True):
-      self.all_text_dict = {k:v for k, v in self.all_text_dict.items() if len(v) < max_length}
-      self.all_text_dict = {k:v for k, v in self.all_text_dict.items() if len(v) > min_length}
+    def filter(self, max_length=None, min_length=None, sort_length=True, remove_numbers=False):
+      if max_length:
+         self.all_text_dict = {k:v for k, v in self.all_text_dict.items() if len(v) < max_length}
+      if min_length:
+         self.all_text_dict = {k:v for k, v in self.all_text_dict.items() if len(v) > min_length}
       if remove_numbers:
           self.all_text_dict = {k:v for k, v in self.all_text_dict.items() if v.isalpha() }
       boxes = np.array(list(self.all_text_dict.keys())) 
@@ -91,7 +93,10 @@ class OcrCrossword(LetterGame):
       words.sort() # sorts normally by alphabetical order
       if sort_length:
          words.sort(key=len)
-      self.gui.set_moves(self.format_cols(words, columns=2, width = 10))
+      try:
+         self.gui.set_moves(self.format_cols(words, columns=2, width=10))
+      except:
+        pass
       for word in words:
         print(word)
       
@@ -128,7 +133,7 @@ def main():
         return
     all_text = text_ocr(asset)
     ocr = OcrCrossword(all_text)
-    ocr.filter(max_length=12, min_length=2, sort_length=False, remove_numbers=True)
+    ocr.filter(max_length=None, min_length=None, sort_length=False, remove_numbers=False)
     ocr.plot_chars()
     
 if __name__ == '__main__':

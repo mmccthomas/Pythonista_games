@@ -90,7 +90,7 @@ class WordSearch(LetterGame):
     no_words_placed = 0
     for i in range(30):
         self.board, words_placed, self.word_coords = create_word_search(self.wordlist, size=self.sizex)     
-        print(f'{i =}, {len(words_placed)}/{len(self.wordlist)}') 
+        #print(f'{i =}, {len(words_placed)}/{len(self.wordlist)}') 
         if len(words_placed) > no_words_placed:
             best = self.board, words_placed, self.word_coords
             no_words_placed = len(words_placed)
