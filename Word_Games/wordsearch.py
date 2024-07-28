@@ -13,6 +13,7 @@ from time import sleep, time
 import math
 import random
 import re
+import numpy as np
 import traceback
 from  collections import Counter
 from scene import get_screen_size
@@ -20,11 +21,11 @@ from word_square_gen import create_word_search
 from Letter_game import LetterGame, Player, Word
 import Letter_game as lg
 import gui.gui_scene as gscene
-from gui.gui_interface import Gui, Squares
+from gui.gui_interface import Gui, Squares, Coord
 BLOCK = '#'
 SPACE = ' '
 WORDLIST = "wordsearch_list.txt"
-GRIDSIZE ='16,16'
+GRIDSIZE ='20,20'
 HINT = (-1, -1)    
   
 class WordSearch(LetterGame):
@@ -97,6 +98,8 @@ class WordSearch(LetterGame):
             if len(words_placed) == len(self.wordlist):   
                  break 
     self.board, words_placed, self.word_coords = best
+    self.fill()
+    words_placed = self.wordlist
     self.gui.set_prompt(f'Placed {len(words_placed)}/{len(self.wordlist)} words') 
     self.wordlist = words_placed    
     self.all_words = [word.replace(' ', '') for word in self.wordlist]
@@ -212,6 +215,7 @@ class WordSearch(LetterGame):
     
     process = self.initialise_board() 
     self.print_board()
+    self.solve()
     while True:
       move = self.get_player_move(self.board)  
       if move[0] == HINT:
@@ -233,6 +237,106 @@ class WordSearch(LetterGame):
     self.finished = True
     self.gui.show_start_menu()
     
+  def find_word(self, word):
+        word = list(word)
+        wordlen = len(word)
+        np_board = np.array(self.board)
+        first_letter = word[0]
+        locs = np.argwhere(np_board == first_letter)
+        for rc in locs:            
+              rc = Coord(rc)
+              r,c = rc
+              bd_r, bd_c = np_board.shape
+              # numpy slicing
+              right = np_board[r, c:c+wordlen]
+              down = np_board[r:r+wordlen, c]
+              ldown = np_board.diagonal(c)[:wordlen]
+              left = np_board[r, c-wordlen+1:c+1]
+              up = np_board[r-wordlen+1:r+1, c]
+              rdown = np.fliplr(np_board).diagonal(bd_r - r)[:wordlen]
+              lup = np.flipud(np_board).diagonal(r)[:wordlen]
+              rup = np.flipud(np.fliplr(np_board)).diagonal(bd_r - r)[:wordlen]
+              
+              print(f'found {word[0]} at {rc}')
+              self.moves = []
+              self.moves.append(rc)
+              for dir in rc.all_dirs:
+                   rc_next = rc + dir
+                   if not self.check_in_board(rc_next):
+                     continue
+                   next = self.get_board_rc(rc_next, self.board)
+                   if next != word[1].lower():
+                        continue
+                   else:
+                       # try same direction for rest of word
+                       print(f'found {word[1]} at {rc_next}')
+                       
+                       self.moves.append(rc_next)
+                       for letter in word[2:]:
+                           rc_next = rc_next + dir
+                           if not self.check_in_board(rc_next):
+                              print('off board')
+                              break                   
+                           if self.get_board_rc(rc_next, self.board) == letter:
+                             print(f'found {letter} at {rc_next}')
+                             self.moves.append(rc_next)
+                           else:
+                             print('next direction')
+                             break # next direction
+                       # success, draw line
+                       self.match_word(self.moves)
+                       print('found ', ''.join(word))
+                       return
+    
+  def solve(self):
+    # solve the wordsearch below':
+    # for each word, find the first letter
+    # then try in all directions to get second letter
+    # if ok, keep going in that direction until word is complete or letter is wrong.
+    # then try other directions and then next occurence of letter
+    
+    for word in self.wordlist:
+      self.gui.set_prompt(f'finding {word}')
+      self.find_word(word)    
+      sleep(1)
+      
+      
+             
+       
+                     
+                
+  def fill(self):
+    table = [
+    'YHWOFETJAEVERBIMES',
+    'EXEULNLRQDCEVATCOI',
+    'LLGAAOPBNELAROHCSN',
+    'DUICVEMAMPASSAGEOT',
+    'ENSBGYLESESNOSINUE',
+    'MEAGREMORESOPMOCTR',
+    'DTIBIEPELTINHTIYRV',
+    'AOOXGRTGTKCEENBEIA',
+    'WTICAINTHAACOAQDVL',
+    'RDANCIBHOGLMLULUOS',
+    'DAOTJALEGERLINETKB',
+    'DOGTNCTEFAUESTAELT',
+    'NSTTAARAHLMTRRPUCN',
+    'APCLICCODRAOBYEKAE',
+    'BYOTAMIHTCFIAGRGDM',
+    'SLNWUREZCCVDRNFOEE',
+    'SACFHTTAZUHAIIOSNV',
+    'ACENOTTNSISEAWRPZO',
+    'RORATORIOSPYTSMEAM',
+    'BOTAGELROCKNROLLDI']  
+    letters = np.array([list(i.lower()) for i in table])
+    r, c = letters.shape
+    self.board = np.array(self.board)
+    bd = self.board.shape
+    self.board[:r, :c] = letters
+    #for r, row in enumerate(table):
+    #  for c, letter in enumerate(list(row)):
+    #     self.board[r][c] = letter.lower()
+    self.gui.update(self.board)
+
 
 if __name__ == '__main__':
   g = WordSearch()

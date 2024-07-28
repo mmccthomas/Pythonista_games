@@ -498,7 +498,8 @@ class Coord(tuple):
         self.c = self.val[1]
         self.row = self.r
         self.col = self.c
-        
+        self.all_dirs = [(-1, 0), (-1, 1), (0, 1),  (1, 1), (1, 0), (1, -1), (0, -1), (-1, -1)]
+        self.nsew_dirs = [(-1, 0), (0, 1),  (1, 0), (0, -1)]
         
     def __repr__(self):
         return f'Coord({self.row}, {self.col})'
@@ -510,13 +511,12 @@ class Coord(tuple):
         return Coord(tuple(p-q for p, q in zip(self.val, other)))
       
     def all_neighbours(self):
-      dirs = [(-1, 0), (-1, 1), (0, 1),  (1, 1), (1, 0), (1, -1), (0, -1), (-1, -1)]
-      return [Coord(self.__add__(d)) for d in dirs]
+      return [Coord(self.__add__(d)) for d in self.all_dirs]
       
     def nsew(self):
         """ up, down, left, right """
-        dirs = [(-1, 0), (0, 1),  (1, 0), (0, -1)]
-        return [Coord(self.__add__(d)) for d in dirs]
+        
+        return [Coord(self.__add__(d)) for d in self.nsew_dirs]
       
     
     
