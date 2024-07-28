@@ -25,7 +25,7 @@ from gui.gui_interface import Gui, Squares, Coord
 BLOCK = '#'
 SPACE = ' '
 WORDLIST = "wordsearch_list.txt"
-GRIDSIZE ='20,20'
+GRIDSIZE ='19,19'
 HINT = (-1, -1)    
   
 class WordSearch(LetterGame):
@@ -43,6 +43,7 @@ class WordSearch(LetterGame):
     self.gui = Gui(self.board, Player())
     self.gui.gs.q = self.q # pass queue into gui
     self.COLUMN_LABELS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'[:self.sizex]
+    self.table = None
     self.gui.set_alpha(True) 
     self.gui.set_grid_colors(grid='lightgrey', highlight='lightblue')
     self.gui.require_touch_move(False)
@@ -60,6 +61,7 @@ class WordSearch(LetterGame):
                             'Quit': self.quit})
     self.known_locs = []
     self.word_coords = {}
+    
     
   def print_board(self):
     """
@@ -98,9 +100,10 @@ class WordSearch(LetterGame):
             if len(words_placed) == len(self.wordlist):   
                  break 
     self.board, words_placed, self.word_coords = best
-    [self.board_rc((r,c,), self.board, SPACE) for c in range(self.sizex) for r in range(self.sizey)]
-    self.fill()
-    words_placed = self.wordlist
+    if self.table:
+        [self.board_rc((r,c,), self.board, SPACE) for c in range(self.sizex) for r in range(self.sizey)]
+        self.fill()
+        words_placed = self.wordlist
     self.gui.set_prompt(f'Placed {len(words_placed)}/{len(self.wordlist)} words') 
     self.wordlist = words_placed    
     self.all_words = [word.replace(' ', '') for word in self.wordlist]
@@ -118,6 +121,7 @@ class WordSearch(LetterGame):
   def select_list(self):
       '''Choose which category'''
       items = [s.capitalize() for s in self.word_dict.keys()]
+      items = [item for item in  items if not item.endswith('_frame')]
       #return selection
       self.gui.selection = ''
       selection = ''
@@ -133,6 +137,8 @@ class WordSearch(LetterGame):
             
         if len(selection) >1:
           self.wordlist = self.word_dict[selection]
+          if selection + '_frame' in self.word_dict:
+             self.table = self.word_dict[selection + '_frame']
           self.wordlist = [word.lower() for word in self.wordlist]
           self.gui.selection =''
           return True
@@ -170,14 +176,17 @@ class WordSearch(LetterGame):
         
   
   def reveal(self):
-      #self.gui.clear_numbers()
-      for word, coords in self.word_coords.items():
-         if coords:
-           color = self.random_color()
-           self.gui.draw_line([self.gui.rc_to_pos(lg.add(coords[i], (-.5, .5))) for i in [0, -1]], line_width=8, color='red', alpha=0.5)
-           #self.print_square(coords, color=color, clear=False, alpha=.5)           
-         else:
-           print('unplaced word', word)
+      if self.table:
+         self.solve()
+      else:
+        #self.gui.clear_numbers()
+        for word, coords in self.word_coords.items():
+           if coords:
+             color = self.random_color()
+             self.gui.draw_line([self.gui.rc_to_pos(lg.add(coords[i], (-.5, .5))) for i in [0, -1]], line_width=8, color='red', alpha=0.5)
+             #self.print_square(coords, color=color, clear=False, alpha=.5)           
+           else:
+             print('unplaced word', word)
       sleep(5)
       self.gui.show_start_menu()
       
@@ -216,7 +225,7 @@ class WordSearch(LetterGame):
     
     process = self.initialise_board() 
     self.print_board()
-    self.solve()
+    
     while True:
       move = self.get_player_move(self.board)  
       if move[0] == HINT:
@@ -239,89 +248,41 @@ class WordSearch(LetterGame):
     self.gui.show_start_menu()
     
   def find_word(self, word):
-        print('SEARCHING  for        ', word)
-        word = word.lower()
-        word = list(word)
-        wordlen = len(word)
-        np_board = np.array(self.board)
-        first_letter = word[0]
-        locs = np.argwhere(np_board == first_letter)
+        # for each word, find the first letter
+        # then try in all directions to get second letter
+        # if ok, keep going in that direction until word is complete or letter is wrong.
+        # then try other directions and then next occurence of letter
+        word = list(word.lower())
+        locs = np.argwhere(self.board == word[0])
         for rc in locs:      
-          rc = Coord(rc)
-          r,c = rc
-          #print(f'found {word[0]} at {rc}')
-          self.moves = [rc]
-          for dir in rc.all_dirs:
-               rc_next = rc + dir
-               if not self.check_in_board(rc_next):
-                   continue            
-               next = self.get_board_rc(rc_next, self.board)
-               if next != word[1]:
-                    continue
-               else:
-                   # try same direction for rest of word
-                   #print(f'found {word[1]} at {rc_next}')
-                       
-                   self.moves.append(rc_next)
-                   for letter in word[2:]:
-                       rc_next = rc_next + dir
-                       if not self.check_in_board(rc_next):
-                          self.moves=[rc]
+            rc = Coord(rc)
+            
+            for dir in rc.all_dirs:
+                 self.moves = [rc]
+                 rc_next = rc
+                 for letter in word[1:]:
+                     rc_next = rc_next + dir
+                     if not self.check_in_board(rc_next):
                           break
-                       next = self.get_board_rc(rc_next, self.board)          
-                       if next == letter:
+                     next = self.get_board_rc(rc_next, self.board)          
+                     if next == letter:
                            self.moves.append(rc_next)
-                       else:
-                           self.moves = [rc]
-                           break # next direction
-                   l = len(self.moves)
-                   if len(self.moves) == wordlen:
-                          # success, draw line
+                     else:
+                         break # next direction
+                     if len(self.moves) == len(word):
                           self.match_word(self.moves)
-                          print('FOUND.          ', ''.join(word))
                           return
     
-  def solve(self):
-    # solve the wordsearch below':
-    # for each word, find the first letter
-    # then try in all directions to get second letter
-    # if ok, keep going in that direction until word is complete or letter is wrong.
-    # then try other directions and then next occurence of letter
-    
+  def solve(self):       
     for word in self.wordlist.copy():
       self.gui.set_prompt(f'finding {word}')
       self.find_word(word)    
-      sleep(1)
-      
-      
-             
-       
-                     
+      #sleep(.1)
+                          
                 
   def fill(self):
-    table = [
-    'YHWOFETJAEVERBIMES',
-    'EXEULNLRQDCEVATCOI',
-    'LLGAAOPBNELAROHCSN',
-    'DUICVEMAMPASSAGEOT',
-    'ENSBGYLESESNOSINUE',
-    'MEAGREMORESOPMOCTR',
-    'DTIBIEPELTINHTIYRV',
-    'AOOXGRTGTKCEENBEIA',
-    'WTICAINTHAACOAQDVL',
-    'RDANCIBHOGLMLULUOS',
-    'DAOTJALEGERLINETKB',
-    'DOGTNCTEFAUESTAELT',
-    'NSTTAARAHLMTRRPUCN',
-    'APCLICCODRAOBYEKAE',
-    'BYOTAMIHTCFIAGRGDM',
-    'SLNWUREZCCVDRNFOEE',
-    'SACFHTTAZUHAIIOSNV',
-    'ACENOTTNSISEAWRPZO',
-    'RORATORIOSPYTSMEAM',
-    'BOTAGELROCKNROLLDI']  
-    letters = np.array([list(i.lower()) for i in table])
-    r, c = letters.shape
+    letters = np.array([list(i.lower()) for i in self.table])
+    r, c = len(letters), len(letters[0])
     self.board = np.array(self.board)
     self.board[:r, :c] = letters
     self.gui.update(self.board)
