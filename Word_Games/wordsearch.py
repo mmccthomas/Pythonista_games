@@ -101,8 +101,13 @@ class WordSearch(LetterGame):
                  break 
     self.board, words_placed, self.word_coords = best
     if self.table:
+        # empty the board and fill with letters from frame in file
         [self.board_rc((r,c,), self.board, SPACE) for c in range(self.sizex) for r in range(self.sizey)]
-        self.fill()
+        letters = np.array([list(i.lower()) for i in self.table])
+        r, c = len(letters), len(letters[0])
+        self.board = np.array(self.board)
+        self.board[:r, :c] = letters
+        self.gui.update(self.board)
         words_placed = self.wordlist
     self.gui.set_prompt(f'Placed {len(words_placed)}/{len(self.wordlist)} words') 
     self.wordlist = words_placed    
@@ -173,11 +178,13 @@ class WordSearch(LetterGame):
         break
       else:
         self.gui.clear_numbers(number_list=move)
-        
-  
+          
   def reveal(self):
-      if self.table:
-         self.solve()
+      if self.table:      
+          for word in self.wordlist.copy():
+             self.gui.set_prompt(f'finding {word}')
+             self.find_word(word)    
+             sleep(1)
       else:
         #self.gui.clear_numbers()
         for word, coords in self.word_coords.items():
@@ -271,21 +278,7 @@ class WordSearch(LetterGame):
                          break # next direction
                      if len(self.moves) == len(word):
                           self.match_word(self.moves)
-                          return
-    
-  def solve(self):       
-    for word in self.wordlist.copy():
-      self.gui.set_prompt(f'finding {word}')
-      self.find_word(word)    
-      #sleep(.1)
-                          
-                
-  def fill(self):
-    letters = np.array([list(i.lower()) for i in self.table])
-    r, c = len(letters), len(letters[0])
-    self.board = np.array(self.board)
-    self.board[:r, :c] = letters
-    self.gui.update(self.board)
+                          return                          
 
 
 if __name__ == '__main__':
