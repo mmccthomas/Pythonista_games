@@ -180,32 +180,32 @@ class GameBoard(Scene):
          GRID_POS = (50, 85)
          grid_size = h - 150
          self.font_size = 24
-         self.SQ_SIZE = grid_size // ((self.DIMENSION_X + self.DIMENSION_Y) / 2)
+         self.SQ_SIZE = grid_size // max(self.DIMENSION_X , self.DIMENSION_Y)
       case 'ipad_portrait':
          GRID_POS = (60, 60)
          grid_size = w - 50
          self.font_size = 24
-         self.SQ_SIZE = grid_size // ((self.DIMENSION_X + self.DIMENSION_Y) / 2)
+         self.SQ_SIZE = grid_size // max(self.DIMENSION_X , self.DIMENSION_Y)
       case 'iphone_landscape':
          GRID_POS = (30, 40)
          grid_size = h - 80
          self.font_size = 16
-         self.SQ_SIZE = grid_size // ((self.DIMENSION_X + self.DIMENSION_Y) / 2)
+         self.SQ_SIZE = grid_size // max(self.DIMENSION_X , self.DIMENSION_Y)
       case 'iphone_portrait':
          GRID_POS = (30, 60)
          grid_size = w - 50
          self.font_size = 12
-         self.SQ_SIZE = grid_size // ((self.DIMENSION_X + self.DIMENSION_Y) / 2)
+         self.SQ_SIZE = grid_size // max(self.DIMENSION_X , self.DIMENSION_Y)
       case 'ipad13_landscape':
          GRID_POS = (100, 85)
          grid_size = h - 150
          self.font_size = 24
-         self.SQ_SIZE = grid_size // ((self.DIMENSION_X + self.DIMENSION_Y) / 2)
+         self.SQ_SIZE = grid_size // max(self.DIMENSION_X , self.DIMENSION_Y)
       case 'ipad13_portrait':
          GRID_POS = (30, 85)
          grid_size = w - 50
          self.font_size = 24
-         self.SQ_SIZE = grid_size // ((self.DIMENSION_X + self.DIMENSION_X) / 2)
+         self.SQ_SIZE = grid_size // max(self.DIMENSION_X , self.DIMENSION_Y)
 
          
     for k, v in kwargs.items():

@@ -590,11 +590,15 @@ class LetterGame():
     
   def get_size(self, size=None):
     # size can override board size
-    if size is not None:
+    # size is x, y
+    if isinstance(size, tuple):
+       selection = f'{size}'     
+    elif isinstance(size, str):
          selection = size
     elif hasattr(self, 'board'):
-        selection = f'{len(self.board)},{len(self.board[0])}'
+        selection = f'{len(self.board[0])},{len(self.board)}'
         self.sizey, self.sizex = len(self.board), len(self.board[0])
+        #self.gui.gs.DIMENSION_Y, self.gui.gs.DIMENSION_X = self.sizey, self.sizex
         return len(self.board), len(self.board[0])
     else:
         selection = console.input_alert("What is the dimension of the board (X, Y)? (Default is 5x5)\nEnter 2 numbers:")
@@ -612,6 +616,7 @@ class LetterGame():
        self.sizex = self.sizey= 5
        board_dimension = (5,5)
        print(f"Invalid input. The board will be 5x5!")
+    #self.gui.gs.DIMENSION_Y, self.gui.gs.DIMENSION_X = board_dimension
     self.create_game_board(board_dimension)
     return board_dimension
       

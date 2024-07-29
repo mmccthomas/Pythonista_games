@@ -35,6 +35,7 @@ class WordSearch(LetterGame):
     # allows us to get a list of rc locations
     self.log_moves = True
     self.debug = False
+    self.table = None
     self.straight_lines_only = True
     self.load_words_from_file(WORDLIST)    
     self.get_size()      
@@ -43,7 +44,7 @@ class WordSearch(LetterGame):
     self.gui = Gui(self.board, Player())
     self.gui.gs.q = self.q # pass queue into gui
     self.COLUMN_LABELS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'[:self.sizex]
-    self.table = None
+    
     self.gui.set_alpha(True) 
     self.gui.set_grid_colors(grid='lightgrey', highlight='lightblue')
     self.gui.require_touch_move(False)
@@ -68,47 +69,54 @@ class WordSearch(LetterGame):
     Display the  players game board, we neve see ai
     """  
     display_words = [word.capitalize() for word in self.wordlist]
+    try:
+       max_len = max([len(word) for word in display_words]) + 1
+    except ValueError:
+       max_len = 10
     
     if self.gui.gs.device.endswith('_landscape'):  
-        msg = self.format_cols(display_words, columns=3, width=10)
+        msg = self.format_cols(display_words, columns=2, width=max_len)
         self.gui.set_moves(msg, font=('Avenir Next', 25))
     elif self.gui.gs.device.endswith('_portrait'):
-        msg = self.format_cols(display_words, columns=5, width=10)
+        msg = self.format_cols(display_words, columns=5, width=max_len)
         self.gui.set_moves(msg, font=('Avenir Next', 20))
     self.gui.update(self.board)  
     
   def get_size(self):
      # note 20x20 is largest before tile image size is too small
-     try:
-         if len(self.wordlist) > 40:
-              gridsize = '20,20'
-         else:
+     if self.table:
+         gridsize =  f'{len(self.table[0])},{len(self.table)}'         
+     else:
+         try:
+             if len(self.wordlist) > 40:
+                  gridsize = '20,20'
+             else:
+                 gridsize = GRIDSIZE
+         except (AttributeError):
              gridsize = GRIDSIZE
-     except (AttributeError):
-         gridsize = GRIDSIZE
      return  LetterGame.get_size(self, gridsize)
   
-  def initialise_board(self):        
-    [self.board_rc((r,c,), self.board, SPACE) for c in range(self.sizex) for r in range(self.sizey)]
-    no_words_placed = 0
-    for i in range(30):
-        self.board, words_placed, self.word_coords = create_word_search(self.wordlist, size=self.sizex)     
-        #print(f'{i =}, {len(words_placed)}/{len(self.wordlist)}') 
-        if len(words_placed) > no_words_placed:
-            best = self.board, words_placed, self.word_coords
-            no_words_placed = len(words_placed)
-            if len(words_placed) == len(self.wordlist):   
-                 break 
-    self.board, words_placed, self.word_coords = best
-    if self.table:
-        # empty the board and fill with letters from frame in file
+  def initialise_board(self):
+    if self.table is None:        
         [self.board_rc((r,c,), self.board, SPACE) for c in range(self.sizex) for r in range(self.sizey)]
+        no_words_placed = 0
+        for i in range(30):
+            self.board, words_placed, self.word_coords = create_word_search(self.wordlist, size=self.sizex)     
+            #print(f'{i =}, {len(words_placed)}/{len(self.wordlist)}') 
+            if len(words_placed) > no_words_placed:
+                best = self.board, words_placed, self.word_coords
+                no_words_placed = len(words_placed)
+                if len(words_placed) == len(self.wordlist):   
+                     break 
+        self.board, words_placed, self.word_coords = best
+    else:
         letters = np.array([list(i.lower()) for i in self.table])
-        r, c = len(letters), len(letters[0])
-        self.board = np.array(self.board)
-        self.board[:r, :c] = letters
+        self.board = letters
         self.gui.update(self.board)
         words_placed = self.wordlist
+        for word in words_placed:
+          coords = self.find_word(word)
+          self.word_coords[word] = coords
     self.gui.set_prompt(f'Placed {len(words_placed)}/{len(self.wordlist)} words') 
     self.wordlist = words_placed    
     self.all_words = [word.replace(' ', '') for word in self.wordlist]
@@ -182,9 +190,10 @@ class WordSearch(LetterGame):
   def reveal(self):
       if self.table:      
           for word in self.wordlist.copy():
-             self.gui.set_prompt(f'finding {word}')
-             self.find_word(word)    
-             sleep(1)
+             moves = self.find_word(word)
+             if moves: 
+                 self.match_word(moves)   
+             #sleep(1)
       else:
         #self.gui.clear_numbers()
         for word, coords in self.word_coords.items():
@@ -276,9 +285,8 @@ class WordSearch(LetterGame):
                            self.moves.append(rc_next)
                      else:
                          break # next direction
-                     if len(self.moves) == len(word):
-                          self.match_word(self.moves)
-                          return                          
+                     if len(self.moves) == len(word):                          
+                          return self.moves                   
 
 
 if __name__ == '__main__':
