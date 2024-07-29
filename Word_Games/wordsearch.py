@@ -188,13 +188,7 @@ class WordSearch(LetterGame):
         self.gui.clear_numbers(number_list=move)
           
   def reveal(self):
-      if self.table:      
-          for word in self.wordlist.copy():
-             moves = self.find_word(word)
-             if moves: 
-                 self.match_word(moves)   
-             #sleep(1)
-      else:
+        # reveal all words      
         #self.gui.clear_numbers()
         for word, coords in self.word_coords.items():
            if coords:
@@ -203,8 +197,8 @@ class WordSearch(LetterGame):
              #self.print_square(coords, color=color, clear=False, alpha=.5)           
            else:
              print('unplaced word', word)
-      sleep(5)
-      self.gui.show_start_menu()
+        sleep(5)
+        self.gui.show_start_menu()
       
   def restart(self):
     """ reinitialise """ 
@@ -236,7 +230,10 @@ class WordSearch(LetterGame):
     self.gui.clear_messages()
     self.gui.set_top('Wordsearch')
     _, _, w, h = self.gui.grid.bbox
-    self.gui.set_enter('Hint', position=(w + 150, 50))
+    if self.gui.device.endswith('_landscape'):
+         self.gui.set_enter('Hint', position=(w + 50, -50))
+    else:
+         self.gui.set_enter('Hint', position=(w -50, h + 50))
     self.word_locations = []
     
     process = self.initialise_board() 

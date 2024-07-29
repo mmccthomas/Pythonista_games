@@ -351,7 +351,7 @@ class GameBoard(Scene):
         anchor_point = (0, 0.5)
         pos_button = (800, 0)
       case 'ipad_portrait':
-        position = (150, h + 20)
+        position = (150, h + 30)
         anchor_point = (0, 0)
         pos_button = (600, 0)
       case 'ipad13_landscape':
@@ -359,7 +359,7 @@ class GameBoard(Scene):
         anchor_point = (0, 0.5)
         pos_button = (w, 0)
       case 'ipad13_portrait':
-        position = (150, h + 20)
+        position = (150, h + 30)
         anchor_point = (0, 0)
         pos_button = (800, 0)
       case 'iphone_portrait':
