@@ -13,7 +13,6 @@ grandparent = os.path.dirname(parent)
 sys.path.append(grandparent)
 from word_square_gen import create_word_search
 from Letter_game import LetterGame, Player
-import Letter_game as lg
 from gui.gui_interface import Gui, Squares, Coord
 BLOCK = '#'
 SPACE = ' '
@@ -43,7 +42,7 @@ class WordSearch(LetterGame):
     self.gui.set_grid_colors(grid='lightgrey', highlight='lightblue')
     self.gui.require_touch_move(False)
     self.gui.allow_any_move(True)
-    self.select_list()
+    self.selection = self.select_list()
     self.SIZE = self.get_size()
     self.gui.gs.DIMENSION_Y, self.gui.gs.DIMENSION_X = self.SIZE
     self.gui.setup_gui(log_moves=True)
@@ -148,7 +147,7 @@ class WordSearch(LetterGame):
              self.table = self.word_dict[selection + '_frame']
           self.wordlist = [word.lower() for word in self.wordlist]
           self.gui.selection = ''
-          return True
+          return selection
         elif selection == "Cancelled_":
           return False
         else:
@@ -158,9 +157,9 @@ class WordSearch(LetterGame):
     """ match word to move"""
     word = []
     for rc in move:
+      rc = Coord(rc)
       if self.check_in_board(rc) and isinstance(rc, tuple):
-        c = self.board[rc[0]][rc[1]]
-        word.append(c)
+        word.append(self.get_board_rc(rc, self.board))        
     selected_word = ''.join(word)
     self.gui.clear_numbers(number_list=move)
     for word in self.wordlist:
@@ -169,7 +168,7 @@ class WordSearch(LetterGame):
       if kword == selected_word:
         self.wordlist.remove(word)
         self.known_locs.extend(move)
-        self.gui.draw_line([self.gui.rc_to_pos(lg.add(move[i], (-.5, .5)))
+        self.gui.draw_line([self.gui.rc_to_pos(Coord(move[i]) + (-.5, .5))
                             for i in [0, -1]],
                            line_width=8, color='red', alpha=0.5)
         self.print_board()
@@ -181,11 +180,12 @@ class WordSearch(LetterGame):
       # reveal all words
       for word, coords in self.word_coords.items():
           if coords:
-             self.gui.draw_line([self.gui.rc_to_pos(lg.add(coords[i], (-.5, .5)))
+             self.gui.draw_line([self.gui.rc_to_pos(Coord(coords[i]) + (-.5, .5))
                                  for i in [0, -1]],
                                 line_width=8, color='red', alpha=0.5)
           else:
              print('unplaced word', word)
+          sleep(0.5)
       sleep(5)
       self.gui.show_start_menu()
       
@@ -207,7 +207,7 @@ class WordSearch(LetterGame):
       word = word.replace(' ', '')
       coords = self.word_coords[word]
       # note that if start and end letter are same this will fail, but OK
-      coord = coords[0] if word[0] == lg.get_board_rc(coords[0], self.board) else coords[-1]
+      coord = coords[0] if word[0] == self.get_board_rc(coords[0], self.board) else coords[-1]
       self.gui.add_numbers([Squares(coord, '', 'cyan', z_position=30,
                             alpha=.5)],
                            clear_previous=False)
@@ -219,7 +219,7 @@ class WordSearch(LetterGame):
     """
     self.gui.clear_numbers()
     self.gui.clear_messages()
-    self.gui.set_top('Wordsearch')
+    self.gui.set_top(f'Wordsearch - {self.selection.capitalize()}')
     _, _, w, h = self.gui.grid.bbox
     if self.gui.device.endswith('_landscape'):
         self.gui.set_enter('Hint', position=(w + 50, -50))
