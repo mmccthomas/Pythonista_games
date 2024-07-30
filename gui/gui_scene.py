@@ -969,7 +969,7 @@ class BoxedLabel():
       self.size = min_size
       self.font = ('Avenir Next', 24)
       self.title = title
-      self.text = mtext
+      self.text = text
       self.index = 1
       self.bounds = Rect(0, 0, 10, 10)
       self.l_box_name = None

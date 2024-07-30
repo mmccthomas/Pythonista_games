@@ -23,6 +23,7 @@ from os.path import basename
 import time
 import console
 import random
+import ui
 from common import tryopen, kyepaths
 from game import KGame, KGameFormatError
 # from input_ui import  
@@ -92,6 +93,7 @@ class KyeApp:
         # And tell glib knows that we want this timer event to keep occurring.
         return True
         
+    @ui.in_background         
     def ended(self):
       self._frame.paused = True
       selected = console.alert(" No lives left", button1='Restart',
