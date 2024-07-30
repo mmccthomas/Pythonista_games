@@ -28,6 +28,7 @@ import ui
 import defaults_cmt
 import console
 import dialogs
+import pickle
 from dialogs import _ListDialogController
 from scene import *
 from canvas_scene import KCanvas
@@ -255,13 +256,21 @@ class KFrame(Scene):
       responder.superview.close()
       self.saved_state = deepcopy(self.app._KyeApp__game)
       print(self.saved_state)
+      with open('saved_state.pkl', 'wb') as f:
+          pickle.dump(self.saved_state, f)
+      
       
     def restorestate(self, responder):      
       responder.superview.close()
       print('restored', self.saved_state)
-      if self.saved_state:
-        self.app._KyeApp__game = deepcopy(self.saved_state)
-        self.app.do_tick()
+      try:
+          with open('saved_state.pkl', 'rb') as f:
+              saved_state = pickle.load(f)
+          if saved_state:
+             self.app._KyeApp__game = deepcopy(saved_state)
+             self.app.do_tick()
+      except:
+        print('No saved state')
         
     @ui.in_background   
     def endleveldialog(self, nextlevel, endmsg):
