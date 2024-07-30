@@ -161,8 +161,9 @@ class CrossNumbers(LetterGame):
     for i, v in enumerate(list_known):
       no, l = v
       letter, _ = l
+      letter = letter.upper()
       if no  != ' ' and no != '.':
-        msg.append(f'{letter:<2} = {no:>2}  ')
+        msg.append(f'{no:>2} = {letter:<2} ')
       if self.gui.device in ['ipad_landscape','ipad13_landscape']:
            msg.append('\n' if i % 2 == 0 else ' ' * 2)
       elif self.gui.device =='ipad_portrait':
@@ -191,9 +192,13 @@ class CrossNumbers(LetterGame):
     self.compute_intersections()
     if self.debug:
         print(self.word_locations)
-    cx.set_props(board=self.board, empty_board=self.empty_board, 
-                 all_word_dict=self.all_word_dict, max_depth=self.max_depth)
-    cx.populate_words_graph(max_iterations=200, length_first=False, max_possibles=100)  
+    cx.set_props(board=self.board,
+                 empty_board=self.empty_board, 
+                 all_word_dict=self.all_word_dict, 
+                 max_depth=self.max_depth)
+    cx.populate_words_graph(max_iterations=200,
+                            length_first=False,
+                            max_possibles=100)  
     # self.print_board()
     self.check_words()
     self.generate_word_number_pairs()
