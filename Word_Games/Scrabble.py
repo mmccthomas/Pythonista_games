@@ -50,8 +50,8 @@ class PPlayer():
     self.PLAYER_2 = '@'
     self.EMPTY = ' '
     self.PIECE_NAMES  =' abcdefghijklmnopqrstuvwxyz0123456789.'
-    self.PIECES = [f'../gui/s_{k}.png' for k in self.PIECE_NAMES]
-    self.PIECES.append('../gui/s_@.png')
+    self.PIECES = [f'../gui/tileblocks/s_{k}.png' for k in self.PIECE_NAMES]
+    self.PIECES.append('../gui/tileblocks/s_@.png')
     self.PLAYERS = None
     
     
@@ -196,7 +196,7 @@ class Scrabble(LetterGame):
     y = y + y_off
     rack = {}
     for n, tile in enumerate(tiles):    
-      t = Tile(Texture(Image.named(f'../gui/s_{tile}.png')), 0,  0, sq_size=self.gui.gs.SQ_SIZE*self.posn.rackscale)   
+      t = Tile(Texture(Image.named(f'../gui/tileblocks/s_{tile}.png')), 0,  0, sq_size=self.gui.gs.SQ_SIZE*self.posn.rackscale)   
       t.position = (w + x + n * self.gui.gs.SQ_SIZE*self.posn.rackscale, y)
       rack[t.bbox] = tile
       parent.add_child(t)     

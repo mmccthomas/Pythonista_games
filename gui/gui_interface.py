@@ -403,10 +403,10 @@ class Gui():
   def ident(self, changed):
     # change rc to ident A1 or 11
     if self.use_alpha:
-      c = 'A B C D E F G H I J K L M N O P Q R S T U V W X Y Z '
+      c = 'A B C D E F G H I J K L M N O P Q R S T U V W X Y Z AAABACADAEAFAGAHAIAJAKALAMANAO'
     else:
-      c =  '1 2 3 4 5 6 7 8 9 1011121314151617181920'
-    r = '1 2 3 4 5 6 7 8 9 1011121314151617181920'
+      c =  '1 2 3 4 5 6 7 8 9 10111213141516171819202122232425262728293031323334353637383940'
+    r = '1 2 3 4 5 6 7 8 9 10111213141516171819202122232425262728293031323334353637383940'
            
     y = changed[0]
     x = changed[1]
@@ -498,7 +498,8 @@ class Coord(tuple):
         self.c = self.val[1]
         self.row = self.r
         self.col = self.c
-        
+        self.all_dirs = [(-1, 0), (-1, 1), (0, 1),  (1, 1), (1, 0), (1, -1), (0, -1), (-1, -1)]
+        self.nsew_dirs = [(-1, 0), (0, 1),  (1, 0), (0, -1)]
         
     def __repr__(self):
         return f'Coord({self.row}, {self.col})'
@@ -510,13 +511,12 @@ class Coord(tuple):
         return Coord(tuple(p-q for p, q in zip(self.val, other)))
       
     def all_neighbours(self):
-      dirs = [(-1, 0), (-1, 1), (0, 1),  (1, 1), (1, 0), (1, -1), (0, -1), (-1, -1)]
-      return [Coord(self.__add__(d)) for d in dirs]
+      return [Coord(self.__add__(d)) for d in self.all_dirs]
       
     def nsew(self):
         """ up, down, left, right """
-        dirs = [(-1, 0), (0, 1),  (1, 0), (0, -1)]
-        return [Coord(self.__add__(d)) for d in dirs]
+        
+        return [Coord(self.__add__(d)) for d in self.nsew_dirs]
       
     
     

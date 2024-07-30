@@ -22,7 +22,8 @@ sys.path.append(grandparent)
 from gui.game_menu import MenuScene
 screen_width, screen_height = get_screen_size()
 
-logging.basicConfig(format='%(asctime)s  %(funcName)s %(message)s',level=logging.INFO)
+logging.basicConfig(format='%(asctime)s  %(funcName)s %(message)s',
+                    level=logging.INFO)
 logger = logging.getLogger(__name__)
 A = Action
 """Variables"""
@@ -143,7 +144,7 @@ class GameBoard(Scene):
     self.device = self.device_size()
     self.log_moves = False
     self.debug = False
-    self.buttons = {} #  bbox: box _obj
+    self.buttons = {}  # bbox: box _obj
     self.long_touch = False  # detects if touch for longer than 1 sec
     self.setup_menus()
         
@@ -180,33 +181,32 @@ class GameBoard(Scene):
          GRID_POS = (50, 85)
          grid_size = h - 150
          self.font_size = 24
-         self.SQ_SIZE = grid_size // ((self.DIMENSION_X + self.DIMENSION_Y) / 2)
+         self.SQ_SIZE = grid_size // max(self.DIMENSION_X, self.DIMENSION_Y)
       case 'ipad_portrait':
-         GRID_POS = (30, 85)
+         GRID_POS = (60, 60)
          grid_size = w - 50
          self.font_size = 24
-         self.SQ_SIZE = grid_size // ((self.DIMENSION_X + self.DIMENSION_Y) / 2)
+         self.SQ_SIZE = grid_size // max(self.DIMENSION_X, self.DIMENSION_Y)
       case 'iphone_landscape':
-         GRID_POS = (30, 50)
-         grid_size = h - 150
+         GRID_POS = (30, 40)
+         grid_size = h - 80
          self.font_size = 16
-         self.SQ_SIZE = grid_size // ((self.DIMENSION_X + self.DIMENSION_Y) / 2)
+         self.SQ_SIZE = grid_size // max(self.DIMENSION_X, self.DIMENSION_Y)
       case 'iphone_portrait':
-         GRID_POS = (30, 85)
+         GRID_POS = (30, 60)
          grid_size = w - 50
-         self.font_size = 16
-         self.SQ_SIZE = grid_size // ((self.DIMENSION_X + self.DIMENSION_Y) / 2)
+         self.font_size = 12
+         self.SQ_SIZE = grid_size // max(self.DIMENSION_X, self.DIMENSION_Y)
       case 'ipad13_landscape':
          GRID_POS = (100, 85)
          grid_size = h - 150
          self.font_size = 24
-         self.SQ_SIZE = grid_size // ((self.DIMENSION_X + self.DIMENSION_Y) / 2)
+         self.SQ_SIZE = grid_size // max(self.DIMENSION_X, self.DIMENSION_Y)
       case 'ipad13_portrait':
          GRID_POS = (30, 85)
          grid_size = w - 50
          self.font_size = 24
-         self.SQ_SIZE = grid_size // ((self.DIMENSION_X + self.DIMENSION_X) / 2)
-
+         self.SQ_SIZE = grid_size // max(self.DIMENSION_X, self.DIMENSION_Y)
          
     for k, v in kwargs.items():
       setattr(self, k, v)
@@ -227,26 +227,33 @@ class GameBoard(Scene):
     
     self.load_images()
     self.setup_ui()
-    #self.redraw_board()
+    # self.redraw_board()
   
   def setup_menus(self):
-      self.pause_menu = {'Continue': self.dismiss_modal_scene, 'Undo': self.dismiss_modal_scene,
-                         'New Game': self.dismiss_modal_scene, 'Quit': self.close}
-      self.start_menu =  {'New Game': self.dismiss_modal_scene, 'Quit': self.close}
+      self.pause_menu = {'Continue': self.dismiss_modal_scene,
+                         'Undo': self.dismiss_modal_scene,
+                         'New Game': self.dismiss_modal_scene,
+                         'Quit': self.close}
+      self.start_menu = {'New Game': self.dismiss_modal_scene,
+                         'Quit': self.close}
   
-  def build_extra_grid(self, grids_x, grids_y, grid_width_x=None, grid_width_y=None, color=None, line_width=2, offset=None, z_position=100):
-    """ define a grid to overlay on top of everything else 
+  def build_extra_grid(self, grids_x, grids_y,
+                       grid_width_x=None, grid_width_y=None,
+                       color=None, line_width=2, offset=None,
+                       z_position=100):
+    """ define a grid to overlay on top of everything else
     allow offset to place grid at centre of square (e.g. go game)"""
     if grid_width_x is None:
       grid_width_x = grids_x
     if grid_width_y is None:
       grid_width_y = grids_y
-    if offset is None:  
+    if offset is None:
       offx, offy = 0, 0
     else:
       offx, offy = offset
     # Parameters to pass to the creation of ShapeNode
-    x = Path.rect(0, 0, self.SQ_SIZE * grid_width_x, self.SQ_SIZE * grids_y * grid_width_y)
+    x = Path.rect(0, 0, self.SQ_SIZE * grid_width_x,
+                  self.SQ_SIZE * grids_y * grid_width_y)
     x.line_width = line_width
     params = {
       "path": x,
@@ -264,7 +271,8 @@ class GameBoard(Scene):
       n.anchor_point = anchor
     
     # Building the rows
-    y = Path.rect(0, 0, self.SQ_SIZE * grids_x * grid_width_x, self.SQ_SIZE * grid_width_y)
+    y = Path.rect(0, 0, self.SQ_SIZE * grids_x * grid_width_x,
+                  self.SQ_SIZE * grid_width_y)
     y.line_width = line_width
     params["path"] = y
     
@@ -277,9 +285,11 @@ class GameBoard(Scene):
         
   def build_background_grid(self):
     parent = Node()
+    font = ('Avenir Next', self.font_size)
     if self.background_image:
       background = SpriteNode(Texture(self.background_image))
-      background.size = (self.SQ_SIZE * self.DIMENSION_X, self.SQ_SIZE * self.DIMENSION_Y)
+      background.size = (self.SQ_SIZE * self.DIMENSION_X,
+                         self.SQ_SIZE * self.DIMENSION_Y)
       background.position = (0, 0)
       background.anchor_point = (0, 0)
       parent.add_child(background)
@@ -307,10 +317,13 @@ class GameBoard(Scene):
       n.anchor_point = anchor
       parent.add_child(n)
       n = LabelNode(row_labels[2 * i: 2 * i + 2], parent=self.game_field)
-      n.position = (pos.x + self.SQ_SIZE / 2, pos.y + self.DIMENSION_Y * self.SQ_SIZE + 20)
+      n.position = (pos.x + self.SQ_SIZE / 2,
+                    pos.y + self.DIMENSION_Y * self.SQ_SIZE + 20)
       n.color = self.grid_label_color
+      n.font = font
     # Building the rows
-    params["path"] = Path.rect(0, 0, self.SQ_SIZE * self.DIMENSION_X, self.SQ_SIZE)
+    params["path"] = Path.rect(0, 0, self.SQ_SIZE * self.DIMENSION_X,
+                               self.SQ_SIZE)
     params['fill_color'] = 'clear'
     for i in range(self.DIMENSION_Y):
       n = ShapeNode(**params)
@@ -319,27 +332,34 @@ class GameBoard(Scene):
       n.anchor_point = anchor
       parent.add_child(n)
       idx = self.DIMENSION_Y - 1 - i
-      n = LabelNode(column_labels[2 * idx: 2 * idx + 2], parent=self.game_field)
+      n = LabelNode(column_labels[2 * idx: 2 * idx + 2],
+                    parent=self.game_field)
       n.position = (pos.x - 20, pos.y + self.SQ_SIZE/2)
-      n.color = self.grid_label_color    
+      n.color = self.grid_label_color
+      n.font = font
     return parent
     
   def setup_ui(self):
     
-    pause_button = SpriteNode('iow:pause_32', position=(32, self.size.h - 36), parent=self)
+    pause_button = SpriteNode('iow:pause_32', position=(32, self.size.h - 36),
+                              parent=self)
     self.grid = self.build_background_grid()
     self.game_field.add_child(self.grid)
-    x, y, w, h = self.grid.bbox # was game_field
+    x, y, w, h = self.grid.bbox  # was game_field
     font = ('Avenir Next', self.font_size)
     # all location relative to grid
-    self.msg_label_t = LabelNode("top", font=font, position=(0, h + 30), parent=self.game_field)
+    self.msg_label_t = LabelNode("top", font=font, position=(0, h + 30),
+                                 parent=self.game_field)
     self.msg_label_t.anchor_point = (0, 0)
     
-    self.msg_label_b = LabelNode("bottom", font=font, position=(0, -30), parent=self.game_field)
+    self.msg_label_b = LabelNode("bottom", font=font, position=(0, -30),
+                                 parent=self.game_field)
     self.msg_label_b.anchor_point = (0, 0)
-    self.msg_label_b2 = LabelNode("bottom2", font=font, position=(0, -60), parent=self.game_field)
+    self.msg_label_b2 = LabelNode("bottom2", font=font, position=(0, -60),
+                                  parent=self.game_field)
     self.msg_label_b2.anchor_point = (0, 0)
-    self.msg_label_prompt = LabelNode("prompt", font=font, position=(0, -90), parent=self.game_field)
+    self.msg_label_prompt = LabelNode("prompt", font=font, position=(0, -90),
+                                      parent=self.game_field)
     self.msg_label_prompt.anchor_point = (0, 0)
     # position right hand message text and enter button
     match self.device:
@@ -348,7 +368,7 @@ class GameBoard(Scene):
         anchor_point = (0, 0.5)
         pos_button = (800, 0)
       case 'ipad_portrait':
-        position = (150, h + 20)
+        position = (150, h + 30)
         anchor_point = (0, 0)
         pos_button = (600, 0)
       case 'ipad13_landscape':
@@ -356,7 +376,7 @@ class GameBoard(Scene):
         anchor_point = (0, 0.5)
         pos_button = (w, 0)
       case 'ipad13_portrait':
-        position = (150, h + 20)
+        position = (150, h + 30)
         anchor_point = (0, 0)
         pos_button = (800, 0)
       case 'iphone_portrait':
@@ -368,30 +388,37 @@ class GameBoard(Scene):
         anchor_point = (0, 0)
         pos_button = (350, 0)
     
-    self.msg_label_r = LabelNode("right", font=font, position=position, parent=self.game_field)
+    self.msg_label_r = LabelNode("right", font=font, position=position,
+                                 parent=self.game_field)
     self.msg_label_r.anchor_point = anchor_point
     
-    #self.enter_button = ShapeNode(ui.Path.rounded_rect(0, 0, 100, 32, 5), position=pos_button, parent=self)
-    #self.enter_button.anchor_point = (0, 0)
-    #self.enter_button.line_width = 2
-    #self.enter_button.fill_color = 'clear'
-    #self.enter_button.stroke_color = 'white'
-    #self.enter_label = LabelNode('Enter', position=(5,5), parent=self.enter_button)
-    #self.enter_label.anchor_point = (0, 0)
-    self.enter_button = BoxedLabel('Enter', '', position=pos_button, min_size=(100, 32),parent=self.game_field)
+    # self.enter_button = ShapeNode(ui.Path.rounded_rect(0, 0, 100, 32, 5),
+    #                               position=pos_button, parent=self)
+    # self.enter_button.anchor_point = (0, 0)
+    # self.enter_button.line_width = 2
+    # self.enter_button.fill_color = 'clear'
+    # self.enter_button.stroke_color = 'white'
+    # self.enter_label = LabelNode('Enter', position=(5,5), 
+    #.                             parent=self.enter_button)
+    # self.enter_label.anchor_point = (0, 0)
+    self.enter_button = BoxedLabel('Enter', '', position=pos_button,
+                                   min_size=(100, 32),
+                                   parent=self.game_field)
     self.buttons[1] = self.enter_button
     self.buttons[1].set_index(1)
     self.enter_button.set_text_props(font=font)
     
   def test_lines(self):
-    rcs = [(0.5, 0.5),(0.5, 2.5), (3.5, 2.5), (3.5, 4.5), (4.5, 4.5), (4.5, 0.5), (0.5, 0.5)]    
-    points = [self.rc_to_pos(r-1,c)  for r, c in rcs] 
-    self.draw_line(points, line_width=1, stroke_color='black', set_line_dash=[10,2])
+    rcs = [(0.5, 0.5), (0.5, 2.5), (3.5, 2.5),
+           (3.5, 4.5), (4.5, 4.5), (4.5, 0.5), (0.5, 0.5)]
+    points = [self.rc_to_pos(r - 1, c) for r, c in rcs]
+    self.draw_line(points, line_width=1,
+                   stroke_color='black', set_line_dash=[10, 2])
    
   def draw_line(self, coords, **kwargs):
     ''' coords is an array of Point objects from rc_to_point
     '''
-    #if self.line is not None:
+    # if self.line is not None:
     #  self.line.remove_from_parent()
     path = ui.Path()
     
@@ -405,17 +432,18 @@ class GameBoard(Scene):
               fn = getattr(path, k)
               fn(v)
             except (AttributeError, TypeError) as e:
-              pass 
+              pass
               # print(traceback.format_exc())
-    minx, miny = None, None        
+    minx, miny = None, None
     for i, p in enumerate(coords):
       # get/update the lower left corner minimum
       try:
           minx, miny = (p.x if minx is None else min(minx, p.x),
-          p.y if miny is None else min(miny, p.y))
+                        p.y if miny is None else min(miny, p.y))
           
-          if i == 0: path.move_to(p.x, -p.y)
-          else: 
+          if i == 0:
+            path.move_to(p.x, -p.y)
+          else:
             path.line_to(p.x, -p.y)
       except (AttributeError):
         print('coords param needs to be array of Points from rc_to_pos()')
@@ -427,11 +455,12 @@ class GameBoard(Scene):
     # the offset(position) of our node has to be the lower left corner
     # point plus the center vector of our path
     self.line = ShapeNode(path,
-    position = (minx + path.bounds.w * 0.5,
-    miny + path.bounds.h *  0.5), z_position=1000,
-    parent=self.game_field)
-    self.line.stroke_color='red'
-    self.line.fill_color='transparent'
+                          position=(minx + path.bounds.w * 0.5,
+                                    miny + path.bounds.h * 0.5),
+                          z_position=1000,
+                          parent=self.game_field)
+    self.line.stroke_color = 'red'
+    self.line.fill_color = 'transparent'
     # modify line parameters
     for k, v in kwargs.items():
         try:
@@ -449,9 +478,13 @@ class GameBoard(Scene):
       self.IMAGES = self.Player.PIECES
     else:
       if ':' in self.Player.PIECES:  # internal icon
-          self.IMAGES = {player: image for player, image in zip(self.Player.PLAYERS, self.Player.PIECES)}
+          self.IMAGES = {player: image
+                         for player, image in zip(self.Player.PLAYERS,
+                                                  self.Player.PIECES)}
       else:
-          self.IMAGES ={player: image for player, image in zip(self.Player.PIECE_NAMES, self.Player.PIECES)}
+          self.IMAGES = {player: image
+                         for player, image in zip(self.Player.PIECE_NAMES,
+                                                  self.Player.PIECES)}
       
   def get_piece(self, r, c):
     return self.board[r][c]
@@ -466,7 +499,7 @@ class GameBoard(Scene):
       t.remove_from_parent()
       
     if fn_piece is None:
-      def fn_piece(piece):return piece
+      def fn_piece(piece): return piece
 
     parent = self.game_field
     for r in range(self.DIMENSION_Y):
@@ -474,21 +507,22 @@ class GameBoard(Scene):
         piece = self.get_piece(r, c)
         animation = False
         
-        # animation = False if piece == self.last_board[r][c] else True        
-        try: 
+        # animation = False if piece == self.last_board[r][c] else True
+        try:
           k = fn_piece(piece)
           if self.debug:
               print('fnpiece', k)
-          # fn_piece allows computation of image name from calling module        
-          t = Tile(Texture(self.IMAGES[k]), 0,0, 
-                           sq_size=self.SQ_SIZE, 
-                           dims=(self.DIMENSION_Y, self.DIMENSION_X))
+          # fn_piece allows computation of image name from calling module
+          t = Tile(Texture(self.IMAGES[k]), 0, 0,
+                   sq_size=self.SQ_SIZE,
+                   dims=(self.DIMENSION_Y, self.DIMENSION_X))
           # t.DIM_Y, t.DIM_X = self.DIMENSION_Y, self.DIMENSION_X
           
-          t.size = (self.SQ_SIZE - self.smaller_tile, self.SQ_SIZE - self.smaller_tile)
+          t.size = (self.SQ_SIZE - self.smaller_tile,
+                    self.SQ_SIZE - self.smaller_tile)
           t.set_pos(r, c, animation=animation)
-          t.name =  fn_piece(piece) + str(r * self.DIMENSION_Y + c)
-          t.position = t.position + (self.smaller_tile/2, self.smaller_tile/2)
+          t.name = fn_piece(piece) + str(r * self.DIMENSION_Y + c)
+          t.position = t.position + (self.smaller_tile / 2, self.smaller_tile / 2)
           parent.add_child(t)
         except (AttributeError, KeyError) as e:
           if self.debug:
@@ -512,10 +546,10 @@ class GameBoard(Scene):
     self.hl = []
     for move in valid_moves:
       if True:
-        t=ShapeNode(ui.Path.rect(0, 0, self.SQ_SIZE, self.SQ_SIZE), 
-                    fill_color=self.highlight_fill,  
-                    position=self.rc_to_pos(move[0], move[1]), alpha=alpha, 
-                    parent=self.game_field, )
+        t = ShapeNode(ui.Path.rect(0, 0, self.SQ_SIZE, self.SQ_SIZE),
+                      fill_color=self.highlight_fill,
+                      position=self.rc_to_pos(move[0], move[1]), alpha=alpha,
+                      parent=self.game_field, )
         t.anchor_point = (0, 0)
         self.highlights.append(move)
         self.hl.append(t)
@@ -536,7 +570,8 @@ class GameBoard(Scene):
               text = t.text
               text_color = t.color
               
-        items[coord] = {'color':color, 'text': text, 'text_color' :text_color, 'alpha': alpha}
+        items[coord] = {'color': color, 'text': text,
+                        'text_color': text_color, 'alpha': alpha}
       return items
     elif isinstance(coords, tuple):
       items = {}
@@ -549,7 +584,8 @@ class GameBoard(Scene):
             elif isinstance(t, LabelNode):
               text = t.text
               text_color = t.color
-      items[coords] = {'color':color, 'text': text, 'text_color' :text_color, 'alpha': alpha}
+      items[coords] = {'color': color, 'text': text,
+                       'text_color': text_color, 'alpha': alpha}
       return items
     else:
        pass
@@ -601,7 +637,7 @@ class GameBoard(Scene):
     for k, v in kwargs.items():
       setattr(self, k, v)
     if clear_previous:
-        self.clear_numbers()    
+        self.clear_numbers()
             
     def add(a, b):
         return tuple(p + q for p, q in zip(a, b))
@@ -613,12 +649,13 @@ class GameBoard(Scene):
            sqsize = self.SQ_SIZE
         r, c = item.position
         x, y = item.offset
-        t=ShapeNode(ui.Path.rounded_rect(0, 0, sqsize, sqsize, item.radius), 
-                    fill_color=item.color,  position=self.rc_to_pos(r+ y, c + x), 
-                    stroke_color=item.stroke_color,
-                    z_position=item.z_position,
-                    alpha=item.alpha,
-                    parent=self.game_field)
+        t = ShapeNode(ui.Path.rounded_rect(0, 0, sqsize, sqsize, item.radius),
+                      fill_color=item.color,
+                      position=self.rc_to_pos(r + y, c + x),
+                      stroke_color=item.stroke_color,
+                      z_position=item.z_position,
+                      alpha=item.alpha,
+                      parent=self.game_field)
         if hasattr(item, 'anchor_point'):
             t.anchor_point = item.anchor_point
         else:
@@ -631,9 +668,9 @@ class GameBoard(Scene):
         tpos_y = (self.SQ_SIZE / 2) + tposy * (self.SQ_SIZE / 2 - 5)
         pos1 = self.rc_to_pos(r, c)
         pos = add(self.rc_to_pos(r, c), (tpos_x, tpos_y))
-        t1 = LabelNode(str(item.text), color=item.text_color, 
-                       font=item.font, position=pos, 
-                       z_position=item.z_position + 5, 
+        t1 = LabelNode(str(item.text), color=item.text_color,
+                       font=item.font, position=pos,
+                       z_position=item.z_position + 5,
                        parent=self.game_field)
         t1.anchor_point = (0, 1.0)
   
@@ -682,12 +719,11 @@ class GameBoard(Scene):
           print('..', end=" ")
       print()
     print()
-          
     
   def turn_status(self, turn, custom_message=None):
       if custom_message:
          self.msg_label_t.text = custom_message
-      else: 
+      else:
           self.msg_label_t.text = "white turn" if turn else "black turn"
       
   def will_close(self):
@@ -706,32 +742,33 @@ class GameBoard(Scene):
     self.touch_time = time()
     self.beep = False
     self.start_touch = touch.location
-    button_touch= [button.bounds.contains_point(touch.location) for button in self.buttons.values()]
+    button_touch = [button.bounds.contains_point(touch.location)
+                    for button in self.buttons.values()]
     
     if touch.location.x < 48 and touch.location.y > self.size.h - 48:
       self.show_pause_menu()
       return
       
-    #elif self.enter_button.bbox.contains_point(touch.location):
+    # elif self.enter_button.bbox.contains_point(touch.location):
     # if self.q:
     #      self.q.put((-1, -1))
     
     elif any(button_touch):
-      for k, button  in self.buttons.items():
-        if button.bounds.contains_point(touch.location):    
+      for k, button in self.buttons.items():
+        if button.bounds.contains_point(touch.location):
           if self.q:
             self.q.put(button.ident)
           return
     
     else:
-      t = touch.location      
+      t = touch.location
       rc = self.point_to_rc(t)
       self.last_rc = rc
       
       try:
           self.touch_indicator = Tile(Texture(self.IMAGES[self.current_player]),
-                                  rc, sq_size=self.SQ_SIZE, 
-                                  dims=(self.DIMENSION_Y, self.DIMENSION_X))
+                                      rc, sq_size=self.SQ_SIZE,
+                                      dims=(self.DIMENSION_Y, self.DIMENSION_X))
           # self.touch_indicator.anchor_point = (0.5, 0.5)
           self.game_field.add_child(self.touch_indicator)
       except (KeyError):
@@ -774,8 +811,8 @@ class GameBoard(Scene):
   
     rc = self.point_to_rc(touch.location)
     r, c = rc
-           
-    if self.check_in_board(rc):  # move testing to top level list(rc) in self.highlights or self.allow_any_square:
+    # move testing to top level list(rc) in self.highlights or self.allow_any_square:        
+    if self.check_in_board(rc):  
       self.board[rc[0]][rc[1]] = self.current_player
       if self.q:
         self.q.put(rc)
@@ -915,35 +952,40 @@ class GameBoard(Scene):
       self.dismiss_modal_scene()
       self.menu = None
     self.paused = False
-      
+
+            
 class BoxedLabel():
   """ a simple class of boxed label with a title
       box follows text size
       text positions must follow box position
-  """ 
+  """
   global GRID_POS
-  def __init__(self, text='text', title='boxed_label', min_size=(100, 50), position=(0,0), parent=parent):
+  
+  def __init__(self, text='text', title='boxed_label',
+               min_size=(100, 50), position=(0, 0), parent=parent):
       ''' position is rel to grid'''
       self.position = position
       self.parent = parent
       self.size = min_size
       self.font = ('Avenir Next', 24)
       self.title = title
-      self.text=text
+      self.text = mtext
       self.index = 1
-      self.bounds = Rect(0,0,10,10) 
+      self.bounds = Rect(0, 0, 10, 10)
       self.l_box_name = None
       self.draw_box(min_size)
       # add text centred on box
       x, y, w, h = self.l_box_name.bbox
-      self.l_name =  LabelNode(text, position=(position[0]+5,position[1]+2), anchor_point=(0,0), font=self.font, parent=parent)
-      self.l_name.anchor_point =  (0,0) # bottom left
+      self.l_name =  LabelNode(text,
+                               position=(position[0] + 5,position[1] + 2),
+                               anchor_point=(0, 0), font=self.font,
+                               parent=parent)
+      self.l_name.anchor_point = (0, 0)  # bottom left
       self.l_name.color = 'white'
       self.set_text(text)
-      self.ident = (-self.index, -self.index)    
+      self.ident = (-self.index, -self.index)
       
-      
-  def draw_box(self, min_size=(100,50)):
+  def draw_box(self, min_size=(100, 50)):
       # fix anchor point at (0,0) otherwise text goes walkabout
       radius = 5
       offset = 1
@@ -951,25 +993,25 @@ class BoxedLabel():
       self.l_box_name = ShapeNode(ui.Path.rounded_rect(0, 0, w_, h_,  radius),
                                   position=self.position,
                                   parent=self.parent)
-      self.l_box_name.anchor_point = (0, 0) # bottom left
+      self.l_box_name.anchor_point = (0, 0)  # bottom left
       self.l_box_name.line_width = 1
       self.l_box_name.fill_color = 'clear'
       self.l_box_name.stroke_color = 'white'
       x, y, w, h = self.l_box_name.bbox
       self.bounds = Rect(x + GRID_POS[0], y + GRID_POS[1], w, h)
-      self.l_box_title = LabelNode(self.title, position=(x + 5, y+h), anchor_point=(0,0),font=self.font,
+      self.l_box_title = LabelNode(self.title, position=(x + 5, y + h),
+                                   anchor_point=(0, 0), font=self.font,
                                    parent=self.parent)
                                    
-  def update_text_positions(self): 
-        """ sync text locations """                                         
-        #if key == 'position':
-        # change text position and bounds
-        x, y, w, h = self.l_box_name.bbox
-        self.bounds = Rect(x + GRID_POS[0], y + GRID_POS[1], w, h)
-        b_x, b_y = self.l_box_name.position
-        self.l_name.position = position=(b_x + 5, b_y + 2)
-        self.l_box_title.position=(b_x + 5, b_y + h)
-        
+  def update_text_positions(self):
+      """ sync text locations """
+      # if key == 'position':
+      # change text position and bounds
+      x, y, w, h = self.l_box_name.bbox
+      self.bounds = Rect(x + GRID_POS[0], y + GRID_POS[1], w, h)
+      b_x, b_y = self.l_box_name.position
+      self.l_name.position = position = (b_x + 5, b_y + 2)
+      self.l_box_title.position = (b_x + 5, b_y + h)
                                               
   def set_text(self, text):
       """ sets box text and recomputes box"""
@@ -981,35 +1023,34 @@ class BoxedLabel():
       x, y, w, h = self.l_name.bbox
       w1, h1 = self.size
       x_scale = (w + 8) / w1 if w > w1 else 1.0
-      y_scale = h / h1 if h > h1 else 1.0        
+      y_scale = h / h1 if h > h1 else 1.0
       self.l_box_name.x_scale = x_scale
       self.l_box_name.y_scale = y_scale
       
       self.update_text_positions()
-      
-      
+           
   def set_props(self, **kwargs):
     # pass kwargs to box, or box text
     # text can change box size
     # box can change text position
-    text_props = {k:v for k, v in kwargs.items() if k in ['color', 'font']}
-    [kwargs.pop(k) for k in text_props]  
-    self.set_box_props(**kwargs)    
+    text_props = {k: v for k, v in kwargs.items() if k in ['color', 'font']}
+    [kwargs.pop(k) for k in text_props]
+    self.set_box_props(**kwargs)
     self.set_text_props(**text_props)
       
-  def set_text_props(self, **kwargs):    
+  def set_text_props(self, **kwargs):
       for k, v in kwargs.items():
           try:
-              setattr(self.l_name, k, v)                      
+              setattr(self.l_name, k, v)
           except (AttributeError):
               print(traceback.format_exc())
-      if 'font' in kwargs:         
+      if 'font' in kwargs:
          self.set_text(self.text)
             
   def set_box_props(self, **kwargs):
       for k, v in kwargs.items():
           try:
-              setattr(self.l_box_name, k, v)                                          
+              setattr(self.l_box_name, k, v)
           except (AttributeError):
               print(traceback.format_exc())
       if 'position' in kwargs or 'anchor_point' in kwargs:
@@ -1018,7 +1059,8 @@ class BoxedLabel():
   def set_index(self, index):
     self.index = index
     self.ident = (-index, -index)
-            
+
+                        
 class MyMenu(MenuScene):
   """ subclass MenuScene to move menu to right """
   def __init__(self, title, subtitle, button_titles, layout=None):
@@ -1037,7 +1079,8 @@ class MyMenu(MenuScene):
 
 
 if __name__ == "__main__":
-  logging.basicConfig(format='%(asctime)s  %(funcName)s %(message)s', level=logging.WARNING)
+  logging.basicConfig(format='%(asctime)s  %(funcName)s %(message)s',
+                      level=logging.WARNING)
   run(GameBoard(), LANDSCAPE, show_fps=True)
     
 

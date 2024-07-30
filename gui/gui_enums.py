@@ -4,4 +4,4 @@ class Player:
     EMPTY = '.'
     PLAYERS =[PLAYER_1, PLAYER_2]
     PIECES = ['emj:Red_Circle', 'emj:Moon_5']
-    # PIECE_NAMES ={RED: 'Red', YELLOW: 'Yellow'}
+    #PIECE_NAMES ={RED: 'Red', YELLOW: 'Yellow'}
