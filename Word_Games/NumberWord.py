@@ -26,6 +26,9 @@ from Letter_game import LetterGame, Player, Word
 import gui.gui_scene as gscene
 from gui.gui_interface import Gui, Squares
 from crossword_create import CrossWord
+from gui.gui_scene import Tile, BoxedLabel
+from ui import Image, Path, LINE_JOIN_ROUND, LINE_JOIN_MITER
+from scene import Texture, Point
 WordleList = [ '5000-more-common.txt', 'words_20000.txt'] 
 BLOCK = '#'
 SPACE = ' '
@@ -88,7 +91,11 @@ class CrossNumbers(LetterGame):
     self.load_words(word_length=self.sizex)    
     self.min_length = 2 # initial min word length
     self.max_length = 15 # initial  maximum word length
-    self.max_depth = 1 # search depth for populate         
+    self.max_depth = 1 # search depth for populate  
+    _, _, w, h = self.gui.grid.bbox 
+    if self.gui.device.endswith('_landscape'):
+       self.gui.set_enter('Hint', position = (w+100, -50))       
+    self.display = 'tiles'
     
   def generate_word_number_pairs(self):
     """ create 2 dictionaries
@@ -122,7 +129,21 @@ class CrossNumbers(LetterGame):
           self.board_rc((r, c), self.board, BLOCK)
     self.update_board()
     
-    
+  def display_numberpairs(self, tiles, x_off=0):
+    """ display players rack
+    x position offset is used to select letters or numbers
+    """   
+    parent = self.gui.game_field
+    _, _, w, h = self.gui.grid.bbox        
+    x, y = 5, 0
+    x = x + x_off* self.gui.gs.SQ_SIZE
+    rack = {}
+    for n, tile in enumerate(tiles):    
+      t = Tile(Texture(Image.named(f'../gui/tileblocks/{tile}.png')), 0,  0, sq_size=self.gui.gs.SQ_SIZE)   
+      t.position = (w + x + 3 * int(n/13) * self.gui.gs.SQ_SIZE , h - (n % 13 +1)* self.gui.gs.SQ_SIZE + y)
+      parent.add_child(t)     
+               
+        
   def update_board(self, hint=False, filter_placed=True):
     """ requires solution_dict from generate_word_number_pairs
                  solution_board from create_number_board 
@@ -154,10 +175,23 @@ class CrossNumbers(LetterGame):
             # number in top left corner
             square_list.append(Squares((r,c), no, 'white' , z_position=30, alpha = .5,
                                        font = ('Avenir Next', 15), text_anchor_point=(-1,1)))
+                                       
+    
+
     # create text list for known dict
     msg = []
     list_known=list(self.known_dict.items()) # no,letter
     list_known =sorted(list_known, key = lambda x: x[1])
+    # create a list of letters in correct order
+    list_of_known_letters = ['_' for _ in range(26)]
+    for i, v in enumerate(list_known):
+        no, l = v
+        letter, _ = l 
+        if isinstance(no, int):
+           if letter == ' ':
+             letter = '_'
+           list_of_known_letters[no-1] = letter
+    
     for i, v in enumerate(list_known):
       no, l = v
       letter, _ = l
@@ -170,10 +204,16 @@ class CrossNumbers(LetterGame):
            msg.append('\n' if i % 5 == 0 else ' ' * 2)
     
     msg = ''.join(msg)
-    self.gui.set_moves(msg, font=('Avenir Next', 23))
+    
     #should now have numbers in number board   
     self.gui.add_numbers(square_list)  
     self.gui.update(self.board)
+    if self.display == 'tiles':
+        self.display_numberpairs(list(range(1, 27)))
+        self.display_numberpairs(list_of_known_letters, x_off=1)
+    else:
+        self.gui.set_moves(msg, font=('Avenir Next', 23))
+    
        
   
   def run(self):
@@ -183,9 +223,6 @@ class CrossNumbers(LetterGame):
     """
     cx = CrossWord(self.gui, self.word_locations, self.all_words)
     self.gui.clear_messages()
-    #self.word_locations = []
-    #process = self.initialise_board() 
-    #self.get_size()
     
     self.print_square(None) 
     self.partition_word_list() 
