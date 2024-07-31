@@ -129,20 +129,28 @@ class CrossNumbers(LetterGame):
           self.board_rc((r, c), self.board, BLOCK)
     self.update_board()
     
-  def display_numberpairs(self, tiles, x_off=0):
+  def display_numberpairs(self, tiles, off=0):
     """ display players rack
     x position offset is used to select letters or numbers
     """   
     parent = self.gui.game_field
-    _, _, w, h = self.gui.grid.bbox        
-    x, y = 5, 0
-    x = x + x_off* self.gui.gs.SQ_SIZE
-    rack = {}
-    for n, tile in enumerate(tiles):    
-      t = Tile(Texture(Image.named(f'../gui/tileblocks/{tile}.png')), 0,  0, sq_size=self.gui.gs.SQ_SIZE)   
-      t.position = (w + x + 3 * int(n/13) * self.gui.gs.SQ_SIZE , h - (n % 13 +1)* self.gui.gs.SQ_SIZE + y)
-      parent.add_child(t)     
-               
+    _, _, w, h = self.gui.grid.bbox
+    if self.gui.device.endswith('_landscape'): 
+        size =  self.gui.gs.SQ_SIZE    
+        x, y = 5, 0
+        x = x + off* size
+        for n, tile in enumerate(tiles):    
+          t = Tile(Texture(Image.named(f'../gui/tileblocks/{tile}.png')), 0,  0, sq_size=size)   
+          t.position = (w + x + 3 * int(n/13) * size , h - (n % 13 +1)* size + y)
+          parent.add_child(t) 
+    else: 
+        size =  self.gui.gs.SQ_SIZE * 0.9
+        x, y = 30, 40
+        y = y + off* size
+        for n, tile in enumerate(tiles):    
+          t = Tile(Texture(Image.named(f'../gui/tileblocks/{tile}.png')), 0,  0, sq_size=size)   
+          t.position = (x + int(n % 13 ) * size , h + (2* int(n / 13) )* size + y)
+          parent.add_child(t)         
         
   def update_board(self, hint=False, filter_placed=True):
     """ requires solution_dict from generate_word_number_pairs
@@ -210,7 +218,7 @@ class CrossNumbers(LetterGame):
     self.gui.update(self.board)
     if self.display == 'tiles':
         self.display_numberpairs(list(range(1, 27)))
-        self.display_numberpairs(list_of_known_letters, x_off=1)
+        self.display_numberpairs(list_of_known_letters, off=1)
     else:
         self.gui.set_moves(msg, font=('Avenir Next', 23))
     
