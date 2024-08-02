@@ -133,7 +133,7 @@ def main():
         return
     all_text = text_ocr(asset)
     ocr = OcrCrossword(all_text)
-    ocr.filter(max_length=None, min_length=None, sort_length=False, remove_numbers=True)
+    ocr.filter(max_length=None, min_length=None, sort_length=True, remove_numbers=False)
     ocr.plot_chars()
     
 if __name__ == '__main__':

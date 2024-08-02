@@ -38,10 +38,6 @@ def get_word_file(location, filename):
   r = requests.get(name)
   with open('filename', 'w') as f:
     f.write(r.text)
-    
-def add(a,b):
-  """ helper function to add 2 tuples """
-  return tuple(p+q for p, q in zip(a, b))
 
 def  board_rc(rc, board, value):
   board[rc[0]][rc[1]] = value 
@@ -52,11 +48,6 @@ def  get_board_rc(rc, board):
 def copy_board(board):
   return list(map(list, board))
   
-def lprint(seq, n):
-  if len(seq) > 2 * n:
-      print(f'{seq[:n]}...........{seq[-n:]}')
-  else:
-      print(seq)        
 
 class CrossNumbers(LetterGame):
   
@@ -190,7 +181,8 @@ class CrossNumbers(LetterGame):
     msg = []
     list_known=list(self.known_dict.items()) # no,letter
     list_known =sorted(list_known, key = lambda x: x[1])
-    # create a list of letters in correct order
+
+    # create a list of letters in correct order    
     list_of_known_letters = ['_' for _ in range(26)]
     for i, v in enumerate(list_known):
         no, l = v
@@ -200,6 +192,7 @@ class CrossNumbers(LetterGame):
              letter = '_'
            list_of_known_letters[no-1] = letter
     
+    # now set up text string
     for i, v in enumerate(list_known):
       no, l = v
       letter, _ = l
@@ -209,13 +202,13 @@ class CrossNumbers(LetterGame):
       if self.gui.device in ['ipad_landscape','ipad13_landscape']:
            msg.append('\n' if i % 2 == 0 else ' ' * 2)
       elif self.gui.device =='ipad_portrait':
-           msg.append('\n' if i % 5 == 0 else ' ' * 2)
-    
+           msg.append('\n' if i % 5 == 0 else ' ' * 2)    
     msg = ''.join(msg)
     
     #should now have numbers in number board   
     self.gui.add_numbers(square_list)  
     self.gui.update(self.board)
+    # now choose text or tiles
     if self.display == 'tiles':
         self.display_numberpairs(list(range(1, 27)))
         self.display_numberpairs(list_of_known_letters, off=1)
