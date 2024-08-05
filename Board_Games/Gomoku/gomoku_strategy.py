@@ -12,18 +12,18 @@ MAX, MIN = True, False  # to be used in minimax
 WIN_SCORE = 1000000000  # large enough to always be the preferred outcome
 #######################
 ####### MODIFY ########
-MAX_NEIGHBOR_DIST = 2  # max distance from an already played piece that we want to check if open
+MAX_NEIGHBOR_DIST = 3 # max distance from an already played piece that we want to check if open default 2
 MAX_NUM_MOVES_TO_EVALUATE = 15  # most moves we want to evaluate at once for any given board
-MAX_DEPTH = 6  # max number of moves ahead to calculate
+MAX_DEPTH = 3  # max number of moves ahead to calculate
 #######################
 
 
 # class for the A.I.
 class GomokuStrategy(GomokuPlayer):
 
-	def __init__(self, color, boardDimension=13):
+	def __init__(self, color, boardDimension=13, ui=None):
 		"""Initializes the board attributes"""
-		super().__init__(color, boardDimension)
+		super().__init__(color, boardDimension, ui=ui)
 		self.GAME_OVER = False
 		self.AI_COLOR = color
 		self.HUMAN_COLOR = opponentOf(color)
@@ -534,14 +534,14 @@ class GomokuStrategy(GomokuPlayer):
 				percentComplete = 0
 				movesChecked = 0
 				barCompleteMultiplier = 0
-				print('\r[%s%s] %d%% (%d/%d moves checked) @ maxDepth = %d' % ("="*barCompleteMultiplier, "-"*(25-barCompleteMultiplier), percentComplete, movesChecked, len(validMoves), localMaxDepth), end = "")
+				self.print_output('\r[%s%s] %d%% (%d/%d moves checked) @ maxDepth = %d' % ("="*barCompleteMultiplier, "-"*(25-barCompleteMultiplier), percentComplete, movesChecked, len(validMoves), localMaxDepth), end = "")
 
 			for move in validMoves:
 				if depth == 0:
 					# print progress bar
 					percentComplete = int((movesChecked/len(validMoves))*100)
 					barCompleteMultiplier = percentComplete // 4
-					print('\r[%s%s] %d%% (%d/%d moves checked) @ maxDepth = %d' % ("="*barCompleteMultiplier, "-"*(25-barCompleteMultiplier), percentComplete, movesChecked, len(validMoves), localMaxDepth), end = "")
+					self.print_output('\r[%s%s] %d%% (%d/%d moves checked) @ maxDepth = %d' % ("="*barCompleteMultiplier, "-"*(25-barCompleteMultiplier), percentComplete, movesChecked, len(validMoves), localMaxDepth), end = "")
 					movesChecked += 1
 
 				boardCopy = copyOfBoard(board)#list(map(list, board)) # copies board

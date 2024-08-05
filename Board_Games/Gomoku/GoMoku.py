@@ -15,6 +15,9 @@ grandparent = os.path.dirname(parent)
 sys.path.append(grandparent)
 from datetime import datetime
 import time
+from time import sleep
+from queue import Queue
+import console
 import gui.gui_scene as gscene
 from gui.gui_interface import Gui, Squares
 from gomoku_strategy import GomokuStrategy, opponentOf, performMove, copyOfBoard
@@ -22,15 +25,13 @@ from gomoku_strategy import GomokuStrategy, opponentOf, performMove, copyOfBoard
 from gomoku_player import GomokuPlayer
 
 EMPTY, BLACK, WHITE = '.', 'X', 'O'
-gameBoard = [] # created later
 userPiece = None
 
-BOARD_OUTPUT_HEIGHT = -1
 BOARD_DIMENSION = 14
 BOARD_SIZE = BOARD_DIMENSION
 time_player = {}
 COLUMN_LABELS = "<Will be filled later>"
-BOARD_HISTORY = [] # [highlightCoordinates, board]
+
 
 """
 This file is the GUI on top of the game backend.
@@ -61,20 +62,22 @@ def get_rbg(color):
 class Player():
   def __init__(self):
     self.PLAYER_1 = WHITE = 'O'
-    self.PLAYER_2 = BLACK = '0'
+    self.PLAYER_2 = BLACK = 'X'
     self.EMPTY = ' '
     self.PLAYERS = [self.PLAYER_1, self.PLAYER_2]
     self.PIECES = ['emj:White_Circle', 'emj:Black_Circle']
-    self.PIECE_NAMES = {'0': 'Black', 'O': 'White'}
+    self.PIECE_NAMES = {'X': 'Black', 'O': 'White'}
     
 class UI:
     def __init__(self):
         """Create, initialize and draw an empty board."""
         self.display_board = [[' ' for c in range(SIZE)] for r in range(SIZE)]
         self.board = None
+        self.q = Queue()  
         self.gui = Gui(self.display_board, Player())
+        self.gui.gs.q = self.q
         self.gui.set_alpha(True) 
-        self.gui.set_grid_colors(grid=BACKGROUND, highlight='lightblue', z_position=5, grid_stroke_color='clear')
+        self.gui.set_grid_colors(grid=BACKGROUND, highlight='yellow', z_position=5, grid_stroke_color='clear')
         self.gui.require_touch_move(False)
         self.gui.allow_any_move(True)
         self.gui.setup_gui(log_moves=False)
@@ -86,7 +89,7 @@ class UI:
         # menus can be controlled by dictionary of labels and functions without parameters
         self.gui.gs.pause_menu = {'Continue': self.gui.gs.dismiss_modal_scene,
                              'Quit': self.gui.gs.close}
-        self.gui.gs.start_menu = {'New Game': run, 'Quit': self.gui.gs.close} 
+        #self.gui.gs.start_menu = {'New Game': run, 'Quit': self.gui.gs.close} 
       
                      
     def initialize(self):
@@ -143,181 +146,211 @@ class UI:
         
     def human_move(self):
         while True:
-           coord = self.gui.wait_for_gui(self.display_board)
-           rc  = (int(coord[:2]), int(coord[2:])) 
-           return  rc_to_point(rc)
+           coord = self.wait_for_gui()
+           #rc  = (coord[:2], coord[2:]) 
+           return  coord
+           
+    def wait_for_gui(self):
+      # loop until dat received over queue
+      while True:
+        # if view gets closed, quit the program
+        if not self.gui.v.on_screen:
+          print('View closed, exiting')
+          sys.exit() 
+          break   
+        #  wait on queue data, either rc selected or function to call
+        sleep(0.01)
+        if not self.q.empty():
+          data = self.q.get(block=False)
+          
+          #self.delta_t('get')
+          #self.q.task_done()
+          if isinstance(data, (tuple, list, int)):
+            coord = data # self.gui.ident(data)
+            break
+          else:
+            try:
+              #print(f' trying to run {data}')
+              data()
+            except (Exception) as e:
+              print(traceback.format_exc())
+              print(f'Error in received data {data}  is {e}')
+      return coord
+  
+    def get_player_move(self, board=None):
+      """Takes in the user's input and performs that move on the board, returns the coordinates of the move
+      Allows for movement over board"""
+      #self.delta_t('start get move')
+      if board is None:
+          board = self.game_board
+      coord_list = []
+      prompt = (f"Select  position (A1 - {self.COLUMN_LABELS[-1]}{self.sizey})")
+      # sit here until piece place on board   
+      items = 0
+      
+      while items < 1000: # stop lockup
+        #self.gui.set_prompt(prompt, font=('Avenir Next', 25))
+        
+        move = self.wait_for_gui()
+        if items == 0: st = time()
+        #print('items',items, move)
+        try:
+          # spot = spot.strip().upper()
+          # row = int(spot[1:]) - 1
+          # col = self.COLUMN_LABELS.index(spot[0])
+          if self.log_moves:
+            coord_list.append(move)
+            items += 1
+            if move == -1:
+              #self.delta_t('end get move')
+              return coord_list       
+          else:
+            break
+        except (Exception) as e:
+          print(traceback.format_exc())
+          print('except,', move, e)
+          coord_list.append(move)
+          return coord_list
+      return move
 
         
 # class for the Human player
 class HumanPlayer(GomokuPlayer):
 
   def __init__(self, color, ui=None):
-    super().__init__(color, isAI=False)
-    self.gui=ui
-    
+    super().__init__(color, isAI=False, ui=ui)
+    self.gui=ui   
 
   def getMove(self, board):
     """Takes in the user's input and returns the move"""
-    self.gui.set_prompt(f"It's your turn, which spot would you like to play? (A1 - H8)")
-    # sit here until piece place on board
-    spot = self.gui.human_move()   
-    
+    self.gui.gui.set_prompt(f"It's your turn, which spot would you like to play? (A1 - H8)")
+    # sit here until piece place on board        
     while True:
-      
-      if len(spot) >= 4 or len(spot) == 0 or spot[0] not in COLUMN_LABELS or not spot[1:].isdigit() or int(spot[1:]) > len(board) or int(spot[1:]) < 1:
-        spot = input(f"{ERROR_SYMBOL} Invalid input. Please try again.\t").strip().upper()
-  
-      elif board[int(spot[1:]) - 1][COLUMN_LABELS.index(spot[0])] != EMPTY:
-        spot = input(f"{ERROR_SYMBOL} That spot is already taken, please choose another:\t").strip().upper()
-      
+      spot = self.gui.human_move()             
+      if board[spot[0]][spot[1]] != EMPTY:
+        self.gui.gui.set_prompt(f"That spot is already taken, please choose another:\t")      
       else:
         break
-    row = int(spot[1:]) - 1
-    col = COLUMN_LABELS.index(spot[0])
+    row, col = spot
     return row, col
 
-
-def createEmptyGameBoard(dimension):
-  """Creates the gameBoard with the specified number of rows and columns"""
-  for i in range(dimension):
-    row = []
-    for j in range(dimension):
-      row.append(EMPTY)
-    gameBoard.append(row)
-
-
-def printGameBoard(highlightCoordinates=None, board=None):
-    """Prints the gameBoard in a human-readable format"""
-    """Transfers  gameBoard to gui
-    if board is a single list just update that item"""
-    if highlightedCoordinates is None:
-        highlightedCoordinates = []
-    if board is None:
-        board = BOARD
-    gui.update(board)
-    gui.valid_moves(highlightedCoordinates)
+class GomukuGame():
+  def __init__(self, ui):
+    self.ui = ui
+    self.gameBoard = None
+  
+  def createEmptyGameBoard(self, dimension):
+    """Creates the gameBoard with the specified number of rows and columns"""
+    return [[EMPTY for i in range(dimension)] for j in range(dimension)]
     
-    if highlightCoordinates is None:
-      highlightCoordinates = []
-    if board is None:
-      board = gameBoard
-    print("\n\t    %s" % " ".join(COLUMN_LABELS))
-    for rowNum in range(len(board)):
-      print("\t%d%s| " % (rowNum+1, "" if rowNum > 8 else " "), end = '')
-      for colNum in range(len(board[rowNum])):
-        spot = board[rowNum][colNum]
-        
-        if spot == EMPTY:
-          print(f"{spot} ", end='')
-        else:
-          print(f"{spot} ", end = '')
-      print("")
-
-
-
-def printAverageTimeTakenByPlayers():
-  """Prints out the average time taken per move for each player"""
-  opponentPiece = opponentOf(userPiece)
-  userTimeTaken = round(time_player[userPiece][1]/max(1, time_player[userPiece][2]), 2)
-  aiTimeTaken = round(time_player[opponentPiece][1]/max(1, time_player[opponentPiece][2]), 2)
-  print("Average time taken per move:")
-  print(f"{time_player[userPiece][0]}: {userTimeTaken}s")
-  print(f"{time_player[opponentPiece][0]}: {aiTimeTaken}s")
-
-
-
-def run():
-    """main method that prompts the user for input"""
-    global gameBoard, userPiece, BOARD_OUTPUT_HEIGHT, COLUMN_LABELS, time_player, BOARD_DIMENSION
-    UserPlayerClass = HumanPlayer
-    AI_DUEL_MODE = False
-
+  def printGameBoard(self, highlightCoordinates=None):
+      """Prints the gameBoard in a human-readable format"""
+      """Transfers  gameBoard to gui
+      if board is a single list just update that item"""
+      self.ui.gui.update(self.gameBoard)
+      if highlightCoordinates:
+        self.ui.gui.gs.clear_highlights()
+        self.ui.gui.valid_moves(highlightCoordinates)   
   
+  def printAverageTimeTakenByPlayers(self):
+    """Prints out the average time taken per move for each player"""
+    opponentPiece = opponentOf(userPiece)
+    userTimeTaken = round(time_player[userPiece][1]/max(1, time_player[userPiece][2]), 2)
+    aiTimeTaken = round(time_player[opponentPiece][1]/max(1, time_player[opponentPiece][2]), 2)
+    self.ui.gui.set_moves('\n'.join(["Average time taken per move:",
+                                f"{time_player[userPiece][0]}: {userTimeTaken}s",
+                                f"{time_player[opponentPiece][0]}: {aiTimeTaken}s"]))
     
-    USER_PIECE = getUserPieceColorInput(gui)
-    turn = BLACK
-    useSavedGame = False
   
-    userPlayerName = "Your AI" if AI_DUEL_MODE else "You"
-    aiPlayerName = "My AI" if AI_DUEL_MODE else "AI"
-  
-    board_dimension = input("What is the dimension of the board? (Default is 13x13)\nEnter a single odd number:\t").strip()
-    
-    if board_dimension.isdigit() and int(board_dimension) % 2 == 1 and 6 < int(board_dimension) < 100:
-      board_dimension = int(board_dimension)
-      print("The board will be %dx%d!" % (board_dimension, board_dimension))
-    else:
-      board_dimension = 13
-      print(f"{ERROR_SYMBOL} Invalid input. The board will be 13x13!")
-    createEmptyGameBoard(int(board_dimension))
-
-    playerColorInput = input("Would you like to be BLACK ('b') or WHITE ('w')? (black goes first!):\t").strip().lower()
-    if playerColorInput == 'b':
-      userPiece = BLACK
-      opponentPiece = WHITE
-      print(f"{userPlayerName} will be BLACK!")
-    else:
-      userPiece = WHITE
-      opponentPiece = BLACK
-      if playerColorInput == 'w':
-        print(f"{userPlayerName} will be WHITE!")
-      else:
-        print(f"{ERROR_SYMBOL} Invalid input. {userPlayerName} will be WHITE!")
-
-  time_player = {
-    userPiece: [userPlayerName, 0, 0],    # [player name, total time, num moves]
-    opponentPiece: [aiPlayerName, 0, 0]
-  }
-  
-  BOARD_DIMENSION = board_dimension
-  BOARD_OUTPUT_HEIGHT = board_dimension + 5
-  playerNames = {userPiece: userPlayerName, opponentPiece: aiPlayerName}
-  players = {opponentPiece: GomokuStrategy(opponentPiece, board_dimension), userPiece: UserPlayerClass(userPiece)}
-
-  print(f"\n{userPlayerName}: {userPiece}\t{aiPlayerName}: {opponentPiece}")
-  
-  printGameBoard()
-  print("\n")
-
-  gameOver, winner = False, None
-
-  while not gameOver:
-    nameOfCurrentPlayer = playerNames[turn]
-    currentPlayer = players[turn]
-    if currentPlayer.isAI:
-      userInput = input(f"{nameOfCurrentPlayer}'s turn, press enter for it to play.\t").strip().upper()
+  def run(self):
+      """main method that prompts the user for input"""
+      global  userPiece, COLUMN_LABELS, time_player
+      UserPlayerClass = HumanPlayer
+      AI_DUEL_MODE = False 
       
+      # USER_PIECE = getUserPieceColorInput(gui)
+      turn = BLACK
+      useSavedGame = False
+    
+      userPlayerName = "You"
+      aiPlayerName = "AI"
+    
+      #board_dimension = console.input_alert("What is the dimension of the board? (Default is 13x13)\nEnter a single odd number:\t").strip()
+      
+      #if board_dimension.isdigit() and int(board_dimension) % 2 == 1 and 6 < int(board_dimension) < 100:
+      #  board_dimension = int(board_dimension)
+      #  print("The board will be %dx%d!" % (board_dimension, board_dimension))
+      #else:
+      board_dimension = 13
+      #print(f"Invalid input. The board will be 13x13!")
+      self.gameBoard = self.createEmptyGameBoard(int(board_dimension))
+  
+      playerColorInput = console.input_alert("Would you like to be BLACK ('b') or WHITE ('w')? (black goes first!):")
+      if playerColorInput == 'b':
+        userPiece = BLACK
+        opponentPiece = WHITE
+        print(f"{userPlayerName} will be BLACK!")
+      else:
+        userPiece = WHITE
+        opponentPiece = BLACK
+        if playerColorInput == 'w':
+          print(f"{userPlayerName} will be WHITE!")
+        else:
+          print(f"Invalid input. {userPlayerName} will be WHITE!")
+  
+      time_player = {
+        userPiece: [userPlayerName, 0, 0],    # [player name, total time, num moves]
+        opponentPiece: [aiPlayerName, 0, 0]
+      }
+      
+      BOARD_DIMENSION = board_dimension
+      
+      playerNames = {userPiece: userPlayerName, opponentPiece: aiPlayerName}
+      players = {opponentPiece: GomokuStrategy(opponentPiece, board_dimension, self.ui), userPiece: UserPlayerClass(userPiece, self.ui)}
+    
+      print(f"\n{userPlayerName}: {userPiece}\t{aiPlayerName}: {opponentPiece}")
+      
+      self.printGameBoard()
+    
+      gameOver, winner = False, None
+    
+      while not gameOver:
+        nameOfCurrentPlayer = playerNames[turn]
+        currentPlayer = players[turn]
+        #if currentPlayer.isAI:
+        #  userInput = input(f"{nameOfCurrentPlayer}'s turn, press enter for it to play.\t").strip().upper()
+          
+            
+        startTime = time.time()
+        rowPlayed, colPlayed = currentPlayer.getMove(self.gameBoard)
+        endTime = time.time()
+        totalTimeTakenForMove = endTime - startTime
+        time_player[turn][1] += totalTimeTakenForMove
+        time_player[turn][2] += 1
+        minutesTaken = int(totalTimeTakenForMove) // 60
+        secondsTaken = totalTimeTakenForMove % 60
+        timeTakenOutputStr = ("  (%dm " % minutesTaken if minutesTaken > 0 else "  (") + ("%.2fs)" % secondsTaken) if currentPlayer.isAI else ""
+        performMove(self.gameBoard, rowPlayed, colPlayed, turn)
         
-    startTime = time.time()
-    rowPlayed, colPlayed = currentPlayer.getMove(gameBoard)
-    endTime = time.time()
-    totalTimeTakenForMove = endTime - startTime
-    time_player[turn][1] += totalTimeTakenForMove
-    time_player[turn][2] += 1
-    minutesTaken = int(totalTimeTakenForMove) // 60
-    secondsTaken = totalTimeTakenForMove % 60
-    timeTakenOutputStr = ("  (%dm " % minutesTaken if minutesTaken > 0 else "  (") + ("%.2fs)" % secondsTaken) if currentPlayer.isAI else ""
-    performMove(gameBoard, rowPlayed, colPlayed, turn)
-    BOARD_HISTORY.append([[[rowPlayed, colPlayed]], copyOfBoard(gameBoard)])
+        self.printGameBoard( [[rowPlayed, colPlayed]])
+        moveFormatted = COLUMN_LABELS[colPlayed] + str(rowPlayed + 1)
+        self.ui.gui.set_prompt("%s played in spot %s%s\n" % (nameOfCurrentPlayer, moveFormatted, timeTakenOutputStr))
+        turn = opponentOf(turn)
+        gameOver, winner = players[opponentPiece].isTerminal(self.gameBoard)
     
-    printGameBoard([[rowPlayed, colPlayed]])
-    moveFormatted = COLUMN_LABELS[colPlayed] + str(rowPlayed + 1)
-    print("%s played in spot %s%s\n" % (nameOfCurrentPlayer, moveFormatted, timeTakenOutputStr))
-    turn = opponentOf(turn)
-    gameOver, winner = players[opponentPiece].isTerminal(gameBoard)
-
-  if winner is None:
-    print("Nobody wins, it's a tie!")
-  else:
-    
-    winnerColorName = "BLACK" if winner == BLACK else "WHITE"
-    print(f"{winnerColorName}wins!\n")
-  printAverageTimeTakenByPlayers()
-  print("\nThanks for playing!\n")
+      if winner is None:
+          self.ui.gui.set_prompt("Nobody wins, it's a tie!")
+      else:        
+          winnerColorName = "BLACK" if winner == BLACK else "WHITE"
+          self.ui.gui.set_prompt(f"{winnerColorName}wins!\n")
+      self.printAverageTimeTakenByPlayers()
+      #ui.gui.set_prompt("\nThanks for playing!\n")
   
 def main():
     ui = UI()
     ui.initialize()
+    g = GomukuGame(ui)
+    g.run()
   
 if __name__ == '__main__':
   main()

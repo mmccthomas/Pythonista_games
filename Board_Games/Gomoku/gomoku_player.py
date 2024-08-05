@@ -4,11 +4,12 @@ from typing import List, Tuple
 
 class GomokuPlayer:
 
-    def __init__(self, color:str, boardDimension:int=13, isAI:bool=True):
+    def __init__(self, color:str, boardDimension:int=13, isAI:bool=True, ui=None):
         """Sets the color for this player, and indicates whether it is an AI"""
         self.color = color
         self.BOARD_DIMENSION = boardDimension
         self.isAI = isAI
+        self.ui = ui
 
     def getMove(self, board:List[List[str]]) -> Tuple[int, int]:
         """Returns the chosen move for a given board, in [rowIndex, columnIndex] format"""
@@ -17,3 +18,9 @@ class GomokuPlayer:
               "Please make sure that you have implemented 'getMove' from the Player super class.\n")
         exit(0)
         return -1, -1 # to satisfy the return type hint warning
+        
+    def print_output(self, msg, **kwargs):
+      if self.ui:
+        self.ui.gui.set_prompt(msg)
+      else:
+        print(msg)
