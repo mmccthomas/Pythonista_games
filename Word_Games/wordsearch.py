@@ -109,6 +109,7 @@ class WordSearch(LetterGame):
         words_placed = self.wordlist
         for word in words_placed:
           coords = self.find_word(word)
+          # print('np rc', self.find_word_np(word))
           self.word_coords[word] = coords
     self.gui.set_prompt(f'Placed {len(words_placed)}/{len(self.wordlist)} words')
     self.wordlist = words_placed
@@ -250,6 +251,17 @@ class WordSearch(LetterGame):
     sleep(4)
     self.finished = True
     self.gui.show_start_menu()
+    
+  def find_word_np(self, word):
+      word = list(word.lower())
+      locs = np.argwhere(self.board == word[0])
+      for rc in locs:
+        r, c = rc
+        all_dirs, indices = self.dirs(self.board, r, c, len(word))
+        for dir in all_dirs:
+          if len(dir) >= len(word):
+             if all(dir[:len(word)] ==list(word)):
+                return rc, indices
     
   def find_word(self, word):
       # for each word, find the first letter
