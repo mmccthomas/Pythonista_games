@@ -12,9 +12,9 @@ MAX, MIN = True, False  # to be used in minimax
 WIN_SCORE = 1000000000  # large enough to always be the preferred outcome
 #######################
 ####### MODIFY ########
-MAX_NEIGHBOR_DIST = 3 # max distance from an already played piece that we want to check if open default 2
+MAX_NEIGHBOR_DIST = 4 # max distance from an already played piece that we want to check if open default 2
 MAX_NUM_MOVES_TO_EVALUATE = 15  # most moves we want to evaluate at once for any given board
-MAX_DEPTH = 3  # max number of moves ahead to calculate
+MAX_DEPTH = 4 # max number of moves ahead to calculate
 #######################
 
 
@@ -534,14 +534,15 @@ class GomokuStrategy(GomokuPlayer):
 				percentComplete = 0
 				movesChecked = 0
 				barCompleteMultiplier = 0
-				self.print_output('\r[%s%s] %d%% (%d/%d moves checked) @ maxDepth = %d' % ("="*barCompleteMultiplier, "-"*(25-barCompleteMultiplier), percentComplete, movesChecked, len(validMoves), localMaxDepth), end = "")
+				self.print_output(barCompleteMultiplier, percentComplete, movesChecked, validMoves, localMaxDepth, end='')
+				
 
 			for move in validMoves:
 				if depth == 0:
 					# print progress bar
 					percentComplete = int((movesChecked/len(validMoves))*100)
 					barCompleteMultiplier = percentComplete // 4
-					self.print_output('\r[%s%s] %d%% (%d/%d moves checked) @ maxDepth = %d' % ("="*barCompleteMultiplier, "-"*(25-barCompleteMultiplier), percentComplete, movesChecked, len(validMoves), localMaxDepth), end = "")
+					self.print_output(barCompleteMultiplier, percentComplete, movesChecked, validMoves, localMaxDepth, end='')
 					movesChecked += 1
 
 				boardCopy = copyOfBoard(board)#list(map(list, board)) # copies board
@@ -574,7 +575,8 @@ class GomokuStrategy(GomokuPlayer):
 					break # pruning
 			if depth == 0:
 				# clear progress bar print-out
-				sys.stdout.write('\033[2K\033[1G')
+				pass
+				#sys.stdout.write('\033[2K\033[1G')
 			return bestMove[0], bestMove[1], score
 		else: 
 			# maxOrMin == MIN

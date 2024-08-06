@@ -19,7 +19,8 @@ class GomokuPlayer:
         exit(0)
         return -1, -1 # to satisfy the return type hint warning
         
-    def print_output(self, msg, **kwargs):
+    def print_output(self, barCompleteMultiplier, percentComplete, movesChecked, validMoves, localMaxDepth, **kwargs):
+      msg = '\r %d%% (%d/%d moves checked) @ maxDepth = %d' % ( percentComplete, movesChecked, len(validMoves), localMaxDepth)
       if self.ui:
         self.ui.gui.set_prompt(msg)
       else:
