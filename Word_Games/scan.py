@@ -74,4 +74,4 @@ def scan_xword(image_name, crossword_file):
         f.write("'" + str(line))
         f.write("'\n")
 if __name__ == "__main__":
-  scan_xword('IMG_4974 Medium.jpeg','test.txt')
+  scan_xword('Cross2.jpg','test.txt')
