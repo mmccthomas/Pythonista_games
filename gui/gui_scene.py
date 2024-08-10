@@ -19,7 +19,7 @@ parent = os.path.dirname(current)
 sys.path.append(parent)
 grandparent = os.path.dirname(parent)
 sys.path.append(grandparent)
-from game_menu import MenuScene
+from gui.game_menu import MenuScene
 screen_width, screen_height = get_screen_size()
 
 logging.basicConfig(format='%(asctime)s  %(funcName)s %(message)s',

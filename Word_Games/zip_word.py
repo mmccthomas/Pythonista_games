@@ -168,12 +168,12 @@ class ZipWord(LetterGame):
       for key, v in self.word_dict.items():
         if '_frame' in key:
          board = [row.replace("'", "") for row in v]
-         board = [row.split('/') for row in board]
+         board = [row.split('/') for row in board] 
          name = key.split('_')[0]
          word_lists[name] = [self.word_dict[name], board]
          
     self.puzzle = random.choice(list(word_lists))
-    # self.puzzle = 'Puzzle17 27'
+    self.puzzle = 'Puzzle18 78'
     self.all_words, self.board = word_lists[self.puzzle]
     self.all_words = [word.lower() for word in self.all_words]
     # parse board to get word objects
