@@ -415,7 +415,7 @@ class Gui():
     #msg = msg.replace(' ', '')
     return  msg
     
-  def wait_for_gui(self, board):
+  def wait_for_gui(self, board, return_rc=False):
     # loop until gui board is not same as local version
     while True:
       # if view gets closed, quit the program
@@ -430,8 +430,11 @@ class Gui():
       time.sleep(0.5)
       
     coord = self.ident(self.changed(board))
-    # print('changed' , self.changed(board), coord)
-    return coord
+    if return_rc:
+        return self.changed(board)
+    else:
+        # print('changed' , self.changed(board), coord)
+        return coord
     
   def dump(self):
     tiles = [t.name for t in self.gs.get_tiles()]

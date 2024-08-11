@@ -122,6 +122,7 @@ class ZipWord(LetterGame):
     Main method that prompts the user for input
     """
     cx = CrossWord(self.gui, self.word_locations, self.all_words)
+    a= self.__dict__.copy()
     self.gui.clear_messages()
     self.gui.set_message2(f'{self.puzzle}')
     x, y, w, h = self.gui.grid.bbox
@@ -167,12 +168,12 @@ class ZipWord(LetterGame):
       for key, v in self.word_dict.items():
         if '_frame' in key:
          board = [row.replace("'", "") for row in v]
-         board = [row.split('/') for row in board]
+         board = [row.split('/') for row in board] 
          name = key.split('_')[0]
          word_lists[name] = [self.word_dict[name], board]
          
     self.puzzle = random.choice(list(word_lists))
-    self.puzzle = 'Puzzle18 95'
+    self.puzzle = 'Puzzle18 78'
     self.all_words, self.board = word_lists[self.puzzle]
     self.all_words = [word.lower() for word in self.all_words]
     # parse board to get word objects
@@ -293,9 +294,10 @@ class ZipWord(LetterGame):
        
   def restart(self):
     # TODO this does not always work. Find why
+    # declaring new instance seems to work, more memory needed?
     self.gui.gs.close()
-    self.__init__()
-    self.run()
+    ZipWord().run()
+    
 
           
 if __name__ == '__main__':

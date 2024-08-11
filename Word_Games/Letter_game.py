@@ -701,6 +701,30 @@ class LetterGame():
     except(AttributeError):
       print(traceback.format_exc())
       return None
+      
+  def dirs(self, board, y, x, length=None):
+      # fast finding of all directions from starting location
+      # optional masking of length
+      # TODO change to finding coordinates, then use those to slice
+      a = np.array(board)
+      a = np.indices(a.shape).transpose()
+      e = a[y, x:]
+      w = np.flip(a[y, :x+1])
+      s = a[y:, x]
+      n = np.flip(a[:y+1, x])
+      se = np.diag(a[y:, x:])
+      sw = np.diag(np.fliplr(a[y:, :x+1]))
+      ne = np.diag(np.flipud(a[:y+1, x:]))
+      nw = np.flip(np.diag(a[:y+1, :x+1]))
+      all_dirs = [n, ne, e, se, s, sw, w, nw]
+      if length:
+          for dirn in all_dirs:
+              dirn = dirn[:length]
+              if len(dirn) < length:
+                  dirn = [] 
+      
+      indices = [dirn.indices for dirn in all_dirs]       
+      return all_dirs, indices
           
   def reveal(self):
     ''' skip to the end and reveal the board '''
