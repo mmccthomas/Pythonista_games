@@ -1426,3 +1426,97 @@ Puzzle16-89_frame:
 '#/ /#/ / / /#/ /#/ / / /#/ /#'
 ' / / / /#/ / / / / /#/ / / / '
 '#/ /#/ /#/ /#/#/#/ /#/ /#/ /#'
+
+Puzzle18-95:
+ACT
+AIL
+CAW
+DEW
+EGG
+GEL
+GRU
+ITS
+KEY
+MAT
+NAN
+TEA
+UNE
+WAX
+YEW
+ACID
+ACME
+BEET
+BRAG
+ETCH
+HAKA
+HEAL
+IRIS
+LIMB
+LION
+MARE
+MIDI
+MUSE
+OVAL
+RAMP
+SWAT
+TELL
+TOOL
+VICE
+ABYSS
+ADOPT
+AGILE
+ANVIL
+BANAL
+BARGE
+CUBAN
+EIGHT
+IMPEL
+REMIX
+RESIT
+SALAD
+SEVER
+CONVOY
+DRENCH
+IREFUL
+JENSEN
+KASBAH
+MATRON
+MINCER
+MYRIAD
+RUGGED
+WARDEN
+CABINET
+COMMUNE
+DIVERSE
+EQUATOR
+KEELHAUL
+LOYALIST
+NIHILISM
+VERMOUTH
+YODELLER
+AVAILABLE
+GUNPOWDER
+VISIONARY
+
+Puzzle18-95_frame:
+' / / /#/ /#/ /#/#/#/#/ / / / / / / / /#/ '
+' /#/#/ / / / / / / / / /#/ /#/#/ /#/ /#/ '
+' /#/#/#/ /#/ /#/#/ /#/ /#/ / / / / / /#/ '
+' / / / / /#/#/ /#/ /#/#/#/ /#/#/ /#/ / / '
+'#/ /#/ /#/ /#/ / / / / /#/#/ / / /#/ /#/#'
+' / / / /#/ /#/ /#/ /#/ /#/#/ /#/#/ / / / '
+'#/ /#/#/#/ / / / /#/ / / / / / / /#/ /#/ '
+'#/#/ / / / /#/ /#/#/#/ /#/ /#/#/#/#/ /#/ '
+'#/#/#/ /#/ /#/ /#/#/#/#/#/ / / /#/ /#/#/ '
+'#/ / / / / / / /#/#/#/#/#/ /#/ / / / / / '
+'#/#/#/ /#/#/#/ /#/#/#/#/#/ /#/ /#/ /#/ /#'
+'#/s/a/n/d/a/l/#/#/#/#/#/#/ /#/ / / /#/ /#'
+'#/#/#/#/ /#/#/ /#/#/#/#/#/#/#/ /#/ /#/#/#'
+'#/ /#/#/ /#/ / / /#/ /#/ / / / / / / / / '
+' / / / / / /#/ / / / / /#/ /#/ /#/#/ /#/ '
+'#/ /#/#/ / / / / /#/ /#/#/ /#/ / / / / / '
+' / / /#/ / / / /#/ / / / / /#/#/#/#/ /#/ '
+' /#/ /#/ /#/ /#/#/#/ /#/ /#/ /#/#/ / / / '
+' / / / /#/ / / / / / /#/ / / / /#/ /#/#/ '
+' /#/ /#/#/#/ /#/#/ /#/#/ /#/ /#/#/ /#/#/ '
+'#/#/ /#/ / / / / / / / / /#/ / / / / / / '
