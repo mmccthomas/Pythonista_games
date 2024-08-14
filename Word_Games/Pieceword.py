@@ -16,6 +16,20 @@ from gui.gui_interface import Gui, Squares
 WordleList = ['5000-more-common.txt'] 
 HSIZE = 4
 VSIZE = 9
+clues =  ['2 Bill too low a price',
+					'4 Very small freshwater fish or a person with little influence Standard word-ending',
+					'6 Claiming for yourself Old laundry machine',
+					'8 Bland Particular period',
+					'10 Mark (an item) for attention Flexible. Large loose hood, part of a monks habit',
+					'12 Layer of cartilage between two vertebrae',
+					'• Last match in a competition',
+					'• Something owed',
+					'14 Temporary shelter Structure and rules of language',
+					'16 Sequence of hereditary rulers',
+					'• Accomplish',
+					'18 Stale, smelly. Chilly',
+					'20 Person paying ground or other rent on a property'
+				 ]
 
 class PieceWord(LetterGame):
   
@@ -67,7 +81,9 @@ class PieceWord(LetterGame):
      }
     self.posn = SimpleNamespace(**position_dict[self.gui.device])
     self.rack = self.display_rack()
-    self.gui.gs.IMAGES = {i:self.pil2ui(image) for i, image in enumerate(self.rack.values())}
+    self.gui.set_moves('\n'.join(clues))
+    
+    #self.gui.gs.IMAGES = {i:self.pil2ui(image) for i, image in enumerate(self.rack.values())}
     
     
   def run(self):
@@ -76,10 +92,7 @@ class PieceWord(LetterGame):
     Main method that prompts the user for input
     """
     
-    self.correct_positions = []
-    self.correct_letters = []
-    self.incorrect_letters = []
-    self.possibles = []
+    
     self.row = 0
     self.square_list = []
     #self.print_square(1)
@@ -91,11 +104,11 @@ class PieceWord(LetterGame):
       #self.print_board()
       move = self.get_player_move(self.board)               
       move = self.process_turn( move, self.board) 
-      self.print_square(move)
+      #self.print_square(move)
       if self.game_over():
         break
       self.row += 1               
-    self.print_board()
+    #self.print_board()
     self.gui.set_message2('')
     self.gui.set_message('') 
     self.gui.set_prompt('')
@@ -122,11 +135,21 @@ class PieceWord(LetterGame):
     rack = {}
     self.rack2 = []
     sqsize = self.gui.gs.SQ_SIZE*3*self.posn.rackscale
-    for n, tile in self.images.items():    
-      t = Tile(Texture(self.pil2ui(tile)), -1,  -1, sq_size=sqsize, dims=(self.gui.gs.DIMENSION_X,self.gui.gs.DIMENSION_Y) )   
-      t.position = (w + x + n%4 * sqsize,  h - y - n//4 * sqsize)
-      t.number = n - 1
-      rack[t.bbox] = tile
+    for n, tile in enumerate(self.images.values()):   
+      if n == self.sizex * self.sizey:
+        break 
+      r = n // self.sizex
+      c = n % self.sizex
+      
+      sqsize = self.gui.gs.SQ_SIZE  
+        
+      t = Tile(Texture(self.pil2ui(tile)), r,  c, sq_size=sqsize, dims=(self.gui.gs.DIMENSION_Y,self.gui.gs.DIMENSION_X) )   
+      t.row, t.col = r, c   
+      rack[(r,c)] = t  
+      #tile.position = (c * sqsize, (self.gui.gs.DIMENSION_Y - 1 - r) * sqsize)      
+      #t.position = (w + x + n%4 * sqsize,  h - y - n//4 * sqsize)
+      t.number = n
+      #rack[t.bbox] = tile
       self.rack2.append(t)
       parent.add_child(t)     
     return rack          
@@ -199,24 +222,19 @@ class PieceWord(LetterGame):
       
     point = self.gui.gs.start_touch - gscene.GRID_POS
     # get letter from rack
-    for index, k in enumerate(self.rack):
-        if k.contains_point(point):
-            letter = index
-            rc = move[-2]
-            return rc, letter, index
+    #for index, k in enumerate(self.rack):
+    #    if k.contains_point(point):
+    #        letter = index
+    #        rc = move[-2]
+    #        return rc, letter, index
             
     # touch on board 
-    rc_start = self.gui.gs.point_to_rc(point)
+    rc_start = self.gui.gs.grid_to_rc(point)
     r_start, c_start = rc_start
     if self.check_in_board(rc_start):
         r, c  = move[-2]
-        for t in self.gui.gs.get_tiles():
-          try:
-            if t.row == r_start and t.col == c_start:        
-               return (r, c), t.number, None
-          except(AttributeError):
-            continue                     
-    
+        t = self.rack[(r_start, c_start)]         
+        return (r, c), t.number, rc_start                        
     return (None, None), None, None   
        
   def process_turn(self, move, board):
@@ -225,47 +243,42 @@ class PieceWord(LetterGame):
     """ 
     rack = self.rack 
     if move:
-      coord, letter, row = move
+      coord, letter, origin = move
       r,c = coord
       
-      self.gui.set_message(f'{r}, {c}={letter}')  
+      self.gui.set_message(f'{origin}>{coord}={letter}')  
       if coord == (None, None):
         return 0
         
       elif letter == 'Finish':
         return 0 
-      elif letter != '' and row is None:
-        # move placed tile
-        r, c = coord
-        sqsize = self.gui.gs.SQ_SIZE
+      elif letter != '':
+        # swap tiles 
+        # take tile at end coord and move it to start coord
+        #r, c = coord
+        #sqsize = self.gui.gs.SQ_SIZE
         #self.board[r][c] = letter 
-        tile = self.rack2[letter]
-        tile.row, tile.col = coord         
-        tile.position = (c * sqsize, (self.gui.gs.DIMENSION_Y - 1 - r) * sqsize)            
-               
-      elif letter != '' and row:  # valid selection
-        try:
-            r, c = coord
-            sqsize = self.gui.gs.SQ_SIZE
-            #self.board[r][c] = letter 
-            tile = self.rack2[letter]
-            tile.scale = 1.33
-            tile.anchor_point = (0, 0)
-            tile.row, tile.col = coord         
-            tile.position = (c * sqsize, (self.gui.gs.DIMENSION_Y - 1 - r) * sqsize)            
-        except (IndexError):
-          pass             
+        tile_move = self.rack[origin]        
+        tile_existing = self.rack[coord]
+                          
+        #tile_move.row, tile_move.col = coord  
+        tile_move.set_pos(coord)  
+        tile_existing.set_pos(origin)       
+        #tile_move.position = (c * sqsize, (self.gui.gs.DIMENSION_Y - 1 - r) * sqsize)            
+                          
+        #tile_existing.row, tile_existing.col = origin  
+        # now update rack        
+        self.rack[origin] = tile_existing
+        self.rack[coord] = tile_move
+        #tile_existing.position = (origin_col * sqsize, (self.gui.gs.DIMENSION_Y - 1 - origin_row) * sqsize)            
+                    
+      
     return 0   
             
   
   def game_over(self):
     return 
-    if self.row == self.sizey:
-      self.gui.set_message(f' Word was {self.chosen_word}')      
-      return True
-    if len(list(set(self.correct_positions))) == self.sizex:
-      self.gui.set_message(f' Well done, you found  {self.chosen_word}')
-      return True  
+    
       
   def restart(self):
     self.gui.gs.close()
@@ -288,6 +301,8 @@ if __name__ == '__main__':
     quit = g.wait()
     if quit:
       break
+
+
 
 
 

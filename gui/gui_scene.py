@@ -521,10 +521,10 @@ class GameBoard(Scene):
           t.size = (self.SQ_SIZE - self.smaller_tile,
                     self.SQ_SIZE - self.smaller_tile)
           t.set_pos(r, c, animation=animation)
-          t.name = fn_piece(piece) + str(r * self.DIMENSION_Y + c)
+          t.name = str(fn_piece(piece)) + str(r * self.DIMENSION_Y + c)
           t.position = t.position + (self.smaller_tile / 2, self.smaller_tile / 2)
           parent.add_child(t)
-        except (AttributeError, KeyError) as e:
+        except (AttributeError, KeyError, TypeError) as e:
           if self.debug:
              print(k)
              print(traceback.format_exc())

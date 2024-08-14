@@ -173,7 +173,7 @@ class ZipWord(LetterGame):
          word_lists[name] = [self.word_dict[name], board]
          
     self.puzzle = random.choice(list(word_lists))
-    self.puzzle = 'Puzzle18 78'
+    #self.puzzle = 'Puzzle18 78'
     self.all_words, self.board = word_lists[self.puzzle]
     self.all_words = [word.lower() for word in self.all_words]
     # parse board to get word objects
