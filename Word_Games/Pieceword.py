@@ -67,6 +67,9 @@ class PieceWord(LetterGame):
     'box1': (45,h+h/8+45), 'box2': (45, h+45),'box3': (3*w/4, h+35),
     'box4': (3*w/4, h+160), 'font': ('Avenir Next', 15)},
      }
+    self.gui.set_pause_menu({'Continue': self.gui.dismiss_menu, 
+                              'New ....': self.restart,
+                              'Quit': self.quit})
     self.selection = self.select_list()
     self.posn = SimpleNamespace(**position_dict[self.gui.device])
     self.rack = self.display_rack()
@@ -80,13 +83,12 @@ class PieceWord(LetterGame):
     """
     Main method that prompts the user for input
     """     
-    move = ''
+    move = ''   
     while True:
       move = self.get_player_move(self.board)               
       move = self.process_turn( move, self.board) 
       if self.game_over():
-        break
-      self.row += 1               
+        break           
     self.gui.set_message2('')
     self.gui.set_message('') 
     self.gui.set_prompt('')    
@@ -164,8 +166,7 @@ class PieceWord(LetterGame):
     return
     LetterGame.load_words(self, word_length, file_list=file_list)
      
-  def initialise_board(self):
-    
+  def initialise_board(self):    
     pass
       
   def pil2ui(self,imgIn):
@@ -197,9 +198,7 @@ class PieceWord(LetterGame):
           images.setdefault(index, img2)
     except(OSError) as e:
       logger.info(f'image load error {e}')
-    return images
-    
-  
+    return images      
     
   def get_player_move(self, board=None):
     """Takes in the user's input and performs that move on the board, returns the coordinates of the move
@@ -209,9 +208,7 @@ class PieceWord(LetterGame):
     if move[0] == (-1, -1):
        return (None, None), 'Enter', None # pressed enter button
       
-    point = self.gui.gs.start_touch - gscene.GRID_POS
-    
-            
+    point = self.gui.gs.start_touch - gscene.GRID_POS               
     # touch on board 
     rc_start = self.gui.gs.grid_to_rc(point)
     r_start, c_start = rc_start
@@ -246,15 +243,11 @@ class PieceWord(LetterGame):
                   
         # now update rack        
         self.rack[origin] = tile_existing
-        self.rack[coord] = tile_move
-          
-                    
-      
-    return 0   
-            
+        self.rack[coord] = tile_move                          
+    return 0               
   
   def game_over(self):
-    
+    # compare placement with solution    
     state = ''
     for r in range(self.sizey):
       for c in range(self.sizex):
@@ -264,24 +257,14 @@ class PieceWord(LetterGame):
     print()
     if state.strip() == self.solution:
       self.gui.set_message('Game over')
-      return True
-      
-    return False
-    
+      return True      
+    return False    
       
   def restart(self):
     self.gui.gs.close()
-    self.finished = False
-    self.SIZE = self.get_size() 
-    self.gui = Gui(self.board, Player())
-    self.gui.set_alpha(True) 
-    self.gui.set_grid_colors(grid='lightgrey', highlight='lightblue')
-    self.gui.require_touch_move(False)
-    self.gui.allow_any_move(True)
-    self.gui.setup_gui(q=self.q)
+    self.__init__()
     self.run() 
-    
-    
+       
     
 if __name__ == '__main__':
   g = PieceWord()
@@ -290,6 +273,8 @@ if __name__ == '__main__':
     quit = g.wait()
     if quit:
       break
+
+
 
 
 

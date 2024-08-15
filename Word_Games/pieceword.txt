@@ -48,3 +48,224 @@ pieceword3_text:
 the right time
 21 Concept, idea Psychological
 
+pieceword10:
+Pieceword3a.jpg
+9, 4
+123
+
+pieceword10_text:
+2 Impressionist's art Mobile toy propelled with one foot
+
+4 Full of trees. Appear or surface
+
+6 Imprudence
+
+8 Quality sought by a laundry?
+
+9 Separate piece of land. Outer shell
+
+11 Gist More mountainous
+
+13 Short trip in a motor car Solemn vow
+
+14 Swan around
+
+16 Decided by officials rather than being fixed by rules
+
+18 Awkward, prickly. Stare hard and angrily
+
+20 Letter puzzle. Unbinding
+
+pieceword4:
+Pieceword4.jpg
+9,4
+5 8172711 6122018301525282432 42123 719313410 226142216 92913 033 3 1
+
+pieceword4_text:
+1 Sleep in the open Small saloon car which can be hired
+
+3 Book of maps. Signpost
+
+5 High-powered Hollow reflected sound
+
+7 Soldier's hat. More sophisticated
+
+9 Sally, fairground game. Shelter for horses Coil of hair, or a currant roll
+
+11 Smoker's saucer Long and slender (writing)
+
+13 Scottish slang word meaning 'antisocial youth' Insect that may get you at night! Travel permit
+
+15 Confrontation, clash. Hilarity
+
+17 Dance movement. Ability to endure
+
+19 Small blown and sucked instrument
+
+• Pungent bulb
+
+21 Unexplained happening. Tried out
+
+pieceword5:
+Pieceword5.jpg
+7, 5
+123
+
+pieceword5_text:
+1 Dried raisin • Stinking
+2 Runner for snow travel
+3 Young bird Value
+4 out, make economies • Breakfast food
+5 Untidy, dirty
+6 Speech impediment • Lustful, unchaste
+7 Common Continental money unit •
+Begin to move
+8 Loose-fitting garment
+9 Stare wonderingly • Curved gateway
+10 Sunday, event honouring the armistice of 1918
+de cologne, perfume • Mate 11
+12 Conflict or jarring
+13 App-based taxi company • Lowest female voice range
+14 Embellish
+15 Clan hostility. Sacred image
+16 Tough. Belch
+17 Holiday
+18 Firm small variety of lettuce • Be untruthful
+19 Gleaming or glistening brightness •
+Mistreatment
+20 Complete
+21 Having a strong sharp smell • Carefully watch
+
+pieceword6:
+Pieceword6.jpg
+7, 5
+123
+
+pieceword6_text:
+1 Subdivision of an army. Hotel customer
+2 Buddy, pal Fruit of the oak tree. Brutal lout
+3 Green Italian sauce Make adjustments
+4 Large powerful cat. Buying and selling Nearest object to the Earth
+5 Furthest down
+6 Treated mercifully Guardsman on duty
+7 Female swan
+8 Appendix to a will Impose excessive
+levies on
+9 Unaccompanied Greenish-blue colour
+10 Avid, eager World-weary sceptic
+Slow tap leak
+11 Polka pattern point. Move the head in agreement
+12 Agricultural establishment Grain used to make bread Curved out of shape
+13 Top covering of a house Side, squad
+14 Pronunciation of words Brought down
+Gordons, Scottish dance 15
+16 By, alone. Spirited and determined
+17 Harmed, impaired
+18 Easy victory Ethical Controversial 1960s musical
+19 Estate agents' word for 'small'. Pager noise
+20 In the near future Parent's brother Furry red Muppet on TV's Sesame Street
+21 Smallest amount Slowly wear away
+
+pieceword7:
+Pieceword7.jpg
+7, 5
+123
+
+pieceword7_text:
+1 Treat with gamma rays
+2 Clip into shape Metal pin for wood
+3 Band of pop musicians
+4 Anchors nautical phrase Attack from a hidden position
+5 Washtub Relating to the mouth
+6 Move further and further away. Narrow inner ring on a dartboard
+7 Classical drama in song
+8 Eyelid swelling Mix with a spoon
+9 Opening stroke in tennis
+10 Popular large house plant. Got on your nerves
+11 Act as referee
+12 Tic, sudden twitch Body of teachers
+13 Spicy Mexican dip
+14 Prison exercise area German word for 'Mr'
+15 Game similar to bingo
+16 Buffed, polished. Cancel out, nullify
+17 Track for wheels. Greek cheese
+18 House and grounds. Dispatched in the post
+19 Elevate
+20 Fabricated. Arab prince
+21 Committed to a particular cause
+
+pieceword8:
+Pieceword8.jpg
+7, 5
+123
+
+pieceword8_text:
+1 Place in a grave Chilled creamy
+dessert
+2 Awaken in the mind
+3 Double knot. Domesticated
+4 Frilly Elizabethan collar. Make a speech. Us a Child Is Born, Christmas carol
+5 Wintertime illness. Be obliged to repay
+6 The Three Wise Men from the East. Solitary person Stratum of ore or coal
+7 Sprinted, hurried
+8 Assassinating Skilled craftsperson
+9 Portion of a circumference
+10 Collapsed Neater
+11 Artificial head of hair Female elephant
+12 Desperately sad. Short-sighted
+13 de cologne, light perfume
+14 Having small hollows in the cheeks. Relating to heavenly bodies
+15 Primate without a tail
+16 Noise made by a lion. Woman getting married Bend out of shape
+17 Health hydro Baked pastry dish
+18 Starchy milk pudding. Japanese art of Swordsmanship. Go by yacht
+19 Firmly against. After tax 20 Childcare provider
+21 Going are plry (along). Permanently injured
+
+pieceword9:
+Pieceword9.jpg
+7, 5
+132329 7211524 2172719 02211 91416 3 42520313330 63428103218 826 112 5
+
+pieceword9_text:
+1 Picture formed of tiny fragments; scrap of food
+2 More wavy
+
+3 Having no gender; feel sorry about
+
+4 Soft brushed leather
+
+5 Bushy-tailed American animal; constituency voter
+
+6 Watery
+
+7 Shelf; faintly (lit)
+
+8 Contend; flock member
+
+9 Coating with plaster
+
+10 Musical threesome; strong desire
+
+11 Fatiguing
+
+12 Operatic solo; building's position
+
+13 Quiet
+
+14 Fuss and bother; generation
+
+15 Place in a grave; thin crisp biscuit
+
+16 Model-aeroplane wood
+
+17 Warm in advance; eating away
+
+18 Sully
+
+19 Juicy nugget of food or information; produce a new idea
+
+20 Move backwards
+
+21 Edged along; sampled
+
