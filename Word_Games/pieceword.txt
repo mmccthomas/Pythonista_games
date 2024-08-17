@@ -402,44 +402,25 @@ ENDAPETAMO KAIL
 9_text:
 1 Picture formed of tiny fragments; scrap of food
 2 More wavy
-
 3 Having no gender; feel sorry about
-
 4 Soft brushed leather
-
 5 Bushy-tailed American animal; constituency voter
-
 6 Watery
-
 7 Shelf; faintly (lit)
-
 8 Contend; flock member
-
 9 Coating with plaster
-
 10 Musical threesome; strong desire
-
 11 Fatiguing
-
 12 Operatic solo; building's position
-
 13 Quiet
-
 14 Fuss and bother; generation
-
 15 Place in a grave; thin crisp biscuit
-
 16 Model-aeroplane wood
-
 17 Warm in advance; eating away
-
 18 Sully
-
 19 Juicy nugget of food or information; 
 produce a new idea
-
 20 Move backwards
-
 21 Edged along; sampled
 
 9_frame:
@@ -521,33 +502,9 @@ SPIA ID W.
 7, 5
 1012261324 525142328183129 9301622113221 220 3 0 4 1 8 73417152733 619
  
-11_frame:
-O LBOOCOL.  OAN
-G EO WE  LON. G
-GOAYES. D R D. 
-GASHAJ B R ECAP
-E I M MIR ADE A
-DICRAU T  L L W
-WASTIFHBAORE O 
-A E M  A. O NFI
-G AIPEISLUGG F 
-I IF SUMB. KI K
-S NEMUM AO. N E
-HUGN APASFOUGHT
-A EG ITUL U SEE
-Z ALOT.  NE K S
-OLLO IRCHI SY C
- I G FCINLAH E 
- COEGO B I EGRE
-K XE BGINNOW.  
-E. NOTYING BI N
-  EE A.  IREAL 
-INDL ILAGG D L 
-
 11_text:
 1 Travelling container for toiletries 
   Know in advance
-
 2 trip, self-gratifying experience 
 3 Passageway in a supermarket or church. 
   Small motor vehicle with an open top 
@@ -577,6 +534,29 @@ Drive or stimulate into action
    Indian savoury cake, often of onions 
 20 Fury, wrath
 21 Embracing closely. Current of air flowing through a room
+
+11_frame:
+O LBOOCOL.  OAN
+G EO WE  LON. G
+GOAYES. D R D. 
+GASHAJ B R ECAP
+E I M MIR ADE A
+DICRAU T  L L W
+WASTIFHBAORE O 
+A E M  A. O NFI
+G AIPEISLUGG F 
+I IF SUMB. KI K
+S NEMUM AO. N E
+HUGN APASFOUGHT
+A EG ITUL U SEE
+Z ALOT.  NE K S
+OLLO IRCHI SY C
+ I G FCINLAH E 
+ COEGO B I EGRE
+K XE BGINNOW.  
+E. NOTYING BI N
+  EE A.  IREAL 
+INDL ILAGG D L 
 
 12:
 ''
