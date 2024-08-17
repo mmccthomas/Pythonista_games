@@ -21,21 +21,24 @@ class PieceWord(LetterGame):
   
   def __init__(self):
   	
-    LetterGame.__init__(self)
+    LetterGame.__init__(self, column_labels_one_based=True)
     self.first_letter = False
     self.tiles = None
     self.load_words_from_file(PUZZLELIST, no_strip=True)
-    self.select_list()
+    self.selection = self.select_list()
     self.gui.build_extra_grid(5, 7, grid_width_x=3, grid_width_y=3, color='red', line_width=5)
-    self.image_name = Image.open(self.image)
-    vsize, hsize = self.image_dims
-    
-    self.images = self.slice_image_into_tiles(self.image_name, img_count_h=hsize, img_count_v=vsize)
+    try:
+       self.image_name = Image.open(self.image)    
+       vsize, hsize = self.image_dims    
+       self.images = self.slice_image_into_tiles(self.image_name, img_count_h=hsize, img_count_v=vsize)
+    except(FileNotFoundError):
+    	 self.images = None
+    	 
     x, y, w, h = self.gui.grid.bbox    
     
     # positions of all objects for all devices
     position_dict = {
-    'ipad13_landscape': {'rackpos': (10, 130), 'rackscale':.25, 'rackoff': h/8, 
+    'ipad13_landscape': {'rackpos': (10, 130), 'rackscale':1, 'rackoff': h/8, 
     'button1': (w+20, h/6), 'button2': (w+250, h/6), 'button3': (w+140, h/6),
     'button4': (w+250, h/6-50), 'button5': (w+140, h/6-50),
     'box1': (w+5, 200+h/8-6), 'box2': (w+5, 200-6), 'box3': (w+5, 2*h/3),
@@ -74,10 +77,12 @@ class PieceWord(LetterGame):
     self.gui.set_pause_menu({'Continue': self.gui.dismiss_menu, 
                               'New ....': self.restart,
                               'Quit': self.quit})
-    self.selection = self.select_list()
+    #self.selection = self.select_list()
     self.posn = SimpleNamespace(**position_dict[self.gui.device])
     self.rack = self.display_rack()
+    self.gui.clear_messages()  
     self.gui.set_moves('\n'.join(self.wordlist), position=(w+50, h/2))
+    self.gui.set_top(f'Pieceword {self.selection.capitalize()}')
     
     
     #self.gui.gs.IMAGES = {i:self.pil2ui(image) for i, image in enumerate(self.rack.values())}
@@ -88,7 +93,8 @@ class PieceWord(LetterGame):
     """
     Main method that prompts the user for input
     """     
-    move = ''   
+    move = '' 
+    
     while True:
       move = self.get_player_move(self.board)               
       move = self.process_turn( move, self.board) 
@@ -104,7 +110,7 @@ class PieceWord(LetterGame):
   def select_list(self):
       '''Choose which category'''
       items = [s.capitalize() for s in self.word_dict.keys()]
-      items = [item for item in items if not item.endswith('_text')]
+      items = [item for item in items if (not item.endswith('_text') and not item.endswith('_frame'))]
       # return selection
       self.gui.selection = ''
       selection = ''
@@ -119,7 +125,7 @@ class PieceWord(LetterGame):
             print(e)
             print(traceback.format_exc())
         print(selection)   
-        if len(selection) > 1:
+        if len(selection):
           self.wordlist = self.word_dict[selection]
           if selection + '_text' in self.word_dict:
              self.table = self.word_dict[selection + '_text']
@@ -149,21 +155,17 @@ class PieceWord(LetterGame):
   def display_rack(self, y_off=0):
     """ display players rack
     y position offset is used to select player_1 or player_2
-    """  
+    """ 
+    tilesize = 3 
     rack = {}
     if self.tiles is not None:
       self.board = np.array(self.board)
-      print(self.board.shape)
-      for n in range(self.tiles.shape[0]):
-        if n == self.sizex * self.sizey:
-            break 
-        r = n // (self.sizex // 3)
-        c = n % (self.sizex // 3)
+      for n in range(self.sizex//tilesize * self.sizey//tilesize):
+        r = n // (self.sizex // tilesize)
+        c = n % (self.sizex // tilesize)
         rack[(r, c)] = n
-        self.board[r*3:r*3+3, c*3:c*3+3] = self.tiles[n]
-      def lstring(s):
-        return s.lower()
-    
+        self.place_tile((r, c), n)     
+      def lstring(s): return s.lower()    
       self.gui.update(self.board, fn_piece=lstring)
       
     else:
@@ -172,26 +174,26 @@ class PieceWord(LetterGame):
       x, y = self.posn.rackpos
       y = y + y_off
       
-      sqsize = self.gui.gs.SQ_SIZE*3*self.posn.rackscale
+      sqsize = self.gui.gs.SQ_SIZE*tilesize*self.posn.rackscale
       for n, tile in enumerate(self.images.values()):   
-        if n == self.sizex * self.sizey:
+        if n == self.sizex//tilesize * self.sizey//tilesize:
           break 
-        r = n // self.sizex
-        c = n % self.sizex
+        r = n // (self.sizex // tilesize)
+        c = n % (self.sizex // tilesize)
         
-        sqsize = self.gui.gs.SQ_SIZE  
+        #sqsize = self.gui.gs.SQ_SIZE  
           
         t = Tile(Texture(self.pil2ui(tile)), r,  c, sq_size=sqsize, 
-                 dims=(self.gui.gs.DIMENSION_Y,self.gui.gs.DIMENSION_X) )   
-        t.row, t.col = r, c   
-        rack[(r,c)] = t  
+                 dims=(self.gui.gs.DIMENSION_Y // tilesize,self.gui.gs.DIMENSION_X//tilesize))   
+        t.row, t.col = r, c 
         t.number = n
+        rack[(r,c)] = t
+        parent.add_child(t)
         
-        parent.add_child(t)  
-        
-        for i in range(self.sizey*3) : 
-          t = LabelNode(str(i+1), parent=parent )   
-          t.position = (w+10, h -20 - i *sqsize/3) #- sqsize*2//3)
+              
+        for i in range(self.sizey * tilesize) : 
+          t = LabelNode(str(i + 1), parent=parent)   
+          t.position = (w+10, h - 20 - i *sqsize/tilesize)
     return rack          
           
   def get_size(self):
@@ -238,6 +240,7 @@ class PieceWord(LetterGame):
   def get_player_move(self, board=None):
     """Takes in the user's input and performs that move on the board, returns the coordinates of the move
     Allows for movement over board"""
+    tilesize = 3
     move = LetterGame.get_player_move(self, self.board)
     
     if move[0] == (-1, -1):
@@ -253,12 +256,17 @@ class PieceWord(LetterGame):
            t = self.rack[(r_start, c_start)]  
            return (r, c), t.number, rc_start     
         else:
-          rc_start = (r_start // 3, c_start // 3)     
-          r, c = (r // 3, c // 3)
+          rc_start = (r_start // tilesize, c_start // tilesize)     
+          r, c = (r // tilesize, c // tilesize)
           return (r, c), self.rack[(r, c)], rc_start      
                            
     return (None, None), None, None   
-       
+  
+  def place_tile(self, coord, tile_index):
+      r, c = coord 
+      tilesize = 3
+      self.board[r * tilesize:r * tilesize+ tilesize, c * tilesize:c * tilesize + tilesize] = self.tiles[tile_index]
+         
   def process_turn(self, move, board):
     """ process the turn
     move is coord, new letter, selection_row
@@ -287,17 +295,10 @@ class PieceWord(LetterGame):
           self.rack[origin] = tile_existing
           self.rack[coord] = tile_move
         else:
-          r,c = coord
-          r1, c1 = origin
           tile_move = self.rack[origin]        
           tile_existing = self.rack[coord]
-          
-          self.board[r*3:r*3+3, c*3:c*3+3] = self.tiles[tile_move]
-          self.board[r1*3:r1*3+3, c1*3:c1*3+3] = self.tiles[tile_existing]
-          #tile_move.set_pos(coord)  
-          #tile_existing.set_pos(origin)               
-                                
-                    
+          self.place_tile(coord, tile_move )         
+          self.place_tile(origin, tile_existing)         
           # now update rack        
           self.rack[origin] = tile_existing
           self.rack[coord] = tile_move 

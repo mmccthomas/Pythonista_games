@@ -1,43 +1,83 @@
-pieceword:
+1:
 Pieceword2.jpg
 9, 4
  81614 2 71821 3 92212 53227263415 61731 024 12313112028293010 4253319 
 
-pieceword_text:
-1 Applied without consent
-(restrictions, eg) Washing place?
-3 Cheated Musical ticker?
-5 Bird that nests in hayfields Mob
+1_text:
+1 Applied without consent (restrictions, eg) 
+  • Washing place?
+3 Cheated 
+• Musical ticker?
+5 Bird that nests in hayfields 
+• Mob
 7 Layer of the atmosphere
 • Incommunicable quality
 9 Line about which a body rotates
 • Word derived from the name of a person
 • Spike of corn
-11 Humiliated. Ancient Egyptian writing material
-13 Lacerate Kill Mystical religious figure
-15 Weapon for shooting poisoned darts • Pseudonym
-17 Outer covering Globetrotter
-19 Good-luck symbol Story of happy rustic innocence
-21 Urinary organ. Heathen
+11 Humiliated. 
+• Ancient Egyptian writing material
+13 Lacerate 
+•Kill •Mystical religious figure
+15 Weapon for shooting poisoned darts
+ • Pseudonym
+17 Outer covering
+• Globetrotter
+19 Good-luck symbol 
+• Story of happy rustic innocence
+21 Urinary organ
+• Heathen
 
-pieceword3:
-Pieceword3.jpg
+1_frame:
+RIPRDEATHE T
+O P. D H AKE
+BLOPE RONN R
+SESONEI ITUB
+ A  G D PH R
+DDES EE POME
+IMP U HORE. 
+N A GAU M SK
+DUP H BLAC O
+ OZURUD B I 
+L ZN BE AAME
+AXIAS MET A 
+OSE O I AYLL
+ E APYCORE B
+ED  E T ADLY
+ I. U R WR G
+IN NCRNG. F 
+ H. I   PALI
+ MUHOEQUESTI
+  NE AU EA. 
+WPIR UEARYM 
+I G E L TE. 
+TRAVELLERRUS
+C T C O I. N
+ MY IDV.    
+S.  N ASH.  
+PONNGO. I.  
+
+3:
+''
 7, 5
 2721 8313413 210 31417 62533 4 1 9202318 02232 5241628112615 719291230
 
-pieceword3_text:
+3_text:
 1 Condiment Ancient counting frame
 2 Lose lustre
 3 Went in search of Extreme dislike
 4 Welsh valley
 5 Ban Typical example
 6 Opponent
-7 _ reality, computer simulation. Hard-wearing, long-lasting
+7 _ reality, computer simulation. 
+  Hard-wearing, long-lasting
 8 Make hazy
-9 Gauge Water formed by condensation at night. Large stream of fresh water
+9 Gauge Water formed by condensation at night. 
+  Large stream of fresh water
 10 Tooth covering Building's frontage
 11 Traditional name given to a wine merchant
-12 Muddled, confused. Refrain 13 Devoted Vim Send a message over the air
+12 Muddled, confused. Refrain 
+13 Devoted Vim Send a message over the air
 14 Collection of wives
 15 Pile of things to be done. Rice dish
 16 Series of loud sounds
@@ -45,73 +85,98 @@ pieceword3_text:
 18 Rye bristle
 19 Rise Argue over a price
 20 Able to say the right thing at
-the right time
+   the right time
 21 Concept, idea Psychological
 
-pieceword10:
-Pieceword3a.jpg
-9, 4
-123
-
-pieceword10_text:
-2 Impressionist's art Mobile toy propelled with one foot
-
-4 Full of trees. Appear or surface
-
-6 Imprudence
-
-8 Quality sought by a laundry?
-
-9 Separate piece of land. Outer shell
-
-11 Gist More mountainous
-
-13 Short trip in a motor car Solemn vow
-
-14 Swan around
-
-16 Decided by officials rather than being fixed by rules
-
-18 Awkward, prickly. Stare hard and angrily
-
-20 Letter puzzle. Unbinding
-
-pieceword4:
-Pieceword4.jpg
+3_frame:
+LOYENA E. J BLE
+ N T RARGPIT L 
+BACADDN RL RVER
+ RATUAASC K MEL
+M MH BI ARNI VI
+ISOER NOT O LED
+CWMOISHAGT MI G
+O ED OUL EMBOME
+IVAAWNMEN A. U 
+ EV T VIRADEEND
+RDSPED D L C TA
+I HL UMETISTION
+ A PERAL FACDIO
+NTN TAC HER. F 
+ H GHTKLODESTTO
+L DE SPEPE N A 
+EFONWAA LDLECTF
+DEW H SOU E. T 
+GLEABAPEPURACUS
+H LSH AREG GU E
+TALHATG R RIRED
+ 
+4:
+''
 9,4
 5 8172711 6122018301525282432 42123 719313410 226142216 92913 033 3 1
 
-pieceword4_text:
-1 Sleep in the open Small saloon car which can be hired
-
+4_text:
+1 Sleep in the open 
+  Small saloon car which can be hired
 3 Book of maps. Signpost
-
-5 High-powered Hollow reflected sound
-
-7 Soldier's hat. More sophisticated
-
-9 Sally, fairground game. Shelter for horses Coil of hair, or a currant roll
-
-11 Smoker's saucer Long and slender (writing)
-
-13 Scottish slang word meaning 'antisocial youth' Insect that may get you at night! Travel permit
-
-15 Confrontation, clash. Hilarity
-
-17 Dance movement. Ability to endure
-
+5 High-powered 
+  Hollow 
+  reflected sound
+7 Soldier's hat. 
+  More sophisticated
+9 Sally, fairground game. 
+  Shelter for horses 
+  Coil of hair, or a currant roll
+11 Smoker's saucer 
+   Long and slender (writing)
+13 Scottish slang word meaning 'antisocial youth' 
+   Insect that may get you at night! 
+   Travel permit
+15 Confrontation, clash. 
+   Hilarity
+17 Dance movement. 
+   Ability to endure
 19 Small blown and sucked instrument
+   • Pungent bulb
+21 Unexplained happening. 
+   Tried out
 
-• Pungent bulb
+4_frame:
+MONIONG V ON
+ R F E V  U 
+TERYEDMIRSSA
+T. BIVK V M 
+ASHR EENEPID
+  YATLD T T 
+OUA T DBUCAB
+ N ERA. EA A
+AS  E WN TOR
+ I HARE.  BE
+RGEA P STD E
+ N MYSS UAUN
+I PC M L U. 
+TOLH E ECERY
+T EIND U.  E
+N I D. E A I
+TICTRAEP Y S
+Z A A  L E Q
+ASSRETISAINI
+I.  D N R U 
+LE T STH ICA
+ CLE KC NNED
+S. NCEHO O R
+TABS E. ISHO
+IERICA BE.  
+M OL S. G.  
+BUNY EWDO.  
 
-21 Unexplained happening. Tried out
-
-pieceword5:
-Pieceword5.jpg
+5:
+''
 7, 5
-123
+19 512 222 7153331 32023 030 1182611 624 9 427171425321016132129 83428
 
-pieceword5_text:
+5_text:
 1 Dried raisin • Stinking
 2 Runner for snow travel
 3 Young bird Value
@@ -136,16 +201,40 @@ Mistreatment
 20 Complete
 21 Having a strong sharp smell • Carefully watch
 
-pieceword6:
-Pieceword6.jpg
-7, 5
-123
+5_frame:
+ I R. EEKEGGR R
+UNI. S A G EK A
+   RCHERIEWDEUD
+TANANCEKEN AUBE
+ M    A NENDS. 
+HICANCLIST O. F
+ F MBRA RURPLTO
+TAW A SKIC L. T
+ L ORDK MLIEN. 
+ S C BR AN RSUL
+ SCAY N REAUQ I
+P L O ICOO DU C
+  EC SINGUROE A
+I. U ON AR TPAL
+GAPPUNT GE HE L
+HAREME.  E DHEE
+I I.  DORA G B 
+COSISC F RVEGEN
+STI L D L L BUS
+C LFY  GERUF R 
+I AA L R  P BSE
 
-pieceword6_text:
+6:
+''
+7, 5
+516 313241425 1 8 9 7 42332171530 627222119293411183312 0 21028262031
+
+6_text:
 1 Subdivision of an army. Hotel customer
 2 Buddy, pal Fruit of the oak tree. Brutal lout
 3 Green Italian sauce Make adjustments
-4 Large powerful cat. Buying and selling Nearest object to the Earth
+4 Large powerful cat. Buying and selling 
+  Nearest object to the Earth
 5 Furthest down
 6 Treated mercifully Guardsman on duty
 7 Female swan
@@ -155,29 +244,59 @@ levies on
 10 Avid, eager World-weary sceptic
 Slow tap leak
 11 Polka pattern point. Move the head in agreement
-12 Agricultural establishment Grain used to make bread Curved out of shape
-13 Top covering of a house Side, squad
+12 Agricultural establishment 
+   Grain used to make bread 
+   Curved out of shape
+13 Top covering of a house 
+   Side, squad
 14 Pronunciation of words Brought down
-Gordons, Scottish dance 15
+15  _ Gordons, Scottish dance
 16 By, alone. Spirited and determined
 17 Harmed, impaired
-18 Easy victory Ethical Controversial 1960s musical
+18 Easy victory Ethical 
+   Controversial 1960s musical
 19 Estate agents' word for 'small'. Pager noise
-20 In the near future Parent's brother Furry red Muppet on TV's Sesame Street
+20 In the near future 
+   Parent's brother 
+   Furry red Muppet on TV's Sesame Street
 21 Smallest amount Slowly wear away
 
-pieceword7:
-Pieceword7.jpg
-7, 5
-123
+6_frame:
+FEIRADSTYS G U 
+ED EPET ACORICI
+L H S AIRO ANE 
+S CYNI R E MOON
+CHUT NCODST A C
+A PHEA LOSENTRY
+U BAM  F UESLIO
+SOOREDMAGN TD L
+H L N ORALTESPA
+KEEORP E ITSOF 
+ T M ATAXN YTIO
+FARESTAL ROM E 
+LEE RORIPPENT A
+E EDIC G L OHUG
+ROD A ENTA MR E
+N TU BC DIJOI L
+ DENCLOD N UN L
+REDT ET BEASGAY
+N CO R N ELF TE
+ DOLMOVER DAOWE
+M WE W TEP M E 
 
-pieceword7_text:
+7:
+''
+7, 5
+1727 93314 81110342216 3 1231832212931 0203013152412 2 7 5 426 6281925
+
+7_text:
 1 Treat with gamma rays
 2 Clip into shape Metal pin for wood
 3 Band of pop musicians
 4 Anchors nautical phrase Attack from a hidden position
 5 Washtub Relating to the mouth
-6 Move further and further away. Narrow inner ring on a dartboard
+6 Move further and further away. 
+  Narrow inner ring on a dartboard
 7 Classical drama in song
 8 Eyelid swelling Mix with a spoon
 9 Opening stroke in tennis
@@ -194,19 +313,44 @@ pieceword7_text:
 20 Fabricated. Arab prince
 21 Committed to a particular cause
 
-pieceword8:
-Pieceword8.jpg
-7, 5
-123
+7_frame:
+REDA. BEDPERATE
+   M SRAI A. H 
+AFFE TATEERVLED
+NEGV R H AWEADI
+ETAE EL F S. R 
+MAIDED D RECROU
+ P IGHRUBALS T 
+H OBAT N  O AIL
+ F EDEESTOTT N 
+A CA O B.  OE N
+T HSTYTRIE UN E
+O. P.  O N STED
+L. CA USHE R. O
+YARARB E TIRERR
+E ISM BLE. ER T
+ S  E IRRAIST I
+MIRMADM I S ITR
+ S  T B GICAC U
+E S IRYUCATEAMB
+D OATE.  S NRAL
+  L STSPAP ATRE
 
-pieceword8_text:
+8:
+''
+7, 5
+1428 43229161817252715 2 52023 9 62421 3 8 031 711 1333026341213192210
+
+8_text:
 1 Place in a grave Chilled creamy
 dessert
 2 Awaken in the mind
 3 Double knot. Domesticated
-4 Frilly Elizabethan collar. Make a speech. Us a Child Is Born, Christmas carol
+4 Frilly Elizabethan collar. Make a speech. 
+  Us a Child Is Born, Christmas carol
 5 Wintertime illness. Be obliged to repay
-6 The Three Wise Men from the East. Solitary person Stratum of ore or coal
+6 The Three Wise Men from the East. Solitary person 
+  Stratum of ore or coal
 7 Sprinted, hurried
 8 Assassinating Skilled craftsperson
 9 Portion of a circumference
@@ -214,20 +358,48 @@ dessert
 11 Artificial head of hair Female elephant
 12 Desperately sad. Short-sighted
 13 de cologne, light perfume
-14 Having small hollows in the cheeks. Relating to heavenly bodies
+14 Having small hollows in the cheeks. 
+   Relating to heavenly bodies
 15 Primate without a tail
-16 Noise made by a lion. Woman getting married Bend out of shape
+16 Noise made by a lion. Woman getting married 
+   Bend out of shape
 17 Health hydro Baked pastry dish
-18 Starchy milk pudding. Japanese art of Swordsmanship. Go by yacht
-19 Firmly against. After tax 20 Childcare provider
+18 Starchy milk pudding. 
+   Japanese art of Swordsmanship. 
+   Go by yacht
+19 Firmly against. After tax 
+20 Childcare provider
 21 Going are plry (along). Permanently injured
 
-pieceword9:
-Pieceword9.jpg
+8_frame:
+ A ROAG. ER. H 
+PLEE. YINCOWVOK
+E. SAG L IC. S 
+RANLLE L A A FA
+G A E TELDIMWIG
+ARCAGI. OD.  TR
+T LA PS ANTIENT
+O ELARE N. NX U
+MED. OEDGINGT R
+I. RUFRATF O I 
+SLAE.  N FLUANN
+M NMAGONEI L G 
+  LIDINET. EN T
+RTI P Y. SAN.  
+ A YOPMAIP TC M
+E UE WNTOOMBSSE
+OWEPIE  W  EE N
+R SO SEAMEEFE D
+RIDEAUMOUR BARP
+ N D SE. SPA  E
+ENDAPETAMO KAIL
+
+9:
+''
 7, 5
 132329 7211524 2172719 02211 91416 3 42520313330 63428103218 826 112 5
 
-pieceword9_text:
+9_text:
 1 Picture formed of tiny fragments; scrap of food
 2 More wavy
 
@@ -263,9 +435,262 @@ pieceword9_text:
 
 18 Sully
 
-19 Juicy nugget of food or information; produce a new idea
+19 Juicy nugget of food or information; 
+produce a new idea
 
 20 Move backwards
 
 21 Edged along; sampled
 
+9_frame:
+GE  T UED L D U
+ VIVERN ERISOME
+REN M UNN T W S
+ENT U MORTITMLY
+S E D ER U E O 
+TEDFERREGSID N 
+ALS DIINVMOSTRI
+T EWE SE O O G 
+AININGTESNEUARI
+G RO VE. A ILED
+RACWEALECING V 
+E EA LY. R H E 
+ E SELS IAIC. S
+ E T IE E CUCOO
+INTRETDERTER. R
+RGEBITA U. B C 
+ I  RETORHEARLI
+ITELEDU G. T U 
+ESSNOIA. SELM R
+RA. ADRODO EPRE
+ WAER T. N SE A
+
+10:
+''
+9, 4
+1331 7231521 317262225302928 620332418273219 416 0 21410 1 8 5341211 9
+
+10_text:
+2 Impressionist's art 
+  Mobile toy propelled with one foot
+4 Full of trees. Appear or surface
+6 Imprudence
+8 Quality sought by a laundry?
+9 Separate piece of land. Outer shell
+11 Gist 
+   More mountainous
+13 Short trip in a motor car 
+   Solemn vow
+14 Swan around
+16 Decided by officials rather than being fixed by rules
+18 Awkward, prickly. 
+   Stare hard and angrily
+20 Letter puzzle. Unbinding
+
+10_frame:
+ATHONA DIODE
+   G L I N C
+ H LOW THOLH
+ S. I  E.   
+LIVANA.  Y S
+ X  G USK.  
+RY. A ETII A
+ D ING Y NTY
+ER. T Y GG S
+    M SCR R 
+M UMIMT UTER
+    D ORN V 
+N OD EH AN A
+ANT I ILLGAL
+   ARDD L.  
+ T  WOGE S S
+KEY I  R COO
+ E  FOSS A I
+    E MER L 
+E H.  P EIER
+   ISLINE E 
+    K    K B
+ESSTENWHIICR
+C H D E NM E
+SPIA ID W.  
+   NOTGRA.  
+ E I IE Y.  
+
+11:
+''
+7, 5
+1012261324 525142328183129 9301622113221 220 3 0 4 1 8 73417152733 619
+ 
+11_frame:
+O LBOOCOL.  OAN
+G EO WE  LON. G
+GOAYES. D R D. 
+GASHAJ B R ECAP
+E I M MIR ADE A
+DICRAU T  L L W
+WASTIFHBAORE O 
+A E M  A. O NFI
+G AIPEISLUGG F 
+I IF SUMB. KI K
+S NEMUM AO. N E
+HUGN APASFOUGHT
+A EG ITUL U SEE
+Z ALOT.  NE K S
+OLLO IRCHI SY C
+ I G FCINLAH E 
+ COEGO B I EGRE
+K XE BGINNOW.  
+E. NOTYING BI N
+  EE A.  IREAL 
+INDL ILAGG D L 
+
+11_text:
+1 Travelling container for toiletries 
+  Know in advance
+
+2 trip, self-gratifying experience 
+3 Passageway in a supermarket or church. 
+  Small motor vehicle with an open top 
+4 Matter which is neither solid nor liquid.
+  Sixth note of a maior scale 
+5 Restrict to a particular place
+6 _Fosbury, 1960s US high jumper. 
+  Falling crystals of ice
+7 Unit of measurement of a ships speed. 
+  Point of land running into the sea
+8 Share the same opinion
+9 Invalid piece of play in sport.
+  Strong current of air
+10 Destroying the enthusiasm of 
+11 Second-largest living bird. 
+   One of a collection of items for auction
+12 Large group of islands
+13 Popular soft drink flavour. Monetary advance
+14 The length of
+15 Toy that you dress 
+Drive or stimulate into action
+16 Ill-mannered person. Deprived of the power of feeling
+17 Naval officer ranking with a general in the army 
+18 Affirmative answer.
+   __chat, leap in ballet
+19 Hard sweet coating on a cake. 
+   Indian savoury cake, often of onions 
+20 Fury, wrath
+21 Embracing closely. Current of air flowing through a room
+
+12:
+''
+7, 5
+2811 623 21320 5342918 022323019241615 9271710 412 72133312526 1 314 8
+
+12_text:
+1 Short fictional work. Of pottery
+2 Unnecessarily
+3 Ball, sphere. Scent
+4 Flightless Australian bird
+ • Overindulgent
+5 Mad with worry
+6 Throw up into the air
+ • Tailless short-legged amphibian
+7 Low-toned brass instrument
+ • Small upland lake
+8 Rich pungent coffee
+9 Maple tree genus.
+ Neck part
+10 Hooliganism
+11 Protein-rich vegetarian foodstuff
+ • Quote as an example
+12 Supervised during an exam
+13 Peel Cape, headland
+14 to, before
+15 Prepare to remove • Prophet
+16 Knock loudly • Chop into small pieces
+17 Eminence or height
+18 Kimono waistband • Container for carrying bricks
+19 Baby's father. Rend
+20 Remains after burning
+21 Fish, often smoked • Converted to cipher
+
+12_frame:
+UBAADDMICY SI N
+R M U I OASHR D
+R ODOCL AK ESEE
+ I A CBANT IS L
+ANTTOOR AE EITE
+ A E SOBIDEDD A
+ B ELLESSEMUPLI
+RIO O   ES E A 
+ L LOBR. TOSNCO
+NESISHD M. TS L
+  C S I PM. TOF
+ATEGILNDOACEE I
+  EG R C ERAOUT
+ FR STOCH Y U. 
+S G. E E MELNVI
+ICEA DRINNOVLAX
+G DC EY. I AI E
+HODHAD  UC GOAD
+N. T DTAR I A. 
+  RRE A AATUIC 
+APEI. I N Y N T
+
+13:
+''
+7, 5
+252928 219 3 5 022261627 133301424 63415171018 42131 71220 813231132 9
+
+13_text:
+1 Chant used in some churches
+2 Pernod-like Greek drink 
+One who consumes or operates 
+3 Most hoity-toity
+
+4 Biological unit of heredity
+ • Slide out of control
+5 Ranking of tennis players
+6 Variety of Japanese food
+ • Wise saying
+7 Most smart
+8 Number of players in a hockey team. 
+  Made fun of
+9 Name for the heather family of plants
+10 Tall tree. 
+   Deposit found on the teeth
+11 Disregarded
+12 Facilitate. 
+   Of dubious reputation
+13 Metaphor, or overused plot device
+14 South American burrowing rodent 
+  . Position taken up
+15 Woman on stage
+16 Bow down to pray. 
+   In progress
+17 Disarmingly attractive person
+18 Crux. Poultry
+19 Affected
+20 Held on to, stored 
+   • Man-eating monster or giant
+21 Old cinema torch-bearer
+
+13_frame:
+ E ATEONGGENE. 
+EDI R C U A STA
+R DRICESTSUSSS 
+E V C EL OOT A 
+ SENOR CH N GRE
+HI  L T UOWL D 
+  TATUE L L POP
+UTI O ARMKEPL. 
+ ACERE O  D ENA
+TART WJ TROP C 
+  SELEAGO U SER
+CHEE EC NTRE D 
+ AFA MA SUNNLAR
+ER NCENG T C IG
+G FT N ADUSHBLE
+ B KID NEINSPLA
+OUZ N VEN O O B
+ R AGE. EOTISNO
+S NKNERALST TAR
+SED A E OTEAED 
+E OGISTTEA. LOU

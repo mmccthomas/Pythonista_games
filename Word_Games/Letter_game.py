@@ -209,13 +209,14 @@ WORDLISTS = ['5000-more-common.txt'] # 'letters3.txt', 'letters10.txt']
 
 class LetterGame():
   
-  def __init__(self):
+  def __init__(self, **kwargs):
     self.debug = False
     # allows us to get a list of rc locations
     self.log_moves = True
     self.straight_lines_only = False
     self.word_dict = None
     self.remaining_ships =[[]]
+    self.column_labels_one_based = False
     # create game_board and ai_board
     self.SIZE = self.get_size() 
      
@@ -228,7 +229,10 @@ class LetterGame():
     self.gui.set_grid_colors(grid='lightgrey', highlight='lightblue')
     self.gui.require_touch_move(False)
     self.gui.allow_any_move(True)
-    
+    for k, v in kwargs.items():
+    	setattr(self, k, v)
+    if self.column_labels_one_based:
+    	self.gui.gs.column_labels = '1 2 3 4 5 6 7 8 9 10111213141516171819202122232425262728293031'
     self.gui.setup_gui(log_moves=True)
     
     # menus can be controlled by dictionary of labels and functions without parameters
