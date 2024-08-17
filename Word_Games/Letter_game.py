@@ -376,7 +376,7 @@ class LetterGame():
                                      z_position=30, alpha = .5, stroke_color='white'))
       self.gui.add_numbers(square_list)   
               
-  def load_words_from_file(self, file_list):
+  def load_words_from_file(self, file_list, no_strip=False):
     # read the entire wordfile as text
     with open(f'{file_list}', "r", encoding='utf-8') as f:
       data = f.read()
@@ -389,7 +389,8 @@ class LetterGame():
   
     key = None
     for word in data_list:
-      word = word.strip()
+      if no_strip == False:
+          word = word.strip()
       
       if ':' in word:
         if key:
@@ -840,6 +841,7 @@ if __name__ == '__main__':
     quit = g.wait()
     if quit:
       break
+
 
 
 
