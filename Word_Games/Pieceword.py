@@ -123,10 +123,9 @@ class PieceWord(LetterGame):
     if self.tiles is not None:
       self.board = np.array(self.board)
       for n in range(self.span * self.sizey//tilesize):
-        r = n // self.span
-        c = n % self.span
-        rack[(r, c)] = n
-        self.place_tile((r, c), n)
+        coord = divmod(n, self.span)       
+        rack[coord] = n
+        self.place_tile(coord, n)
          
       self.gui.update(self.board)
       
@@ -137,9 +136,7 @@ class PieceWord(LetterGame):
       for n, tile in enumerate(self.images.values()):
         if n == self.span * self.sizey//tilesize:
           break
-        r = n // self.span
-        c = n % self.span
-          
+        r, c = divmod(n, self.span)         
         t = Tile(Texture(self.pil2ui(tile)), r,  c, sq_size=sqsize,
                  dims=(self.gui.gs.DIMENSION_Y // tilesize, self.gui.gs.DIMENSION_X // tilesize))
         t.row, t.col = r, c
@@ -255,10 +252,9 @@ class PieceWord(LetterGame):
     print(f'{len(self.solution)=}')
     for n in range(self.span * self.sizey//tilesize):
         val = int(self.solution[n * 2: n * 2 + 2])
-        r = n // self.span
-        c = n % self.span    
-        self.place_tile((r, c),  val)
-        self.rack[(r, c)] = val
+        coord = divmod(n, self.span)  
+        self.place_tile(coord,  val)
+        self.rack[coord] = val
     self.gui.update(self.board)
     sleep(2)
     self.game_over()
@@ -297,6 +293,7 @@ if __name__ == '__main__':
     quit = g.wait()
     if quit:
       break
+
 
 
 
