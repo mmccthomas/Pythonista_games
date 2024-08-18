@@ -1660,3 +1660,108 @@ Puzzle18-78_frame:
 ' /o/ /#/#/#/ /#/#/ /#/#/ /#/#/ /#/#/ /#/#/#/ / / '
 ' /#/ /#/#/#/ /#/#/ /#/#/ /#/#/ /#/#/ /#/#/#/ /#/ '
 ' / / / / / / /#/#/ / / / / / / /#/#/ / / / / / / '
+
+Puzzle19-1:
+AMP
+BYE
+CAT
+ELL
+GYM
+HAM
+INN
+ITS
+OWE
+PET
+SIN
+USE
+COMA
+DEAL
+EDIT
+ESPY
+FINO
+FLIP
+GLEE
+HARE
+INTO
+KISS
+LAZY
+LOSS
+MARL
+MASS
+NECK
+NINE
+ORCA
+PARE
+PINE
+POMP
+REED
+ROOM
+STYE
+TERN
+TICK
+VAIN
+WAXY
+ZINC
+ABHOR
+ANISE
+APPLE
+ARISE
+CIVIL
+EVOKE
+FLOPS
+MAYOR
+MOYES
+QUEEN
+RELAX
+TERRY
+WIDEN
+YUCCA
+AUTUMN
+BEHOLD
+BRASSY
+CELERY
+CHEESY
+DEBUNK
+DEVISE
+DOLLOP
+DROWSY
+HYSSOP
+INSIST
+OILCAN
+POSTER
+SISTER
+TRUISM
+TYRANT
+ACRONYM
+RAMEKIN
+DEFINITION
+DESALINATE
+DEVOTIONAL
+DISINHERIT
+LEADERLESS
+STUPENDOUS
+TRANSVERSE
+TUMBLEWEED
+
+Puzzle19-1_frame:
+' / / / / / / / / / /#/ / / / / / / / / / '
+' /#/ /#/#/#/ /#/ / / / / /#/ /#/#/#/ /#/ '
+'f/l/i/p/#/f/l/o/p/s/#/ / / / / /#/ / / / '
+' /#/ /#/ /#/ /#/#/ / / /#/#/ /#/ /#/ /#/ '
+' /#/#/ / / / / / /#/ /#/ / / / / / /#/#/ '
+' /#/ /#/ /#/ /#/ /#/ /#/ /#/ /#/ /#/ /#/ '
+' / / / / / /#/ / / / / / / /#/ / / / / / '
+' /#/ /#/ /#/#/#/ /#/#/#/ /#/#/#/ /#/ /#/ '
+' / / /#/ / / / /#/#/#/#/#/ / / / /#/ / / '
+' / / / /#/#/ /#/#/#/#/#/#/#/ /#/#/ / / / '
+'#/ /#/ / / / /#/#/#/#/#/#/#/ / / / /#/ /#'
+' / / / /#/#/ /#/#/#/#/#/#/#/ /#/#/ / / / '
+' / / /#/ / / / /#/#/#/#/#/ / / / /#/ / / '
+' /#/ /#/ /#/#/#/ /#/#/#/ /#/#/#/ /#/ /#/ '
+' / / / / / /#/ / / / / / / /#/ / / / / / '
+' /#/ /#/ /#/ /#/ /#/ /#/ /#/ /#/ /#/ /#/ '
+' /#/#/ / / / / / /#/ /#/ / / / / / /#/#/ '
+' /#/ /#/ /#/ /#/#/ / / /#/#/ /#/ /#/ /#/ '
+' / / / /#/ / / / / /#/ / / / / /#/ / / / '
+' /#/ /#/#/#/ /#/ / / / / /#/ /#/#/#/ /#/ '
+' / / / / / / / / / /#/ / / / / / / / / / '

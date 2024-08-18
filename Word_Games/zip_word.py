@@ -134,7 +134,7 @@ class ZipWord(LetterGame):
                  empty_board=self.empty_board,
                  all_word_dict=self.all_word_dict,
                  max_depth=self.max_depth,
-                 debug=False)
+                 debug=self.debug)
     cx.populate_words_graph(max_iterations=1000, length_first=False)
     self.check_words()
     self.create_number_board()
@@ -173,7 +173,7 @@ class ZipWord(LetterGame):
          word_lists[name] = [self.word_dict[name], board]
          
     self.puzzle = random.choice(list(word_lists))
-    #self.puzzle = 'Puzzle18 78'
+    self.puzzle = 'Puzzle19 1'
     self.all_words, self.board = word_lists[self.puzzle]
     self.all_words = [word.lower() for word in self.all_words]
     # parse board to get word objects

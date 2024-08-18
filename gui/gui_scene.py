@@ -134,6 +134,7 @@ class GameBoard(Scene):
     self.grid_fill = 'lightgreen'
     self.grid_stroke_color = None
     self.grid_z_position = 10
+    self.row_labels = None
     self.highlight_fill = '#00bc10'
     self.use_alpha = False
     self.column_labels = None
