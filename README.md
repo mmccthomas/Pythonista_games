@@ -54,7 +54,7 @@ Find the words to fit
 
 Pieceword
 ---------
-2x2 tiles jumbled on a grid. Use the clues to rearrange them.
+3x3 word tiles jumbled on a grid. Use the clues to rearrange them.
 
 Wordle clone
 ------------
