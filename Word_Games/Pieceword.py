@@ -14,7 +14,7 @@ from gui.gui_scene import Tile
 from gui.gui_interface import Coord
 from scene import Texture, LabelNode
 PUZZLELIST = "pieceword.txt"
-tilesize = 3
+TILESIZE = 3
 
 
 class PieceWord(LetterGame):
@@ -23,6 +23,7 @@ class PieceWord(LetterGame):
     LetterGame.__init__(self, column_labels_one_based=True)
     self.first_letter = False
     self.tiles = None
+    self.debug = False
     self.load_words_from_file(PUZZLELIST, no_strip=True) 
     self.selection = self.select_list()
     self.gui.build_extra_grid(5, 7, grid_width_x=3, grid_width_y=3,
@@ -40,7 +41,7 @@ class PieceWord(LetterGame):
                              'New ....': self.restart,
                              'Reveal': self.reveal,
                              'Quit': self.quit})
-    self.span = self.sizex // tilesize
+    self.span = self.sizex // TILESIZE
     self.rack = self.display()
     
     self.gui.clear_messages()
@@ -81,7 +82,8 @@ class PieceWord(LetterGame):
             print(e)
             
         if len(selection):
-          print(f'{selection=}')
+          if self.debug:   
+            print(f'{selection=}')
           self.wordlist = self.word_dict[selection]
           
           if selection + '_text' in self.word_dict:
@@ -93,12 +95,13 @@ class PieceWord(LetterGame):
           if selection + '_frame' in self.word_dict:
             # rearrange frame text into N 3x3 tiles
             self.frame = self.word_dict[selection + '_frame']
-            [print(row, len(row)) for row in self.frame] # for debug
+            if self.debug:   
+               [print(row, len(row)) for row in self.frame] # for debug
             assert all([len(row) == len(self.frame[0]) for row in self.frame]), 'Error in string lengths'
             # convert to numpy
             self.frame = np.array([np.array(row.lower(), dtype=str) for row in self.frame])
             
-            self.frame = self.frame.view('U1').reshape((-1, self.image_dims[1] * tilesize))
+            self.frame = self.frame.view('U1').reshape((-1, self.image_dims[1] * TILESIZE))
             # replace spaces and dot by hash for display
             self.frame[self.frame == ' '] = '#'
             self.frame[self.frame == '.'] = '#'
@@ -123,7 +126,7 @@ class PieceWord(LetterGame):
     rack = {}
     if self.tiles is not None:
       self.board = np.array(self.board)
-      for n in range(self.span * self.sizey//tilesize):
+      for n in range(self.span * self.sizey//TILESIZE):
         coord = divmod(n, self.span)       
         rack[coord] = n
         self.place_tile(coord, n)
@@ -133,13 +136,13 @@ class PieceWord(LetterGame):
     else:
       parent = self.gui.game_field
       
-      sqsize = self.gui.gs.SQ_SIZE*tilesize
+      sqsize = self.gui.gs.SQ_SIZE*TILESIZE
       for n, tile in enumerate(self.images.values()):
-        if n == self.span * self.sizey//tilesize:
+        if n == self.span * self.sizey//TILESIZE:
           break
         r, c = divmod(n, self.span)         
         t = Tile(Texture(self.pil2ui(tile)), r,  c, sq_size=sqsize,
-                 dims=(self.gui.gs.DIMENSION_Y // tilesize, self.gui.gs.DIMENSION_X // tilesize))
+                 dims=(self.gui.gs.DIMENSION_Y // TILESIZE, self.gui.gs.DIMENSION_X // TILESIZE))
         t.row, t.col = r, c
         t.number = n
         rack[(r, c)] = t
@@ -200,10 +203,10 @@ class PieceWord(LetterGame):
     point = self.gui.gs.start_touch - gscene.GRID_POS
     # touch on board
     # Coord is a tuple that can support arithmetic
-    rc_start = Coord(self.gui.gs.grid_to_rc(point)).divide(tilesize)
+    rc_start = Coord(self.gui.gs.grid_to_rc(point)) // TILESIZE
     
     if self.check_in_board(rc_start):
-        rc = Coord(move[-2]).divide(tilesize)
+        rc = Coord(move[-2]) // TILESIZE
         if self.tiles is None:
            return rc, self.rack[rc_start].number, rc_start
         else:
@@ -213,8 +216,8 @@ class PieceWord(LetterGame):
   
   def place_tile(self, coord, tile_index):
       r, c = coord
-      self.board[r * tilesize:r * tilesize + tilesize,
-                 c * tilesize:c * tilesize + tilesize] = self.tiles[tile_index]
+      self.board[r * TILESIZE:r * TILESIZE + TILESIZE,
+                 c * TILESIZE:c * TILESIZE + TILESIZE] = self.tiles[tile_index]
          
   def process_turn(self, move, board):
     """ process the turn
@@ -223,7 +226,7 @@ class PieceWord(LetterGame):
     if move:
       coord, letter, origin = move
       
-      self.gui.set_message(f'{origin}>{coord}={letter}')
+      # self.gui.set_message(f'{origin}>{coord}={letter}')
       if coord == (None, None):
         return 0
         
@@ -253,7 +256,7 @@ class PieceWord(LetterGame):
                         
   def reveal(self): 
     """ place all tiles in their correct location """
-    for n in range(self.span * self.sizey//tilesize):
+    for n in range(self.span * self.sizey//TILESIZE):
         val = int(self.solution[n * 2: n * 2 + 2])
         coord = Coord(divmod(n, self.span))
         if self.tiles is not None:
@@ -274,14 +277,15 @@ class PieceWord(LetterGame):
   def game_over(self):
     # compare placement with solution
     state = ''
-    for r in range(self.sizey // tilesize):
+    for r in range(self.sizey // TILESIZE):
       for c in range(self.span):
         if self.tiles is None:
           no = f'{self.rack[(r, c)].number:02d}'
         else:
           no = f'{self.rack[(r, c)]:02d}'
-        state += no    
-    print(state)
+        state += no 
+    if self.debug:   
+        print(state)
     if state == self.solution:
       self.gui.set_message('Game over')
       return True
@@ -300,6 +304,7 @@ if __name__ == '__main__':
     quit = g.wait()
     if quit:
       break
+
 
 
 
