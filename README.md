@@ -52,6 +52,10 @@ Anagram words
 Crossword grid filled with a selection of words.
 Find the words to fit
 
+Pieceword
+---------
+2x2 tiles jumbled on a grid. Use the clues to rearrange them.
+
 Wordle clone
 ------------
 Possibly too simple, as only valid words are presented for selection
