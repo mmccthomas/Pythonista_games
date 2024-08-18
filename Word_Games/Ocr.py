@@ -90,7 +90,7 @@ class OcrCrossword(LetterGame):
       # sort by length then by alphabet
       words = list(self.all_text_dict.values())
 
-      words.sort() # sorts normally by alphabetical order
+      #words.sort() # sorts normally by alphabetical order
       if sort_length:
          words.sort(key=len)
       try:
@@ -115,10 +115,10 @@ class OcrCrossword(LetterGame):
       
     def plot_chars(self):
       for box, letter in self.all_text_dict.items():
-        #t=ShapeNode(ui.Path.rect(0,0,box[2], box[3]), 
-        #            fill_color='clear',  position=(box[0], box[1]), 
-        #            stroke_color='white',
-        #            parent=self.gui.game_field)
+        t=ShapeNode(ui.Path.rect(0,0,box[2], box[3]), 
+                   fill_color='clear',  position=(box[0], box[1]), 
+                 stroke_color='white',
+                  parent=self.gui.game_field)
         t=LabelNode(letter,  position=(box[0], box[1]), 
                     color='white',
                     parent=self.gui.game_field)
@@ -133,7 +133,7 @@ def main():
         return
     all_text = text_ocr(asset)
     ocr = OcrCrossword(all_text)
-    ocr.filter(max_length=None, min_length=None, sort_length=True, remove_numbers=True)
+    ocr.filter(max_length=None, min_length=None, sort_length=False, remove_numbers=True)
     ocr.plot_chars()
     
 if __name__ == '__main__':
