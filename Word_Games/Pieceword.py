@@ -1,6 +1,6 @@
 # Pieceword game
 # tiles are 3x3 squares, to fit into 15 x 35 grid
-# file for each puzzle has 3 sections , no, no_text, and no_frame
+# file for each puzzle has 3 sections , puzzleno, puzzleno_text, and puzzleno_frame
 
 from time import sleep
 from PIL import Image
@@ -94,23 +94,23 @@ class PieceWord(LetterGame):
              
           if selection + '_frame' in self.word_dict:
             # rearrange frame text into N 3x3 tiles
-            self.frame = self.word_dict[selection + '_frame']
+            frame = self.word_dict[selection + '_frame']
             if self.debug:   
-               [print(row, len(row)) for row in self.frame] # for debug
-            assert all([len(row) == len(self.frame[0]) for row in self.frame]), 'Error in string lengths'
+               [print(row, len(row)) for row in frame] # for debug
+            assert all([len(row) == len(frame[0]) for row in frame]), 'Error in string lengths'
             # convert to numpy
-            self.frame = np.array([np.array(row.lower(), dtype=str) for row in self.frame])
+            frame = np.array([np.array(row.lower(), dtype=str) for row in frame])
             
-            self.frame = self.frame.view('U1').reshape((-1, self.image_dims[1] * TILESIZE))
+            frame = frame.view('U1').reshape((-1, self.image_dims[1] * TILESIZE))
             # replace spaces and dot by hash for display
-            self.frame[self.frame == ' '] = '#'
-            self.frame[self.frame == '.'] = '#'
+            frame[frame == ' '] = '#'
+            frame[frame == '.'] = '#'
             # divide into rows of 3
-            b = np.split(self.frame, self.image_dims[0], axis=0)
+            rowsplit = np.split(frame, self.image_dims[0], axis=0)
             # divide each row into blocks of 3x3
-            c = [np.split(b[i], self.image_dims[1], axis=1) for i in range(len(b))]
+            colsplit = [np.split(rowsplit[i], self.image_dims[1], axis=1) for i in range(len(rowsplit))]
             # add all together to get N 3x3 blocks
-            self.tiles = np.concatenate(c)
+            self.tiles = np.concatenate(colsplit)
             
           self.wordlist = [word for word in self.table if word]
           self.gui.selection = ''
