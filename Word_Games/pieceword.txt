@@ -28,7 +28,7 @@ Pieceword2.jpg
 21 Urinary organ
 • Heathen
 
-1_frame:
+_1_frame:
 RIPRDEATHE T
 O P. D H AKE
 BLOPE RONN R

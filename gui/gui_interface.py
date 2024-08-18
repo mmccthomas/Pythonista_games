@@ -512,6 +512,12 @@ class Coord(tuple):
        
     def __sub__(self, other):
         return Coord(tuple(p-q for p, q in zip(self.val, other)))
+        
+    def mult(self, scalar_int):
+    	  return Coord(tuple(p * scalar_int for p in self.val))
+    	  
+    def divide(self, scalar_int):
+    	  return Coord(tuple(p // scalar_int for p in self.val))
       
     def all_neighbours(self):
       return [Coord(self.__add__(d)) for d in self.all_dirs]

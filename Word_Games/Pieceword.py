@@ -11,6 +11,7 @@ from types import SimpleNamespace
 from Letter_game import LetterGame
 import gui.gui_scene as gscene
 from gui.gui_scene import Tile
+from gui.gui_interface import Coord
 from scene import Texture, LabelNode
 PUZZLELIST = "pieceword.txt"
 tilesize = 3
@@ -198,17 +199,15 @@ class PieceWord(LetterGame):
       
     point = self.gui.gs.start_touch - gscene.GRID_POS
     # touch on board
-    rc_start = self.gui.gs.grid_to_rc(point)
-    r_start, c_start = rc_start
+    # Coord is a tuple that can support arithmetic
+    rc_start = Coord(self.gui.gs.grid_to_rc(point)).divide(tilesize)
+    
     if self.check_in_board(rc_start):
-        r, c = move[-2]
+        rc = Coord(move[-2]).divide(tilesize)
         if self.tiles is None:
-           t = self.rack[(r_start, c_start)]
-           return (r, c), t.number, rc_start
+           return rc, self.rack[rc_start].number, rc_start
         else:
-          rc_start = (r_start // tilesize, c_start // tilesize)
-          r, c = (r // tilesize, c // tilesize)
-          return (r, c), self.rack[(r, c)], rc_start
+          return rc, self.rack[rc], rc_start
                            
     return (None, None), None, None
   
@@ -247,15 +246,27 @@ class PieceWord(LetterGame):
         self.rack[coord] = tile_move
     return 0
     
+  def get_tile_no(self, n):
+    for t in self.gui.gs.get_tiles():
+        if t.number == n:
+            return t
+                        
   def reveal(self): 
     """ place all tiles in their correct location """
-    print(f'{len(self.solution)=}')
     for n in range(self.span * self.sizey//tilesize):
         val = int(self.solution[n * 2: n * 2 + 2])
-        coord = divmod(n, self.span)  
-        self.place_tile(coord,  val)
-        self.rack[coord] = val
-    self.gui.update(self.board)
+        coord = Coord(divmod(n, self.span))
+        if self.tiles is not None:
+          self.place_tile(coord,  val)
+          self.rack[coord] = val
+          self.gui.update(self.board)
+        else:
+          try:
+            t = self.get_tile_no(val)
+            t.set_pos(coord)
+            self.rack[coord] = t
+          except (AttributeError):
+            pass        
     sleep(2)
     self.game_over()
     self.gui.gs.show_start_menu()
@@ -263,19 +274,15 @@ class PieceWord(LetterGame):
   def game_over(self):
     # compare placement with solution
     state = ''
-    if self.tiles is None:
-        for r in range(self.sizey):
-          for c in range(self.sizex):
-            no = f'{self.rack[(r, c)].number:02d}'
-            state += no
-    else:
-        for r in range(self.sizey // tilesize):
-          for c in range(self.span):
-            no = f'{self.rack[(r, c)]:02d}'
-            state += no
+    for r in range(self.sizey // tilesize):
+      for c in range(self.span):
+        if self.tiles is None:
+          no = f'{self.rack[(r, c)].number:02d}'
+        else:
+          no = f'{self.rack[(r, c)]:02d}'
+        state += no    
     print(state)
-    print()
-    if state.strip() == self.solution:
+    if state == self.solution:
       self.gui.set_message('Game over')
       return True
     return False
@@ -293,6 +300,8 @@ if __name__ == '__main__':
     quit = g.wait()
     if quit:
       break
+
+
 
 
 
