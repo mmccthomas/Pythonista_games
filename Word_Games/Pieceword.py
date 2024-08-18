@@ -23,9 +23,12 @@ class PieceWord(LetterGame):
     LetterGame.__init__(self, column_labels_one_based=True)
     self.first_letter = False
     self.tiles = None
-    self.debug = False
+    self.debug = True
     self.load_words_from_file(PUZZLELIST, no_strip=True) 
     self.selection = self.select_list()
+    if self.selection is False:
+       self.gui.gs.show_start_menu()
+       return 
     self.gui.build_extra_grid(5, 7, grid_width_x=3, grid_width_y=3,
                               color='red', line_width=5)
     try:
@@ -47,7 +50,7 @@ class PieceWord(LetterGame):
     self.gui.clear_messages()
     self.gui.set_enter('', stroke_color='black') # hide box
     self.gui.set_moves('\n'.join(self.wordlist), position=(w + 50, h / 2))
-    self.gui.set_top(f'Pieceword no{self.selection.capitalize()}')
+    self.gui.set_top(f'Pieceword no {self.selection.capitalize()}')
     
   def run(self):
     """
@@ -72,7 +75,7 @@ class PieceWord(LetterGame):
       # return selection
       self.gui.selection = ''
       selection = ''
-      prompt = ' Select category'
+      prompt = ' Select puzzle'
       while self.gui.selection == '':
         self.gui.input_text_list(prompt=prompt, items=items, position=(800, 0))
         while self.gui.text_box.on_screen:
@@ -80,7 +83,8 @@ class PieceWord(LetterGame):
             selection = self.gui.selection.lower()
           except (Exception) as e:
             print(e)
-            
+        if selection == 'cancelled_':
+        	return False 
         if len(selection):
           if self.debug:   
             print(f'{selection=}')
