@@ -51,6 +51,7 @@ class PieceWord(LetterGame):
     self.gui.set_enter('', stroke_color='black') # hide box
     self.gui.set_moves('\n'.join(self.wordlist), position=(w + 50, h / 2))
     self.gui.set_top(f'Pieceword no {self.selection.capitalize()}')
+    self.finished = False
     
   def run(self):
     """
