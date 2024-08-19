@@ -787,7 +787,6 @@ class LetterGame():
       #self.gui.set_prompt(prompt, font=('Avenir Next', 25))
       
       move = self.wait_for_gui()
-      self.gui.set_prompt(''.join(str(move)))
       if items == 0: st = time()
       #print('items',items, move)
       try:
@@ -806,8 +805,7 @@ class LetterGame():
         print(traceback.format_exc())
         print('except,', move, e)
         coord_list.append(move)
-        return coord_list
-    
+        return coord_list    
     return move
 
   def quit(self):
