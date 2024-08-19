@@ -19,18 +19,12 @@ from Word_Games.Letter_game import LetterGame
 from scene import *
 import gui.gui_scene as gs
 import numpy as np
+savefile= 'Ocr_save.txt'
 
 VNImageRequestHandler = objc_util.ObjCClass('VNImageRequestHandler')
 VNRecognizeTextRequest = objc_util.ObjCClass('VNRecognizeTextRequest')
 class Player():
   def __init__(self):
-    
-    #images = slice_image_into_tiles('Letters_blank.jpg', 6, 5)
-    characters ='__abcd_efghijklmnopqrstuv wxyz*'
-    #IMAGES ={characters[j]:pil2ui(images[j]) for j in range(1,30)}
-    # test
-    #for d,i in IMAGES.items():
-    # print(d), i.show()
     self.PLAYER_1 = ' '
     self.PLAYER_2 = '@'
     self.EMPTY = ' '
@@ -64,6 +58,7 @@ def text_ocr(asset):
 
 class OcrCrossword(LetterGame):
     def __init__(self, all_text_dict):
+        self.load() # attempt to load temp file
         self.SIZE = self.get_size()        
         self.q = Queue()
         self.log_moves = False
@@ -74,14 +69,13 @@ class OcrCrossword(LetterGame):
         self.gui.require_touch_move(False)
         self.gui.allow_any_move(True)
         self.gui.setup_gui(grid_fill='black')
-        self.board = np.full((self.sizey, self.sizex), ' ')
+        self.board = np.array(self.board)
+        self.board[self.board == '-'] = ' ' # replace '-' by ' '
         self.COLUMN_LABELS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'[:self.sizex]
-        self.gui.update(self.board)
         self.gui.build_extra_grid(self.sizex, self.sizey, grid_width_x=1, grid_width_y=1,
                               color='black', line_width=1)
         self.all_text_dict = all_text_dict
         self.x, self.y, self.w, self.h = self.gui.grid.bbox
-        print(self.gui.grid.bbox)
         self.gui.clear_messages()
         self.box_positions()
         self.set_buttons()
@@ -146,13 +140,13 @@ class OcrCrossword(LetterGame):
       x, y, w, h = self.gui.grid.bbox 
       tsize = self.posn.rackscale * self.gui.gs.SQ_SIZE
       self.wordsbox = self.gui.add_button(text='', title='Words', position=self.posn.box1, 
-                          min_size=(7 * tsize+10, tsize+10), 
+                          min_size=(5 * tsize+10, tsize+10), 
                           fill_color='black')
-      self.gui.set_props(self.wordsbox, font=self.posn.font)
+      self.gui.set_props(self.wordsbox, font=('Courier New', 12))
       self.gridbox = self.gui.add_button(text='', title='Grid', position=self.posn.box2, 
-                          min_size=(7 * tsize+10, tsize+10), 
+                          min_size=(2* tsize+10, tsize+10), 
                           fill_color='black')
-      self.gui.set_props(self.gridbox, font=self.posn.font)
+      self.gui.set_props(self.gridbox, font=('Courier New', 12))
                 
     def set_buttons(self):
       """ install set of active buttons """ 
@@ -191,12 +185,13 @@ class OcrCrossword(LetterGame):
                                    color='black', font=self.posn.font)              
 
     def create_grid(self):
-      self.lines = []
-      for index in range(self.board.shape[0]):
-        line = '/'.join(self.board[index, :])
-        line = "'" + line + "'\n"
-        self.lines.append(line)
-      self.lines[-1] =   self.lines[-1] .rstrip()
+      """ create string represention of board
+          slashes separate each character
+      """
+      self.lines = ["'" + '/'.join(self.board[i, :]) + "'\n" 
+                    for i in range(self.board.shape[0])]
+      # remove last \n
+      self.lines[-1] = self.lines[-1].rstrip()
       self.gui.set_text(self.gridbox, ''.join(self.lines))
                        
     def get_player_move(self, board=None):
@@ -205,7 +200,6 @@ class OcrCrossword(LetterGame):
       Allows for movement over board"""
       
       move = LetterGame.get_player_move(self, self.board)
-      
       
       # deal with buttons. each returns the button text    
       if move[0] < 0 and move[1] < 0:
@@ -228,8 +222,6 @@ class OcrCrossword(LetterGame):
       """
       if move:
         coord, letter, origin = move
-        
-        self.gui.set_message(f'{origin}>{coord}={letter}')
             
         if letter == 'Quit':
           return 0
@@ -254,16 +246,24 @@ class OcrCrossword(LetterGame):
            
         elif letter == 'Copy grid':
            self.create_grid()
-           clipboard.set('\nPuzzle_frame:\n' + ''.join(self.lines))
+           clipboard.set('Puzzle_frame:\n' + ''.join(self.lines))
+           try:
+              os.remove(savefile)
+           except OSError:
+                pass
            
         elif letter == 'Copy both':
            self.create_grid()
-           msg = 'Puzzle:\n' + '\n'.join(self.words) + '\nPuzzle_frame:\n' + ''.join(self.lines)
+           msg = 'Puzzle:\n' + '\n'.join(self.words) + 'Puzzle_frame:\n' + ''.join(self.lines)
            clipboard.set(msg)
+           try:
+              os.remove(savefile)
+           except OSError:
+                pass
            
         elif letter == 'Add letters':
            self.letters_mode = not self.letters_mode
-           self.gui.set_props(self.letters, fill_color = 'red' if self.letters_mode else 'pink')
+           self.gui.set_props(self.letters, fill_color = 'red' if self.letters_mode else 'cyan')
         
            
         elif letter != '':  # valid selection
@@ -272,25 +272,50 @@ class OcrCrossword(LetterGame):
               if not self.letters_mode and not self.gui.long_touch:
                   self.board_rc(origin, self.board, '#' if cell == ' ' else ' ')  
               else:
-              	try:
-              	   letter = dialogs.input_alert('Enter 1 or more letters')  
-              	except (KeyboardInterrupt):
-              		return
-              	if letter:
-              		for index, l in enumerate(letter):
-              		   self.board_rc(origin + (0, index), self.board, l.lower() )
+                try:
+                   letter = dialogs.input_alert('Enter 1 or more letters')  
+                except (KeyboardInterrupt):
+                  return
+                if letter:
+                  for index, l in enumerate(letter):
+                     self.board_rc(origin + (0, index), self.board, l.lower() )
               self.create_grid()   
               self.gui.update(self.board)       
           except (IndexError):
-            pass             
+            pass 
+                        
+    def save(self): 
+      with open(savefile, 'w') as f:
+        f.write(''.join(self.lines))
           
-      
+    def load(self):
+    	response = dialogs.alert('Load temporary file?', '', 'YES', 'NO', hide_cancel_button=True)
+    	if response == 1:
+	      try:
+	        with open(savefile, 'r') as f:
+	          lines = f.read()
+	        lines = lines.split('\n')
+	        self.lines = lines
+	        rows = len(self.lines)
+	        cols = (len(self.lines[0])-1)//2
+	        self.board = np.full((rows, cols), ' ') 
+	        for i, line in enumerate(lines):
+	          row = line.strip("'").split('/')
+	          self.board[i,:] = np.array(row)
+	        
+	      except (Exception) as e:
+	        print(e)
+        
+        
     def run(self):
+      self.create_grid()   
+      self.gui.update(self.board)      
       while True:
         move = self.get_player_move()
         end = self.process_turn(move, self.board)
+        self.save()
         if end == 0:
-        	break
+          break
       
     def filter(self, max_length=None, min_length=None, sort_length=True, remove_numbers=False):
       if max_length:
@@ -308,7 +333,7 @@ class OcrCrossword(LetterGame):
       if sort_length:
          words.sort(key=len)
       try:
-         self.gui.set_text(self.wordsbox, self.format_cols(words, columns=4, width=10))
+         self.gui.set_text(self.wordsbox, self.format_cols(words, columns=4, width=12))
       except:
         pass
       self.words = words 
@@ -320,7 +345,7 @@ def main():
     if asset is not None:
        all_text = text_ocr(asset)
     else:
-    	all_text = []
+      all_text = []
     ocr = OcrCrossword(all_text)
     if all_text:
        ocr.filter(max_length=None, min_length=None, sort_length=True, remove_numbers=True)
@@ -328,6 +353,11 @@ def main():
     
 if __name__ == '__main__':
     main()
+
+
+
+
+
 
 
 
