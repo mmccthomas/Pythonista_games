@@ -1765,3 +1765,183 @@ Puzzle19-1_frame:
 ' / / / /#/ / / / / /#/ / / / / /#/ / / / '
 ' /#/ /#/#/#/ /#/ / / / / /#/ /#/#/#/ /#/ '
 ' / / / / / / / / / /#/ / / / / / / / / / '
+
+Puzzle20-9:
+AUK
+BAT
+DIE
+DON
+JAR
+KID
+LAD
+MOO
+TAP
+TEE
+WAR
+WHO
+CANDOUR
+CATSUIT
+CHATEAU
+COMEDIC
+CORACLE
+COWSLIP
+CYPRESS
+DERVISH
+DIVIDER
+EARLDOM
+ELITIST
+EMINENT
+GUTLESS
+HEARTEN
+HOODLUM
+HYGIENE
+LAMBADA
+LATTICE
+LEMMING
+LINEAGE
+LOWBROW
+MODICUM
+PALETTE
+PERGOLA
+PREVENT
+REFRAIN
+REVOLVE
+SEAGULL
+SERVANT
+SHIVERY
+SNOWCAP
+SUNTRAP
+TADPOLE
+TRINKET
+UNHAPPY
+WETNESS
+PALENESS
+PRACTICE
+SLIPOVER
+UNBIDDEN
+COGNITIVE
+EXPENSIVE
+MILLINERY
+MOONLIGHT
+SANDSTORM
+TERRORISM
+TROUSSEAU
+UNINVITED
+
+Puzzle20-9_frame:
+' / / / / / / /#/#/ / / / /c/ / /#/#/ / / / / / / '
+' /#/ /#/#/#/ /#/#/ /#/#/ /#/#/ /#/#/ /#/#/#/ /#/ '
+' / / /#/#/#/ /#/#/ /#/#/ /#/#/ /#/#/ /#/#/#/ / / '
+' /#/#/ / / / / / / / / /#/ / / / / / / / / /#/#/ '
+' /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ '
+' /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ '
+' / / / / / / /#/#/ / / / / / / /#/#/ / / / / / / '
+'#/#/#/ /#/#/#/#/#/#/#/#/ /#/#/#/#/#/#/#/#/ /#/#/#'
+'#/#/#/ /#/#/#/#/#/#/#/#/ /#/#/#/#/#/#/#/#/ /#/#/#'
+' / / / / / / /#/#/ / / / / / / /#/#/ / / / / / / '
+' /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ '
+' /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ '
+' / / /#/ / / / / / /c/ /#/ / / / / / / / /#/ / / '
+' /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ '
+' /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ '
+' / / / / / / /#/#/ / / / / / / /#/#/ / / / / / / '
+'#/#/#/ /#/#/#/#/#/#/#/#/ /#/#/#/#/#/#/#/#/ /#/#/#'
+'#/#/#/ /#/#/#/#/#/#/#/#/ /#/#/#/#/#/#/#/#/ /#/#/#'
+' / / / / / / /#/#/ / / / / / / /#/#/ / / / / / / '
+' /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ '
+' /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ '
+' /#/#/ / / / / / / / / /#/ / / / / / / / / /#/#/ '
+' / / /#/#/#/ /#/#/ /#/#/ /#/#/ /#/#/ /#/#/#/ / / '
+' /#/ /#/#/#/ /#/#/c/#/#/ /#/#/ /#/#/ /#/#/#/ /#/ '
+' / / / / / / /#/#/ / / / / / / /#/#/ / / / / / / '
+
+Puzzle21-21:
+AEON
+BEAU
+BLOC
+CASK
+DISC
+GNAT
+GRIP
+HURT
+IBEX
+IMAM
+LACK
+LEEK
+LOAM
+OPTS
+POLO
+PORK
+RIOT
+SETT
+SODA
+TACO
+WARD
+WILY
+CROWN
+EDICT
+GLINT
+MATEY
+MOGUL
+RASPY
+RUSTY
+SWEAR
+USURP
+VICAR
+VINYL
+BUNION
+EXHALE
+HERMIT
+LASSIE
+LOCKER
+MAJORS
+POLITE
+RAMROD
+SPIGOT
+THORNY
+THRIFT
+TRAUMA
+UNHOLY
+URBANE
+BASMATI
+BREADED
+CRESTED
+ELECTOR
+FLOUNCY
+HEALTHY
+KINETIC
+SIDECAR
+STAMINA
+STERNUM
+TSARIST
+ARTERIAL
+BACKPACK
+SACKABLE
+SKULLCAP
+EXPANSION
+FEROCIOUS
+REARRANGE
+SUPERFINE
+
+Puzzle21-21_frame:
+'#/#/#/#/#/ / / / / / / /#/ /#/#/#/ / / / '
+'#/#/#/#/#/ /#/#/#/#/ /#/ / / / / /#/ /#/#'
+'#/#/#/#/#/ /#/ / / / / / / /#/#/#/#/ /#/ '
+'#/#/#/#/#/ /#/ /#/#/ /#/ / / / / / / /#/ '
+'#/#/#/#/#/ /#/ /#/ / / / /#/ /#/#/#/ /#/ '
+'b/a/c/k/p/a/c/k/#/ /#/#/ /#/ / / / / /#/ '
+' /#/#/ /#/#/#/ /#/ /#/ /#/#/ /#/#/ / / / '
+' /#/#/ /#/ /#/ / / / / / /#/ / / / /#/#/ '
+' / / / / / / / /#/ /#/ /#/#/ /#/#/ / / / '
+' /#/#/ /#/ /#/ /#/#/ / / / / / / / / /#/#'
+' /#/#/ / / / /#/#/ / / / /#/#/ /#/#/ /#/ '
+' / / / /#/ / / / / / /#/ / / / / / / / / '
+'#/#/ /#/ /#/ /#/#/ / / / /#/#/ /#/#/#/#/ '
+' / / / / /#/ /#/#/ /#/ /#/ /#/ /#/ / / / '
+' /#/ /#/ / / / / / /#/ / / / / / / /#/#/ '
+' /#/ /#/ /#/ /#/ / / / /#/ /#/ /#/ / / / '
+' /#/ /#/#/#/#/#/ /#/ /#/ / / / /#/ /#/ /#'
+' /#/ /#/ /#/ /#/ / / / / / /#/ / / / / / '
+' / / / / / / / / /#/ /#/ /#/#/#/#/ /#/ /#'
+'#/#/#/#/ /#/ /#/ /#/ / / / / / /#/#/#/ /#'
+' / / / / / / /#/ /#/ /#/#/#/#/#/ / / / / '

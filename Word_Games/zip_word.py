@@ -11,6 +11,7 @@ import os
 import sys
 import random
 import traceback
+import dialogs
 from time import sleep, time
 from queue import Queue
 current = os.path.dirname(os.path.realpath(__file__))
@@ -159,7 +160,25 @@ class ZipWord(LetterGame):
     """ check for finished game
     board matches solution"""
     return self.board == self.solution_board
-  
+ 
+  def select_list(self, word_lists):
+      '''Choose which category'''
+      items = [s.capitalize() for s in word_lists.keys()]
+      items = [item for item in items
+               if not  item.endswith('_frame')]
+      # return selection
+      selection = ''
+      prompt = ' Select puzzle'
+      selection = dialogs.list_dialog(prompt, items)
+      
+      if selection == 'cancelled_':
+        	return None 
+      if len(selection):
+          if self.debug:   
+            print(f'{selection=}')
+          return selection
+          
+     
   def initialise_board(self):
     
     word_lists = {}
@@ -171,9 +190,11 @@ class ZipWord(LetterGame):
          board = [row.split('/') for row in board] 
          name = key.split('_')[0]
          word_lists[name] = [self.word_dict[name], board]
-         
+        
     self.puzzle = random.choice(list(word_lists))
-    self.puzzle = 'Puzzle19 1'
+    self.puzzle = self.select_list(word_lists)
+    if not self.puzzle:
+    	self.puzzle = random.choice(list(word_lists))
     self.all_words, self.board = word_lists[self.puzzle]
     self.all_words = [word.lower() for word in self.all_words]
     # parse board to get word objects
