@@ -19,7 +19,7 @@ from Word_Games.Letter_game import LetterGame
 from scene import *
 import gui.gui_scene as gs
 import numpy as np
-savefile= 'Ocr_save.txt'
+savefile= 'Ocr_save'
 
 VNImageRequestHandler = objc_util.ObjCClass('VNImageRequestHandler')
 VNRecognizeTextRequest = objc_util.ObjCClass('VNRecognizeTextRequest')
@@ -90,7 +90,7 @@ class OcrCrossword(LetterGame):
         'button4': (w+20, 3 *h/21), 'button5': (w+150, 3*h/21),
         'button6': (w+20, 4 *h/21), 'button7': (w+150, 0), 'button8': (w + 20, 5*h/21),
         'box1': (w+5, 2*h/3-6), 'box2': (w+5, 6*h/21), 'box3': (w+5, 2*h/3),
-        'box4': (w+5, h-50), 'font': ('Avenir Next', 10) },
+        'box4': (w+5, h-50), 'font': ('Avenir Next', 15) },
                                            
         'ipad13_portrait': {'rackpos': (50-w, h+50), 'rackscale': 0.9, 'rackoff': h/8,
         'button1': (w/2, h+200), 'button2': (w/2, h+50), 'button3': (w/2, h+250),
@@ -247,24 +247,15 @@ class OcrCrossword(LetterGame):
         elif letter == 'Copy grid':
            self.create_grid()
            clipboard.set('Puzzle_frame:\n' + ''.join(self.lines))
-           try:
-              os.remove(savefile)
-           except OSError:
-                pass
-           
+                   
         elif letter == 'Copy both':
            self.create_grid()
-           msg = 'Puzzle:\n' + '\n'.join(self.words) + 'Puzzle_frame:\n' + ''.join(self.lines)
-           clipboard.set(msg)
-           try:
-              os.remove(savefile)
-           except OSError:
-                pass
+           msg = 'Puzzle:\n' + '\n'.join(self.words) + '\nPuzzle_frame:\n' + ''.join(self.lines)
+           clipboard.set(msg)           
            
         elif letter == 'Add letters':
            self.letters_mode = not self.letters_mode
-           self.gui.set_props(self.letters, fill_color = 'red' if self.letters_mode else 'cyan')
-        
+           self.gui.set_props(self.letters, fill_color = 'red' if self.letters_mode else 'cyan')       
            
         elif letter != '':  # valid selection
           try:
@@ -284,25 +275,14 @@ class OcrCrossword(LetterGame):
           except (IndexError):
             pass 
                         
-    def save(self): 
-      with open(savefile, 'w') as f:
-        f.write(''.join(self.lines))
+    def save(self):
+    	np.save(savefile, self.board) 
           
     def load(self):
     	response = dialogs.alert('Load temporary file?', '', 'YES', 'NO', hide_cancel_button=True)
     	if response == 1:
 	      try:
-	        with open(savefile, 'r') as f:
-	          lines = f.read()
-	        lines = lines.split('\n')
-	        self.lines = lines
-	        rows = len(self.lines)
-	        cols = (len(self.lines[0])-1)//2
-	        self.board = np.full((rows, cols), ' ') 
-	        for i, line in enumerate(lines):
-	          row = line.strip("'").split('/')
-	          self.board[i,:] = np.array(row)
-	        
+	      	self.board = np.load(savefile + '.npy')	      	
 	      except (Exception) as e:
 	        print(e)
         
@@ -348,7 +328,7 @@ def main():
       all_text = []
     ocr = OcrCrossword(all_text)
     if all_text:
-       ocr.filter(max_length=None, min_length=None, sort_length=True, remove_numbers=True)
+       ocr.filter(max_length=None, min_length=None, sort_length=True, remove_numbers=False)
     ocr.run()
     
 if __name__ == '__main__':
