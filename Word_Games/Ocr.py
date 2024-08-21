@@ -1,6 +1,6 @@
-# attempt to use text recognition to read a filled crossword puzzle
-# problems with recognising single letters
-#can use this to read lists of words though.
+# Use VisionKit text recognition to read an image
+# containing text.
+# Provide a grid to generate crossword frame as text
 import photos
 import objc_util
 import os
@@ -35,29 +35,23 @@ class Player():
     self.PLAYERS = None
     
 def text_ocr(asset):
-  img_data = objc_util.ns(asset.get_image_data().getvalue())
-
+  """Image recognition of text
+  works best with full words or numbers
+  individual letters not so great
+  """
+  img_data = objc_util.ns(asset.get_image_data().getvalue()) 
   with objc_util.autoreleasepool():
     req = VNRecognizeTextRequest.alloc().init().autorelease()
-    #print(req.supportedRecognitionLanguagesAndReturnError_(None))
     req.setRecognitionLanguages_(['zh-Hant', 'en-US'])
     req.setRecognitionLevel_(0) # accurate
-    req.setCustomWords_([x for x in list('ABCDEFGHIJKLMNOPQRSTUVWXYZ')]) # individual letters
-
     handler = VNImageRequestHandler.alloc().initWithData_options_(img_data, None).autorelease()
-    success = handler.performRequests_error_([req], None)
-    
+    success = handler.performRequests_error_([req], None)    
     if success:
-        all_text = {}
-        for result in req.results():
-          cg_box = result.boundingBox()
-          x, y = cg_box.origin.x, cg_box.origin.y
-          w, h = cg_box.size.width, cg_box.size.height
-          all_text[x, y, w, h] = str(result.text())
-        return all_text
+        return [str(result.text()) for result in req.results()]
+        
 
 class OcrCrossword(LetterGame):
-    def __init__(self, all_text_dict):
+    def __init__(self, all_text):
         self.load() # attempt to load temp file
         self.SIZE = self.get_size()        
         self.q = Queue()
@@ -66,15 +60,17 @@ class OcrCrossword(LetterGame):
         self.gui.gs.q = self.q 
         self.words = []
         self.letters_mode = False
+        self.direction_mode = False
         self.gui.require_touch_move(False)
         self.gui.allow_any_move(True)
         self.gui.setup_gui(grid_fill='black')
         self.board = np.array(self.board)
         self.board[self.board == '-'] = ' ' # replace '-' by ' '
         self.COLUMN_LABELS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'[:self.sizex]
-        self.gui.build_extra_grid(self.sizex, self.sizey, grid_width_x=1, grid_width_y=1,
-                              color='black', line_width=1)
-        self.all_text_dict = all_text_dict
+        self.gui.build_extra_grid(self.sizex, self.sizey, 
+                                  grid_width_x=1, grid_width_y=1,
+                                  color='black', line_width=1)
+        self.all_text = all_text
         self.x, self.y, self.w, self.h = self.gui.grid.bbox
         self.gui.clear_messages()
         self.box_positions()
@@ -85,65 +81,36 @@ class OcrCrossword(LetterGame):
       # positions of all objects for all devices
         x, y, w, h = self.gui.grid.bbox    
         position_dict = {
-        'ipad13_landscape': {'rackpos': (10, 200), 'rackscale': 0.9, 'rackoff': h/8, 
+        'ipad13_landscape': {'rackscale': 0.9,
         'button1': (w+20, 0), 'button2': (w+20, h/21), 'button3': (w+150, h/21),
         'button4': (w+20, 3 *h/21), 'button5': (w+150, 3*h/21),
-        'button6': (w+20, 4 *h/21), 'button7': (w+150, 0), 'button8': (w + 20, 5*h/21),
-        'box1': (w+5, 2*h/3-6), 'box2': (w+5, 6*h/21), 'box3': (w+5, 2*h/3),
-        'box4': (w+5, h-50), 'font': ('Avenir Next', 15) },
-                                           
-        'ipad13_portrait': {'rackpos': (50-w, h+50), 'rackscale': 0.9, 'rackoff': h/8,
-        'button1': (w/2, h+200), 'button2': (w/2, h+50), 'button3': (w/2, h+250),
-        'button4': (w/2, h+100), 'button5': (w/2, h+150),
-        'box1': (45, h+h/8+45), 'box2': (45, h+45), 'box3': (2*w/3, h+45),
-        'box4': (2*w/3, h+200), 'font': ('Avenir Next', 24) },
-        
-        'ipad_landscape': {'rackpos': (10, 200), 'rackscale': 1.0, 'rackoff': h/8,
-        'button1': (w+10, h/6), 'button2': (w+230, h/6), 'button3': (w+120, h/6),
-        'button4': (w+230, h/6-50), 'button5': (w+120, h/6-50),
-        'box1': (w+5, 200+h/8-6), 'box2': (w+5, 200-6), 'box3': (w+5, 2*h/3),
-        'box4': (w+5, h-50), 'font': ('Avenir Next', 20) },
-        
-        'ipad_portrait': {'rackpos': (50-w, h+50), 'rackscale': 1.0, 'rackoff': h/8,
-        'button1': (9*w/15, h+190), 'button2': (9*w/15, h+30), 'button3': (9*w/15, h+150),
-        'button4': (9*w/15, h+70), 'button5': (9*w/15, h+110),
-        'box1': (45,h+h/8+45), 'box2': (45, h+45),'box3': (3*w/4, h+35),
-        'box4': (3*w/4, h+160), 'font': ('Avenir Next', 20)},
-        
-        'iphone_landscape': {'rackpos': (10, 200), 'rackscale': 1.5, 'rackoff': h/4,
-        'button1': (w+10, h/6), 'button2': (w+230, h/6), 'button3': (w+120, h/6),
-        'button4': (w+230, h/6-50), 'button5': (w+120, h/6-50),
-        'box1': (w+5, 200+h/8-6), 'box2': (w+5, 200-6), 'box3': (w+5, 2*h/3),
-        'box4': (w+5, h-50), 'font': ('Avenir Next', 15) },
-        
-        #'iphone_landscape': {'rackpos': (10, 0), 'rackscale': 1.5, 'rackoff': h/4,
-        #'button1': (w+5, h), 'button2': (w+300, h-50), 'button3': (w+300, h-100),
-        #'button4': (w+300, h-150), 'button5': (w+300, h-200),
-        # 'box1': (w+5, h/4-6), 'box2': (w+5, -6), 'box3': (w+5, h/2),
-        # 'box4': (w+5, h), 'font': ('Avenir Next', 15)},
-        
-        #'iphone_portrait': {'rackpos': (10, 200), 'rackscale': 1.5, 'rackoff': h/8,
-        #'button1': (w, h/6), 'button2': (w+250, h/6), 'button3': (w+140, h/6),
-        #'button4': (w/2, h+100), 'button5': (w/2, h+150),
-        #'box1': (5, h+h/8-6), 'box2': (5, h-6), 'box3': (5, h),
-        #'box4': (5, h-50),  'font': ('Avenir Next', 15)}
-        'iphone_portrait': {'rackpos': (50-w, h+50), 'rackscale': 1.5, 'rackoff': h/8,
-        'button1': (9*w/15, h+190), 'button2': (9*w/15, h+30), 'button3': (9*w/15, h+150),
-        'button4': (9*w/15, h+70), 'button5': (9*w/15, h+110), 
-        'box1': (45,h+h/8+45), 'box2': (45, h+45),'box3': (3*w/4, h+35),
-        'box4': (3*w/4, h+160), 'font': ('Avenir Next', 15)},
-         }
-        self.posn = SimpleNamespace(**position_dict[self.gui.device])
+        'button6': (w+20, 4 *h/21), 'button7': (w+150, 0), 'button8': (w+20, 5*h/21),
+        'button9': (w+150, 5*h/21),
+        'box1': (w+5, 2*h/3-6), 'box2': (w+5, 6*h/21), 'font': ('Avenir Next', 15)},                                         
+
+        'ipad13_landscape': {'rackscale': 0.9,
+        'button1': (w+20, 0), 'button2': (w+20, h/21), 'button3': (w+150, h/21),
+        'button4': (w+20, 3*h/21), 'button5': (w+150, 3*h/21),
+        'button6': (w+20, 4*h/21), 'button7': (w+150, 0), 'button8': (w+20, 5*h/21),
+        'button9': (w+150, 5*h/21),
+        'box1': (w+5, 2*h/3-6), 'box2': (w+5, 6*h/21), 'font': ('Avenir Next', 15)}
+        }        
+        try:
+           self.posn = SimpleNamespace(**position_dict[self.gui.device])
+        except (KeyError):
+           raise KeyError('Portrait mode  or iphone not supported')
            
     def add_boxes(self):
       """ add non responsive decoration boxes"""
       x, y, w, h = self.gui.grid.bbox 
       tsize = self.posn.rackscale * self.gui.gs.SQ_SIZE
-      self.wordsbox = self.gui.add_button(text='', title='Words', position=self.posn.box1, 
+      self.wordsbox = self.gui.add_button(text='', title='Words', 
+                          position=self.posn.box1, 
                           min_size=(5 * tsize+10, tsize+10), 
                           fill_color='black')
       self.gui.set_props(self.wordsbox, font=('Courier New', 12))
-      self.gridbox = self.gui.add_button(text='', title='Grid', position=self.posn.box2, 
+      self.gridbox = self.gui.add_button(text='', title='Grid', 
+                          position=self.posn.box2, 
                           min_size=(2* tsize+10, tsize+10), 
                           fill_color='black')
       self.gui.set_props(self.gridbox, font=('Courier New', 12))
@@ -182,7 +149,11 @@ class OcrCrossword(LetterGame):
       self.letters = self.gui.add_button(text='Add letters', title='', position=self.posn.button8,
                                    min_size=(100, 32), reg_touch=True,
                                    stroke_color='black', fill_color='cyan',
-                                   color='black', font=self.posn.font)              
+                                   color='black', font=self.posn.font)
+      self.direction = self.gui.add_button(text='Across', title='', position=self.posn.button9,
+                                   min_size=(100, 32), reg_touch=True,
+                                   stroke_color='black', fill_color='cyan',
+                                   color='black', font=self.posn.font)                                       
 
     def create_grid(self):
       """ create string represention of board
@@ -224,6 +195,8 @@ class OcrCrossword(LetterGame):
         coord, letter, origin = move
             
         if letter == 'Quit':
+          self.gui.gs.close()
+          sys.exit() 
           return 0
           
         elif letter == 'Clear':
@@ -233,6 +206,7 @@ class OcrCrossword(LetterGame):
            
         elif letter == 'Copy Text':
            clipboard.set('Puzzle:\n' + '\n'.join(self.words))
+           self.gui.set_message('Data copied')   
         
         elif letter == 'Fill bottom':
           self.board[np.fliplr(np.flipud(self.board.copy()))=='#'] = '#'
@@ -247,11 +221,18 @@ class OcrCrossword(LetterGame):
         elif letter == 'Copy grid':
            self.create_grid()
            clipboard.set('Puzzle_frame:\n' + ''.join(self.lines))
+           self.gui.set_message('Data copied')   
                    
         elif letter == 'Copy both':
            self.create_grid()
            msg = 'Puzzle:\n' + '\n'.join(self.words) + '\nPuzzle_frame:\n' + ''.join(self.lines)
-           clipboard.set(msg)           
+           clipboard.set(msg)
+           self.gui.set_message('Data copied') 
+           
+        elif letter == 'Across' or letter == 'Down':
+           self.direction_mode = not self.direction_mode
+           self.gui.set_text(self.direction, 'Down' if self.direction_mode else 'Across')     
+           self.gui.set_props(self.direction, fill_color='lightblue' if self.direction_mode else 'cyan')                      
            
         elif letter == 'Add letters':
            self.letters_mode = not self.letters_mode
@@ -267,25 +248,28 @@ class OcrCrossword(LetterGame):
                    letter = dialogs.input_alert('Enter 1 or more letters')  
                 except (KeyboardInterrupt):
                   return
-                if letter:
+                if letter:              
                   for index, l in enumerate(letter):
-                     self.board_rc(origin + (0, index), self.board, l.lower() )
+                    if self.direction_mode:                 
+                      self.board_rc(origin + (index, 0), self.board, l.lower() )
+                    else:
+                      self.board_rc(origin + (0, index), self.board, l.lower() )
+                      
               self.create_grid()   
               self.gui.update(self.board)       
           except (IndexError):
             pass 
                         
     def save(self):
-    	np.save(savefile, self.board) 
+      np.save(savefile, self.board) 
           
     def load(self):
-    	response = dialogs.alert('Load temporary file?', '', 'YES', 'NO', hide_cancel_button=True)
-    	if response == 1:
-	      try:
-	      	self.board = np.load(savefile + '.npy')	      	
-	      except (Exception) as e:
-	        print(e)
-        
+      response = dialogs.alert('Load temporary file?', '', 'YES', 'NO', hide_cancel_button=True)
+      if response == 1:
+        try:
+          self.board = np.load(savefile + '.npy')         
+        except (Exception) as e:
+          print(e)       
         
     def run(self):
       self.create_grid()   
@@ -298,17 +282,16 @@ class OcrCrossword(LetterGame):
           break
       
     def filter(self, max_length=None, min_length=None, sort_length=True, remove_numbers=False):
+      
+      words = self.all_text
       if max_length:
-         self.all_text_dict = {k:v for k, v in self.all_text_dict.items() if len(v) < max_length}
+         words = [word for word in words if len(word) < max_length]
       if min_length:
-         self.all_text_dict = {k:v for k, v in self.all_text_dict.items() if len(v) > min_length}
+         words = [word for word in words if len(word) > min_length]
       if remove_numbers:
-          self.all_text_dict = {k:v for k, v in self.all_text_dict.items() if v.isalpha() }
-      
-      
-      # sort by length then by alphabet
-      words = list(self.all_text_dict.values())
-
+          self.all_text = [word for word in words if word.isalpha()]
+            
+      # sort by length then by alphabet      
       words.sort() # sorts normally by alphabetical order
       if sort_length:
          words.sort(key=len)
@@ -333,11 +316,6 @@ def main():
     
 if __name__ == '__main__':
     main()
-
-
-
-
-
 
 
 

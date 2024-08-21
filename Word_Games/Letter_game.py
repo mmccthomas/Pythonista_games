@@ -608,8 +608,8 @@ class LetterGame():
     else:
         selection = console.input_alert("What is the dimension of the board (X, Y)? (Default is 5x5)\nEnter 2 numbers:")
     try:
-      selection = selection.strip() 
-      size = selection.split(',')
+    	# can use space, comma or x for seperator
+      size = selection.replace(',',' ').replace('x', ' ').split() 
       if len(size) == 2:
         self.sizey = int(size[1])
         self.sizex = int(size[0])
