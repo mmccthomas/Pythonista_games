@@ -209,13 +209,14 @@ WORDLISTS = ['5000-more-common.txt'] # 'letters3.txt', 'letters10.txt']
 
 class LetterGame():
   
-  def __init__(self):
+  def __init__(self, **kwargs):
     self.debug = False
     # allows us to get a list of rc locations
     self.log_moves = True
     self.straight_lines_only = False
     self.word_dict = None
     self.remaining_ships =[[]]
+    self.column_labels_one_based = False
     # create game_board and ai_board
     self.SIZE = self.get_size() 
      
@@ -228,7 +229,10 @@ class LetterGame():
     self.gui.set_grid_colors(grid='lightgrey', highlight='lightblue')
     self.gui.require_touch_move(False)
     self.gui.allow_any_move(True)
-    
+    for k, v in kwargs.items():
+    	setattr(self, k, v)
+    if self.column_labels_one_based:
+    	self.gui.gs.column_labels = '1 2 3 4 5 6 7 8 9 10111213141516171819202122232425262728293031'
     self.gui.setup_gui(log_moves=True)
     
     # menus can be controlled by dictionary of labels and functions without parameters
@@ -376,7 +380,7 @@ class LetterGame():
                                      z_position=30, alpha = .5, stroke_color='white'))
       self.gui.add_numbers(square_list)   
               
-  def load_words_from_file(self, file_list):
+  def load_words_from_file(self, file_list, no_strip=False):
     # read the entire wordfile as text
     with open(f'{file_list}', "r", encoding='utf-8') as f:
       data = f.read()
@@ -389,7 +393,8 @@ class LetterGame():
   
     key = None
     for word in data_list:
-      word = word.strip()
+      if no_strip == False:
+          word = word.strip()
       
       if ':' in word:
         if key:
@@ -603,8 +608,8 @@ class LetterGame():
     else:
         selection = console.input_alert("What is the dimension of the board (X, Y)? (Default is 5x5)\nEnter 2 numbers:")
     try:
-      selection = selection.strip() 
-      size = selection.split(',')
+    	# can use space, comma or x for seperator
+      size = selection.replace(',',' ').replace('x', ' ').split() 
       if len(size) == 2:
         self.sizey = int(size[1])
         self.sizex = int(size[0])
@@ -800,7 +805,7 @@ class LetterGame():
         print(traceback.format_exc())
         print('except,', move, e)
         coord_list.append(move)
-        return coord_list
+        return coord_list    
     return move
 
   def quit(self):
@@ -840,6 +845,7 @@ if __name__ == '__main__':
     quit = g.wait()
     if quit:
       break
+
 
 
 

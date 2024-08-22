@@ -134,6 +134,7 @@ class GameBoard(Scene):
     self.grid_fill = 'lightgreen'
     self.grid_stroke_color = None
     self.grid_z_position = 10
+    self.row_labels = None
     self.highlight_fill = '#00bc10'
     self.use_alpha = False
     self.column_labels = None
@@ -296,7 +297,10 @@ class GameBoard(Scene):
     if self.use_alpha:
       row_labels = 'A B C D E F G H I J K L M N O P Q R S T U V W X Y Z AAABACAD'
     else:
-      row_labels = '0 1 2 3 4 5 6 7 8 9 101112131415161718192021222324252627282930'
+    	if self.row_labels:
+    		 row_labels = self.row_labels
+    	else:
+          row_labels = '0 1 2 3 4 5 6 7 8 9 101112131415161718192021222324252627282930'
     if self.column_labels:
         column_labels = self.column_labels
     else:
@@ -521,10 +525,10 @@ class GameBoard(Scene):
           t.size = (self.SQ_SIZE - self.smaller_tile,
                     self.SQ_SIZE - self.smaller_tile)
           t.set_pos(r, c, animation=animation)
-          t.name = fn_piece(piece) + str(r * self.DIMENSION_Y + c)
+          t.name = str(fn_piece(piece)) + str(r * self.DIMENSION_Y + c)
           t.position = t.position + (self.smaller_tile / 2, self.smaller_tile / 2)
           parent.add_child(t)
-        except (AttributeError, KeyError) as e:
+        except (AttributeError, KeyError, TypeError) as e:
           if self.debug:
              print(k)
              print(traceback.format_exc())

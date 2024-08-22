@@ -198,10 +198,10 @@ class CrossWord():
             
         if self.debug:
           try:
-            self.show_squares(word.coords)            
+            #self.gui.gs.highlight_squares(word.coords)            
             self.gui.update(self.board)
             sleep(.25)  
-          except(AttributeError):
+          except(AttributeError) as e:
             pass
         if index == max_iterations:
           break
