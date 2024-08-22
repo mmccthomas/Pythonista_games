@@ -88,7 +88,7 @@ class OcrCrossword(LetterGame):
         'button9': (w+150, 5*h/21),
         'box1': (w+5, 2*h/3-6), 'box2': (w+5, 6*h/21), 'font': ('Avenir Next', 15)},                                         
 
-        'ipad13_landscape': {'rackscale': 0.9,
+        'ipad_landscape': {'rackscale': 0.9,
         'button1': (w+20, 0), 'button2': (w+20, h/21), 'button3': (w+150, h/21),
         'button4': (w+20, 3*h/21), 'button5': (w+150, 3*h/21),
         'button6': (w+20, 4*h/21), 'button7': (w+150, 0), 'button8': (w+20, 5*h/21),
