@@ -223,7 +223,7 @@ class CrossWord():
     print('no words', words)
     # print(msg)   
     self.gui.set_prompt(msg)
-    self.gui.update(self.board) 
+    self.gui.update(self.board)
     
   
   def get_word(self, wordlist, req_letters, wordlength):

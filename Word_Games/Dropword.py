@@ -59,7 +59,7 @@ class DropWord(LetterGame):
     # allows us to get a list of rc locations
     self.log_moves = False
     #self.word_locations = []
-    self.load_words_from_file('crossword_templates.txt')
+    self.load_words_from_file('dropword_templates.txt')
     self.initialise_board() 
     # create game_board and ai_board
     self.SIZE = self.get_size() 
@@ -126,6 +126,97 @@ class DropWord(LetterGame):
     # now reset centre column
     self.board[:, self.sizex//2] = self.solution[:, self.sizex//2]
     self.gui.print_board(self.board)
+    self.gui.update(self.board)
+             
+        
+  def update_board(self, hint=False, filter_placed=True):
+    """ requires solution_dict from generate_word_number_pairs
+                 solution_board from create_number_board 
+    """
+    def key_from_value(dict_, val, pos=0):
+      for k, v in dict_.items():
+        if v[pos] == val:
+          return k
+      return None
+      
+    self.gui.clear_numbers()
+    square_list = []
+    for r, row in enumerate(self.board):
+      for c, char_ in enumerate(row):
+        if char_ != BLOCK:
+          no = key_from_value(self.solution_dict, self.solution_board[r][c])
+          self.number_board[r][c] = no
+          # reveal known
+          k = self.known_dict[no][0]
+          if k != ' ':
+            self.board[r][c] = k
+            if hint:
+              color = 'yellow' if self.known_dict[no][1] else 'orange'
+            else:
+              color = 'yellow'
+            square_list.append(Squares((r,c), '', color , z_position=30, alpha = .5, stroke_color='white'))
+          else:
+            self.board[r][c] = ' '
+            # number in top left corner
+            square_list.append(Squares((r,c), no, 'white' , z_position=30, alpha = .5,
+                                       font = ('Avenir Next', 15), text_anchor_point=(-1,1)))
+                                       
+    
+
+    # create text list for known dict
+    msg = []
+    list_known=list(self.known_dict.items()) # no,letter
+    list_known =sorted(list_known, key = lambda x: x[1])
+
+    # create a list of letters in correct order    
+    list_of_known_letters = ['_' for _ in range(26)]
+    for i, v in enumerate(list_known):
+        no, l = v
+        letter, _ = l 
+        if isinstance(no, int):
+           if letter == ' ':
+             letter = '_'
+           list_of_known_letters[no-1] = letter
+    
+    # now set up text string
+    for i, v in enumerate(list_known):
+      no, l = v
+      letter, _ = l
+      letter = letter.upper()
+      if no  != ' ' and no != '.':
+        msg.append(f'{no:>2} = {letter:<2} ')
+      if self.gui.device in ['ipad_landscape','ipad13_landscape']:
+           msg.append('\n' if i % 2 == 0 else ' ' * 2)
+      elif self.gui.device =='ipad_portrait':
+           msg.append('\n' if i % 5 == 0 else ' ' * 2)    
+    msg = ''.join(msg)
+    
+    #should now have numbers in number board   
+    self.gui.add_numbers(square_list)  
+    self.gui.update(self.board)
+    # now choose text or tiles
+    if self.display == 'tiles':
+        self.display_numberpairs(list(range(1, 27)))
+        self.display_numberpairs(list_of_known_letters, off=1)
+    else:
+        self.gui.set_moves(msg, font=('Avenir Next', 23))
+    
+  def fill_crossword(self):
+     while True:
+     	 cx = CrossWord(self.gui, self.word_locations, self.all_words)
+       cx.set_props(board=self.board,
+                 empty_board=self.empty_board, 
+                 all_word_dict=self.all_word_dict, 
+                 max_depth=self.max_depth)
+       cx.populate_words_graph(max_iterations=200,
+                              length_first=False,
+                              max_possibles=100)    
+       fixed = len([word for word in self.word_locations if word.fixed]) 
+       no_words = len(self.word_locations)      
+       if fixed == no_words:
+          break
+       self.board = self.empty_board.copy()
+       self.gui.set_message(f'Filled {fixed}/ {no_words} words, Trying again')       
     self.gui.update(self.board)                
   
   def run(self):
@@ -142,13 +233,9 @@ class DropWord(LetterGame):
     self.compute_intersections()
     if self.debug:
         print(self.word_locations)
-    cx.set_props(board=self.board,
-                 empty_board=self.empty_board, 
-                 all_word_dict=self.all_word_dict, 
-                 max_depth=self.max_depth)
-    cx.populate_words_graph(max_iterations=200,
-                            length_first=False,
-                            max_possibles=100)  
+    
+    self.fill_crossword()
+    
     self.drop_words()
     self.check_words()
     self.gui.set_message('')
@@ -312,6 +399,8 @@ if __name__ == '__main__':
     if quit:
       break
   
+
+
 
 
 
