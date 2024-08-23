@@ -18,15 +18,18 @@ import random
 import console
 import dialogs
 import re
+from time import sleep
 import traceback
+import numpy as np
 from time import sleep, time
 from queue import Queue
 from collections import defaultdict
 from Letter_game import LetterGame, Player, Word
 import gui.gui_scene as gscene
-from gui.gui_interface import Gui, Squares
+from gui.gui_interface import Gui, Squares, Coord
 from crossword_create import CrossWord
 from gui.gui_scene import Tile, BoxedLabel
+import gui.gui_scene as gs
 from ui import Image, Path, LINE_JOIN_ROUND, LINE_JOIN_MITER
 from scene import Texture, Point
 WordleList = [ '5000-more-common.txt', 'words_20000.txt'] 
@@ -49,18 +52,18 @@ def copy_board(board):
   return list(map(list, board))
   
 
-class CrossNumbers(LetterGame):
+class DropWord(LetterGame):
   
   def __init__(self):
     self.debug = False
     # allows us to get a list of rc locations
-    self.log_moves = True
+    self.log_moves = False
     #self.word_locations = []
     self.load_words_from_file('crossword_templates.txt')
     self.initialise_board() 
     # create game_board and ai_board
     self.SIZE = self.get_size() 
-     
+    self.COLUMN_LABELS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'[:self.sizex] 
     # load the gui interface
     self.q = Queue()
     self.gui = Gui(self.board, Player())
@@ -70,7 +73,7 @@ class CrossNumbers(LetterGame):
     self.gui.set_grid_colors(grid='white', highlight='lightblue')
     self.gui.require_touch_move(False)
     self.gui.allow_any_move(True)
-    self.gui.setup_gui(log_moves=False) # SQ_SIZE=45)
+    self.gui.setup_gui(grid_fill='black')
     
     # menus can be controlled by dictionary of labels and functions without parameters
     self.gui.set_pause_menu({'Continue': self.gui.dismiss_menu, 
@@ -85,27 +88,10 @@ class CrossNumbers(LetterGame):
     self.max_depth = 1 # search depth for populate  
     _, _, w, h = self.gui.grid.bbox 
     if self.gui.device.endswith('_landscape'):
-       self.gui.set_enter('Hint', position = (w+100, -50))       
-    self.display = 'tiles'
+       self.gui.set_enter('Undo', position = (w+100, -50))       
     
-  def generate_word_number_pairs(self):
-    """ create 2 dictionaries
-    solution contains complete number, letter pairs
-    known_dict contains partial known items
-    """
-    self.letters = [letter for letter in 'abcdefghijklmnopqrstuvwxyz']
-    numbers = list(range(1,27))
-    shuffled = random.sample(self.letters, k=len(self.letters))
-    self.solution_dict = {number:[letter, True] for number, letter in zip(numbers, shuffled)}
-    self.solution_dict[' '] = [' ', False]
-    self.solution_dict['.'] = ['.', False]
-    choose_three = random.choices(numbers, k=3)
-    self.known_dict={number: [' ', False] for number in numbers}
-    for no in choose_three:
-      self.known_dict[no] =[self.solution_dict[no][0], True]
-    self.known_dict[' '] = [' ', False]
-    self.known_dict['.'] = ['.', False]
     
+  
   def create_number_board(self):
     """ redraws the board with numbered squares and blank tiles for unknowns
     and letters for known"""          
@@ -113,35 +99,36 @@ class CrossNumbers(LetterGame):
     self.number_board = copy_board(self.empty_board)
     self.board = [[" " if _char == "." else _char for c, _char in enumerate(row)] for r, row in enumerate(self.board)]
     self.solution_board = copy_board(self.board)
-    self.board = copy_board(self.empty_board)
+    self.board = np.array(copy_board(self.empty_board))
     for r, row in enumerate(self.solution_board):
       for c, _char in enumerate(row):
         if _char == SPACE:
           self.board_rc((r, c), self.board, BLOCK)
-    self.update_board()
+    #self.update_board()
     
-  def display_numberpairs(self, tiles, off=0):
-    """ display players rack
-    x position offset is used to select letters or numbers
-    """   
-    parent = self.gui.game_field
-    _, _, w, h = self.gui.grid.bbox
-    if self.gui.device.endswith('_landscape'): 
-        size =  self.gui.gs.SQ_SIZE    
-        x, y = 5, 0
-        x = x + off* size
-        for n, tile in enumerate(tiles):    
-          t = Tile(Texture(Image.named(f'../gui/tileblocks/{tile}.png')), 0,  0, sq_size=size)   
-          t.position = (w + x + 3 * int(n/13) * size , h - (n % 13 +1)* size + y)
-          parent.add_child(t) 
-    else: 
-        size =  self.gui.gs.SQ_SIZE * 0.9
-        x, y = 30, 40
-        y = y + off* size
-        for n, tile in enumerate(tiles):    
-          t = Tile(Texture(Image.named(f'../gui/tileblocks/{tile}.png')), 0,  0, sq_size=size)   
-          t.position = (x + int(n % 13 ) * size , h + (2* int(n / 13) )* size + y)
-          parent.add_child(t)         
+  def drop_words(self):
+    self.solution = self.board.copy()
+    self.gui.update(self.board)
+    sleep(3)
+    self.board[self.board =='.'] = '#'
+    self.gui.print_board(self.board, 'initial board')
+    for r in range(self.sizey-1, 1, -1):
+      for c in range(self.sizex):
+        while True:
+          # remove BLOCK at bottom of column until letter
+          if self.board[r,c] == BLOCK:            
+            above = self.board[:r, c]
+            l = above.shape[0]
+            self.board[1:l+1,c] = above
+            self.board[0,c] = ' '
+            self.gui.update(self.board, str(r))
+          else:
+            break
+    # now reset centre column
+    self.board[:, self.sizex//2] = self.solution[:, self.sizex//2]
+    self.gui.print_board(self.board)
+    self.gui.update(self.board)
+             
         
   def update_board(self, hint=False, filter_placed=True):
     """ requires solution_dict from generate_word_number_pairs
@@ -222,10 +209,11 @@ class CrossNumbers(LetterGame):
     """
     Main method that prompts the user for input
     """
+    self.create_number_board()
     cx = CrossWord(self.gui, self.word_locations, self.all_words)
     self.gui.clear_messages()
     
-    self.print_square(None) 
+    #self.print_square(None) 
     self.partition_word_list() 
     self.compute_intersections()
     if self.debug:
@@ -237,22 +225,19 @@ class CrossNumbers(LetterGame):
     cx.populate_words_graph(max_iterations=200,
                             length_first=False,
                             max_possibles=100)  
+    self.drop_words()
     # self.print_board()
     self.check_words()
-    self.generate_word_number_pairs()
-    self.create_number_board()
-    if self.debug:
-      print(self.anagrams())
-      [print(word, count) for word, count in self.word_counter.items() if count > 1]
+    #self.create_number_board()
     self.gui.set_message('')
+    
     while True:
       move = self.get_player_move(self.board)               
-      finish = self.process_turn( move, self.number_board) 
-      sleep(1)
+      finish = self.process_turn( move, self.board) 
       if finish:
         break
-      if self.game_over():
-        break
+      #if self.game_over():
+      #  break
     
     self.gui.set_message2('Game over')
     self.gui.set_message('') 
@@ -306,18 +291,24 @@ class CrossNumbers(LetterGame):
         else:
           self.square_list.append(Squares((r, c), '', 'white' , z_position=30, alpha = .5))     
     self.gui.add_numbers(self.square_list)   
-    return   
-  
+    return 
+      
+  def undo(self):
+    self.board = self.lastboard
+    self.gui.update(self.board)
+    
   def process_turn(self, move, board):
     """ process the turn
     move is coord, new letter
     """    
     if move:
-      coord, letter = move
-      if move == ((None, None), None):
+      coord, letter, row = move
+      if move == ((None, None), None, None):
         return False
       r,c = coord
       if letter == 'Enter':
+        self.undo()
+        return False
         # show all incorrect squares
         self.gui.set_prompt('Incorrect squares marked orange')
         self.update_board(hint=True)
@@ -331,72 +322,61 @@ class CrossNumbers(LetterGame):
       elif letter == 'Finish':
         return True    
       elif letter != '':
-        no = board[r][c]
+        # place a black square at location and move all tiles above it one square up
+        no = self.board[r][c]
         if no != BLOCK:
-          correct = self.solution_dict[no][0] == letter
-          self.known_dict[no] = [letter, correct]
-          self.update_board()
+          self.lastboard = self.board.copy()
+          above = self.board[1:r+1, c]
+          l = above.shape[0]
+          self.board[:l,c] = above 
+          #self.board[0:r-2, c] = self.board[1:r-1, c]
+          self.board[r, c] = BLOCK
+          self.gui.update(self.board)
+          #self.update_board()
           return False 
         else:
-          return False     
+          self.lastboard = self.board.copy()
+          above = self.board[:r, c]
+          l = above.shape[0]
+          self.board[1:l+1,c] = above
+          self.board[0,c] = ' '
+          self.gui.update(self.board)
+          #self.update_board()
+          return False      
       return True
   
   def reveal(self):
     ''' skip to the end and reveal the board '''
-    self.known_dict = self.solution_dict
-    self.update_board()
+    #self.board = self.solution
+    self.gui.update(self.solution)
+    #self.update_board()
     # This skips the wait for new location and induces Finished boolean to 
     # halt the run loop
     self.q.put((-10, -10)) 
         
   def get_player_move(self, board=None):
-    """Takes in the user's input and performs that move on the board, returns the coordinates of the move
-    Allows for movement over board"""
-    #self.delta_t('start get move')
-    self.gui.set_enter('Hint')
-    if board is None:
-        board = self.board
-    prompt = (f"Select  position on board")
-    # sit here until piece place on board   
-    rc = self.wait_for_gui()
-    # print('selection position',rc)
-    self.gui.set_prompt(f'selected {rc}')  
-    if rc == (-1, -1):
-      return (None, None), 'Enter' # pressed enter button
-    if rc == (-10, -10):
-      return (None, None), 'Finish' # induce a finish
-    if get_board_rc(rc, board) != BLOCK:
-      # now got rc as move
-      # now open list
-      if board is None:
-          board = self.board
-      selected_ok = False
-      possibles = [letter.upper() for letter in  self.letters]
-      prompt = f"Select from {len(possibles)} items"
-      if len(possibles) == 0:
-        raise (IndexError, "possible list is empty")
-      items = sorted(list(possibles)) 
-             
-      #return selection
-      self.gui.selection = ''
-      selection = ''
-      while self.gui.selection == '':
-        self.gui.input_text_list(prompt=prompt, items=items, position=(800,0))
-        while self.gui.text_box.on_screen:    
-          try:
-            selection = self.gui.selection.lower()
-          except (Exception) as e:
-            print(e)
-            print(traceback.format_exc())
-            
-        if len(selection) == 1:
-          self.gui.selection =''
-          # print('letter ', selection)
-          return rc, selection
-        elif selection == "Cancelled_":
-          return (None, None), None
-        else:
-          return (None, None), None      
+      """Takes in the user's input and performs that move on the board,
+      returns the coordinates of the move
+      Allows for movement over board"""
+      
+      move = LetterGame.get_player_move(self, self.board)
+      self.gui.set_message(str(move))
+      # deal with buttons. each returns the button text  
+      if move == (-1, -1):
+          return (None, None), 'Enter', None   
+      if move == (-10, -10):
+          return (None, None), 'Finish', None 
+          
+      point = self.gui.gs.start_touch - gs.GRID_POS
+      # touch on board
+      # Coord is a tuple that can support arithmetic
+      rc_start = Coord(self.gui.gs.grid_to_rc(point))
+      
+      if self.check_in_board(rc_start):
+          rc = Coord(move)
+          return rc, self.get_board_rc(rc, self.board), rc_start
+                             
+      return (None, None), None, None
        
   def restart(self):
     self.gui.gs.close()
@@ -405,7 +385,7 @@ class CrossNumbers(LetterGame):
     self.run() 
 
 if __name__ == '__main__':
-  g = CrossNumbers()
+  g = DropWord()
   g.run()
   
   while(True):
@@ -413,4 +393,11 @@ if __name__ == '__main__':
     if quit:
       break
   
+
+
+
+
+
+
+
 
