@@ -59,7 +59,7 @@ class DropWord(LetterGame):
     # allows us to get a list of rc locations
     self.log_moves = False
     #self.word_locations = []
-    self.load_words_from_file('crossword_templates.txt')
+    self.load_words_from_file('dropword_templates.txt')
     self.initialise_board() 
     # create game_board and ai_board
     self.SIZE = self.get_size() 
@@ -202,7 +202,22 @@ class DropWord(LetterGame):
     else:
         self.gui.set_moves(msg, font=('Avenir Next', 23))
     
-       
+  def fill_crossword(self):
+     while True:
+     	 cx = CrossWord(self.gui, self.word_locations, self.all_words)
+       cx.set_props(board=self.board,
+                 empty_board=self.empty_board, 
+                 all_word_dict=self.all_word_dict, 
+                 max_depth=self.max_depth)
+       cx.populate_words_graph(max_iterations=200,
+                              length_first=False,
+                              max_possibles=100)    
+       fixed = len([word for word in self.word_locations if word.fixed]) 
+       no_words = len(self.word_locations)      
+       if fixed == no_words:
+          break
+       self.board = self.empty_board.copy()
+       self.gui.set_message(f'Filled {fixed}/ {no_words} words, Trying again')       
   
   def run(self):
     #LetterGame.run(self)
@@ -218,13 +233,9 @@ class DropWord(LetterGame):
     self.compute_intersections()
     if self.debug:
         print(self.word_locations)
-    cx.set_props(board=self.board,
-                 empty_board=self.empty_board, 
-                 all_word_dict=self.all_word_dict, 
-                 max_depth=self.max_depth)
-    cx.populate_words_graph(max_iterations=200,
-                            length_first=False,
-                            max_possibles=100)  
+    
+    self.fill_crossword()
+    
     self.drop_words()
     # self.print_board()
     self.check_words()
@@ -393,6 +404,8 @@ if __name__ == '__main__':
     if quit:
       break
   
+
+
 
 
 
