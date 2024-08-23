@@ -79,6 +79,7 @@ class DropWord(LetterGame):
     self.gui.set_pause_menu({'Continue': self.gui.dismiss_menu, 
                               'New ....': self.restart,
                               'Reveal': self.reveal,
+                              'Start Again': self.startagain,
                               'Quit': self.quit})
     self.gui.set_start_menu({'New Game': self.restart, 'Quit': self.quit})
           
@@ -86,6 +87,7 @@ class DropWord(LetterGame):
     self.min_length = 2 # initial min word length
     self.max_length = 15 # initial  maximum word length
     self.max_depth = 1 # search depth for populate  
+    self.gui.clear_messages()
     _, _, w, h = self.gui.grid.bbox 
     if self.gui.device.endswith('_landscape'):
        self.gui.set_enter('Undo', position = (w+100, -50))           
@@ -133,7 +135,7 @@ class DropWord(LetterGame):
     """
     self.create_number_board()
     cx = CrossWord(self.gui, self.word_locations, self.all_words)
-    self.gui.clear_messages()
+    #
     
     #self.print_square(None) 
     self.partition_word_list() 
@@ -150,6 +152,7 @@ class DropWord(LetterGame):
     self.drop_words()
     self.check_words()
     self.gui.set_message('')
+    self.boards = []
     
     while True:
       move = self.get_player_move(self.board)               
@@ -199,10 +202,12 @@ class DropWord(LetterGame):
     self.length_matrix()                  
     self.empty_board = copy_board(self.board)
     print(len(self.word_locations), 'words', self.min_length, self.max_length) 
-    
-  
+     
   def undo(self):
-    self.board = self.lastboard
+    try:
+      self.board = self.boards.pop()
+    except(Exception) as e:
+      print(e)
     self.gui.update(self.board)
     
   def process_turn(self, move, board):
@@ -214,6 +219,7 @@ class DropWord(LetterGame):
       if move == ((None, None), None, None):
         return False
       r,c = coord
+      self.boards.append(self.board.copy())
       if letter == 'Enter':
         self.undo()
         return False
@@ -229,29 +235,29 @@ class DropWord(LetterGame):
         return False
       elif letter == 'Finish':
         return True    
-      elif letter != '':
+      elif coord == row and letter != '':
         # place a black square at location and move all tiles above it one square up
         no = self.board[r][c]
         if no != BLOCK:
-          self.lastboard = self.board.copy()
           above = self.board[1:r+1, c]
           l = above.shape[0]
           self.board[:l,c] = above 
-          #self.board[0:r-2, c] = self.board[1:r-1, c]
           self.board[r, c] = BLOCK
           self.gui.update(self.board)
-          #self.update_board()
           return False 
-        else:
-          self.lastboard = self.board.copy()
+        else:          
           above = self.board[:r, c]
           l = above.shape[0]
           self.board[1:l+1,c] = above
           self.board[0,c] = ' '
           self.gui.update(self.board)
-          #self.update_board()
-          return False      
-      return True
+          return False
+      elif coord != row: # and letter != BLOCK:
+          self.board[coord] = self.board[row]
+          self.board[row] = BLOCK
+          self.gui.update(self.board)
+          return False
+      return False
   
   def reveal(self):
     ''' skip to the end and reveal the board '''
@@ -285,6 +291,11 @@ class DropWord(LetterGame):
           return rc, self.get_board_rc(rc, self.board), rc_start
                              
       return (None, None), None, None
+      
+  def startagain(self): 
+    self.board = self.solution.copy()
+    self.drop_words()
+    self.gui.update(self.board) 
        
   def restart(self):
     self.gui.gs.close()
