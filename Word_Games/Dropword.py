@@ -88,9 +88,7 @@ class DropWord(LetterGame):
     self.max_depth = 1 # search depth for populate  
     _, _, w, h = self.gui.grid.bbox 
     if self.gui.device.endswith('_landscape'):
-       self.gui.set_enter('Undo', position = (w+100, -50))       
-    
-    
+       self.gui.set_enter('Undo', position = (w+100, -50))           
   
   def create_number_board(self):
     """ redraws the board with numbered squares and blank tiles for unknowns
@@ -104,7 +102,6 @@ class DropWord(LetterGame):
       for c, _char in enumerate(row):
         if _char == SPACE:
           self.board_rc((r, c), self.board, BLOCK)
-    #self.update_board()
     
   def drop_words(self):
     self.solution = self.board.copy()
@@ -127,82 +124,7 @@ class DropWord(LetterGame):
     # now reset centre column
     self.board[:, self.sizex//2] = self.solution[:, self.sizex//2]
     self.gui.print_board(self.board)
-    self.gui.update(self.board)
-             
-        
-  def update_board(self, hint=False, filter_placed=True):
-    """ requires solution_dict from generate_word_number_pairs
-                 solution_board from create_number_board 
-    """
-    def key_from_value(dict_, val, pos=0):
-      for k, v in dict_.items():
-        if v[pos] == val:
-          return k
-      return None
-      
-    self.gui.clear_numbers()
-    square_list = []
-    for r, row in enumerate(self.board):
-      for c, char_ in enumerate(row):
-        if char_ != BLOCK:
-          no = key_from_value(self.solution_dict, self.solution_board[r][c])
-          self.number_board[r][c] = no
-          # reveal known
-          k = self.known_dict[no][0]
-          if k != ' ':
-            self.board[r][c] = k
-            if hint:
-              color = 'yellow' if self.known_dict[no][1] else 'orange'
-            else:
-              color = 'yellow'
-            square_list.append(Squares((r,c), '', color , z_position=30, alpha = .5, stroke_color='white'))
-          else:
-            self.board[r][c] = ' '
-            # number in top left corner
-            square_list.append(Squares((r,c), no, 'white' , z_position=30, alpha = .5,
-                                       font = ('Avenir Next', 15), text_anchor_point=(-1,1)))
-                                       
-    
-
-    # create text list for known dict
-    msg = []
-    list_known=list(self.known_dict.items()) # no,letter
-    list_known =sorted(list_known, key = lambda x: x[1])
-
-    # create a list of letters in correct order    
-    list_of_known_letters = ['_' for _ in range(26)]
-    for i, v in enumerate(list_known):
-        no, l = v
-        letter, _ = l 
-        if isinstance(no, int):
-           if letter == ' ':
-             letter = '_'
-           list_of_known_letters[no-1] = letter
-    
-    # now set up text string
-    for i, v in enumerate(list_known):
-      no, l = v
-      letter, _ = l
-      letter = letter.upper()
-      if no  != ' ' and no != '.':
-        msg.append(f'{no:>2} = {letter:<2} ')
-      if self.gui.device in ['ipad_landscape','ipad13_landscape']:
-           msg.append('\n' if i % 2 == 0 else ' ' * 2)
-      elif self.gui.device =='ipad_portrait':
-           msg.append('\n' if i % 5 == 0 else ' ' * 2)    
-    msg = ''.join(msg)
-    
-    #should now have numbers in number board   
-    self.gui.add_numbers(square_list)  
-    self.gui.update(self.board)
-    # now choose text or tiles
-    if self.display == 'tiles':
-        self.display_numberpairs(list(range(1, 27)))
-        self.display_numberpairs(list_of_known_letters, off=1)
-    else:
-        self.gui.set_moves(msg, font=('Avenir Next', 23))
-    
-       
+    self.gui.update(self.board)                
   
   def run(self):
     #LetterGame.run(self)
@@ -226,9 +148,7 @@ class DropWord(LetterGame):
                             length_first=False,
                             max_possibles=100)  
     self.drop_words()
-    # self.print_board()
     self.check_words()
-    #self.create_number_board()
     self.gui.set_message('')
     
     while True:
@@ -280,19 +200,7 @@ class DropWord(LetterGame):
     self.empty_board = copy_board(self.board)
     print(len(self.word_locations), 'words', self.min_length, self.max_length) 
     
-  def print_square(self, process, color=None):
-    """ render the empty grid with black and white squares """
-    self.gui.clear_numbers()     
-    self.square_list =[]
-    for r, row in enumerate(self.board):
-      for c, character in enumerate(row):
-        if character == BLOCK:
-          self.square_list.append(Squares((r, c), '', 'black' , z_position=30, alpha = .5)) 
-        else:
-          self.square_list.append(Squares((r, c), '', 'white' , z_position=30, alpha = .5))     
-    self.gui.add_numbers(self.square_list)   
-    return 
-      
+  
   def undo(self):
     self.board = self.lastboard
     self.gui.update(self.board)
