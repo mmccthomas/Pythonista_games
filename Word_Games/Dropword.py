@@ -88,9 +88,7 @@ class DropWord(LetterGame):
     self.max_depth = 1 # search depth for populate  
     _, _, w, h = self.gui.grid.bbox 
     if self.gui.device.endswith('_landscape'):
-       self.gui.set_enter('Undo', position = (w+100, -50))       
-    
-    
+       self.gui.set_enter('Undo', position = (w+100, -50))           
   
   def create_number_board(self):
     """ redraws the board with numbered squares and blank tiles for unknowns
@@ -104,7 +102,6 @@ class DropWord(LetterGame):
       for c, _char in enumerate(row):
         if _char == SPACE:
           self.board_rc((r, c), self.board, BLOCK)
-    #self.update_board()
     
   def drop_words(self):
     self.solution = self.board.copy()
@@ -218,6 +215,7 @@ class DropWord(LetterGame):
           break
        self.board = self.empty_board.copy()
        self.gui.set_message(f'Filled {fixed}/ {no_words} words, Trying again')       
+    self.gui.update(self.board)                
   
   def run(self):
     #LetterGame.run(self)
@@ -237,9 +235,7 @@ class DropWord(LetterGame):
     self.fill_crossword()
     
     self.drop_words()
-    # self.print_board()
     self.check_words()
-    #self.create_number_board()
     self.gui.set_message('')
     
     while True:
@@ -291,19 +287,7 @@ class DropWord(LetterGame):
     self.empty_board = copy_board(self.board)
     print(len(self.word_locations), 'words', self.min_length, self.max_length) 
     
-  def print_square(self, process, color=None):
-    """ render the empty grid with black and white squares """
-    self.gui.clear_numbers()     
-    self.square_list =[]
-    for r, row in enumerate(self.board):
-      for c, character in enumerate(row):
-        if character == BLOCK:
-          self.square_list.append(Squares((r, c), '', 'black' , z_position=30, alpha = .5)) 
-        else:
-          self.square_list.append(Squares((r, c), '', 'white' , z_position=30, alpha = .5))     
-    self.gui.add_numbers(self.square_list)   
-    return 
-      
+  
   def undo(self):
     self.board = self.lastboard
     self.gui.update(self.board)
