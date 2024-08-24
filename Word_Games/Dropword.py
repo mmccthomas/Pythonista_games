@@ -203,7 +203,7 @@ class DropWord(LetterGame):
     
   def fill_crossword(self):
      while True:
-     	 cx = CrossWord(self.gui, self.word_locations, self.all_words)
+       cx = CrossWord(self.gui, self.word_locations, self.all_words)
        cx.set_props(board=self.board,
                  empty_board=self.empty_board, 
                  all_word_dict=self.all_word_dict, 
@@ -213,11 +213,11 @@ class DropWord(LetterGame):
                               max_possibles=100)    
        fixed = len([word for word in self.word_locations if word.fixed]) 
        no_words = len(self.word_locations)      
-       if fixed == no_words:
-          break
+       # fixed == no_words:
+       break
        self.board = self.empty_board.copy()
        self.gui.set_message(f'Filled {fixed}/ {no_words} words, Trying again')       
-    self.gui.update(self.board)                
+       self.gui.update(self.board)                
   
   def run(self):
     #LetterGame.run(self)
@@ -399,6 +399,7 @@ if __name__ == '__main__':
     if quit:
       break
   
+
 
 
 

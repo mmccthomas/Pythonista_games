@@ -78,7 +78,7 @@ class Sudoko(LetterGame):
        case'ipad_landscape':
            position = (w+10, 8*h/9)
        case 'iphone_portrait':
-           position = (280, 470)
+           position = (180, 470)
        case 'ipad13_landscape':
            position = (w+10, 8*h/9)
        case 'ipad13_portrait':
@@ -219,7 +219,7 @@ class Sudoko(LetterGame):
           
     self.gui.set_message2('')
     while True:
-      self.gui.set_top(f'Sudoko\t\tLevel {self.puzzle}\t\t\t\t\tHints : {self.hints}',
+      self.gui.set_top(f'Sudoko\t\tLevel {self.puzzle}\t\tHints : {self.hints}',
                        font=('Avenir Next', 20))
       move = self.get_player_move(self.board)
       sleep(1)
@@ -316,13 +316,14 @@ class Sudoko(LetterGame):
          
   def add_note(self, pos, item):
       """ add a note to a cell"""
+      font=('Avenir', 6)
       msg = ''.join([f'{let}\n' if i % 4 == 3 else f'{let}  ' for i, let in enumerate(item)]).strip()
       data = self.gui.get_numbers(pos)[pos]
       data['text'] = msg
       if self.puzzle.startswith('Killer'):
          total = str(self.totals[pos]) if pos in self.totals else ''
          data['text'] = total + '\n' + msg
-      self.gui.put_numbers({pos: data})
+      self.gui.put_numbers({pos: data}, font=font)
   
   def process_selection(self, move):
     """ process the turn
