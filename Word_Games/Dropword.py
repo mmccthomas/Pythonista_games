@@ -79,7 +79,6 @@ class DropWord(LetterGame):
     self.gui.set_pause_menu({'Continue': self.gui.dismiss_menu, 
                               'New ....': self.restart,
                               'Reveal': self.reveal,
-                              'Start Again': self.startagain,
                               'Quit': self.quit})
     self.gui.set_start_menu({'New Game': self.restart, 'Quit': self.quit})
           
@@ -87,7 +86,6 @@ class DropWord(LetterGame):
     self.min_length = 2 # initial min word length
     self.max_length = 15 # initial  maximum word length
     self.max_depth = 1 # search depth for populate  
-    self.gui.clear_messages()
     _, _, w, h = self.gui.grid.bbox 
     if self.gui.device.endswith('_landscape'):
        self.gui.set_enter('Undo', position = (w+100, -50))           
@@ -202,7 +200,7 @@ class DropWord(LetterGame):
         self.gui.set_moves(msg, font=('Avenir Next', 23))
     
   def fill_crossword(self):
-     while True:
+       #while True:
        cx = CrossWord(self.gui, self.word_locations, self.all_words)
        cx.set_props(board=self.board,
                  empty_board=self.empty_board, 
@@ -213,33 +211,25 @@ class DropWord(LetterGame):
                               max_possibles=100)    
        fixed = len([word for word in self.word_locations if word.fixed]) 
        no_words = len(self.word_locations)      
-       # fixed == no_words:
-       break
-       self.board = self.empty_board.copy()
+       #if fixed == no_words:
+       #   break
+       #self.board = self.empty_board.copy()
        self.gui.set_message(f'Filled {fixed}/ {no_words} words, Trying again')       
        self.gui.update(self.board)                
   
   def run(self):
-    #LetterGame.run(self)
     """
     Main method that prompts the user for input
     """
     self.create_number_board()
-    cx = CrossWord(self.gui, self.word_locations, self.all_words)
-    #
-    
-    #self.print_square(None) 
+    self.gui.clear_messages() 
     self.partition_word_list() 
     self.compute_intersections()
     if self.debug:
         print(self.word_locations)
-    
     self.fill_crossword()
-    
     self.drop_words()
-    self.check_words()
     self.gui.set_message('')
-    self.boards = []
     
     while True:
       move = self.get_player_move(self.board)               
@@ -258,13 +248,8 @@ class DropWord(LetterGame):
       
   def game_over(self):
     """ check for finished game   
-    no more empty letters left in bosrd"""
-    test = []
-    for r, row in enumerate(self.number_board):
-      for c, _char in enumerate(row):
-        if isinstance(_char, int):
-          test.append(self.board[r][c].isalpha())
-    return all(test)
+    board = solution"""
+    return self.board == self.solution
            
   def load_words(self, word_length, file_list=WordleList):
     LetterGame.load_words(self, word_length, file_list=file_list)
@@ -289,13 +274,38 @@ class DropWord(LetterGame):
     self.length_matrix()                  
     self.empty_board = copy_board(self.board)
     print(len(self.word_locations), 'words', self.min_length, self.max_length) 
-     
+    
+  
   def undo(self):
-    try:
-      self.board = self.boards.pop()
-    except(Exception) as e:
-      print(e)
+    self.board = self.lastboard
     self.gui.update(self.board)
+  
+  def shift(self, distance, start):            
+    col = self.selected_col
+    if distance > 0:
+        for d in range(distance):
+            alphas = np.char.isalpha(col)
+            if any(alphas[:start-1]): # alpha to left of selected
+                 #find 1st non_alpha to left of selected
+                 a = np.argwhere(~alphas[:start-1])
+                 if a.shape[0] == 0: # no space
+                    return col
+                 first_alpha = np.max(a)+1
+                 col[first_alpha-1:start] = col[first_alpha:start+1]
+                 col[start:start+1] = BLOCK
+             
+            else: # no alpha so simple move
+              col[start-1] = col[start]
+              col[start] = BLOCK
+              alphas = np.char.isalpha(col)
+              col[~alphas] = BLOCK              
+            start -= 1
+          
+    else: # move a single tile down
+        if col[start+1] == BLOCK:
+          col[start+1], col[start] = col[start], col[start+1]
+    return col
+      
     
   def process_turn(self, move, board):
     """ process the turn
@@ -306,44 +316,52 @@ class DropWord(LetterGame):
       if move == ((None, None), None, None):
         return False
       r,c = coord
-      self.boards.append(self.board.copy())
       if letter == 'Enter':
         self.undo()
         return False
-        # show all incorrect squares
-        self.gui.set_prompt('Incorrect squares marked orange')
-        self.update_board(hint=True)
-        # now turn off marked squares
-        sleep(2)
-        for k,v in self.known_dict.items():
-          if not v[1]:
-            self.known_dict[k] = [' ', False]
-        self.update_board(hint=False)
-        return False
       elif letter == 'Finish':
         return True    
-      elif coord == row and letter != '':
+      elif letter != '':
+        if c != row[1]:
+            return False # not allowed
+        r_start = row[0]
+        r_end = coord[0]
+        self.selected_col = self.board[:, row[1]]
+        if r_start == r_end: # tap on char
+            #if self.selected_col[r_start].isalpha():
+            # move adjacent alphas left if blank to move into
+            self.board[:, c] = self.shift(1, r_start)
+            #else:
+            #delete block, move adjacent alphas right
+            #self.board[:, c] = self.shift(-1, r_start)
+            pass
+        else:
+            self.board[:, c] = self.shift(r_start - r_end, r_start)
+          
+        """
         # place a black square at location and move all tiles above it one square up
         no = self.board[r][c]
         if no != BLOCK:
+          self.lastboard = self.board.copy()
           above = self.board[1:r+1, c]
           l = above.shape[0]
           self.board[:l,c] = above 
+          #self.board[0:r-2, c] = self.board[1:r-1, c]
           self.board[r, c] = BLOCK
           self.gui.update(self.board)
+          #self.update_board()
           return False 
-        else:          
+        else:
+          self.lastboard = self.board.copy()
           above = self.board[:r, c]
           l = above.shape[0]
           self.board[1:l+1,c] = above
           self.board[0,c] = ' '
           self.gui.update(self.board)
+          #self.update_board()
           return False
-      elif coord != row: # and letter != BLOCK:
-          self.board[coord] = self.board[row]
-          self.board[row] = BLOCK
-          self.gui.update(self.board)
-          return False
+          """    
+      self.gui.update(self.board)
       return False
   
   def reveal(self):
@@ -378,11 +396,6 @@ class DropWord(LetterGame):
           return rc, self.get_board_rc(rc, self.board), rc_start
                              
       return (None, None), None, None
-      
-  def startagain(self): 
-    self.board = self.solution.copy()
-    self.drop_words()
-    self.gui.update(self.board) 
        
   def restart(self):
     self.gui.gs.close()
@@ -399,6 +412,10 @@ if __name__ == '__main__':
     if quit:
       break
   
+
+
+
+
 
 
 
