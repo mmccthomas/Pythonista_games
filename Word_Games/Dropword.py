@@ -281,7 +281,7 @@ class DropWord(LetterGame):
     self.gui.update(self.board)
   
   def shift(self, distance, start):            
-    col = self.selected_col
+    col = self.selected_col.copy()
     if distance > 0:
         for d in range(distance):
             alphas = np.char.isalpha(col)
@@ -291,19 +291,25 @@ class DropWord(LetterGame):
                  if a.shape[0] == 0: # no space
                     return col
                  first_alpha = np.max(a)+1
-                 col[first_alpha-1:start] = col[first_alpha:start+1]
-                 col[start:start+1] = BLOCK
+                 for x in range(first_alpha, start+1):
+                    if col[x-1]in [BLOCK, ' ']:
+                       col[x-1], col[x] = col[x], col[x-1]
+                    else:
+                      return self.selected_col                 
              
             else: # no alpha so simple move
-              col[start-1] = col[start]
-              col[start] = BLOCK
-              alphas = np.char.isalpha(col)
-              col[~alphas] = BLOCK              
+              if col[start-1]in [BLOCK, ' ']:
+                 col[start-1], col[start] = col[start], col[start-1]
+              else:
+              	  return self.selected_col  
+                
             start -= 1
           
     else: # move a single tile down
         if col[start+1] == BLOCK:
           col[start+1], col[start] = col[start], col[start+1]
+    alphas = np.char.isalpha(col)
+    col[~alphas] = BLOCK  
     return col
       
     
@@ -412,6 +418,7 @@ if __name__ == '__main__':
     if quit:
       break
   
+
 
 
 
