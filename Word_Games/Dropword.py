@@ -92,7 +92,8 @@ class DropWord(LetterGame):
     self.gui.clear_messages() 
     _, _, w, h = self.gui.grid.bbox 
     if self.gui.device.endswith('_landscape'):
-       self.gui.set_enter('Undo', position = (w+100, -50))            
+       self.gui.set_enter('Undo', position = (w+100, -50))       
+    self.gui.set_top('Dropword')     
 
   def drop_words(self):
     """ delete all blocks and drop letters to the bottom """
@@ -157,11 +158,8 @@ class DropWord(LetterGame):
     while True:
       move = self.get_player_move(self.board)               
       finish = self.process_turn( move, self.board) 
-      if finish:
-        break
-      #if self.game_over():
-      #  break
-
+      if finish or self.game_over():
+         break
     self.gui.set_message2('Game over')
     self.gui.set_message('') 
     self.gui.set_prompt('')
@@ -172,7 +170,7 @@ class DropWord(LetterGame):
   def game_over(self):
     """ check for finished game   
     board = solution"""
-    return self.board == self.solution
+    return  np.all(self.board == self.solution)
 
   def load_words(self, word_length, file_list=WordleList):
     LetterGame.load_words(self, word_length, file_list=file_list)
@@ -192,18 +190,28 @@ class DropWord(LetterGame):
     self.puzzle = random.choice(list(boards))
     #self.puzzle = 'Puzzle'
     self.board = boards[self.puzzle]
-    self.word_locations = []                  
+    self.word_locations = []
+        
+    self.length_matrix()                                    
     self.empty_board = copy_board(self.board)
-    #print(len(self.word_locations), 'words', self.min_length, self.max_length) 
+    print(len(self.word_locations), 'words', self.min_length, self.max_length) 
       
   def undo(self):
     self.board = self.lastboard
     self.gui.update(self.board)
   
-  def shift(self, distance, x): 
-              
+  def shift(self, distance, start): 
+    
+    def swap(col, start, dir=1):
+      if col[start-dir]in [BLOCK, SPACE]:
+          col[start-dir], col[start] = col[start], col[start-dir]  
+      else:
+          return self.selected_col
+                    
     col = self.selected_col.copy()
-    if distance > 0:
+    if (distance == 1) and (col[start-1]in [BLOCK, SPACE]):
+    	  swap(col, start, dir=1)    
+    elif distance > 0:
         for d in range(distance):
             alphas = np.char.isalpha(col)
             if any(alphas[:start-1]): # alpha to left of selected
@@ -213,20 +221,15 @@ class DropWord(LetterGame):
                     return col
                  first_alpha = np.max(a)+1
                  for x in range(first_alpha, start+1):
-                    if col[x-1]in [BLOCK, SPACE]:
-                       col[x-1], col[x] = col[x], col[x-1]
-                    else:
-                      return self.selected_col                              
+                    if swap(col, x, dir=1):
+                        return self.selected_col                              
             else: # no alpha so simple move
-                if col[start-1]in [BLOCK, SPACE]:
-                   col[start-1], col[start] = col[start], col[start-1]
-                else:
-                  return self.selected_col  
-                                  
+                if swap(col, start, dir=1):
+                  return self.selected_col                                    
             start -= 1          
     else: # move a single tile down
-        if col[start+1] == BLOCK:
-          col[start+1], col[start] = col[start], col[start+1]
+        swap(col, start, dir=-1) 
+        
     alphas = np.char.isalpha(col)
     col[~alphas] = BLOCK  
     return col      
@@ -301,8 +304,10 @@ class DropWord(LetterGame):
   def restart(self):
     self.gui.gs.close()
     self.finished = False
-    self.__init__()
-    self.run() 
+    g = DropWord()
+    g.run()
+    #self.__init__()
+    #self.run() 
 
 if __name__ == '__main__':
   g = DropWord()
@@ -313,6 +318,7 @@ if __name__ == '__main__':
     if quit:
       break
   
+
 
 
 
