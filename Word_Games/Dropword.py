@@ -88,12 +88,20 @@ class DropWord(LetterGame):
     self.load_words(word_length=self.sizex)    
     
     self.max_depth = 1 # search depth for populate  
-    self.load_words(word_length=self.sizex)    
+    self.load_words(word_length=self.sizex) 
+    self.moves = []   
     self.gui.clear_messages() 
     _, _, w, h = self.gui.grid.bbox 
     if self.gui.device.endswith('_landscape'):
-       self.gui.set_enter('Undo', position = (w+100, -50))       
-    self.gui.set_top('Dropword')     
+       self.gui.set_enter('Undo', position = (w+50, h-150))       
+    self.gui.set_top('Dropword')
+    self.hintbox = self.gui.add_button(text='', title='Hint word', 
+                          position=(w+50, h-50), 
+                          min_size=(150, 32), 
+                          fill_color='black')
+    _ = self.gui.add_button(text='Hint', title='', position=(w+50,h-100),
+                                   min_size=(100, 32), reg_touch=True)                     
+    #self.gui.set_props(self.wordsbox, font=('Courier New', 12))     
 
   def drop_words(self):
     """ delete all blocks and drop letters to the bottom """
@@ -197,20 +205,23 @@ class DropWord(LetterGame):
     print(len(self.word_locations), 'words', self.min_length, self.max_length) 
       
   def undo(self):
-    self.board = self.lastboard
-    self.gui.update(self.board)
+    try:
+       self.board = self.moves.pop()
+       self.gui.update(self.board)
+    except (IndexError):
+      return
   
   def shift(self, distance, start): 
     
     def swap(col, start, dir=1):
-      if col[start-dir]in [BLOCK, SPACE]:
+      if (col[start-dir] == BLOCK) or (col[start-dir] == SPACE):
           col[start-dir], col[start] = col[start], col[start-dir]  
       else:
-          return self.selected_col
+          return True
                     
     col = self.selected_col.copy()
-    if (distance == 1) and (col[start-1]in [BLOCK, SPACE]):
-    	  swap(col, start, dir=1)    
+    if (distance == 1) and (col[start-1] == BLOCK or col[start-1] == SPACE):
+        swap(col, start, dir=1)    
     elif distance > 0:
         for d in range(distance):
             alphas = np.char.isalpha(col)
@@ -243,15 +254,19 @@ class DropWord(LetterGame):
       if move == ((None, None), None, None):
         return False
       r,c = coord
-      self.lastboard = self.board.copy()
+      
       if letter == 'Enter':
         self.undo()
+        return False
+      elif letter == 'Hint':
+        self.hint()
         return False
       elif letter == 'Finish':
         return True    
       elif letter != '':
         if c != row[1]:
             return False # not allowed
+        self.moves.append(self.board.copy())
         r_start, r_end = row[0], coord[0]
         self.selected_col = self.board[:, row[1]]
         if r_start == r_end: # tap on char
@@ -263,10 +278,14 @@ class DropWord(LetterGame):
       return False
 
   def hint(self):
-    try:    
-        col = self.columns.pop()
-        self.board[:, col] = self.solution[:, col]
-        self.indicate_hint(col)
+    try:   
+        across_words =  [word for word in self.word_locations if word.direction == 'across']
+        random.shuffle(across_words)
+        hintword = across_words[0]
+        self.gui.set_text(self.hintbox,f'{hintword.word} at row {hintword.start[0]}')
+        #col = self.columns.pop()
+        #self.board[:, col] = self.solution[:, col]
+        #self.indicate_hint(col)
         self.gui.update(self.board)
     except (IndexError):
       self.game_over()
@@ -285,13 +304,17 @@ class DropWord(LetterGame):
       Allows for movement over board"""
       
       move = LetterGame.get_player_move(self, self.board)
-      self.gui.set_message(str(move))
-      # deal with buttons. each returns the button text  
+      #self.gui.set_message(str(move))
+      # deal with buttons. each returns the button text 
+      
       if move == (-1, -1):
           return (None, None), 'Enter', None   
       if move == (-10, -10):
           return (None, None), 'Finish', None 
-          
+      # deal with buttons. each returns the button text    
+      if move[0] < 0 and move[1] < 0:
+          return (None, None), self.gui.gs.buttons[-move[0]].text, None  
+              
       point = self.gui.gs.start_touch - gs.GRID_POS
       # touch on board
       # Coord is a tuple that can support arithmetic
@@ -318,6 +341,8 @@ if __name__ == '__main__':
     if quit:
       break
   
+
+
 
 
 
