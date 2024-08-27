@@ -93,15 +93,18 @@ class DropWord(LetterGame):
     self.gui.clear_messages() 
     _, _, w, h = self.gui.grid.bbox 
     if self.gui.device.endswith('_landscape'):
-       self.gui.set_enter('Undo', position = (w+50, h-150))       
+       self.gui.set_enter('Undo', position = (w+50, h-150), 
+                          stroke_color='black', 
+                          fill_color='yellow',color='black')       
     self.gui.set_top('Dropword')
     self.hintbox = self.gui.add_button(text='', title='Hint word', 
                           position=(w+50, h-50), 
-                          min_size=(150, 32), 
-                          fill_color='black')
+                          min_size=(150, 32))                      
     _ = self.gui.add_button(text='Hint', title='', position=(w+50,h-100),
-                                   min_size=(100, 32), reg_touch=True)                     
-    #self.gui.set_props(self.wordsbox, font=('Courier New', 12))     
+                                   min_size=(100, 32), reg_touch=True, 
+                                   stroke_color='black', 
+                                   fill_color='yellow',color='black')                   
+      
 
   def drop_words(self):
     """ delete all blocks and drop letters to the bottom """
@@ -168,6 +171,7 @@ class DropWord(LetterGame):
       finish = self.process_turn( move, self.board) 
       if finish or self.game_over():
          break
+    console.hud_alert('Game Over')
     self.gui.set_message2('Game over')
     self.gui.set_message('') 
     self.gui.set_prompt('')
