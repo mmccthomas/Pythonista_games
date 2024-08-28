@@ -91,7 +91,7 @@ class KrossWord(LetterGame):
     #    self.gui.set_moves(msg, font=('Avenir Next', 25))
     #elif self.gui.gs.device.endswith('_portrait'):
     #    msg = self.format_cols(display_words, columns=5, width=max_len)
-    self.gui.set_moves(msg, font=('Avenir Next', 20))
+    self.gui.set_moves(msg, font=('Avenir Next', 16))
     self.gui.update(self.board)
     
   def get_size(self):
@@ -253,40 +253,49 @@ class KrossWord(LetterGame):
               
   def solve(self):
     """solve the krossword"""
-    
-    for start, no in self.start_dict.items():
-      #for each direction calculate max length
-      # then calculate a match word to encode existing letters
-      #for each word in self.wordlist[start] list
-      # shorten match word and see if there is only one match
-      # if so, place it
-      start = Coord(start)
-      words = self.wordlist[int(no)]
-      
-      for dirn in start.all_dirs:
-        dirn = Coord(dirn)
-        match = words[0][0]
-        next = start + dirn
-        while self.check_in_board(next):
-          l = self.board[next]
-          if l.isalpha():
-            match = match + l
-          else:
-            match = match + '.'
-          next += dirn
-        
-        possible_words = []
-        for word in words:
-          if len(match) >= len(word):               
-            m = re.compile(match[:len(word)]) 
-            if m.search(word):   
-              possible_words.append(word)
-        if len(possible_words) == 1:
-          word = possible_words.pop()
-          for index, letter in enumerate(word):
-            self.board[start + dirn * index] = letter
-          self.wordlist[int(no)].remove(word)
-          self.gui.update(self.board)
+    placed = True
+    while placed:
+      placed = False
+      for start, no in self.start_dict.items():
+        #for each direction calculate max length
+        # then calculate a match word to encode existing letters
+        #for each word in self.wordlist[start] list
+        # shorten match word and see if there is only one match
+        # if so, place it
+        start = Coord(start)
+        words = self.wordlist[int(no)]
+        try:
+          for dirn in start.all_dirs:
+            dirn = Coord(dirn)
+            match = words[0][0]
+            next = start + dirn
+            while self.check_in_board(next):
+              l = self.board[next]
+              if l.isalpha():
+                match = match + l
+              else:
+                match = match + '.'
+              next += dirn
+            
+            possible_words = []
+            for word in words:
+              if len(match) >= len(word):               
+                m = re.compile(match[:len(word)]) 
+                if m.search(word):   
+                  possible_words.append(word)
+            if len(possible_words) == 1:
+              word = possible_words.pop()
+              for index, letter in enumerate(word):
+                self.board[start + dirn * index] = letter
+              self.wordlist[int(no)].remove(word)
+              print(f'placed {word} at {start}')
+              self.gui.update(self.board)
+              sleep(4)
+              placed = True
+        except (IndexError):
+          continue
+      sleep(2)
+    self.gui.set_message('no more placements')
       
       
                          
