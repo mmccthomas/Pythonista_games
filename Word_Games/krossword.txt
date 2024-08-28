@@ -75,3 +75,425 @@ Puzzle1_frame:
 ' / / / / / / /10/ / / / / '
 ' / / / / /11/ / / / / / / '
 ' / / / / / / / /12/ / / / '
+
+Puzzle2:
+1
+CAESAREAN
+CLASS
+CROSSWIND
+CROUCHING
+2
+GAUGE
+GLANCE
+GRUESOME
+GYRATION
+3
+RED
+REFUGE
+RIGHT
+RUMBA
+4
+ACORN
+AIL
+ANTE
+5
+MARABOU
+MEAL
+MERMAID
+MOUSTACHE
+MUSICAL
+6
+TONE
+TORY
+TROT
+TRUE
+TUBA
+7
+NEBULA
+NECTAR
+NUMEROUS
+NURTURE
+NYLONS
+8
+SAKI
+SCAN
+SMOKE
+STUN
+9
+BAKING
+BARBER
+BEEN
+BOTANY
+10
+HALO
+HERE
+HOE
+HOWL
+11
+EDGE
+EGG
+ENGLISH
+EVICTS
+EWE
+12
+ALE
+ALLOT
+AMOEBA
+ATONEMENT
+13
+SHINGLE
+SMILING
+SNOW
+SYMPTOM
+
+Puzzle2_frame:
+' / / / / / / / /1/ / / / '
+' / / / / /2/ / / / / / / '
+'3/ / / / / / / / / / /4/ '
+' / / / / / /5/ / / / / / '
+' / / /6/ / / / / / / / / '
+' / / / / / / / / / / / /7'
+' / / / / / / / / / / / / '
+' / / / /8/ / /9b/a/r/b/e/r'
+' / / / / / /a/ / / / / / '
+' / / / / /k/ / / / / /10/ '
+'11/ / / /i/ / / / / / / / '
+' / / /n/ / / / / / /12/ / '
+' / /g/ / / /13/ / / / / / '
+
+Puzzle3:
+1
+FEATHER
+FLAPJACK
+FOR
+FROWNED
+2
+DELTA
+DEN
+DINE
+3
+PIER
+PILLOW
+PREJUDICE
+PROGRESS
+PUTT
+4
+SAGA
+SEE
+SIT
+STIRRUPS
+SURREAL
+5
+EDIT
+ELABORATE
+ELM
+EVEN
+6
+COAL
+COMA
+CRIED
+7
+MACADAMIA
+MAJOR
+MALARIA
+MIGRATE
+MUSIC
+8
+SET
+SKATING
+SUE
+9
+SCAMP
+SCORER
+SOFA
+10
+ACCEPTED
+ANTE
+APPEAR
+AUNT
+11
+BACKSTAGE
+BASIC
+BESPOKE
+BUN
+BYE
+12
+PECAN
+POTASSIUM
+PREVAILED
+13
+ADHERE
+ALTITUDE
+ASK
+ASTRONAUT
+
+Puzzle3_frame:
+' / / / / / /1/ /a/ / / / '
+' / /2/ / / / / /i/3/ / / '
+' / / / / / / / /r/ / /4/ '
+' / / / / / / / /a/ / / / '
+'5/ / / /6/ / / /l/ / / / '
+' / / / / / / / /a/ / / / '
+' / / / / / / / /7m/ / / / '
+' / / / / / / /i/ / / / / '
+' / / / / / /g/8/ / / / /10'
+' / /9/ / /r/ / / / / / / '
+' / / / /a/ / / / / /11/ / '
+' /12/ /t/ / / / / / / / / '
+' / /e/ / /13/ / / / / / / '
+
+Puzzle4:
+1
+PATTERN
+POSER
+PRESS
+PROGRAMME
+PUNCH
+2
+OAR
+OCCASION
+OHM
+OMELETTE
+OWE
+3
+BATON
+BEDROCK
+BUNCHES
+4
+AEON
+AMP
+AORTA
+ARENA
+5
+SABOTEUR
+SCREE
+SPAIN
+STUB
+6
+SARDINE
+SLANG
+SONATA
+7
+CANASTA
+COMET
+CORNISH
+8
+SAILOR
+SINGLE
+SPARKLER
+STRING
+SUNSHINE
+9
+PARMESAN
+PERCALE
+PHRASE
+PIRATE
+10
+TIE
+TOE
+TOR
+11
+DATA
+DICED
+DRAB
+DRAW
+DRY
+DYED
+12
+AKIN
+ALB
+ARRAY
+ATE
+13
+MALLET
+MANOR
+MINI
+14
+SOBER
+STIR
+SWEEPING
+
+Puzzle4_frame:
+' / / / / / / / /1/ / / / '
+' / / / / / / / / / / / / '
+' / /2/ / / / / / / / / / '
+' / / / / / / / / / / / / '
+' / / / / / /3b/ / / / /4/ '
+' /5/ / / / /e/u/ / / / / '
+' / / /6/ / /d/ /n/ / / /7'
+'8/ / / / / /r/ / /c/9/ / '
+' / / / / / /o/ / / /h/ / '
+' / / / / /10/c/ / /11/ /e/ '
+' / / / / / /k/12/ / / / /s'
+' /13/ / / / / / / / / / / '
+' / / / / / / /14/ / / / / '
+
+Puzzle5:
+1
+FASTENER
+FIELD
+FLAIR
+2
+RAT
+READY
+RIP
+RUE
+4
+ABANDON
+ALL
+ART
+ATTRACT
+5
+NAIL
+NEAR
+NEWS
+NOEL
+NORTHERN
+NUMB
+3
+DRESSER
+DUO
+6
+CAMEL
+CANNON
+CENTAUR
+CHASE
+CLOUDED
+7
+FILTER
+FINANCE
+FOLIAGE
+FRIEND
+8
+ADD
+ALDER
+AMAZE
+ARAB
+9
+ABLE
+ALGAE
+AMBIENT
+ANGEL
+10
+LEARN
+LIEU
+LION
+LOSE
+11
+CRYSTAL
+CUBE
+12
+HABIT
+HEIRESS
+HEROINE
+HUNGRY
+13
+WAND
+WAR
+WHEEL
+WHY
+WOMBAT
+14
+SECLUDED
+SIREN
+SOCIABLE
+
+Puzzle5_frame:
+' / / / /1/ / / / / / / / '
+' / /2/ / / /3/ / / / / / '
+' / / / / / / / / / / / /4'
+' / / /5/ / / / / / / / / '
+' / / / / / /6/ / / / / / '
+'l/ / / / / / / / / / /7/ '
+'8a/ / / / / / / / / / / / '
+'t/ / / / / / / / / / / / '
+'s/ / /e/ /9/ / / / / / / '
+'y/ /b/ / / / / /10/ / / / '
+'r/u/ / / / / / / / / / / '
+'11c/ / / /12/ / / / / / / / '
+' / /13/ / / / / / / / / /14'
+
+Puzzle6:
+1
+PAIR
+PEANUT
+PER
+POND
+PROMENADE
+2
+VAT
+VIA
+VIOLATE
+3
+BAIL
+BAR
+BLARNEY
+BOA
+BORDER
+BOWER
+4
+MATT
+MENU
+MIEN
+MINERALS
+5
+CALM
+CLIP
+COLON
+COLT
+CORACLE
+CRIB
+6
+NARROWLY
+NOT
+NOTORIETY
+7
+REALLY
+REDWING
+RURAL
+8
+TEACHER
+TITLE
+TOTAL
+TRANCE
+9
+ALL
+ALMS
+ARIA
+ART
+ATOM
+AWARD
+10
+DART
+DIRE
+DREAMING
+DUEL
+11
+JADE
+JET
+JINX
+JOT
+12
+LAG
+LAMBAST
+LECTURER
+LILTING
+13
+HEARTY
+HUMANE
+HYBRID
+
+Puzzle6_frame:
+' / / /1/ / / / / / / / / '
+' / / / / / / / / / /2/ / '
+' / / / / / / /3/ / / / / '
+' /4/ / / / / / / /5c/o/l/t'
+' / / / / / / / /o/ / / /6'
+'7/ / / / / / /r/ / / / / '
+' / / / / / /a/ /8/ / / / '
+' / / / /9/c/ / / / / / / '
+' / / / /l/ / / / / / / / '
+' / / /e/ / / / / /10/ / / '
+' / / / / / / / / / / /11/ '
+' / /12/ / / / / / / / / / '
+' / / / / /13/ / / / / / / '

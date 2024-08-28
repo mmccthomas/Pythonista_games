@@ -19,6 +19,7 @@ from time import sleep
 import random
 import numpy as np
 import traceback
+from copy import deepcopy
 current = os.path.dirname(os.path.realpath(__file__))
 parent = os.path.dirname(current)
 sys.path.append(parent)
@@ -117,26 +118,28 @@ class KrossWord(LetterGame):
     board = [row.split('/') for row in board]
     self.board = np.array(board)
     # deal with number/alpha combo
-    number_letters = [(r,c) for c in range(self.sizex) for r in range(self.sizey) if len(list(split_text(board[r][c])))>1]
+    number_letters = np.array([(r,c) for c in range(self.sizex) 
+                               for r in range(self.sizey) 
+                               if len(list(split_text(board[r][c])))>1])
     numbers = np.argwhere(np.char.isnumeric(self.board))
     self.start_dict = {}
     square_list = []
-    for number in numbers:
-      no = self.board[tuple(number)]
+    for number in np.append(numbers, number_letters, axis=0):
+      try:
+         no, letter = list(split_text(self.board[tuple(number)]))
+         self.board[tuple(number)] = letter
+      except (ValueError) as e:
+         no = self.board[tuple(number)]
+         
       self.start_dict[tuple(number)] = no
-      square_list.append(Squares(number, no, 'clear', z_position=30,
+      square_list.append(Squares(number, no, 'yellow', z_position=30,
                                         alpha=0.5, font=('Avenir Next', 20),
-                                        text_anchor_point=(-1, 1)))
+                                        text_anchor_point=(-1.1, 1.2)))
                         
-    for number in number_letters:
-      no, letter = list(split_text(self.board[tuple(number)]))
-      self.start_dict[tuple(number)] = no
-      square_list.append(Squares(number, no, 'clear', z_position=30,
-                                        alpha=0.5, font=('Avenir Next', 20),
-                                        text_anchor_point=(-1, 1)))
-      self.board[tuple(number)] = letter
     self.gui.add_numbers(square_list)
     self.board[np.char.isnumeric(self.board)] = SPACE
+    
+    # split the words and numbers into dictionary
     key = None
     w_dict = {}
     w_list = []
@@ -200,7 +203,13 @@ class KrossWord(LetterGame):
     #self.delta_t('start process turn')
     def uniquify(moves):
       """ filters list into unique elements retaining order"""
-      return list(dict.fromkeys(moves))      
+      return list(dict.fromkeys(moves)) 
+           
+    def strike(text):
+      result = ''
+      for c in text:
+          result = result + c + '\u0336'
+      return result
           
    # try to deal with directions 
     if isinstance(move, list):
@@ -212,9 +221,9 @@ class KrossWord(LetterGame):
           pass
           move = uniquify(move)        
         
-          try:
+        try:
             start = move[0]
-            item_list = self.wordlist[self.start_dict[start]]
+            item_list = self.wordlist[int(self.start_dict[start])]
             prompt = f"Select from {len(item_list)} items"
             if len(item_list) == 0:
                raise (IndexError, "list is empty")
@@ -233,19 +242,25 @@ class KrossWord(LetterGame):
                   print(e)
                   print(traceback.format_exc())
                   
-              if selection in item_list and len(moves) == len(selection):
+              if selection in item_list and len(move) == len(selection):
                 self.gui.selection = ''
                 if self.debug:
                     print('letter ', selection, 'row', selection_row)
-                for coord, lette in zip(move, selection):
+                for coord, letter in zip(move, selection):
                   self.board[coord] = letter
-                  
+                #strike thru text
+                if all([self.board[coord] == self.solution[coord] for coord in move]):
+                   word =self.wordlist[int(self.start_dict[start])][selection_row]
+                   word = strike(word)
+                   self.wordlist[int(self.start_dict[start])][selection_row] = word
+                   self.print_board()
+                self.gui.update(self.board)  
                 return
               elif selection == "Cancelled_":
                 return
               else:
                 return            
-          except (Exception):
+        except (Exception):
               """ all_words may not exist or clicked outside box"""
               if self.debug:
                 print(traceback.format_exc())
@@ -253,85 +268,67 @@ class KrossWord(LetterGame):
               
   def solve(self):
     """solve the krossword"""
+    self.empty_board = self.board.copy()
+    self.wordlist_original = deepcopy(self.wordlist)
     placed = True
     while placed:
       placed = False
       for start, no in self.start_dict.items():
-        #for each direction calculate max length
-        # then calculate a match word to encode existing letters
-        #for each word in self.wordlist[start] list
-        # shorten match word and see if there is only one match
-        # if so, place it
+        #for each start location , load the words for that location 
+        # for each direction  then calculate a match word to encode existing letters
+        # if match, put unto list of possible direction
+        # if only one possible direction, place it
         start = Coord(start)
         words = self.wordlist[int(no)]
         try:
-          for dirn in start.all_dirs:
-            dirn = Coord(dirn)
-            match = words[0][0]
-            next = start + dirn
-            while self.check_in_board(next):
-              l = self.board[next]
-              if l.isalpha():
-                match = match + l
-              else:
-                match = match + '.'
-              next += dirn
-            
-            possible_words = []
-            for word in words:
-              if len(match) >= len(word):               
-                m = re.compile(match[:len(word)]) 
-                if m.search(word):   
-                  possible_words.append(word)
-            if len(possible_words) == 1:
-              word = possible_words.pop()
-              for index, letter in enumerate(word):
+          for word in words:
+            #try all directions
+            possible_direction = []
+            for dirn in start.all_dirs:
+              dirn = Coord(dirn)
+              match = ['.' for _ in range(len(word))]
+              match[0] = word[0] # first letter
+              skip = False
+              next = start + dirn
+              for i in range(1, len(word)):                                
+                if not self.check_in_board(next):
+                  skip = True
+                  break
+                else:
+                  l = self.board[next]
+                  if l.isalpha():
+                    match[i] = l
+                  next += dirn
+              if skip: 
+                continue
+                                        
+              m = re.compile(''.join(match)) 
+              if m.search(word):   
+                possible_direction.append(dirn)
+                
+            if len(possible_direction) == 1:
+               dirn = possible_direction.pop()
+               for index, letter in enumerate(word):
                 self.board[start + dirn * index] = letter
-              self.wordlist[int(no)].remove(word)
-              print(f'placed {word} at {start}')
-              self.gui.update(self.board)
-              sleep(4)
-              placed = True
-        except (IndexError):
+               self.wordlist[int(no)].remove(word)
+               print(f'placed {word} at {start}')
+               self.gui.update(self.board)
+               sleep(.5)
+               placed = True
+        except (Exception) as e:
+          print(e)
           continue
-      sleep(2)
-    self.gui.set_message('no more placements')
+    self.solution = self.board.copy()
+    self.gui.print_board( self.solution, 'solution')
+    self.board = self.empty_board
+    self.wordlist = self.wordlist_original.copy()
+    self.gui.update(self.board)  
       
-      
-                         
-  def match_word(self, move):
-    """ match word to move"""
-    word = []
-    for rc in move:
-      rc = Coord(rc)
-      if self.check_in_board(rc) and isinstance(rc, tuple):
-        word.append(self.get_board_rc(rc, self.board))        
-    selected_word = ''.join(word)
-    self.gui.clear_numbers(number_list=move)
-    for word in self.wordlist:
-      kword = word.replace(' ', '')
-      kword = kword.lower()
-      if kword == selected_word:
-        self.wordlist.remove(word)
-        self.known_locs.extend(move)
-        self.gui.draw_line([self.gui.rc_to_pos(Coord(move[i]) + (-.5, .5))
-                            for i in [0, -1]],
-                           line_width=8, color='red', alpha=0.5)
-        self.print_board()
-        break
-      else:
-        self.gui.clear_numbers(number_list=move)
-          
+                       
   def reveal(self):
       # reveal all words
-      for word, coords in self.word_coords.items():
-          if coords:
-             self.gui.draw_line([self.gui.rc_to_pos(Coord(coords[i]) + (-.5, .5))
-                                 for i in [0, -1]],
-                                line_width=8, color='red', alpha=0.5)
-          else:
-             print('unplaced word', word)
-          sleep(0.5)
+      self.gui.update(self.solution)
+      
       sleep(5)
       self.gui.show_start_menu()
       
@@ -345,7 +342,7 @@ class KrossWord(LetterGame):
     """
     Checks if the game is over
     """
-    return self.wordlist == []
+    return np.all(self.board == self.solution)
     
   def hint(self):
       """ illuminate the start letter of a random unplaced word """
@@ -365,7 +362,7 @@ class KrossWord(LetterGame):
     """
     self.gui.clear_numbers()
     self.gui.clear_messages()
-    self.gui.set_top(f'Wordsearch - {self.selection.capitalize()}')
+    self.gui.set_top(f'Krossword - {self.selection}')
     _, _, w, h = self.gui.grid.bbox
     if self.gui.device.endswith('_landscape'):
         self.gui.set_enter('Hint', position=(w + 50, -50))

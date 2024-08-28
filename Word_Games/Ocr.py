@@ -61,6 +61,7 @@ class OcrCrossword(LetterGame):
         self.words = []
         self.letters_mode = False
         self.direction_mode = False
+        self.multi_mode = False
         self.gui.require_touch_move(False)
         self.gui.allow_any_move(True)
         self.gui.setup_gui(grid_fill='black')
@@ -85,14 +86,14 @@ class OcrCrossword(LetterGame):
         'button1': (w+20, 0), 'button2': (w+20, h/21), 'button3': (w+150, h/21),
         'button4': (w+20, 3 *h/21), 'button5': (w+150, 3*h/21),
         'button6': (w+20, 4 *h/21), 'button7': (w+150, 0), 'button8': (w+20, 5*h/21),
-        'button9': (w+150, 5*h/21),
+        'button9': (w+150, 5*h/21),   'button10': (w+250, 5*h/21),
         'box1': (w+5, 2*h/3-6), 'box2': (w+5, 6*h/21), 'font': ('Avenir Next', 15)},                                         
 
         'ipad_landscape': {'rackscale': 0.9,
         'button1': (w+20, 0), 'button2': (w+20, h/21), 'button3': (w+150, h/21),
         'button4': (w+20, 3*h/21), 'button5': (w+150, 3*h/21),
         'button6': (w+20, 4*h/21), 'button7': (w+150, 0), 'button8': (w+20, 5*h/21),
-        'button9': (w+150, 5*h/21),
+        'button9': (w+150, 5*h/21),   'button10': (w+250, 5*h/21),
         'box1': (w+5, 2*h/3-6), 'box2': (w+5, 6*h/21), 'font': ('Avenir Next', 15)}
         }        
         try:
@@ -153,7 +154,11 @@ class OcrCrossword(LetterGame):
       self.direction = self.gui.add_button(text='Across', title='', position=self.posn.button9,
                                    min_size=(100, 32), reg_touch=True,
                                    stroke_color='black', fill_color='cyan',
-                                   color='black', font=self.posn.font)                                       
+                                   color='black', font=self.posn.font)      
+      self.multi_character = self.gui.add_button(text='Multi', title='', position=self.posn.button10,
+                                   min_size=(100, 32), reg_touch=True,
+                                   stroke_color='black', fill_color='cyan',
+                                   color='black', font=self.posn.font)                                          
 
     def create_grid(self):
       """ create string represention of board
@@ -232,8 +237,12 @@ class OcrCrossword(LetterGame):
         elif letter == 'Across' or letter == 'Down':
            self.direction_mode = not self.direction_mode
            self.gui.set_text(self.direction, 'Down' if self.direction_mode else 'Across')     
-           self.gui.set_props(self.direction, fill_color='lightblue' if self.direction_mode else 'cyan')                      
-           
+           self.gui.set_props(self.direction, fill_color='lightblue' if self.direction_mode else 'cyan')     
+                            
+        elif letter == 'Multi':
+           self.multi_mode = not self.multi_mode           
+           self.gui.set_props(self.multi_character, fill_color='lightblue' if self.multi_mode else 'cyan')    
+            
         elif letter == 'Add letters':
            self.letters_mode = not self.letters_mode
            self.gui.set_props(self.letters, fill_color = 'red' if self.letters_mode else 'cyan')       
@@ -248,12 +257,16 @@ class OcrCrossword(LetterGame):
                    letter = dialogs.input_alert('Enter 1 or more letters')  
                 except (KeyboardInterrupt):
                   return
-                if letter:              
-                  for index, l in enumerate(letter):
-                    if self.direction_mode:                 
-                      self.board_rc(origin + (index, 0), self.board, l.lower() )
-                    else:
-                      self.board_rc(origin + (0, index), self.board, l.lower() )
+                if letter:     
+                  if self.multi_mode:
+                      self.board_rc(origin, self.board, letter)
+                  else:             
+                    for index, l in enumerate(letter):
+                      
+                      if self.direction_mode:                 
+                        self.board_rc(origin + (index, 0), self.board, l.lower() )
+                      else:
+                        self.board_rc(origin + (0, index), self.board, l.lower() )
                       
               self.create_grid()   
               self.gui.update(self.board)       
