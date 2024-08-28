@@ -497,3 +497,84 @@ Puzzle6_frame:
 ' / / / / / / / / / / /11/ '
 ' / /12/ / / / / / / / / / '
 ' / / / / /13/ / / / / / / '
+
+Puzzle7:
+1
+LEEWARD
+LEMUR
+LIARS
+LIKENED
+2
+BARD
+BEFRIENDS
+BREEZE
+3
+OARS
+OATMEAL
+OMEN
+ORCHARD
+OVERBOARD
+4
+DEODORANT
+DOWNPOUR
+DRAW
+DYED
+5
+SAUCE
+SHRED
+SLOE
+SLUICED
+SNOOD
+SPADE
+STROPPY
+6
+THEMED
+TILT
+TORPID
+TUNA
+7
+AARDVARK
+ACUMEN
+ADDER
+AIDE
+AMAZOH
+ARENA
+8
+SPA
+SPOT
+SUM
+9
+HARNESSED
+HEM
+HID
+HURRY
+10
+CAROL
+CAVY
+CORN
+CUED
+11
+OUR
+ODDMENTS
+OPERATOR
+12
+GAZPACHO
+GEODE
+GNARLY
+GREENERY
+GROOMING
+
+Puzzle7_frame:
+' / / / / / /1/ / / / / / '
+' / / / / / / / / / / /2/ '
+' / / / / / / / / /3/ / / '
+'4/ / / / / / / / / / / / '
+' / / / /5/ / / / / / / / '
+' /6/ / / / / / / / / / / '
+' / / / / / / / / / / / / '
+' / / / / / / / /7a/r/e/n/a'
+' / / / / /8/ /m/ / / / /9'
+' / / /10/ / /a/ / / / / / '
+' / / / / /z/ / / / / / / '
+' / / / /o/ / / / / /11/ / '
+' / / /n/ / / /12/ / / / / '
