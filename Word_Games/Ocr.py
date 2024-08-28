@@ -281,7 +281,7 @@ class OcrCrossword(LetterGame):
         if end == 0:
           break
       
-    def filter(self, max_length=None, min_length=None, sort_length=True, remove_numbers=False):
+    def filter(self, sort_alpha=True, max_length=None, min_length=None, sort_length=True, remove_numbers=False):
       
       words = self.all_text
       if max_length:
@@ -292,7 +292,8 @@ class OcrCrossword(LetterGame):
           self.all_text = [word for word in words if word.isalpha()]
             
       # sort by length then by alphabet      
-      words.sort() # sorts normally by alphabetical order
+      if sort_alpha:
+         words.sort() # sorts normally by alphabetical order
       if sort_length:
          words.sort(key=len)
       try:
@@ -311,7 +312,7 @@ def main():
       all_text = []
     ocr = OcrCrossword(all_text)
     if all_text:
-       ocr.filter(max_length=None, min_length=None, sort_length=True, remove_numbers=False)
+       ocr.filter(sort_alpha=False, max_length=None, min_length=None, sort_length=False, remove_numbers=True)
     ocr.run()
     
 if __name__ == '__main__':

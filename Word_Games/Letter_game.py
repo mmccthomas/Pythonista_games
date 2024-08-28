@@ -17,7 +17,7 @@ import traceback
 from  collections import Counter
 from types import SimpleNamespace
 from collections import defaultdict
-from itertools import groupby
+from itertools import groupby, zip_longest
 from queue import Queue
 import console
 import sound
@@ -287,30 +287,30 @@ class LetterGame():
        
     match columns:
        case 2:
-          for first, second, in zip(
+          for first, second, in zip_longest(
                  my_list[::columns], 
-                 my_list[1::columns]):
+                 my_list[1::columns], fillvalue=''):
              msg.append(f'{first: <{width}}{second}')
        case 3:
-          for first, second, third in zip(
+          for first, second, third in zip_longest(
                  my_list[::columns], 
                  my_list[1::columns], 
-                 my_list[2::columns]):
+                 my_list[2::columns], fillvalue=''):
              msg.append(f'{first: <{width}}{second: <{width}}{third}')      
        case 4:
-          for first, second, third, fourth in zip(
+          for first, second, third, fourth in zip_longest(
                  my_list[::columns], 
                  my_list[1::columns], 
                  my_list[2::columns],
-                 my_list[3::columns]):
+                 my_list[3::columns], fillvalue=''):
              msg.append(f'{first: <{width}}{second: <{width}}{third: <{width}}{fourth}')      
        case 5:
-          for first, second, third, fourth, fifth in zip(
+          for first, second, third, fourth, fifth in zip_longest(
                  my_list[::columns], 
                  my_list[1::columns], 
                  my_list[2::columns],
                  my_list[3::columns],
-                 my_list[4::columns]):
+                 my_list[4::columns], fillvalue=''):
              msg.append(f'{first: <{width}}{second: <{width}}{third: <{width}}{fourth: <{width}}{fifth}')      
        case _ :
            raise ValueError('Columns > 5 not supported')

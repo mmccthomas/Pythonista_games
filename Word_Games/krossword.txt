@@ -1,0 +1,77 @@
+Puzzle1:
+1
+FACADE
+FAVOUR
+FIDELITY
+FILO
+FREELANCING
+2
+PAD
+PAL
+POETRY
+PRIMARILY
+PROGENY
+3
+BELA
+BILIOUS
+BLANCMANGE
+BOND
+BOTHERSOME
+5
+BARON
+BEDPAN
+BOOK
+BREAD
+BROILING
+4
+SANDPIPER
+SAVOY
+SEAM
+SHY
+SLIGO
+6
+SNIDELY
+SPRAYER
+STYLE
+7
+MINEHEAD
+MOLLYCODDLE
+MUNICH
+MYSTIQUE
+MYTH
+8
+ALGAE
+ALMA
+ANIME
+9
+CHIA
+COLE
+CONTOUR
+10
+SATE
+SIGNING
+SKI
+SNAPPY
+11
+SAVAGE
+SCONCE
+SNIP
+12
+NANA
+NEED
+NEPHOLOGY
+
+Puzzle1_frame:
+' / / / / /1/ / / / / / / '
+' / / / / / / / / / /2/ / '
+' / / / / / / / / / / / / '
+' /3/ / / / / / / / / / / '
+' / / / /4s/l/i/g/o/ / / / '
+' / / /a/ / / / /5/ / / / '
+' / /v/ / / / / / / / / /6'
+'7/o/ / / / / / / / / / / '
+'y/ / /8/ / / / / / / / / '
+' / / / / / / / / / / /9/ '
+' / / / / / / /10/ / / / / '
+' / / / / /11/ / / / / / / '
+' / / / / / / / /12/ / / / '
