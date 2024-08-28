@@ -304,10 +304,14 @@ class KrossWord(LetterGame):
                                         
               m = re.compile(''.join(match)) 
               if m.search(word):   
-                possible_direction.append(dirn)
-                
+                possible_direction.append((dirn, match))
+            # try only one possible
+            # or only one with match having more than one alpha
+            print()
+            [print(no, dirn, match) for (dirn, match) in possible_direction]
             if len(possible_direction) == 1:
-               dirn = possible_direction.pop()
+               dirn, match = possible_direction.pop()
+               
                for index, letter in enumerate(word):
                 self.board[start + dirn * index] = letter
                self.wordlist[int(no)].remove(word)
