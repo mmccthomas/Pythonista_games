@@ -1,4 +1,5 @@
 Puzzle1:
+#659-72
 1
 FACADE
 FAVOUR
@@ -77,6 +78,7 @@ Puzzle1_frame:
 ' / / / / / / / /12/ / / / '
 
 Puzzle2:
+#437-143
 1
 CAESAREAN
 CLASS
@@ -162,6 +164,7 @@ Puzzle2_frame:
 ' / /g/ / / /13/ / / / / / '
 
 Puzzle3:
+#437-56
 1
 FEATHER
 FLAPJACK
@@ -236,13 +239,14 @@ Puzzle3_frame:
 ' / / / / / / / /a/ / / / '
 ' / / / / / / / /7m/ / / / '
 ' / / / / / / /i/ / / / / '
-' / / / / / /g/8/ / / / /10'
-' / /9/ / /r/ / / / / / / '
+' / / / / / /g/8/ / / / / '
+' / /9/ / /r/ / / / / / /10'
 ' / / / /a/ / / / / /11/ / '
 ' /12/ /t/ / / / / / / / / '
 ' / /e/ / /13/ / / / / / / '
 
 Puzzle4:
+#483-142
 1
 PATTERN
 POSER
@@ -329,6 +333,7 @@ Puzzle4_frame:
 ' / / / / / / /14/ / / / / '
 
 Puzzle5:
+#483-85
 1
 FASTENER
 FIELD
@@ -414,6 +419,7 @@ Puzzle5_frame:
 ' / /13/ / / / / / / / / /14'
 
 Puzzle6:
+#483-58
 1
 PAIR
 PEANUT
@@ -499,6 +505,7 @@ Puzzle6_frame:
 ' / / / / /13/ / / / / / / '
 
 Puzzle7:
+#437-95
 1
 LEEWARD
 LEMUR
@@ -578,3 +585,339 @@ Puzzle7_frame:
 ' / / / / /z/ / / / / / / '
 ' / / / /o/ / / / / /11/ / '
 ' / / /n/ / / /12/ / / / / '
+
+Puzzle8:
+#659-38
+1
+RELEGATE
+REPAIRING
+RHYTHM
+ROSARY
+RURALISM
+2
+CHEEKIEST
+CLAD
+CLASSICAL
+COOL
+CYLINDER
+3
+FATED
+FATIGUE
+FITS
+FLEA
+FRETFUL
+4
+DARK
+DISH
+DISREGARD
+DRAGONFLY
+6
+SCHOLAR
+SLIPPER
+SODA
+STIR
+7
+TEST
+TIGRESS
+TOE
+TRAIL
+5
+SEATS
+SENSORY
+SIDEARM
+STAMINA
+8
+SANG
+SIT
+SNAIL
+SOUR
+SOW
+9
+TOIL
+TREE
+TUNA
+10
+DISDAIN
+DRAGEE
+DREAMLAND
+11
+LAIR
+LEGEND
+LIP
+LUCID
+12
+PAROCHIAL
+PILL
+POLO
+13
+BISHOPS
+BOUGHT
+BROLLY
+
+Puzzle8_frame:
+' / / / / / / /1/ / / / / '
+' / / / / / / / / /2/ / / '
+' / / / / / / / / / / / / '
+' /3/ / / / / / / / / / / '
+'d/r/a/g/e/r/s/i/4d/ / / / '
+' / / / / / / /r/ / / / / '
+'5/ / / / / /a/ / / / /6/ '
+' / / / / /g/ / /7/ / / / '
+' / / /8/o/ / / / / / / / '
+' / / /n/ /9/ / / / / / /10'
+' / /f/ / / / / / /11/ / / '
+' /l/ / /12/ / / / / / / / '
+'y/ / / / / /13/ / / / / / '
+
+Puzzle9:
+#482-132
+1
+KEEPSAKES
+KISS
+KITE
+KOI
+2
+ASTIR
+ATHLETE
+3
+REFORMATS
+RINSES
+RUE
+4
+MARROW
+MESSES
+MOPE
+MOUSSAKA
+5
+AISLE
+ANTE
+APPROACH
+6
+PAINT
+PASTE
+PET
+PROPERTY
+7
+PARROT
+PIE
+PIKE
+POPPING
+PREDATOR
+PRIEST
+8
+PEBBLES
+PLANNER
+POTATO
+PRY
+9
+KEBAB
+KEEN
+KNAVE
+KOALA
+10
+SAD
+SALT
+SMARTEST
+STATISTIC
+11
+ILL
+IMPRISON
+IOTA
+IRON
+ITCH
+12
+BLOAT
+BLOOM
+BRIM
+13
+JANITOR
+JESTER
+JOURNEY
+JOVIAL
+JUNCTION
+
+Puzzle9_frame:
+' / / / /1/ / / / / / / / '
+' / / / / / /2/ / / / / / '
+' /3/ / / / / / / /4/ / / '
+' / / / / / / / / / / /5/ '
+' / /6/ / / / / / / / / / '
+' / / / / /7p/ / / / / / / '
+' / / / / /o/r/ / / / / /8'
+' / / / / /p/9/e/ / / / / '
+'10/ / / / /p/ / /d/ / / / '
+' / / /11/ /i/ / / /a/ / / '
+' / / / / /n/ / / / /t/ / '
+' / / / /12/g/ / / / / /o/ '
+' / / / / / / /13/ / / / /r'
+
+Puzzle10:
+#482-102
+1
+GENE
+GNOCCHI
+GOAT
+GRENADE
+GROTTO
+2
+MAGNETIC
+MORNING
+MOTE
+3
+HAIL
+HELIX
+HENNA
+HER
+HIM
+HOD
+HOT
+4
+REALISTIC
+REEL
+RELIC
+5
+PADRE
+PIETY
+PILOT
+PIPE
+PLANE
+PLY
+6
+ICEBERG
+INN
+INTONE
+ITEM
+7
+SANGUINE
+SLALOM
+SPIRITS
+SPUR
+8
+CHIP
+CITY
+CLIP
+COOL
+CRUET
+CUBE
+9
+KEEN
+KISS
+KNAPWEED
+KOHL
+10
+BAR
+BEE
+BEVEL
+BOUNTEOUS
+11
+TEE
+TESTAMENT
+TOE
+TREATY
+12
+JANITOR
+JOSTLE
+JOYSTICK
+
+Puzzle10_frame:
+' / / / / / / / / /1/ / / '
+' / / / / / / / / / / /2/ '
+' / /3/ / / / / / / / / / '
+' / / / / / / / / / / / /t'
+' /4/ / / / /5/ / / / /n/ '
+' / / / / / / / / / /e/ /6'
+' / / / / / / / / /m/ / / '
+'7/ / / / / / / /a/ / / / '
+' / / /8/ / / /t/ / / / / '
+' / / / / / /s/ /9/ / / / '
+' / / / / /e/ / / / /10/ / '
+' / /e/e/11t/ / / / / / / / '
+' / / / / / / /12/ / / / / '
+
+Puzzle11:
+#482-63
+1
+FIDDLE
+FOREMAN
+FOSTER
+FREELY
+2
+CALL
+CAROUSING
+COAL
+CREEPING
+CUE
+3
+LEAPFROG
+LEARNER
+LEGAL
+LIT
+4
+WARE
+WEB
+WILT
+WISE
+WOAD
+5
+TEENY
+TELLINGLY
+TORUS
+TREAD
+TUCK
+6
+DEAR
+DECISION
+DUCKWEED
+7
+OGEE
+OILY
+ORCHARD
+ORNATE
+8
+ACID
+ACUMEN
+AFTER
+APSE
+ARK
+ARNICA
+AUGUR
+9
+SALLY
+SKY
+SPLAYED
+SWUM
+10
+BAR
+BENCH
+BIN
+BOB
+BURR
+11
+EBB
+ENDANGER
+ERR
+12
+QUID
+QUIP
+QUORUM
+13
+IDEA
+IMAGINE
+IMAM
+IMPEL
+INDY
+
+Puzzle11_frame:
+' / / / / / /1/ / / / / / '
+' / / / /2/ / / / / / / / '
+' / / / / / / / / / / /3/ '
+' / / /4/ / / / / / / / / '
+' / / / / / / / /5/ / / / '
+' /6/ / / / / / / / / / / '
+' / / / / /7o/ / / / / / / '
+' / / / /i/ /r/8/ / / / / '
+'9/ / /l/ / / /c/ / / / / '
+' / /y/ / / / / /h/ /10/ / '
+' / / / / / / / / /a/ / /11'
+' / / / / / / / / /12/r/ / '
+' / / /13/ / / / / / / /d/ '

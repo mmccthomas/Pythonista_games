@@ -66,12 +66,127 @@ class KrossWord(LetterGame):
     # menus can be controlled by dictionary of labels and functions without parameters
     self.gui.set_pause_menu({'Continue': self.gui.dismiss_menu,
                              'Reveal': self.reveal,
+                             'Replay': self.replay,
                              'Quit': self.quit})
     self.gui.set_start_menu({'New Game': self.restart,
                             'Quit': self.quit})
     self.known_locs = []
     self.word_coords = {}
+    self.moves = []
     
+  def find_possibles(self, start, word):
+      start = Coord(start)
+      #try all directions
+      possible_direction = []
+      for dirn in start.all_dirs:
+          dirn = Coord(dirn)
+          match = ['.' for _ in range(len(word))]
+          match[0] = word[0] # first letter
+          skip = False
+          next = start + dirn
+          for i in range(1, len(word)):                                
+              if not self.check_in_board(next):
+                  skip = True
+                  break
+              else:
+                  l = self.board[next]
+                  if l.isalpha():
+                    match[i] = l
+                  next += dirn
+          if skip: 
+              continue
+                                        
+          m = re.compile(''.join(match)) 
+          if m.search(word):   
+               possible_direction.append((dirn, match))
+      return possible_direction 
+      
+  def print_possible(self, possibles):
+    compass = {(-1, 0): 'N', (-1, 1): 'NE', (0, 1): 'E',  
+               (1, 1): 'SE', (1, 0): 'S', (1, -1): 'SW', 
+               (0, -1): 'W', (-1, -1): 'NW'}
+    
+    msg = ',\t'.join([compass[possible[0]] + '\t' + ' '.join(possible[1]) for possible in possibles])
+    return msg
+  
+  def find_best_possible(self, possible_direction):
+    for (d, match) in possible_direction:
+       if np.sum(np.char.isalpha(np.array(match))) >=2:
+             return d, match
+    return None, None                          
+    
+  def solve(self):
+    
+    """solve the krossword"""
+    self.empty_board = self.board.copy()
+    self.wordlist_original = deepcopy(self.wordlist)
+    placed = 1
+    iteration = 0
+    total_placed = 0
+    enable_best_guess = False
+    while placed:
+      placed = 0
+      iteration += 1
+      print(f'{iteration = }, best_guess={enable_best_guess}')
+      for start, no in self.start_dict.items():
+        #for each start location , load the words for that location 
+        # for each direction  then calculate a match word to encode existing letters
+        # if match, put unto list of possible direction
+        # if only one possible direction, place it
+        # TODO what to do if there is more than one possible?
+        # could try and mark location to revert?
+        # trigger might be no possible directions
+        
+        start = Coord(start)
+        try:
+          for word in self.wordlist[int(no)]:
+            
+            possible_direction = self.find_possibles(start, word)
+            print()
+            print(start, no, word, self.print_possible(possible_direction))
+            # try only one possible
+            # or only one with match having more than one alpha
+            dirn = None            
+            if len(possible_direction) == 1:
+               dirn, _ = possible_direction.pop()
+               print('only one', word, no)
+            else:
+              if enable_best_guess:
+                dirn, match = self.find_best_possible(possible_direction)
+              if dirn:
+                 print('best match', word, no, match)
+                 
+              
+            if dirn:  
+               for index, letter in enumerate(word):
+                self.board[start + dirn * index] = letter
+               self.wordlist[int(no)].remove(word)
+               placed += 1
+               total_placed += 1
+               print(f'placed {word} at {start}')
+               self.gui.update(self.board)
+               sleep(.05)
+               
+        except (Exception) as e:
+          print(traceback.format_exc())
+          continue
+      self.gui.set_message(f'Placed {placed} words on iteration {iteration}, {total_placed} total')
+      
+      if placed == 0 and total_placed != len(self.all_words) and iteration < 20:
+         enable_best_guess = True
+         placed = 1
+      else:
+        enable_best_guess = False
+         
+    #self.gui.set_message('')   
+    self.solution = self.board.copy()
+    self.gui.print_board( self.empty_board, 'initial')
+    self.gui.print_board( self.solution, 'solution')
+    self.board = self.empty_board
+    self.wordlist = self.wordlist_original.copy()
+    self.gui.update(self.board)  
+      
+                        
   def print_board(self):
     """
     Display the  players game board, we neve see ai
@@ -144,6 +259,9 @@ class KrossWord(LetterGame):
     w_dict = {}
     w_list = []
     for word in self.wordlist:
+      # skip comment
+      if word.startswith('#'):
+        continue
       if word.isnumeric():
         if key:
           w_dict[key] = w_list # remove empty string
@@ -244,6 +362,7 @@ class KrossWord(LetterGame):
                   
               if selection in item_list and len(move) == len(selection):
                 self.gui.selection = ''
+                self.moves.append((self.board.copy(), deepcopy(self.wordlist)))
                 if self.debug:
                     print('letter ', selection, 'row', selection_row)
                 for coord, letter in zip(move, selection):
@@ -254,6 +373,7 @@ class KrossWord(LetterGame):
                    word = strike(word)
                    self.wordlist[int(self.start_dict[start])][selection_row] = word
                    self.print_board()
+                
                 self.gui.update(self.board)  
                 return
               elif selection == "Cancelled_":
@@ -266,69 +386,7 @@ class KrossWord(LetterGame):
                 print(traceback.format_exc())
               return
               
-  def solve(self):
-    """solve the krossword"""
-    self.empty_board = self.board.copy()
-    self.wordlist_original = deepcopy(self.wordlist)
-    placed = True
-    while placed:
-      placed = False
-      for start, no in self.start_dict.items():
-        #for each start location , load the words for that location 
-        # for each direction  then calculate a match word to encode existing letters
-        # if match, put unto list of possible direction
-        # if only one possible direction, place it
-        start = Coord(start)
-        words = self.wordlist[int(no)]
-        try:
-          for word in words:
-            #try all directions
-            possible_direction = []
-            for dirn in start.all_dirs:
-              dirn = Coord(dirn)
-              match = ['.' for _ in range(len(word))]
-              match[0] = word[0] # first letter
-              skip = False
-              next = start + dirn
-              for i in range(1, len(word)):                                
-                if not self.check_in_board(next):
-                  skip = True
-                  break
-                else:
-                  l = self.board[next]
-                  if l.isalpha():
-                    match[i] = l
-                  next += dirn
-              if skip: 
-                continue
-                                        
-              m = re.compile(''.join(match)) 
-              if m.search(word):   
-                possible_direction.append((dirn, match))
-            # try only one possible
-            # or only one with match having more than one alpha
-            print()
-            [print(no, dirn, match) for (dirn, match) in possible_direction]
-            if len(possible_direction) == 1:
-               dirn, match = possible_direction.pop()
-               
-               for index, letter in enumerate(word):
-                self.board[start + dirn * index] = letter
-               self.wordlist[int(no)].remove(word)
-               print(f'placed {word} at {start}')
-               self.gui.update(self.board)
-               sleep(.5)
-               placed = True
-        except (Exception) as e:
-          print(e)
-          continue
-    self.solution = self.board.copy()
-    self.gui.print_board( self.solution, 'solution')
-    self.board = self.empty_board
-    self.wordlist = self.wordlist_original.copy()
-    self.gui.update(self.board)  
-      
-                       
+  
   def reveal(self):
       # reveal all words
       self.gui.update(self.solution)
@@ -348,17 +406,28 @@ class KrossWord(LetterGame):
     """
     return np.all(self.board == self.solution)
     
-  def hint(self):
-      """ illuminate the start letter of a random unplaced word """
-      word = random.choice(self.wordlist)
-      word = word.replace(' ', '')
-      coords = self.word_coords[word]
-      # note that if start and end letter are same this will fail, but OK
-      coord = coords[0] if word[0] == self.get_board_rc(coords[0], self.board) else coords[-1]
-      self.gui.add_numbers([Squares(coord, '', 'cyan', z_position=30,
-                            alpha=.5)],
-                           clear_previous=False)
-             
+  def undo(self):
+    """ reverse changes"""      
+    try:
+       self.board, self.wordlist = self.moves.pop()
+       self.gui.update(self.board)
+       self.print_board()
+    except (IndexError):
+      return
+      
+  def replay(self):
+    """ replay from stored moves"""      
+    try:
+       #self.moves.reverse()
+       length = len(self.moves)
+       for i in range(length):
+           self.board, self.wordlist = self.moves[i]
+           self.gui.update(self.board)
+           self.print_board()
+           sleep(1)
+    except (IndexError):
+      return
+      
   def run(self):
     # LetterGame.run(self)
     """
@@ -369,9 +438,9 @@ class KrossWord(LetterGame):
     self.gui.set_top(f'Krossword - {self.selection}')
     _, _, w, h = self.gui.grid.bbox
     if self.gui.device.endswith('_landscape'):
-        self.gui.set_enter('Hint', position=(w + 50, -50))
+        self.gui.set_enter('Undo', position=(w + 50, -50))
     else:
-        self.gui.set_enter('Hint', position=(w - 50, h + 50))
+        self.gui.set_enter('Undo', position=(w - 50, h + 50))
     self.word_locations = []
     
     self.initialise_board()
@@ -380,16 +449,13 @@ class KrossWord(LetterGame):
     while True:
       move = self.get_player_move(self.board)
       if move[0] == HINT:
-        self.hint()
+        self.undo()
       move = self.process_turn(move, self.board)
-      
-      #self.print_square(move, clear=False, alpha=0.2)
-      #sleep(1)
-      #self.match_word(move)
+  
       # if finish:
       #  break
-      if self.game_over():
-       break
+      #if self.game_over():
+      # break
     
     self.gui.set_message2('Game over')
     self.gui.set_message('')
@@ -398,42 +464,6 @@ class KrossWord(LetterGame):
     self.finished = True
     self.gui.show_start_menu()
     
-  def find_word_np(self, word):
-      word = list(word.lower())
-      locs = np.argwhere(self.board == word[0])
-      for rc in locs:
-        r, c = rc
-        all_dirs, indices = self.dirs(self.board, r, c, len(word))
-        for dir in all_dirs:
-          if len(dir) >= len(word):
-             if all(dir[:len(word)] ==list(word)):
-                return rc, indices
-    
-  def find_word(self, word):
-      # for each word, find the first letter
-      # then try in all directions to get second letter
-      # if ok, keep going in that direction until word is complete
-      # or letter is wrong.
-      # then try other directions and then next occurence of letter
-      word = list(word.lower())
-      locs = np.argwhere(self.board == word[0])
-      for rc in locs:
-          rc = Coord(rc)            
-          for dir in rc.all_dirs:
-              self.moves = [rc]
-              rc_next = rc
-              for letter in word[1:]:
-                  rc_next = rc_next + dir
-                  if not self.check_in_board(rc_next):
-                      break
-                  next = self.get_board_rc(rc_next, self.board)
-                  if next == letter:
-                      self.moves.append(rc_next)
-                  else:
-                      break  # next direction
-                  if len(self.moves) == len(word):
-                      return self.moves
-
 
 if __name__ == '__main__':
   g = KrossWord()
@@ -444,6 +474,12 @@ if __name__ == '__main__':
     if quit:
       break
   
+
+
+
+
+
+
 
 
 
