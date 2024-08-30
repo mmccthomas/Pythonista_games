@@ -162,25 +162,21 @@ class KrossWord(LetterGame):
       return False
       
     for (d, match) in possible_direction:
-       #if no_matches(match) >=2:
-       #      return d, match
-       fills = word_fills_gap(match, no, d)
-       
+    
+       fills = word_fills_gap(match, no, d)       
        fits = word_fits_out_of_group(word, match, no, d)
-       print(f'{fills =}, {fits = }')
+       #print(f'{fills =}, {fits = }')
        if fits:
-          return d, match, 'pink'
+          return d, match
        if fills:
-          return d, match, 'cyan'
+          return d, match
     return None, None, None                         
     
-  def solve(self):    
+  def solve(self, enable_guesses=False):    
     """solve the krossword
-    suppose approach this as dfs
-    at each point where guess is made, store the state.
-    if get to end with squares still blank, note no blank squares.
-    restore the state and restart the solve """
-    
+    This only works when the starting words allow unique 
+    word at each number 
+    """    
     placed = 1
     iteration = 0
     total_placed = 0
@@ -188,15 +184,12 @@ class KrossWord(LetterGame):
     while placed:
       placed = 0
       iteration += 1
-      print(f'{iteration = }, best_guess={enable_best_guess}')
+      #print(f'{iteration = }, best_guess={enable_best_guess}')
       for start, no in self.start_dict.items():
         #for each start location , load the words for that location 
         # for each direction  then calculate a match word to encode existing letters
         # if match, put unto list of possible direction
         # if only one possible direction, place it
-        # TODO what to do if there is more than one possible?
-        # could try and mark location to revert?
-        # trigger might be no possible directions
         
         start = Coord(start)
         try:
@@ -206,36 +199,32 @@ class KrossWord(LetterGame):
             possible_direction = self.find_possibles(start, word)
             if possible_direction is None:
             	return False
-            print()
-            print(start, no, word, self.print_possible(possible_direction))
+            #print()
+            #print(start, no, word, self.print_possible(possible_direction))
             # try only one possible
             # or only one with match having more than one alpha
             dirn = None            
             if len(possible_direction) == 1:
                dirn, _ = possible_direction.pop()
-               color = 'orange'
-               print('only one', word, no)
+               #print('only one', word, no)
             else:
               if enable_best_guess:
-                dirn, match, color = self.find_best_possible(word, possible_direction, no)
-              if dirn:
-                 print('best match', word, no, match)
+                dirn, match = self.find_best_possible(word, possible_direction, no)
+              #if dirn:
+              #   print('best match', word, no, match)
                  
               
             if dirn: 
                self.moves.append((self.board.copy(), deepcopy(self.wordlist))) 
-               if color != 'orange':
-                   self.checkpoint = self.board, word, no, dirn
                for index, letter in enumerate(word):
                 self.board[start + dirn * index] = letter
                self.wordlist[int(no)].remove(word)
                placed += 1
                total_placed += 1
-               print(f'placed {word} at {start}')
-               self.gui.update(self.board)
+               #print(f'placed {word} at {start}')
+               #self.gui.update(self.board)
                coords = [start + dirn * index  for index in range(len(word))]
-               #self.highlight_(coords, color)
-               sleep(.01)
+               #sleep(.01)
                
         except (Exception) as e:
           print(traceback.format_exc())
@@ -243,37 +232,26 @@ class KrossWord(LetterGame):
       self.gui.set_message(f'Placed {placed} words on iteration {iteration}, {total_placed} total')
       
       if placed == 0 and total_placed != len(self.all_words) and iteration < 20:
-         #enable_best_guess = True
+         if enable_guesses:
+         	  enable_best_guess = True
          placed = 1
       else:
         enable_best_guess = False
          
-    #self.gui.set_message('')   
+    self.gui.set_message('')   
     self.solution = self.board.copy()
-    self.gui.print_board( self.empty_board, 'initial')
-    self.gui.print_board( self.solution, 'solution')
+    #self.gui.print_board( self.empty_board, 'initial')
+    #self.gui.print_board( self.solution, 'solution')
     empty = np.sum(self.board == SPACE)
     self.board = self.empty_board
     self.wordlist = self.wordlist_original.copy()
     self.gui.update(self.board)  
     return empty
   
-  		
-  def highlight_(self, coords, color):
-    square_list = []
-    for coord in coords:
-      if Coord(tuple(coord)) in self.start_dict:
-        text = self.start_dict[Coord(tuple(coord))]
-      else:
-        text = ''
-      square_list.append(Squares(coord, text, color, z_position=30,
-                                        alpha=0.5, font=('Avenir Next', 20),
-                                        text_anchor_point=(-1.1, 1.2)))                        
-    self.gui.add_numbers(square_list, clear_previous=False)      
                 
   def print_board(self):
     """
-    Display the  players game board, we neve see ai
+    Display the  players game board
     """
     display_words = self.wordlist
     msg = ''
@@ -291,7 +269,7 @@ class KrossWord(LetterGame):
     #    self.gui.set_moves(msg, font=('Avenir Next', 25))
     #elif self.gui.gs.device.endswith('_portrait'):
     #    msg = self.format_cols(display_words, columns=5, width=max_len)
-    self.gui.set_moves(msg, font=('Avenir Next', 16))
+    self.gui.set_moves(msg, font=('Avenir Next', 18))
     self.gui.update(self.board)
     
   def get_size(self):
@@ -523,7 +501,7 @@ class KrossWord(LetterGame):
     """
     self.gui.clear_numbers()
     self.gui.clear_messages()
-    self.gui.set_top(f'Krossword - {self.selection} orange=only pink=fits, cyan=fills')
+    self.gui.set_top(f'Krossword - {self.selection}')
     _, _, w, h = self.gui.grid.bbox
     if self.gui.device.endswith('_landscape'):
         self.gui.set_enter('Undo', position=(w + 50, -50))
@@ -535,7 +513,7 @@ class KrossWord(LetterGame):
     self.print_board()
     self.empty_board = self.board.copy()
     self.wordlist_original = deepcopy(self.wordlist)
-    error = self.solve() 
+    error = self.solve(enable_guesses=False) 
     while True:
       move = self.get_player_move(self.board)
       if move[0] == HINT:
@@ -544,8 +522,8 @@ class KrossWord(LetterGame):
   
       # if finish:
       #  break
-      #if self.game_over():
-      # break
+      if self.game_over():
+        break
     
     self.gui.set_message2('Game over')
     self.gui.set_message('')
