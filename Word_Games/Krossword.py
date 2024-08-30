@@ -109,10 +109,63 @@ class KrossWord(LetterGame):
     msg = ',\t'.join([compass[possible[0]] + '\t' + ' '.join(possible[1]) for possible in possibles])
     return msg
   
-  def find_best_possible(self, possible_direction):
+  def find_best_possible(self, word, possible_direction, no):
+    """ 1. large number matches, relative to length of word
+        2. match more than 1  in one direction but no others and no other word in group has match in that direction
+        2. word would fill a gap with correct length
+        3. word would fit when none of the other words would
+        4. if no possible_direction, mistake made, we may need to go back - how?
+    """
+    def find_start(no):
+      for start, no_str in self.start_dict.items():
+        if no_str == str(no):
+          return start
+          
+    def no_matches(match):
+      return np.sum(np.char.isalpha(np.array(match)))
+      
+    def word_fills_gap(match, no, dirn):
+      """ find start location from no
+      start at start move len match in dirn
+      if no space beyond extent or edge of board  then fills gap
+      dirn already deals with case where word would not fit
+      """
+      start = find_start(no)
+      loc = start + dirn * (len(match) + 1)
+      if self.check_in_board(loc):
+         alpha = self.board[loc].isalpha()
+         return alpha
+      else:
+        return True
+          
+    def word_fits_out_of_group(word, match, no, dirn):
+      """word would fit when none of the other words would"""
+      group = self.wordlist[int(no)] 
+      start = find_start(no)
+      fit = []
+      for other_word in group:
+        if other_word == word:
+          word_matches = no_matches(match) > 1
+          continue
+        possibles = dict(self.find_possibles(start, other_word))
+        try:
+          m = possibles[dirn]       
+          fit.append(no_matches(m) > 1)
+        except (KeyError):
+        	continue
+      if not any(fit):
+        return word_matches
+      return False
+      
     for (d, match) in possible_direction:
-       if np.sum(np.char.isalpha(np.array(match))) >=2:
-             return d, match
+       #if no_matches(match) >=2:
+       #      return d, match
+       fills = word_fills_gap(match, no, d)
+       
+       fits = word_fits_out_of_group(word, match, no, d)
+       print(f'{fills =}, {fits = }')
+       if fits:
+       	  return d, match
     return None, None                          
     
   def solve(self):
@@ -139,7 +192,8 @@ class KrossWord(LetterGame):
         
         start = Coord(start)
         try:
-          for word in self.wordlist[int(no)]:
+          words = self.wordlist[int(no)]
+          for word in sorted(words, key=len, reverse=True):
             
             possible_direction = self.find_possibles(start, word)
             print()
@@ -152,7 +206,7 @@ class KrossWord(LetterGame):
                print('only one', word, no)
             else:
               if enable_best_guess:
-                dirn, match = self.find_best_possible(possible_direction)
+                dirn, match = self.find_best_possible(word, possible_direction, no)
               if dirn:
                  print('best match', word, no, match)
                  
@@ -246,7 +300,7 @@ class KrossWord(LetterGame):
       except (ValueError) as e:
          no = self.board[tuple(number)]
          
-      self.start_dict[tuple(number)] = no
+      self.start_dict[Coord(tuple(number))] = no
       square_list.append(Squares(number, no, 'yellow', z_position=30,
                                         alpha=0.5, font=('Avenir Next', 20),
                                         text_anchor_point=(-1.1, 1.2)))
@@ -362,7 +416,10 @@ class KrossWord(LetterGame):
                   
               if selection in item_list and len(move) == len(selection):
                 self.gui.selection = ''
+                
+                # store board and wordlist before this move
                 self.moves.append((self.board.copy(), deepcopy(self.wordlist)))
+                
                 if self.debug:
                     print('letter ', selection, 'row', selection_row)
                 for coord, letter in zip(move, selection):
@@ -474,6 +531,12 @@ if __name__ == '__main__':
     if quit:
       break
   
+
+
+
+
+
+
 
 
 
