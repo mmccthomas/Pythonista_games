@@ -73,8 +73,10 @@ class KrossWord(LetterGame):
     self.known_locs = []
     self.word_coords = {}
     self.moves = []
-    self.checkpoints = []
+    self.checkpoint = None
     
+  
+            
   def find_possibles(self, start, word):
       start = Coord(start)
       #try all directions
@@ -178,8 +180,7 @@ class KrossWord(LetterGame):
     at each point where guess is made, store the state.
     if get to end with squares still blank, note no blank squares.
     restore the state and restart the solve """
-    self.empty_board = self.board.copy()
-    self.wordlist_original = deepcopy(self.wordlist)
+    
     placed = 1
     iteration = 0
     total_placed = 0
@@ -224,7 +225,7 @@ class KrossWord(LetterGame):
             if dirn: 
                self.moves.append((self.board.copy(), deepcopy(self.wordlist))) 
                if color != 'orange':
-                   self.checkpoints.append((len(self.moves), dirn))
+                   self.checkpoint = self.board, word, no, dirn
                for index, letter in enumerate(word):
                 self.board[start + dirn * index] = letter
                self.wordlist[int(no)].remove(word)
@@ -233,7 +234,7 @@ class KrossWord(LetterGame):
                print(f'placed {word} at {start}')
                self.gui.update(self.board)
                coords = [start + dirn * index  for index in range(len(word))]
-               self.highlight_(coords, color)
+               #self.highlight_(coords, color)
                sleep(.01)
                
         except (Exception) as e:
@@ -242,7 +243,7 @@ class KrossWord(LetterGame):
       self.gui.set_message(f'Placed {placed} words on iteration {iteration}, {total_placed} total')
       
       if placed == 0 and total_placed != len(self.all_words) and iteration < 20:
-         enable_best_guess = True
+         #enable_best_guess = True
          placed = 1
       else:
         enable_best_guess = False
@@ -251,17 +252,12 @@ class KrossWord(LetterGame):
     self.solution = self.board.copy()
     self.gui.print_board( self.empty_board, 'initial')
     self.gui.print_board( self.solution, 'solution')
+    empty = np.sum(self.board == SPACE)
     self.board = self.empty_board
     self.wordlist = self.wordlist_original.copy()
     self.gui.update(self.board)  
-    self.decode_moves()
+    return empty
   
-  def decode_moves(self):
-  	if self.checkpoints:
-  		before = self.moves[self.checkpoints[0][0]][0]
-  		after = self.moves[self.checkpoints[0][0] + 1][0]
-  		changed_board = np.argwhere(after != before)
-  		self.highlight_(changed_board, 'red')
   		
   def highlight_(self, coords, color):
     square_list = []
@@ -482,8 +478,8 @@ class KrossWord(LetterGame):
       # reveal all words
       self.gui.update(self.solution)
       
-      sleep(5)
-      #self.gui.show_start_menu()
+      sleep(3)
+      self.gui.show_start_menu()
       
   def restart(self):
     """ reinitialise """
@@ -537,9 +533,9 @@ class KrossWord(LetterGame):
     
     self.initialise_board()
     self.print_board()
+    self.empty_board = self.board.copy()
+    self.wordlist_original = deepcopy(self.wordlist)
     error = self.solve() 
-    if error == False:
-    	raise IndexError
     while True:
       move = self.get_player_move(self.board)
       if move[0] == HINT:
