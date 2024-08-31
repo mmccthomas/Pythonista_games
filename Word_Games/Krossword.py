@@ -309,8 +309,8 @@ class KrossWord(LetterGame):
          no = self.board[tuple(number)]
          
       self.start_dict[Coord(tuple(number))] = no
-      square_list.append(Squares(number, no, 'clear', z_position=30,
-                                        alpha=0.5, font=('Avenir Next', 20),
+      square_list.append(Squares(number, no, 'yellow', z_position=30,
+                                        alpha=0.5, font=('Avenir Next', 18),
                                         text_anchor_point=(-1.1, 1.2)))
                         
     self.gui.add_numbers(square_list)

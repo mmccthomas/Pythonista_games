@@ -2616,3 +2616,98 @@ Puzzle29-27_frame:
 ' / / / / / / /#/ / / / / / / '
 ' /#/ /#/ /#/ /#/ /#/ /#/ /#/ '
 ' / / / / /#/ / / /#/ / / / / '
+
+Puzzle:
+14
+18
+23
+26
+ating trust (8)
+recious stone (6)
+7(10)
+ise (6)
+olf (4)
+pudding (2,3,3)
+reserves (6)
+lesS, Staying
+US (4-4)
+ainly (6)
+(6)
+erficially (6)
+4
+NUMBER ONE
+One-word song titles are listed here. How many do you remember?
+3letters
+Bad
+Ben
+Jet
+One
+Rio
+4letters
+Geno
+HerO
+KisS
+Rise
+Stay
+Sway
+Zoom
+5 letters
+Clair
+Diana
+Drive
+Hello
+Lover
+Music
+Tears
+6letters
+Agad0O
+AtomIc
+Memory
+Nikita
+Ramona
+Volare
+Xanadu
+7 letters
+Grandad
+Sailing
+Uptight
+Wannabe
+8letters
+Cherokee
+Feelings
+Question
+Sussudio
+9 letters
+Galveston
+Heartbeat
+Sacrifice
+Something
+Yesterday
+10 letters
+Chiquitita
+Copacabana
+Fairground
+Summertime
+Witchcraft
+Puzzle_frame:
+'#/ / / / / / / / / / / / / / / / / / / '
+'#/#/#/#/ /#/#/#/ / / / / / / / / / / / '
+'#/#/#/#/ /#/ /#/ / / / / / / / / / / / '
+' / / / / / / / / / / / / / / / / / / / '
+' /#/#/#/ / / / / / / / / / / / / / / / '
+' /#/#/#/ / / / / / / / / / / / / / / / '
+' /#/ / / / / / / / / / / / / / / / / / '
+' /#/#/#/ / / / / / / / / / / / / / / / '
+' /#/#/#/ / / / / / / / / / / / / / / / '
+' /#/ /#/#/ / / / / / / / / / / / / / / '
+' / / / / / / / / / / / / / / / / / / / '
+' /#/ /#/#/ / / / / / / / / / / / / / / '
+'#/#/ /#/ / / / / / / / / / / / / / / / '
+'#/#/ /#/ / / / / / / / / / / / / / / / '
+'#/#/ / / / / / / / / / / / / / / / / / '
+'#/#/#/#/#/ / / / / / / / / / / / / / / '
+' / / / /#/ / / / / / / / / / / / / / / '
+'#/ /#/#/ / / / / / / / / / / / / / / / '
+' / / / / / / / / / / / / / / / / / / / '
+'#/ /#/#/ / / / / / / / / / / / / / / / '
+'#/ / / / / / / / / / / / / / / / / / / '

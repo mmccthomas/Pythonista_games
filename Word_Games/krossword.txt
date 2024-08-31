@@ -983,3 +983,81 @@ Puzzle11_frame:
 ' / / / / / / / / /a/ / /11'
 ' / / / / / / / / /12/r/ / '
 ' / / /13/ / / / / / / /d/ '
+
+Puzzle12:
+#391_85
+1
+Daunted
+Dessert
+Disrepair
+Dormant
+Drool
+2
+Sinew
+Skua
+Stairway
+Superstar
+Swan
+3
+Pastime
+Pew
+Polar
+Pro
+4
+Sermonise
+Spasmodic
+Spite
+Steamer
+Sugar
+5
+Chalk
+Cigar
+Crustacea
+Current
+6
+Adjacent
+Ambushing
+Answer
+Arpeggio
+7
+Deficit
+Deny
+Drama
+Draper
+Durum
+8
+Rank
+Rare
+Renal
+Rim
+Rotor
+Rule
+9
+Disc
+Disharmony
+Doubt
+10
+Abbess
+Acer
+Adopt
+Alimony
+11
+Obsessed
+Obstetric
+Order
+Overact
+
+Puzzle12_frame:
+' / / / / / /1/o/ / / / / '
+' / / /2/ / /i/ / / / / / '
+' / / / / /g/ / / / / / / '
+' / / / /g/ / / / / /3/ / '
+' /4/ /e/ / / / / / / / / '
+' / /p/ / / / / / / / / / '
+' /r/ / / / / / / / / /5/ '
+'6a/ / / / / / / / / / / / '
+'n/ / / / / / / / / / / /7'
+'s/ / / / / / / / /8/ / / '
+'w/ /9/ / / / / / / / / / '
+'e/ / / / / /10/ / / / / / '
+'r/ / / /11/ / / / / / / / '
