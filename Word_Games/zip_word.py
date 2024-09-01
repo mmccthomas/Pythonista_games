@@ -12,6 +12,7 @@ import sys
 import random
 import traceback
 import dialogs
+from itertools import zip_longest
 from time import sleep, time
 from queue import Queue
 current = os.path.dirname(os.path.realpath(__file__))
@@ -81,6 +82,8 @@ class ZipWord(LetterGame):
     words_placed = [word.word for word in self.word_locations if word.fixed]
     words = []
     x, y, width, height = self.gui.grid.bbox
+    
+    
     # iterate over word lengths
     for k, wordlist in self.all_word_dict.items():
       if wordlist:
@@ -103,18 +106,25 @@ class ZipWord(LetterGame):
              words.extend([f'{word}\n' if i % 3 == 2 else f'{word}  '
                            for i, word in enumerate(w)])
              position = (width + 10, -20)
-             fontsize = 20
+             font = 'Fira Mono'
+             fontsize = 16
              anchor = (0, 0)
+             
          else:  # self.gui.device == 'ipad_portrait':
+            
              words.extend([f'{word}\n' if i % 10 == 2 else f'{word}  '
-                           for i, word in enumerate(w)])
+                          for i, word in enumerate(w)])
              anchor = (0, 0)
-             position = (40, height)
-             fontsize = 15
-      
+             position = (40, height+30)
+             fontsize = 18
+             font = 'Fira Mono'
+             # format into columns if it fits
+             w_cols, s, no_lines = self.format_for_portrait(self.all_word_dict) 
+             if no_lines <10:
+               words = w_cols
     msg = ''.join(words)
     # set message box to be anchored at bottom left
-    self.gui.set_moves(msg, font=('Avenir Next', fontsize),
+    self.gui.set_moves(msg, font=(font, fontsize),
                        anchor_point=anchor, position=position)
     self.gui.update(self.board)
   

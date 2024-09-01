@@ -323,6 +323,24 @@ class LetterGame():
     """ nice simple metthod to flatten a nested 2d list """
     return sum(list_of_lists, [])
     
+  def format_for_portrait(self, word_dict):
+      """ expects a dictionary with len(words) as key, and unsorted 
+      list of words with that length
+      transform dictionary into columns with each column being same length
+      Need to use monospaced font such as Fira Mono
+      """
+      headers = [f'{k:<{k}}' for k in word_dict]
+      rows = [sorted(list(value)) for value in word_dict.values()] 
+      cols =   [list(c) for c in zip_longest(*rows, fillvalue='')]
+      for i, row in enumerate(cols):
+        for j, item in enumerate(row):
+          if len(item) == 0:
+            cols[i][j] = f'{" ":<{len(headers[j])}}'
+            
+      words = [' '.join(headers), '\n', '\n'.join([' '.join(c) for c in cols])]
+      no_lines = len(cols) + 1
+      return words, ''.join(words), no_lines
+               
   def run(self):
     """
     Main method that prompts the user for input
