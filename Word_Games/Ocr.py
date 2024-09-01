@@ -14,7 +14,7 @@ sys.path.append(parent)
 grandparent = os.path.dirname(parent)
 sys.path.append(grandparent)
 from types import SimpleNamespace
-from gui.gui_interface import Gui, Coord
+from gui.gui_interface import Gui, Coord, Squares
 from Word_Games.Letter_game import LetterGame
 from scene import *
 import gui.gui_scene as gs
@@ -61,7 +61,7 @@ class OcrCrossword(LetterGame):
         self.words = []
         self.letters_mode = False
         self.direction_mode = False
-        self.multi_mode = False
+        self.index_mode = False
         self.gui.require_touch_move(False)
         self.gui.allow_any_move(True)
         self.gui.setup_gui(grid_fill='black')
@@ -77,7 +77,21 @@ class OcrCrossword(LetterGame):
         self.box_positions()
         self.set_buttons()
         self.add_boxes()
+        self.add_indexes()
         
+    def add_indexes(self):
+      if hasattr(self, 'indexes'):
+          indexes = np.argwhere(self.indexes !=0)
+          squares_list = []
+          for index in indexes:
+            i = self.indexes[tuple(index)]
+            squares_list.append(Squares(index, str(i), 'yellow', z_position=30,
+                                            alpha=0.5, font=('Avenir Next', 18),
+                                            text_anchor_point=(-1.1, 1.2)))
+          self.gui.add_numbers(squares_list) 
+      else:
+         self.indexes = np.zeros(self.board.shape, dtype=int)
+         
     def box_positions(self):
       # positions of all objects for all devices
         x, y, w, h = self.gui.grid.bbox    
@@ -155,7 +169,7 @@ class OcrCrossword(LetterGame):
                                    min_size=(100, 32), reg_touch=True,
                                    stroke_color='black', fill_color='cyan',
                                    color='black', font=self.posn.font)      
-      self.multi_character = self.gui.add_button(text='Multi', title='', position=self.posn.button10,
+      self.multi_character = self.gui.add_button(text='Indexes', title='', position=self.posn.button10,
                                    min_size=(100, 32), reg_touch=True,
                                    stroke_color='black', fill_color='cyan',
                                    color='black', font=self.posn.font)                                          
@@ -164,8 +178,23 @@ class OcrCrossword(LetterGame):
       """ create string represention of board
           slashes separate each character
       """
-      self.lines = ["'" + '/'.join(self.board[i, :]) + "'\n" 
-                    for i in range(self.board.shape[0])]
+      self.lines = []
+      for r in range(self.sizey):
+        line = "'"
+        for c in range(self.sizex):
+          i = self.indexes[r, c]
+          char = self.board[r, c]
+          if i != 0 and char != ' ':
+             item = str(i) + char
+          elif i != 0:
+          	 item = str(i)
+          else:
+             item = char       
+          line = line + item + '/'
+          
+        line = line[:-1] + "'\n" 
+        self.lines.append(line)
+      
       # remove last \n
       self.lines[-1] = self.lines[-1].rstrip()
       self.gui.set_text(self.gridbox, ''.join(self.lines))
@@ -239,9 +268,9 @@ class OcrCrossword(LetterGame):
            self.gui.set_text(self.direction, 'Down' if self.direction_mode else 'Across')     
            self.gui.set_props(self.direction, fill_color='lightblue' if self.direction_mode else 'cyan')     
                             
-        elif letter == 'Multi':
-           self.multi_mode = not self.multi_mode           
-           self.gui.set_props(self.multi_character, fill_color='lightblue' if self.multi_mode else 'cyan')    
+        elif letter == 'Indexes':
+           self.index_mode = not self.index_mode           
+           self.gui.set_props(self.multi_character, fill_color='lightblue' if self.index_mode else 'cyan')    
             
         elif letter == 'Add letters':
            self.letters_mode = not self.letters_mode
@@ -258,7 +287,12 @@ class OcrCrossword(LetterGame):
                 except (KeyboardInterrupt):
                   return
                 if letter:     
-                  if self.multi_mode:
+                  if self.index_mode and letter.isnumeric():
+                    self.indexes[origin] = int(letter)
+                    self.gui.add_numbers([Squares(origin, str(letter), 'yellow', z_position=30,
+                                        alpha=0.5, font=('Avenir Next', 18),
+                                        text_anchor_point=(-1.1, 1.2))], clear_previous=False)
+                  elif len(letter) == 1:
                       self.board_rc(origin, self.board, letter)
                   else:             
                     for index, l in enumerate(letter):
@@ -275,14 +309,16 @@ class OcrCrossword(LetterGame):
                         
     def save(self):
       np.save(savefile, self.board) 
+      np.save(savefile + '_indexes', self.indexes)
           
     def load(self):
       response = dialogs.alert('Load temporary file?', '', 'YES', 'NO', hide_cancel_button=True)
       if response == 1:
         try:
-          self.board = np.load(savefile + '.npy')         
-        except (Exception) as e:
-          print(e)       
+          self.board = np.load(savefile + '.npy')      
+          self.indexes = np.load(savefile + '_indexes.npy')
+        except (Exception):
+          print(e)    
         
     def run(self):
       self.create_grid()   
@@ -330,6 +366,11 @@ def main():
     
 if __name__ == '__main__':
     main()
+
+
+
+
+
 
 
 
