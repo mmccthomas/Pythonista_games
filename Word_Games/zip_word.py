@@ -12,6 +12,7 @@ import sys
 import random
 import traceback
 import dialogs
+from textwrap import wrap
 from itertools import zip_longest
 from time import sleep, time
 from queue import Queue
@@ -70,30 +71,33 @@ class ZipWord(LetterGame):
     self.update_board()
     
   def update_board(self, hint=False, filter_placed=None):
+    """ display the wordlist
+    needs to be different for landscape and portrait mode
+    for portrait, it may be better to display words in column order
+    use wrap function to maximise words across screen
+    """
     LetterGame.update_board(self, hint, filter_placed)
        
     # create text list
     msg = []
-    # TODO this needs some work
-    # confusion between filter_placed
-    
+    filtered_dict = {}
     # if filter_placed list only those words not yet on the board,
     # else those words on the board
     words_placed = [word.word for word in self.word_locations if word.fixed]
     words = []
     x, y, width, height = self.gui.grid.bbox
-    
+    scr_w, scr_h = self.gui.wh
     
     # iterate over word lengths
     for k, wordlist in self.all_word_dict.items():
       if wordlist:
-         words.append(f'\nLEN={k}\n')
+         #words.append(f'\nLEN={k}:\t')
          if filter_placed is True:
            # sort unplaced words
            w = sorted([word for word in wordlist if word not in words_placed])
            self.word_display = w
          elif filter_placed is False:
-           # sort placed words
+           # sort placed words           
            w = sorted([word for word in wordlist if word in words_placed])
            self.word_display = w
          else:  # None
@@ -102,26 +106,35 @@ class ZipWord(LetterGame):
                w = self.word_display
            else:
                w = sorted([word for word in wordlist])
-         if self.gui.device.endswith('landscape'):
-             words.extend([f'{word}\n' if i % 3 == 2 else f'{word}  '
-                           for i, word in enumerate(w)])
+         filtered_dict[k] = w 
+         if self.gui.device.endswith('landscape'):             
              position = (width + 10, -20)
              font = 'Fira Mono'
-             fontsize = 16
-             anchor = (0, 0)
-             
-         else:  # self.gui.device == 'ipad_portrait':
-            
-             words.extend([f'{word}\n' if i % 10 == 2 else f'{word}  '
-                          for i, word in enumerate(w)])
-             anchor = (0, 0)
-             position = (40, height+30)
              fontsize = 18
+             anchor = (0, 0)
+             word_block =[f'LEN={k}: ']
+             word_block.extend(w)
+             no_characters = (scr_w - position[0]) // (fontsize *3/4)
+             # extra CR for landscape
+             words.extend('\n'.join(wrap(' '.join(word_block), no_characters)) + '\n\n')
+                          
+         else:  # self.gui.device == 'ipad_portrait':            
+             #words.extend([f'{word}\n' if i % 10 == 2 else f'{word}  '
+             #             for i, word in enumerate(w)])
+             anchor = (0, 0)
+             position = (40, height)
+             fontsize = 18
+             word_block =[f'LEN={k}: ']
+             word_block.extend(w)
              font = 'Fira Mono'
-             # format into columns if it fits
-             w_cols, s, no_lines = self.format_for_portrait(self.all_word_dict) 
-             if no_lines <10:
-               words = w_cols
+             no_characters = (scr_w - position[0]) // (fontsize*.75)
+             words.extend('\n'.join(wrap(' '.join(word_block), no_characters)) + '\n')
+             
+    if self.gui.device.endswith('_portrait'):          
+      # format into columns if it fits
+      w_cols, s, no_lines = self.format_for_portrait(filtered_dict) 
+      if no_lines <10:
+         words = w_cols
     msg = ''.join(words)
     # set message box to be anchored at bottom left
     self.gui.set_moves(msg, font=(font, fontsize),
