@@ -122,7 +122,7 @@ class ZipWord(LetterGame):
              #words.extend([f'{word}\n' if i % 10 == 2 else f'{word}  '
              #             for i, word in enumerate(w)])
              anchor = (0, 0)
-             position = (40, height)
+             position = (40, height+20)
              fontsize = 18
              word_block =[f'LEN={k}: ']
              word_block.extend(w)

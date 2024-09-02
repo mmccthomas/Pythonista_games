@@ -47,6 +47,8 @@ def text_ocr(asset):
     handler = VNImageRequestHandler.alloc().initWithData_options_(img_data, None).autorelease()
     success = handler.performRequests_error_([req], None)    
     if success:
+        results =  [result.text() for result in req.results()]
+         
         return [str(result.text()) for result in req.results()]
         
 
@@ -187,7 +189,7 @@ class OcrCrossword(LetterGame):
           if i != 0 and char != ' ':
              item = str(i) + char
           elif i != 0:
-          	 item = str(i)
+             item = str(i)
           else:
              item = char       
           line = line + item + '/'
@@ -366,6 +368,7 @@ def main():
     
 if __name__ == '__main__':
     main()
+
 
 
 
