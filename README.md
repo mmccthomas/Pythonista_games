@@ -56,6 +56,17 @@ Pieceword
 ---------
 3x3 word tiles jumbled on a grid. Use the clues to rearrange them.
 
+Dropword
+--------
+A crossword filled with a section of words. The black squares have been removed, causing
+all the letter to drop. Reconstruct the crosssword by dragging the letters
+to their correct locations
+
+Krossword
+---------
+A reverse wordsearch. 
+Place the given words in their correct locations given then starting points
+
 Wordle clone
 ------------
 Possibly too simple, as only valid words are presented for selection
