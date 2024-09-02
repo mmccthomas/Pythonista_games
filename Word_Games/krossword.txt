@@ -1061,3 +1061,179 @@ Puzzle12_frame:
 'w/ /9/ / / / / / / / / / '
 'e/ / / / / /10/ / / / / / '
 'r/ / / /11/ / / / / / / / '
+
+Puzzle13:
+#660_38
+1
+BITE
+BLUES
+BRAE
+BUD
+BYE
+2
+CITE
+CLASP
+COMET
+CURIO
+3
+ACQUIRED
+APROPOS
+ARGUABLE
+4
+GATE
+GEE
+GLEN
+GRANULE
+GUITAR
+5
+MAUL
+MAY
+MERLE
+MIDI
+MOIRE
+6
+GERM
+GLUE
+GNUS
+GORGEOUS
+GOSSAMER
+7
+DISROBE
+DORMOUSE
+DYNAMO
+8
+BEHAVIOUR
+BLENDER
+BOOKEND
+BREWING
+9
+TAGINE
+TEMPERATE
+TOWER
+TRUST
+10
+PAROLED
+PASS
+PEARLS
+POKE
+POTASSIUM
+11
+ICED
+IMPLEMENT
+INK
+INTRINSIC
+ION
+12
+HEM
+HEN
+HER
+HOAR
+HOW
+13
+ACME
+ADO
+ALEE
+ANON
+14
+DEBATE
+DOUR
+DRINKING
+DUSTY
+
+Puzzle13_frame:
+' / /1/ / / / / /2/ / / / '
+' / / / / / / / / / / /3/ '
+' / / /4/ / / / / / / / / '
+' / / / / / /5/ / / / / / '
+' / / / / / / / / /6/ / / '
+'o/m/a/n/y/7d/ / / / / / / '
+'8/ / / / / /o/ / / / / / '
+' / / / / / / /r/ / / / / '
+' / / / / / / / /m/ /9/ / '
+' / / / / / / / / /o/ / /10'
+' /11/ / / / /12/ / / /u/ / '
+' / / /13/ / / / / / / /s/ '
+' / / / / / / /14/ / / / /e'
+
+Puzzle14:
+#660_72
+1
+SATCHEL
+SESAME
+SHINDIG
+SOAK
+STRAITENED
+2
+MALTREATING
+MEASLIEST
+MOON
+MOTHPROOF
+MOVIE
+3
+SEE
+SITAR
+SPA
+12
+4
+FERN
+FIFE
+FINGERTIPS
+FLAIL
+5
+TAROT
+TERRITORY
+TIGHTFISTED
+TRIATHLON
+TWILL
+6
+AEROBICS
+AIM
+AMETHYST
+ART
+7
+AIDEMEMOIRE
+ANTIOCH
+ARIADNE
+ASTI
+ATHLETE
+8
+SARI
+SEW
+SILENT
+SOLID
+9
+SPIT
+SPOT
+STEEL
+10
+POD
+POLO
+PREEN
+11
+ACE
+AIR
+AUK
+12
+DEPOSIT
+DOGSBODY
+DOT
+13
+ADVISE
+ANKLES
+AORTA
+ASTUTE
+
+Puzzle14_frame:
+' / / / / / /1/ / /a/ / / '
+' / / / /2/ / / /p/ / / / '
+' / / / / / / /3s/ / / / / '
+' / / / / / / / /e/ / / /4'
+'5/ / / / / / / / /e/ / / '
+' / / / / /6/ / / / / / / '
+' /7/ / / / / / / / / / / '
+' / / / / / / / / /8/ / / '
+' / / / / / / / / / / / / '
+' / / /9/ / / / /10/ / / / '
+' / / / / / / / / / / /11/ '
+' / /12/ / / / / / / / / / '
+' / / / / / / /13/ / / / / '

@@ -338,8 +338,8 @@ class ZipWord(LetterGame):
   def restart(self):
     # TODO this does not always work. Find why
     self.gui.gs.close()
-    self.__init__()
-    self.run()
+    g = ZipWord()
+    g.run()
 
           
 if __name__ == '__main__':
