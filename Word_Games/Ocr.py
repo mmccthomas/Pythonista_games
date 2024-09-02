@@ -319,7 +319,7 @@ class OcrCrossword(LetterGame):
         try:
           self.board = np.load(savefile + '.npy')      
           self.indexes = np.load(savefile + '_indexes.npy')
-        except (Exception):
+        except (Exception) as e:
           print(e)    
         
     def run(self):
@@ -363,7 +363,7 @@ def main():
       all_text = []
     ocr = OcrCrossword(all_text)
     if all_text:
-       ocr.filter(sort_alpha=False, max_length=None, min_length=None, sort_length=False, remove_numbers=True)
+       ocr.filter(sort_alpha=False, max_length=None, min_length=None, sort_length=False, remove_numbers=False)
     ocr.run()
     
 if __name__ == '__main__':
