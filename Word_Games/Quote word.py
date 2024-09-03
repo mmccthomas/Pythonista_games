@@ -11,6 +11,8 @@ from PIL import Image
 import ui
 import io
 import numpy as np
+import textwrap
+import random
 from types import SimpleNamespace
 from Letter_game import LetterGame
 import gui.gui_scene as gscene
@@ -35,6 +37,8 @@ class QuoteWord(LetterGame):
        return 
     self.gui.build_extra_grid(4, 4, grid_width_x=3, grid_width_y=3,
                               color='red', line_width=5)
+    self.gui.build_extra_grid(12, 12, grid_width_x=1, grid_width_y=1,
+                              color='black', line_width=2)                        
     
        
     x, y, w, h = self.gui.grid.bbox
@@ -44,11 +48,11 @@ class QuoteWord(LetterGame):
                              'Reveal': self.reveal,
                              'Quit': self.quit})
     self.span = self.sizex // TILESIZE
-    self.rack = self.display()
+    self.rack, msg = self.display()
     
     self.gui.clear_messages()
     self.gui.set_enter('', stroke_color='black') # hide box
-    self.gui.set_moves('\n'.join(self.wordlist), position=(w + 50, h / 2), font=('Avenir', 20))
+    self.gui.set_moves(msg, position=(w + 50, h / 2), font=('Avenir', 20))
     self.gui.set_top(f'Pieceword no {self.selection.capitalize()}')
     self.finished = False
     
@@ -84,7 +88,7 @@ class QuoteWord(LetterGame):
           except (Exception) as e:
             print(e)
         if selection == 'cancelled_':
-        	return False 
+          return False 
         if len(selection):
           if self.debug:   
             print(f'{selection=}')
@@ -123,18 +127,33 @@ class QuoteWord(LetterGame):
   def display(self):
       """ display tiles on board
       """
+      text = self.wordlist[0].lower().replace(' ', '#')
+      words_list = textwrap.wrap(text, width=12, break_long_words=True, max_lines=12)
+      for r, row in enumerate(words_list):
+        for c, char in enumerate(row):
+          self.board[r][c] = char
+      self.gui.update(self.board)  
       rack = {}
     
       self.board = np.array(self.board)
+      self.solution = self.board.copy()
       for n in range(self.span * self.sizey//TILESIZE):
         coord = divmod(n, self.span)       
-        rack[coord] = n
-        self.place_tile(coord, n)
-         
+        line = self.get_tile(coord).reshape((1,-1))[0]
+        np.random.shuffle(line)
+        rack[coord] = line.copy()
+      text = [] 
+      for k,v in rack.items():
+        v[~np.char.isalpha(v)] = ''
+        coord = str(TILESIZE * k[0]+ 1) + 'ABCDEFGHIJKL'[k[1]*TILESIZE]
+        text.append(f'{coord} {"".join(v)}')
+      msg = '\n'.join(text)
+      self.gui.print_board(self.board)  
       self.gui.update(self.board)
-      
+      self.board[np.char.isalpha(self.board)] = ' '
+      self.gui.update(self.board)
                   
-      return rack
+      return rack, msg
           
   def get_size(self):
     LetterGame.get_size(self, '12, 12')
@@ -161,14 +180,18 @@ class QuoteWord(LetterGame):
     point = self.gui.gs.start_touch - gscene.GRID_POS
     # touch on board
     # Coord is a tuple that can support arithmetic
-    rc_start = Coord(self.gui.gs.grid_to_rc(point)) // TILESIZE
+    rc_start = Coord(self.gui.gs.grid_to_rc(point)) # // TILESIZE
     
     if self.check_in_board(rc_start):
+      
         rc = Coord(move[-2]) // TILESIZE
-        if self.tiles is None:
-           return rc, self.rack[rc_start].number, rc_start
+        if self.board[rc_start] == ' ':
+          if rc in self.rack:
+            arr = self.rack[rc].copy()
+            self.rack.pop(rc, None)
+          return rc, arr, rc_start
         else:
-          return rc, self.rack[rc], rc_start
+          return rc, self.board[rc_start], rc_start
                            
     return (None, None), None, None
   
@@ -176,6 +199,11 @@ class QuoteWord(LetterGame):
       r, c = coord
       self.board[r * TILESIZE:r * TILESIZE + TILESIZE,
                  c * TILESIZE:c * TILESIZE + TILESIZE] = self.tiles[tile_index]
+                 
+  def get_tile(self, coord):
+      r, c = coord
+      return self.board[r * TILESIZE:r * TILESIZE + TILESIZE,
+                 c * TILESIZE:c * TILESIZE + TILESIZE] 
          
   def process_turn(self, move, board):
     """ process the turn
@@ -187,10 +215,11 @@ class QuoteWord(LetterGame):
       # self.gui.set_message(f'{origin}>{coord}={letter}')
       if coord == (None, None):
         return 0
-        
-      elif letter == 'Finish':
-        return 0
-      elif letter != '':
+      elif isinstance(letter, np.ndarray):
+        #fill 3x3 tile with contents of letter array
+        coord_ = Coord(divmod(origin, self.span)) 
+        pass 
+      elif letter != ' ':
         # swap tiles
         # take tile at end coord and move it to start coord
         tile_move = self.rack[origin]
@@ -234,17 +263,8 @@ class QuoteWord(LetterGame):
       
   def game_over(self):
     # compare placement with solution
-    state = ''
-    for r in range(self.sizey // TILESIZE):
-      for c in range(self.span):
-        if self.tiles is None:
-          no = f'{self.rack[(r, c)].number:02d}'
-        else:
-          no = f'{self.rack[(r, c)]:02d}'
-        state += no 
-    if self.debug:   
-        print(state)
-    if state == self.solution:
+    
+    if np.array_equal(self.board,self.solution):
       self.gui.set_message('Game over')
       return True
     return False
@@ -262,6 +282,7 @@ if __name__ == '__main__':
     quit = g.wait()
     if quit:
       break
+
 
 
 
