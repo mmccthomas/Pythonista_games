@@ -18,7 +18,6 @@ from Letter_game import LetterGame
 import gui.gui_scene as gscene
 from gui.gui_scene import Tile
 from gui.gui_interface import Coord
-from scene import Texture, LabelNode
 PUZZLELIST = "quoteword.txt"
 TILESIZE = 3
 
@@ -191,15 +190,32 @@ class QuoteWord(LetterGame):
             self.rack.pop(rc, None)
           return rc, arr, rc_start
         else:
-          return rc, self.board[rc_start], rc_start
+          return Coord(move[-2]) , self.board[rc_start], rc_start
                            
     return (None, None), None, None
   
-  def place_tile(self, coord, tile_index):
-      r, c = coord
-      self.board[r * TILESIZE:r * TILESIZE + TILESIZE,
-                 c * TILESIZE:c * TILESIZE + TILESIZE] = self.tiles[tile_index]
-                 
+  def place_tile(self, origin, letter):
+        #fill 3x3 tile with contents of letter array
+        coord_ = Coord(origin) // TILESIZE
+        coord_ = coord_ * TILESIZE
+        self.gui.set_message(f'{origin}>{coord_}')
+        pos_index, letter_index = 0, 0
+        while True:
+          r_, c_ = divmod(pos_index, TILESIZE)
+          try:
+            l = letter[letter_index]
+            if l.isalpha():
+              if  self.board[coord_ + (r_, c_)] == ' ':
+                 self.board[coord_ + (r_, c_)] = l
+                 letter_index += 1
+              pos_index += 1
+              
+            else:
+              letter_index +=1
+          except (IndexError):
+            break
+            
+      
   def get_tile(self, coord):
       r, c = coord
       return self.board[r * TILESIZE:r * TILESIZE + TILESIZE,
@@ -211,29 +227,19 @@ class QuoteWord(LetterGame):
     """
     if move:
       coord, letter, origin = move
-      
+      self.gui.set_message(f'{origin}>{coord}={letter}')
       # self.gui.set_message(f'{origin}>{coord}={letter}')
       if coord == (None, None):
         return 0
       elif isinstance(letter, np.ndarray):
-        #fill 3x3 tile with contents of letter array
-        coord_ = Coord(divmod(origin, self.span)) 
-        pass 
-      elif letter != ' ':
+        self.place_tile(origin, letter)
+      elif letter != ' ':        
         # swap tiles
         # take tile at end coord and move it to start coord
-        tile_move = self.rack[origin]
-        tile_existing = self.rack[coord]
-        if self.tiles is None:
-          tile_move.set_pos(coord)
-          tile_existing.set_pos(origin)         
-        else:
-          self.place_tile(coord, tile_move)
-          self.place_tile(origin, tile_existing)
-          self.gui.update(self.board)
-        # now update rack
-        self.rack[origin] = tile_existing
-        self.rack[coord] = tile_move
+        if self.board[origin].isalpha() and self.board[coord].isalpha():
+           self.board[origin], self.board[coord] = self.board[coord], self.board[origin]
+           
+      self.gui.update(self.board)
     return 0
     
   def get_tile_no(self, n):
@@ -243,20 +249,9 @@ class QuoteWord(LetterGame):
                         
   def reveal(self): 
     """ place all tiles in their correct location """
-    for n in range(self.span * self.sizey//TILESIZE):
-        val = int(self.solution[n * 2: n * 2 + 2])
-        coord = Coord(divmod(n, self.span))
-        if self.tiles is not None:
-          self.place_tile(coord,  val)
-          self.rack[coord] = val
-          self.gui.update(self.board)
-        else:
-          try:
-            t = self.get_tile_no(val)
-            t.set_pos(coord)
-            self.rack[coord] = t
-          except (AttributeError):
-            pass        
+    
+    self.gui.update(self.solution)
+        
     sleep(2)
     self.game_over()
     self.gui.gs.show_start_menu()
@@ -282,6 +277,8 @@ if __name__ == '__main__':
     quit = g.wait()
     if quit:
       break
+
+
 
 
 
