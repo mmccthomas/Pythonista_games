@@ -51,7 +51,7 @@ class QuoteWord(LetterGame):
     
     self.gui.clear_messages()
     self.gui.set_enter('', stroke_color='black') # hide box
-    self.gui.set_moves(msg, position=(w + 50, h / 2), font=('Avenir', 20))
+    self.gui.set_moves(msg, position=(w + 50, h / 2), font=('Fira Mono', 20))
     self.gui.set_top(f'Pieceword no {self.selection.capitalize()}')
     self.finished = False
     
