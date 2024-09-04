@@ -1,4 +1,4 @@
 *.pkl
 *.json
 Kye/kye_config.json
-Word_Games/Ocr_save.npy
+Word_Games/*.npy
