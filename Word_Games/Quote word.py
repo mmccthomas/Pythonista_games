@@ -91,31 +91,7 @@ class QuoteWord(LetterGame):
         if len(selection):
           if self.debug:   
             print(f'{selection=}')
-          self.wordlist = self.word_dict[selection]
-          
-          
-             
-          if selection + '_frame' in self.word_dict:
-            # rearrange frame text into N 3x3 tiles
-            frame = self.word_dict[selection + '_frame']
-            if self.debug:   
-               [print(row, len(row)) for row in frame] # for debug
-            assert all([len(row) == len(frame[0]) for row in frame]), 'Error in string lengths'
-            # convert to numpy
-            frame = np.array([np.array(row.lower(), dtype=str) for row in frame])
-            
-            frame = frame.view('U1').reshape((-1, self.image_dims[1] * TILESIZE))
-            # replace spaces and dot by hash for display
-            frame[frame == ' '] = '#'
-            frame[frame == '.'] = '#'
-            # divide into rows of 3
-            rowsplit = np.split(frame, self.image_dims[0], axis=0)
-            # divide each row into blocks of 3x3
-            colsplit = [np.split(rowsplit[i], self.image_dims[1], axis=1) for i in range(len(rowsplit))]
-            # add all together to get N 3x3 blocks
-            self.tiles = np.concatenate(colsplit)
-            
-          
+          self.wordlist = self.word_dict[selection]   
           self.gui.selection = ''
           return selection
         elif selection == "Cancelled_":
@@ -161,10 +137,7 @@ class QuoteWord(LetterGame):
     return
      
   def initialise_board(self):
-    pass
-      
-  
-  
+    pass   
       
   def get_player_move(self, board=None):
     """Takes in the user's input and performs that move on the board,
@@ -214,8 +187,7 @@ class QuoteWord(LetterGame):
               letter_index +=1
           except (IndexError):
             break
-            
-      
+                
   def get_tile(self, coord):
       r, c = coord
       return self.board[r * TILESIZE:r * TILESIZE + TILESIZE,
@@ -242,11 +214,6 @@ class QuoteWord(LetterGame):
       self.gui.update(self.board)
     return 0
     
-  def get_tile_no(self, n):
-    for t in self.gui.gs.get_tiles():
-        if t.number == n:
-            return t
-                        
   def reveal(self): 
     """ place all tiles in their correct location """
     
@@ -257,8 +224,7 @@ class QuoteWord(LetterGame):
     self.gui.gs.show_start_menu()
       
   def game_over(self):
-    # compare placement with solution
-    
+    # compare placement with solution    
     if np.array_equal(self.board,self.solution):
       self.gui.set_message('Game over')
       return True

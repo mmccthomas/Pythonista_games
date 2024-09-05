@@ -493,8 +493,11 @@ class Gui():
     return self.gs.rc_to_pos(coord[0], coord[1])
 
 class Coord(tuple):
-    ''' a simple class to allow addition and slicing'''
-    
+    """ a simple class to allow addition and slicing
+    example: coord = Coord(rc)
+             neighbours = coord.all_neighbours()
+             scaled = coord * 3
+    """
     def __init__(self, val):
         self.val = val
         self.r = self.val[0]
@@ -502,32 +505,37 @@ class Coord(tuple):
         self.row = self.r
         self.col = self.c
         self.all_dirs = [(-1, 0), (-1, 1), (0, 1),  (1, 1), (1, 0), (1, -1), (0, -1), (-1, -1)]
+        self.compass_points = ['N', 'NE', 'E', 'SE', 'S', 'SW', 'W', 'NW']
         self.nsew_dirs = [(-1, 0), (0, 1),  (1, 0), (0, -1)]
         
     def __repr__(self):
         return f'Coord({self.row}, {self.col})'
         
     def __add__(self, other):
+       ''' implement + '''
        return Coord(tuple(p+q for p, q in zip(self.val, other)))
        
     def __sub__(self, other):
+        ''' implement  - '''
         return Coord(tuple(p-q for p, q in zip(self.val, other)))
         
     def __mul__(self, scalar_int):
-    	  return Coord(tuple(p * scalar_int for p in self.val))
-    	  
+        ''' implement * '''
+        return Coord(tuple(p * scalar_int for p in self.val))
+        
     def __floordiv__(self, scalar_int):
-    	  return Coord(tuple(p // scalar_int for p in self.val))
-    	  
+        ''' implement // '''
+        return Coord(tuple(p // scalar_int for p in self.val))
+        
     def __truediv__(self, scalar):
-    	  return Coord(tuple(p / scalar for p in self.val)) 
-    	  
+        ''' implement // '''
+        return Coord(tuple(p / scalar for p in self.val)) 
+        
     def all_neighbours(self):
       return [Coord(self.__add__(d)) for d in self.all_dirs]
       
     def nsew(self):
-        """ up, down, left, right """
-        
+        """ up, down, left, right """        
         return [Coord(self.__add__(d)) for d in self.nsew_dirs]
       
     
@@ -553,5 +561,6 @@ class Squares():
     for k, v in kwargs.items():
       setattr(self, k, v)
       
+
 
 
