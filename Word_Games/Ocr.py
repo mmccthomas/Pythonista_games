@@ -8,6 +8,9 @@ import sys
 import clipboard
 import dialogs
 from queue import Queue
+import pandas as pd
+from matplotlib import pyplot
+import traceback
 current = os.path.dirname(os.path.realpath(__file__))
 parent = os.path.dirname(current)
 sys.path.append(parent)
@@ -47,10 +50,53 @@ def text_ocr(asset):
     handler = VNImageRequestHandler.alloc().initWithData_options_(img_data, None).autorelease()
     success = handler.performRequests_error_([req], None)    
     if success:
+        all_text = {}
+        for result in req.results():
+          cg_box = result.boundingBox()
+          x, y = cg_box.origin.x, cg_box.origin.y
+          w, h = cg_box.size.width, cg_box.size.height
+          all_text[x, y, w, h] = str(result.text())
+        
         results =  [result.text() for result in req.results()]
          
-        return [str(result.text()) for result in req.results()]
-        
+        return all_text #[str(result.text()) for result in req.results()]        
+
+def sort_by_postion(all_text_dict):
+    # use the box data to reorder text
+    # attempts to reconstruct crossword letters
+    
+    #attempt to put dictionary into regular grid
+    # all_text_dict has form (x, y, w, h): text
+    #x, y, w, h are scaled 0-1.0
+    
+    df = pd.DataFrame(np.array(list(all_text_dict.keys())), columns=('x', 'y', 'w', 'h'))
+    # scale 0-1000 and round to nearest 5
+    df2 = df.multiply(1000).astype(int)    
+    df3 = df2.divide(5.0).round().multiply(5).astype(int)
+    # find sungle spacing
+    df_diff = df3.diff()
+    df_med = df_diff.median()['y']
+    # scale to spacing
+    df4 = df3.divide(-df_med).round().astype(int)
+    #stitch text
+    text_df = pd.DataFrame(np.array(list(all_text_dict.values())), columns =['text'])
+    df = df4.join(text_df)   
+    #sort by y then x
+    sorted_df = df.sort_values(by=['y', 'x'], ascending=[False, True])
+    print(sorted_df.to_string())
+    # prepare board
+    board =np.empty((df['y'].max()+1, df['x'].max()+1), dtype='U1')
+    board[:,:] = ' '
+    #fill board
+    try:
+        for _, row in sorted_df.iterrows():
+    	      board[row['y'], row['x']: row['x']+len(row['text'])] = list(row['text'])
+    except (ValueError) as e:
+    	print(traceback.format_exc())
+    # turn upside down
+    board = np.flipud(board)
+    # print it
+    [print(''.join(row)) for row in board]
 
 class OcrCrossword(LetterGame):
     def __init__(self, all_text):
@@ -358,9 +404,12 @@ def main():
     all_assets = photos.get_assets()
     asset = photos.pick_asset(assets=all_assets)
     if asset is not None:
-       all_text = text_ocr(asset)
+       all_text_dict= text_ocr(asset)
     else:
       all_text = []
+    sort_by_postion(all_text_dict)
+    
+    all_text = list(all_text_dict.values())
     ocr = OcrCrossword(all_text)
     if all_text:
        ocr.filter(sort_alpha=False, max_length=None, min_length=None, sort_length=False, remove_numbers=False)
@@ -368,6 +417,11 @@ def main():
     
 if __name__ == '__main__':
     main()
+
+
+
+
+
 
 
 
