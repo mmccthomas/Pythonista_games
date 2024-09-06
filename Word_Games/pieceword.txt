@@ -58,6 +58,29 @@ N CO R N ELF TE
  DOLMOVER DAOWE
 M WE W TEP M E 
 
+437_4_frame2:
+'f/e/i/r/a/d/s/t/y/s/#/g/#/u/#'
+'e/d/#/e/p/e/t/#/a/c/o/r/i/c/i'
+'l/#/h/#/s/#/a/i/r/o/#/a/n/e/#'
+'s/#/c/y/n/i/#/r/#/e/#/m/o/o/n'
+'c/h/u/t/#/n/c/o/d/s/t/#/a/#/c'
+'a/#/p/h/e/a/#/l/o/s/e/n/t/r/y'
+'u/#/b/a/m/#/#/f/#/u/e/s/l/i/o'
+'s/o/o/r/e/d/m/a/g/n/#/t/d/#/l'
+'h/#/l/#/n/#/o/r/a/l/t/e/s/p/a'
+'k/e/e/o/r/p/#/e/#/i/t/s/o/f/#'
+'#/t/#/m/#/a/t/a/x/n/#/y/t/i/o'
+'f/a/r/e/s/t/a/l/#/r/o/m/#/e/#'
+'l/e/e/#/r/o/r/i/p/p/e/n/t/#/a'
+'e/#/e/d/i/c/#/g/#/l/#/o/h/u/g'
+'r/o/d/#/a/#/e/n/t/a/#/m/r/#/e'
+'n/#/t/u/#/b/c/#/d/i/j/o/i/#/l'
+'#/d/e/n/c/l/o/d/#/n/#/u/n/#/l'
+'r/e/d/t/#/e/t/#/b/e/a/s/g/a/y'
+'n/#/c/p/#/r/#/n/#/e/l/f/#/t/e'
+'#/d/o/l/m/o/v/e/r/#/d/a/o/w/e'
+'m/#/w/e/#/w/#/t/e/p/#/m/#/e/#'
+
 437_76:
 ''
 7, 5

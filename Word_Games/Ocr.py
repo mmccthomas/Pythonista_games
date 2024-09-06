@@ -47,6 +47,7 @@ def text_ocr(asset):
     req = VNRecognizeTextRequest.alloc().init().autorelease()
     req.setRecognitionLanguages_(['zh-Hant', 'en-US'])
     req.setRecognitionLevel_(0) # accurate
+    req.setCustomWords_([x for x in list('ABCDEFGHIJKLMNOPQRSTUVWXYZ')]) # individual letters
     handler = VNImageRequestHandler.alloc().initWithData_options_(img_data, None).autorelease()
     success = handler.performRequests_error_([req], None)    
     if success:
@@ -71,16 +72,16 @@ def sort_by_postion(all_text_dict):
     
     df = pd.DataFrame(np.array(list(all_text_dict.keys())), columns=('x', 'y', 'w', 'h'))
     # scale 0-1000 and round to nearest 5
-    df2 = df.multiply(1000).astype(int)    
-    df3 = df2.divide(5.0).round().multiply(5).astype(int)
+    df = df.multiply(1000).astype(int)    
+    df = df.divide(5.0).round().multiply(5).astype(int)
     # find sungle spacing
-    df_diff = df3.diff()
+    df_diff = df.diff()
     df_med = df_diff.median()['y']
     # scale to spacing
-    df4 = df3.divide(-df_med).round().astype(int)
+    df = df.divide(-df_med).round().astype(int)
     #stitch text
     text_df = pd.DataFrame(np.array(list(all_text_dict.values())), columns =['text'])
-    df = df4.join(text_df)   
+    df = df.join(text_df)   
     #sort by y then x
     sorted_df = df.sort_values(by=['y', 'x'], ascending=[False, True])
     print(sorted_df.to_string())
@@ -90,18 +91,19 @@ def sort_by_postion(all_text_dict):
     #fill board
     try:
         for _, row in sorted_df.iterrows():
-    	      board[row['y'], row['x']: row['x']+len(row['text'])] = list(row['text'])
+            board[row['y'], row['x']: row['x']+len(row['text'])] = list(row['text'])
     except (ValueError) as e:
-    	print(traceback.format_exc())
+      print(traceback.format_exc())
     # turn upside down
     board = np.flipud(board)
     # print it
     [print(''.join(row)) for row in board]
+    return board, board.shape
 
 class OcrCrossword(LetterGame):
-    def __init__(self, all_text):
+    def __init__(self, all_text, board, board_size):
         self.load() # attempt to load temp file
-        self.SIZE = self.get_size()        
+        self.SIZE = self.get_size(board, board_size)        
         self.q = Queue()
         self.log_moves = False
         self.gui = Gui(self.board, Player())
@@ -121,12 +123,23 @@ class OcrCrossword(LetterGame):
                                   color='black', line_width=1)
         self.all_text = all_text
         self.x, self.y, self.w, self.h = self.gui.grid.bbox
+        self.gui.update(self.board)
         self.gui.clear_messages()
         self.box_positions()
         self.set_buttons()
         self.add_boxes()
         self.add_indexes()
         
+    def get_size(self, board, board_size):
+      if board is not None:
+        response = dialogs.alert('Use decoded board?', '', 'YES', 'NO', hide_cancel_button=True)
+        if response == 1:
+          try:
+            self.board = np.char.lower(board)            
+          except (Exception) as e:
+            print(e)      
+      super().get_size()
+      
     def add_indexes(self):
       if hasattr(self, 'indexes'):
           indexes = np.argwhere(self.indexes !=0)
@@ -407,16 +420,18 @@ def main():
        all_text_dict= text_ocr(asset)
     else:
       all_text = []
-    sort_by_postion(all_text_dict)
+      all_text_dict = {}
+    board, board_size = sort_by_postion(all_text_dict)
     
     all_text = list(all_text_dict.values())
-    ocr = OcrCrossword(all_text)
+    ocr = OcrCrossword(all_text, board, board_size)
     if all_text:
        ocr.filter(sort_alpha=False, max_length=None, min_length=None, sort_length=False, remove_numbers=False)
     ocr.run()
     
 if __name__ == '__main__':
     main()
+
 
 
 
