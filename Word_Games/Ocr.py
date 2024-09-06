@@ -66,34 +66,41 @@ def sort_by_postion(all_text_dict):
     # use the box data to reorder text
     # attempts to reconstruct crossword letters
     
+    if not all_text_dict:
+    	return None, None
+    	
     #attempt to put dictionary into regular grid
     # all_text_dict has form (x, y, w, h): text
-    #x, y, w, h are scaled 0-1.0
-    
+    #x, y, w, h are scaled 0-1.0      	
     df = pd.DataFrame(np.array(list(all_text_dict.keys())), columns=('x', 'y', 'w', 'h'))
     # scale 0-1000 and round to nearest 5
     df = df.multiply(1000).astype(int)    
     df = df.divide(5.0).round().multiply(5).astype(int)
-    # find sungle spacing
+    # find  spacing of rows
     df_diff = df.diff()
     df_med = df_diff.median()['y']
     # scale to spacing
     df = df.divide(-df_med).round().astype(int)
-    #stitch text
+    
+    #stitch text as new column
     text_df = pd.DataFrame(np.array(list(all_text_dict.values())), columns =['text'])
-    df = df.join(text_df)   
+    df = df.join(text_df) 
+      
     #sort by y then x
     sorted_df = df.sort_values(by=['y', 'x'], ascending=[False, True])
+    
+    # print all of the dataframe
     print(sorted_df.to_string())
+    
     # prepare board
-    board =np.empty((df['y'].max()+1, df['x'].max()+1), dtype='U1')
-    board[:,:] = ' '
-    #fill board
+    board = np.empty((df['y'].max()+1, df['x'].max()+1), dtype='U1')
+    board[:, :] = ' '
+     #attempt to fill board given by row and col
     try:
         for _, row in sorted_df.iterrows():
             board[row['y'], row['x']: row['x']+len(row['text'])] = list(row['text'])
     except (ValueError) as e:
-      print(traceback.format_exc())
+        print(traceback.format_exc())
     # turn upside down
     board = np.flipud(board)
     # print it
