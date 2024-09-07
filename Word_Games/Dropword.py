@@ -109,8 +109,8 @@ class DropWord(LetterGame):
   def drop_words(self):
     """ delete all blocks and drop letters to the bottom """
     self.solution = self.board.copy()    
-    self.gui.update(self.board)
-    sleep(0.5)
+    #self.gui.update(self.board)
+    #sleep(0.5)
     self.board[self.board =='.'] = '#'
     self.gui.print_board(self.board, 'initial board')
     for r in range(self.sizey-1, 1, -1):
@@ -121,7 +121,7 @@ class DropWord(LetterGame):
             above = self.board[:r, c]
             self.board[1: above.shape[0] + 1, c] = above
             self.board[0, c] = ' '
-            self.gui.update(self.board, str(r))
+            #self.gui.update(self.board, str(r))
           else:
             break
     # now reset centre column
@@ -152,7 +152,7 @@ class DropWord(LetterGame):
      fixed = len([word for word in self.word_locations if word.fixed]) 
      no_words = len(self.word_locations)      
      self.gui.set_message(f'Filled {fixed}/ {no_words} words')       
-     self.gui.update(self.board)                
+     #self.gui.update(self.board)                
   
   def run(self):
     """
