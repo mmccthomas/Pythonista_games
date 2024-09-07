@@ -71,14 +71,21 @@ Wordle clone
 ------------
 Possibly too simple, as only valid words are presented for selection
 
+Quoteword
+---------
+Take a short quote (used Stephen Fry). Scramble the letters.
+You must swap letters to descramble the quote.
+This is WIP as the game is not very interesting at present
+
 Tetris
 ------
 Simple implemation of a classic game. 
 An early attempt by me, could be prettier!
 
-Demolition (my own from 1983!)
+Demolition
 -----------
-VERY simple ball drop program in the style of breakout
+VERY simple ball drop program in the style of breakout.
+Originally programmed on Commodore PET in 1983!
 
 SeaBattle
 ---------
@@ -119,6 +126,11 @@ Caterpillar
 -----------
 a version of Snake modelled on The Very Hungry Caterpillar for my grandchildren
 
+Ocr
+---
+This is used to read text from an image, and also used to create crossword frame.
+Uses Apple UiKit for Ocr. Attempts made to read single letters from crossword grid, but not very successful.
+experiences crashes sometimes, hence each move us stored in numpy array for instant recovery.
 
 
 Much of the  working engines of these games were provided by other developers.
