@@ -209,7 +209,7 @@ class Gui():
   
   def input_numbers(self, prompt='', position=None, items=None, **kwargs):
     """ pop up a number panel """
-    self.number_panel = ui.load_view('../gui/Number_panel.pyui')
+    self.number_panel = ui.load_view('Number_panel.pyui')
     self.buttons = [self.number_panel[f'button{n}'] for n in range(1,10)]
     self.prompt= self.number_panel['prompt']
     self.prompt.text = prompt
@@ -227,7 +227,7 @@ class Gui():
     
   def input_letters(self, prompt='', position=None, items=None, **kwargs):
     """ pop up a letter panel """
-    self.letter_panel = ui.load_view('../gui/Letter_panel.pyui')
+    self.letter_panel = ui.load_view('Letter_panel.pyui')
     self.buttons = [self.letter_panel[f'button{n}'] for n in 'abcdefghijklmnopqrstuvwxyz ']
     self.prompt= self.letter_panel['prompt']
     self.prompt.text = prompt

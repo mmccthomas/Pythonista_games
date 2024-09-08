@@ -15,7 +15,12 @@ class Wordle(LetterGame):
   def __init__(self):
     LetterGame.__init__(self)
     self.first_letter = False
-    
+    self.gui.set_pause_menu({'Continue': self.gui.dismiss_menu, 
+                              'New ....': self.restart,
+                              #'Hint': self.hint,
+                              #'Reveal': self.reveal,
+                              'Quit': self.quit})
+    self.gui.set_start_menu({'New Game': self.restart, 'Quit': self.quit})
     
   def run(self):
     #LetterGame.run(self)
@@ -183,16 +188,9 @@ class Wordle(LetterGame):
   def restart(self):
     self.gui.gs.close()
     self.finished = False
-    self.SIZE = self.get_size() 
-    self.gui = Gui(self.board, Player())
-    self.gui.set_alpha(True) 
-    self.gui.set_grid_colors(grid='lightgrey', highlight='lightblue')
-    self.gui.require_touch_move(False)
-    self.gui.allow_any_move(True)
-    self.gui.setup_gui(q=self.q)
-    self.run() 
-    
-    
+    g = Wordle()
+    g.run()
+            
     
 if __name__ == '__main__':
   g = Wordle()
