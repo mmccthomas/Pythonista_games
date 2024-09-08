@@ -1,4 +1,4 @@
 *.pkl
 *.json
-Kye/kye_config.json
+Kye/*.json
 Word_Games/*.npy
