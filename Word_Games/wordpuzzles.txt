@@ -3251,3 +3251,96 @@ Puzzle36-78_frame:
 ' / / /#/#/#/ /#/#/ /#/#/ /#/#/ /#/#/ /#/#/#/ / / '
 ' /#/ /#/#/#/ /#/#/ /#/#/ /#/#/ /#/#/ /#/#/#/ /#/ '
 ' / / / / / / /#/#/ / / / / / / /#/#/ / / / / / / '
+
+Puzzle37-72:
+Hue
+Ire
+Jam
+Oar
+Pep
+Rut
+Tea
+Web
+Wry
+Atom
+Draw
+Join
+Knee
+Luge
+Peck
+Raft
+Rail
+Clunk
+Delta
+Exile
+Motif
+Ranch
+Sonar
+Tenon
+Until
+Enlace
+Errand
+Golden
+Import
+Nudism
+Nutria
+Pompom
+String
+Equable
+Jugular
+Mudbath
+Rebirth
+Rollmop
+Hostelry
+Incubate
+Relevant
+Sparsity
+Throttle
+Tiramisu
+Actuarial
+Airworthy
+Apportion
+Beekeeper
+Heartfelt
+Patchouli
+Sandpaper
+Workbench
+Beautician
+Motorcycle
+Naturalism
+Needlecord
+Nutcracker
+Obligatory
+Parliament
+Refundable
+
+Puzzle37-72_frame:
+'#/#/ / / / / / / /#/ / / / / / '
+' /#/ /#/ /#/ /#/ /#/#/ /#/#/ /#'
+' / / / / / / / / / /#/ / / / /#'
+' /#/ /#/ /#/ /#/ /#/#/ /#/#/ /#'
+' /#/ /#/#/#/ /#/ /#/ / / / / / '
+' / / / / / / / / / /#/ /#/#/ /#'
+' /#/ /#/ /#/ /#/ /#/#/ /#/#/ /#'
+' / / / / / / / / / /#/ / / / / '
+' /#/#/#/ /#/ /#/ /#/#/#/ /#/ /#'
+' / / / / / / / / /#/#/ / / / /#'
+'#/#/#/#/ /#/#/#/#/ /#/#/ /#/#/#'
+' / / / / / / /#/#/ /#/#/ /#/#/#'
+' /#/ /#/ /#/#/ / / / / / / / /#'
+' /#/ /#/#/#/#/ /#/ /#/ /#/#/ /#'
+' / / / / / /#/ /#/#/ / / /#/ /#'
+'#/#/ /#/ /#/ /#/ /#/#/ /#/ / / '
+' / / / / /#/ / / / / / /#/#/ /#'
+' /#/#/#/ /#/ /#/ /#/#/ / / / / '
+' / / / / / / / / /#/#/ /#/#/ /#'
+'#/ /#/ /#/#/ /#/ / / / /#/#/#/#'
+' / / / / / / / /#/ /#/ / / / / '
+'#/#/ /#/ /#/ /#/#/ /#/#/ /#/#/ '
+' / / / / / /#/ / / / / / / /#/ '
+'#/#/ /#/ /#/#/#/#/ /#/#/ /#/#/ '
+'#/ / / / / / /#/ / / / / /#/#/ '
+' /#/ /#/ /#/ /#/#/ /#/#/ / / / '
+' / / /#/ / / / / / / / / /#/#/ '
+' /#/ / / /#/ /#/#/ /#/#/ /#/#/ '
+' / / /#/ / / / / / / / / / /#/#'

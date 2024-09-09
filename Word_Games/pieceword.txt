@@ -1281,3 +1281,126 @@ and enthusiasm
 animal skin
 20 Loud noise
 21 Staff of the royal regalia • Liquorice flavouring
+
+300_16:
+''
+7, 5
+123
+
+300_16_frame:
+RADEPT G. Y CUS
+ED. A VERPENA E
+DOT N. D  T SOR
+TLELITLIN. E SL
+ EXE EEV MPSWE 
+DICALA YO. SHAL
+  CTATN TE. IAL
+SMAW UGLINSLS E
+  SACIE OD. TED
+ I EAKTARLTOABA
+ S  RE SE HBSE 
+UTHNEDSS VENCEN
+ T PAUI ASTRL. 
+ O E RTEDE UEGA
+CRED GT EDAME. 
+E AN U P TUBED.
+RETTEDREA B  US
+E UW D R KALBET
+AVIDINC PD PR A
+N N N AVEE OOAR
+TAG C D NROTS D
+
+300_16_text:
+1 Gossip, aimless chatter • Primitive
+counting device
+2 Outlay of money
+3 Sharp, bitter (taste) •Person who
+bans unsuitable films
+4 Best of the bunch
+5 Momentary view • Put in bondage
+6 Meal of raw vegetables
+7 Had a large meal • Had a good doze
+8 Consume • Be in the red
+9 Formal agreement to marry
+10 Toothpaste container•Singing voice
+11 Withdrew and turned back
+12 Cabbage with curled leaves•
+Balanced and level
+13 Waterproof sheet
+14 View, look at • Increase an engine's
+speed
+15 Plant often grown with mustard。
+Early years
+16 Make petty or unnecessary
+Objections
+17 Person powering a rowing-boat。
+Made ineffective
+18 Level of development
+19 Make a quick dash through a
+public event wearing no clothes
+• Diverging from a centre
+20 Held in high regard
+21 Sentenced to eternal punishment。
+___ line, place for a signature
+
+392_98:
+''
+7, 5
+123
+
+392_98_text:
+1 Adder's other name•Grass border
+2 Reverence • Aggregate containing
+metal
+3 Angular figure
+4 Musical term for very quick
+  Not pronounced
+5 Sudden evasive movement
+6 Group of sports players 
+• Protein-rich bean
+7 Neaten (hail,eg)
+8 Eye membrane • Having a space
+  or cavity inside
+9 Strong,vigorous
+10 Enclosed wire structure。
+   Windmill blade
+11 Blood-flow stauncher
+12 Against •Opposite of 'easy"
+13 Popular curry
+14 Surface material of a tooth
+• belt, securing strap in cars or
+aeroplanes
+15 Showy splendour, brilliant display
+16 Milky precious gem • Number in
+a quartet
+17 Printing apparatus
+18 Traditional Japanese hostess•
+Member of the clergy
+19 Astronomica calendar
+20 Side away from the wind•
+Old coaching house
+21 Exuberant enjoyment, zest •
+Improve the mind
+
+392_98_frame:
+VIP. BRIMS VAC 
+A AMEL.  IC NN 
+M GE EUSTC H ED
+STOMANANE E.   
+P DE IK KYPTODG
+AM T LARD A U Y
+ VECAGE AW PUR 
+RE K A STNEA B 
+ON ANTI A. LSON
+PREA ARGEUNSP I
+ A R VO YE PHOL
+ TEIFYT E SOY. 
+G A OP FO ALI. 
+ETY S S U LESAF
+ U GEIPARTO T L
+ I AIDD TR BAL 
+COR M ENAO IN P
+O EYA  O GUSSHA
+G FER U S G ALT
+E O AWRESLOW.  
+LYG PO.  E ECLA

@@ -1237,3 +1237,81 @@ Puzzle14_frame:
 ' / / / / / / / / / / /11/ '
 ' / /12/ / / / / / / / / / '
 ' / / / / / / /13/ / / / / '
+
+Puzzle15:
+#392_85
+1
+Dart
+Desertion
+Dishonest
+Dog
+Dreamer
+2
+Climber
+Cool
+Creature
+Cube
+Curtail
+3
+Waitress
+Weasel
+Wheel
+Win
+4
+Floristry
+Flue
+Fourteen
+Freighter
+Fuel
+5
+Seminary
+Serration
+Sprig
+Sustain
+6
+Tenuous
+Tiger
+Tome
+7
+Deity
+Dot
+Dray
+Dreary
+8
+Caprine
+Cinematic
+Climactic
+Cog
+9
+Saltire
+Senator
+Sergeant
+Sin
+Sue
+10
+Bail
+Berg
+Blear
+Brae
+Brief
+11
+Vaunted
+Vertebra
+Victory
+
+Puzzle15_frame:
+' / / / / / / / / /1/ / / '
+' / / /2c/ / / / / / / / / '
+' / /o/ /r/ / / / / /3/ / '
+'4/o/ / / /e/ / / / / / / '
+'l/ / / / / /a/ / / / /5/ '
+' / / / / / / /t/ / / / / '
+' / /6/ / / / / /u/ / / / '
+' / / / / / / /7/ /r/ / / '
+' / / / / / / / / / /e/ / '
+' / / / / / / / / / / / /8'
+' /9/ / / / / / / / / / / '
+' / / / / / / / / /10/ / / '
+' / / / / / /11/ / / / / / '
+
+
