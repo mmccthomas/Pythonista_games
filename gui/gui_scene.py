@@ -184,7 +184,7 @@ class GameBoard(Scene):
          self.font_size = 24
          self.SQ_SIZE = grid_size // max(self.DIMENSION_X, self.DIMENSION_Y)
       case 'ipad_portrait':
-         GRID_POS = (60, 60)
+         GRID_POS = (35, 85)
          grid_size = w - 50
          self.font_size = 24
          self.SQ_SIZE = grid_size // max(self.DIMENSION_X, self.DIMENSION_Y)

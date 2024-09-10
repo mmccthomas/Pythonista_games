@@ -77,6 +77,8 @@ class Sudoko(LetterGame):
     match  self.gui.device:
        case'ipad_landscape':
            position = (w+10, 8*h/9)
+       case'ipad_portrait':
+           position = (7*w/9, h+50)
        case 'iphone_portrait':
            position = (180, 470)
        case 'ipad13_landscape':
