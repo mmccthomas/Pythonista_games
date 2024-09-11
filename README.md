@@ -15,12 +15,14 @@ Kye
 My personal favourite from 1992
 Full credit to Colin Garbutt for the original program, and Colin Phipps for the Python version.
 I have adapted GUI to use Pythonista for IOS rather than pygtk.
+Entry point : Kye/Kye.py
 
 Sudoko
 -------
 Both classic, Killer and KenKen are supported.
 The Sudoko solve engine is provided by 
 http://norvig.com/sudoku.html
+Entry point : WordGames/Sudoku.py
 
 Wordsearch
 ----------
@@ -28,29 +30,34 @@ Wordsearch
  Multiple word categories included
  
  place engine word_square_gen.py from ?
- 
+Entry point : WordGames/wordsearch.py
+
 Scrabble
 --------
 Classic game, based on ai engine from Murat Sahin scrabble_ai_main
 Plays a mean game.
 Option for AI-AI game
+Entry point : WordGames/Scrabble.py
 
 ZipWords
 --------
 Crossword grid filled with a selection of words.
 Find the words to fit
 Idea taken from Puzzler magazine
+Entry point : WordGames/Pieceword.py
 
 NumberWords
 -----------
 Crossword grid filled with a selection of words.
 Find the letter linked to each number.
 Idea taken from Puzzler magazine
+Entry point : WordGames/NumberWord.py
 
 Anagram words
 -------------
 Crossword grid filled with a selection of words.
 Find the words to fit
+Entry point : WordGames/anagram_word.py
 
 Pieceword
 ---------
