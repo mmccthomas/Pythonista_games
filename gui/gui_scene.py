@@ -374,7 +374,7 @@ class GameBoard(Scene):
       case 'ipad_portrait':
         position = (150, h + 30)
         anchor_point = (0, 0)
-        pos_button = (600, 0)
+        pos_button = (600, 600)
       case 'ipad13_landscape':
         position = (w + 10, h / 2)
         anchor_point = (0, 0.5)
@@ -382,11 +382,11 @@ class GameBoard(Scene):
       case 'ipad13_portrait':
         position = (150, h + 30)
         anchor_point = (0, 0)
-        pos_button = (800, 0)
+        pos_button = (870, h+50)
       case 'iphone_portrait':
         position = (150, h + 20)
         anchor_point = (0, 0)
-        pos_button = (350, 0)
+        pos_button = (350, 350)
       case _:
         position = (150, h + 20)
         anchor_point = (0, 0)
@@ -405,7 +405,7 @@ class GameBoard(Scene):
     # self.enter_label = LabelNode('Enter', position=(5,5), 
     #.                             parent=self.enter_button)
     # self.enter_label.anchor_point = (0, 0)
-    self.enter_button = BoxedLabel('Enter', '', position=pos_button,
+    self.enter_button = BoxedLabel('Hint', '', position=pos_button,
                                    min_size=(100, 32),
                                    parent=self.game_field)
     self.buttons[1] = self.enter_button

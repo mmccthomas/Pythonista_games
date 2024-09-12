@@ -849,7 +849,7 @@ class LetterGame():
             # print('item', item)
             if item is self.quit:
               return True
-            
+            item() 
         except (Exception) as e:
           print(traceback.format_exc())
           print(e)

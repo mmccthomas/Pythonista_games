@@ -85,7 +85,9 @@ class CrossNumbers(LetterGame):
     self.max_depth = 1 # search depth for populate  
     _, _, w, h = self.gui.grid.bbox 
     if self.gui.device.endswith('_landscape'):
-       self.gui.set_enter('Hint', position = (w+100, -50))       
+       self.gui.set_enter('Hint', position = (w+100, -50))      
+    else:
+    	self.gui.set_enter('Hint', position=(w-65, h+30),size=(60, 40)) 
     self.display = 'tiles'
     
   def generate_word_number_pairs(self):
@@ -233,7 +235,8 @@ class CrossNumbers(LetterGame):
     cx.set_props(board=self.board,
                  empty_board=self.empty_board, 
                  all_word_dict=self.all_word_dict, 
-                 max_depth=self.max_depth)
+                 max_depth=self.max_depth,
+                 debug=self.debug)
     cx.populate_words_graph(max_iterations=200,
                             length_first=False,
                             max_possibles=100)  
@@ -245,6 +248,7 @@ class CrossNumbers(LetterGame):
       print(self.anagrams())
       [print(word, count) for word, count in self.word_counter.items() if count > 1]
     self.gui.set_message('')
+    self.gui.set_enter('Hint')
     while True:
       move = self.get_player_move(self.board)               
       finish = self.process_turn( move, self.number_board) 
@@ -353,7 +357,7 @@ class CrossNumbers(LetterGame):
     """Takes in the user's input and performs that move on the board, returns the coordinates of the move
     Allows for movement over board"""
     #self.delta_t('start get move')
-    self.gui.set_enter('Hint')
+    #self.gui.set_enter('Hint')
     if board is None:
         board = self.board
     prompt = (f"Select  position on board")
