@@ -200,7 +200,7 @@ class CrossWord():
           try:
             #self.gui.gs.highlight_squares(word.coords)            
             self.gui.update(self.board)
-            sleep(.25)  
+            sleep(0.25)  
           except(AttributeError) as e:
             pass
         if index == max_iterations:

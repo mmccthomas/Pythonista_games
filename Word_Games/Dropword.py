@@ -54,8 +54,8 @@ def copy_board(board):
 
 class DropWord(LetterGame):
   
-  def __init__(self):
-    self.debug = False
+  def __init__(self, debug=False):
+    self.debug = debug
     # allows us to get a list of rc locations
     self.log_moves = False
     self.min_length = 2 # initial min word length
@@ -143,7 +143,8 @@ class DropWord(LetterGame):
      cx.set_props(board=self.board,
                   empty_board=self.empty_board, 
                   all_word_dict=self.all_word_dict, 
-                  max_depth=self.max_depth)
+                  max_depth=self.max_depth,
+                  debug=self.debug)
      cx.populate_words_graph(max_iterations=200,
                              length_first=False,
                              max_possibles=100)
@@ -337,7 +338,7 @@ class DropWord(LetterGame):
     #self.run() 
 
 if __name__ == '__main__':
-  g = DropWord()
+  g = DropWord(debug=False)
   g.run()
   
   while(True):
