@@ -4,7 +4,7 @@ Pythonista Games
 This is a series of python word and board games to operate on the iPad using the excellent Pythonista app.
 
 In general, the games do not work well on iPhone due to smaller screen area and the restrictions of touch interface.
-Some optimisation has been made to operate in Portrait mode, but Landscale is preferred.
+Some optimisation has been made to operate in iPad Portrait mode, but Landscape is generally preferred.
 The games do not autodetect orientation change.
 
 The games all use the Scene module, which is a thin wrapper around the Apple UiKit framework.
@@ -16,9 +16,11 @@ Games are:
 
 Kye
 ---
-My personal favourite from 1992
+My personal favourite from 1992. Superb program that plays best using a smart pencil.
 Full credit to Colin Garbutt for the original program, and Colin Phipps for the Python version.
 I have adapted GUI to use Pythonista for IOS rather than pygtk.
+For further details on the game see https://en.wikipedia.org/wiki/Kye_(video_game),
+  https://www.kye.me.uk/ and http://games.moria.org.uk/kye/
 
 Entry point : Kye/Kye.py
 
@@ -43,7 +45,7 @@ Scrabble
 --------
 Classic game, based on ai engine from Murat Sahin scrabble_ai_main
 Plays a mean game.
-Option for AI-AI game
+Option for AI-AI game using 'Complete Game' in Pause Menu
 
 Entry point : Word_Games/Scrabble.py
 
@@ -190,6 +192,8 @@ Notes
 
 Much of the  working engines of these games were provided by other developers.
 I have added the gui front end for use on ios using Pythonista, along with any changes I saw fit.
+
+All games have a Pause Menu button in top left corner with various options
 
 Crossword filling with random words proved particularly challenging, but was mostly successful. 
 I would be very interested in any improvements.
