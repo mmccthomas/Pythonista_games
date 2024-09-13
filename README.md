@@ -3,6 +3,10 @@ Pythonista Games
 
 This is a series of python word and board games to operate on the iPad using the excellent Pythonista app.
 
+In general, the games do not work well on iPhone due to smaller screen area and the restrictions of touch interface.
+Some optimisation has been made to operate in Portrait mode, but Landscale is preferred.
+The games do not autodetect orientation change.
+
 The games all use the Scene module, which is a thin wrapper around the Apple UiKit framework.
 
 A generic gui framework has been developed to place a grid at maximum size, along with buttons and messages
@@ -181,7 +185,21 @@ experiences crashes sometimes, hence each move is stored in numpy array for inst
 Entry point : Word_Games/Ocr.py
 
 
+Notes
+-----
+
 Much of the  working engines of these games were provided by other developers.
 I have added the gui front end for use on ios using Pythonista, along with any changes I saw fit.
 
+Crossword filling with random words proved particularly challenging, but was mostly successful. 
+I would be very interested in any improvements.
 
+Some games, e.g. wordsearch, rely upon touch dragging to select direction and length. 
+
+Each game is based on a hierarchy of modules.
+
+The lowest level, gui/gui_scene.py, handles the screen drawing and other graphics
+
+gui/gui_interface is the user interface level. Many functions simply call the lower level functions.
+
+Word_Games/Letter_games.py is used as a base class for many of the crossword type games.
