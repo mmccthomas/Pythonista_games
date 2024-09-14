@@ -1314,4 +1314,163 @@ Puzzle15_frame:
 ' / / / / / / / / /10/ / / '
 ' / / / / / /11/ / / / / / '
 
+Puzzle16:
+#661_38
+1
+EAR
+ENAMEL
+ENTHRAL
+ETERNALLY
+2
+FAN
+FARAWAY
+FENNEL
+FUME
+3
+SAY
+SEE
+SEWN
+SHIN
+STAY
+4
+SEA
+SHALL
+SUCCEED
+5
+CARROT
+CEREAL
+COLONIAL
+CYGNET
+6
+EAT
+EITHER
+EMERGE
+ENCRYPT
+EXTRA
+7
+PANTRY
+PARENT
+PLATELET
+POLYMER
+PROTON
+PRYING
+PURR
+8
+SEROTONIN
+SHE
+SIR
+STATUTE
+STUN
+SUM
+9
+AGENDA
+ARC
+AREA
+10
+ACRE
+AGITATION
+ART
+ASTIR
+11
+REGULATE
+RHUBARB
+RINGLET
+ROUTINE
+12
+THEORETIC
+TITLE
+TURNSTILE
+TWINKLING
 
+Puzzle16_frame:
+' / / / / / / / / /t/1/ / '
+' / / / / / / /2/e/ / / / '
+' / / /3/ / / /n/ / / /4/ '
+' / / / / / /g/ / / / / / '
+' / / / / /y/ / / / / / / '
+' / / / /5c/ / / / / / / / '
+'6/ / / / /o/ / / / / / / '
+' / / / / /7/l/ / / / / / '
+' / / / / / / /o/ / / / / '
+' / /8/ / / / / /n/9/ / / '
+' / / / / / / / / /i/ / /10'
+' / / / / / /11/ / / /a/ / '
+' / / / / / / / /12/ / /l/ '
+
+Puzzle17:
+#661_72
+1
+MEASURE
+MIDWEEK
+MILLENNIUM
+MORNING
+2
+TALKATIVE
+TIARA
+TREECREEPER
+TRIENNIAL
+3
+CAKESTAND
+CANYON
+CLARINET
+CLICHE
+6
+BILL
+BLAND
+BLENHEIM
+BLUNT
+BRIGAND
+4
+SEWELL
+SOCIALISED
+SURROUNDED
+7
+PHEW
+PLEA
+PREAMBLE
+5
+GEL
+GIN
+GUY
+8
+SEA
+SNEAKY
+SNOWFALL
+9
+SAT
+SKULL
+STAR
+10
+BARRELLED
+BLADE
+BLAZE
+BUNDESTAG
+11
+KALE
+KEG
+KNEE
+12
+SERIAL
+SINAI
+STRAIN
+SUE
+SUM
+13
+CANADA
+COLONNADES
+CRAM
+
+Puzzle17_frame:
+' / / / / / /1/ / / / / / '
+' / / / /2/ / / / / / / / '
+' / / / / / / /3/ / / / / '
+' /4/ / / / / / / / /5/ / '
+' / / / / / / / / / / / /6'
+' / /7/ / /8/ / / / / / / '
+' / / / / / / / /9/ / / / '
+' / / / / / / / / / / / / '
+'10/ / / / / / / / / / / / '
+' / / / / / / / / /11/ / /e'
+' / / / / / / / / / / /u/ '
+' / / / / /l/a/i/r/e/12s/ / '
+' / / /13/ / / / / / / / / '

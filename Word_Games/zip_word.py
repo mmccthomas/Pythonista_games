@@ -4,8 +4,7 @@ You have to guess the letter
 Chris Thomas May 2024
 
 The games uses a 20k word dictionary
-currntly fixed at 25 x 25 size due to needing to create grid manually
-attempts to automate grid creation ahve not been succesful so far
+
 """
 import os
 import sys

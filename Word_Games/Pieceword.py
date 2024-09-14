@@ -23,7 +23,7 @@ class PieceWord(LetterGame):
     LetterGame.__init__(self, column_labels_one_based=True)
     self.first_letter = False
     self.tiles = None
-    self.debug = False
+    self.debug = True
     self.load_words_from_file(PUZZLELIST, no_strip=True) 
     self.selection = self.select_list()
     if self.selection is False:
@@ -85,7 +85,7 @@ class PieceWord(LetterGame):
           except (Exception) as e:
             print(e)
         if selection == 'cancelled_':
-        	return False 
+          return False 
         if len(selection):
           if self.debug:   
             print(f'{selection=}')
@@ -208,14 +208,17 @@ class PieceWord(LetterGame):
     point = self.gui.gs.start_touch - gscene.GRID_POS
     # touch on board
     # Coord is a tuple that can support arithmetic
-    rc_start = Coord(self.gui.gs.grid_to_rc(point)) // TILESIZE
-    
-    if self.check_in_board(rc_start):
-        rc = Coord(move[-2]) // TILESIZE
-        if self.tiles is None:
-           return rc, self.rack[rc_start].number, rc_start
-        else:
-          return rc, self.rack[rc], rc_start
+    try:
+        rc_start = Coord(self.gui.gs.grid_to_rc(point)) // TILESIZE
+        
+        if self.check_in_board(rc_start):
+            rc = Coord(move[-2]) // TILESIZE
+            if self.tiles is None:
+               return rc, self.rack[rc_start].number, rc_start
+            else:
+              return rc, self.rack[rc], rc_start
+    except (KeyError):
+      pass
                            
     return (None, None), None, None
   
@@ -309,6 +312,7 @@ if __name__ == '__main__':
     quit = g.wait()
     if quit:
       break
+
 
 
 

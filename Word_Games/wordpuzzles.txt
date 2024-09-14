@@ -3344,3 +3344,193 @@ Puzzle37-72_frame:
 ' / / /#/ / / / / / / / / /#/#/ '
 ' /#/ / / /#/ /#/#/ /#/#/ /#/#/ '
 ' / / /#/ / / / / / / / / / /#/#'
+
+Puzzle38-26:
+AIR
+CUE
+DON
+DYE
+EAU
+ION
+IRE
+IRK
+LIP
+MAN
+OPT
+RUT
+SPA
+TAR
+TRY
+ABUT
+ACME
+AMMO
+BILE
+CARD
+CHUG
+CODE
+DARK
+HOOF
+HUSH
+LIMA
+LULL
+MAMA
+MUCK
+PERP
+ROAM
+TAXI
+TOME
+TRUG
+AXIOM
+BUMPY
+CABLE
+ELFIN
+EXUDE
+FACET
+GRASP
+LABEL
+LATCH
+LUCRE
+NUDGE
+ORATE
+UPSET
+ACETIC
+AMORAL
+ASTHMA
+CLUMSY
+EXCITE
+FIGURE
+MERINO
+MISFIT
+PATOIS
+SPRAWL
+TODDLE
+CONTENT
+GASTRIC
+OVERFLY
+WASSAIL
+DRABNESS
+ECONOMIC
+FLEXIBLE
+NEPOTISM
+SATIRIST
+GLYCERINE
+SEMIOLOGY
+STAIRCASE
+
+Puzzle38-26_frame:
+' / / /#/ /#/ /#/#/#/#/ / / / / / / / /#/ '
+' /#/#/ / / / / / / / / /#/ /#/#/ /#/ /#/ '
+' /#/#/#/ /#/ /#/#/ /#/ /#/ / / / / / /#/ '
+' / / / / /#/#/ /#/ /#/#/#/ /#/#/ /#/ / / '
+'#/ /#/ /#/ /#/ / / / / /#/#/ / / /#/ /#/#'
+' / / / /#/ /#/ /#/ /#/ /#/#/ /#/#/ / / / '
+'#/ /#/#/#/t/a/x/i/#/ / / / / / / /#/ /#/ '
+'#/#/ / / / /#/ /#/#/#/ /#/ /#/#/#/#/ /#/ '
+'#/#/#/ /#/ /#/ /#/#/#/#/#/ / / /#/ /#/#/ '
+'#/ / / / / / / /#/#/#/#/#/ /#/ / / / / / '
+'#/#/#/ /#/#/#/ /#/#/#/#/#/ /#/ /#/ /#/ /#'
+'#/ / / / / / /#/#/#/#/#/#/ /#/ / / /#/ /#'
+'#/#/#/#/ /#/#/ /#/#/#/#/#/#/#/ /#/ /#/#/#'
+'#/ /#/#/ /#/ / / /#/ /#/ / / / / / / / / '
+' / / / / / /#/ / / / / /#/ /#/ /#/#/ /#/ '
+'#/ /#/#/ / / / / /#/ /#/#/ /#/ / / / / / '
+' / / /#/ / / / /#/ / / / / /#/#/#/#/ /#/ '
+' /#/ /#/ /#/ /#/#/#/ /#/ /#/ /#/#/ / / / '
+' / / / /#/ / / / / / /#/ / / / /#/ /#/#/ '
+' /#/ /#/#/#/ /#/#/ /#/#/ /#/ /#/#/ /#/#/ '
+'#/#/ /#/ / / / / / / / / /#/ / / / / / / '
+
+Puzzle39-95:
+ASH
+GIN
+HUM
+HUT
+IMP
+OIK
+ONE
+OPT
+PET
+ROE
+SKY
+SOB
+TEN
+TOY
+USE
+BAKE
+BAND
+BORN
+EPIC
+FLIP
+HERS
+LINO
+MONK
+NEEP
+PEAK
+REEK
+ROPE
+SITE
+SNAG
+SOOT
+TACK
+TEAR
+UNIT
+YULE
+AMBIT
+BRAVO
+ELVER
+GRAIN
+HURRY
+IDYLL
+INLET
+PANDA
+RATIO
+RUMBA
+SLIME
+USHER
+YUCCA
+ABACUS
+ATTIRE
+BOUCLE
+CREAKY
+EMERGE
+FILTHY
+GASMAN
+LARIAT
+NUMBER
+SERENE
+WEIRDO
+CRUDITY
+LENIENT
+PRODUCE
+SPEAKER
+DEDICATE
+EARPIECE
+LINGERIE
+TEMPLATE
+YEARLING
+CONSTABLE
+ILLIBERAL
+WATERMILL
+
+Puzzle39-95_frame:
+' / / /#/ /#/ /#/#/#/#/ / / / / / / / /#/ '
+' /#/#/ / / / / / / / / /#/ /#/#/ /#/ /#/ '
+' /#/#/#/ /#/ /#/#/ /#/ /#/ / / / / / /#/ '
+' / / / / /#/#/ /#/ /#/#/#/ /#/#/ /#/ / / '
+'#/ /#/ /#/ /#/ / / / / /#/#/ / / /#/ /#/#'
+' / / / /#/ /#/ /#/ /#/ /#/#/ /#/#/ / / / '
+'#/ /#/#/#/ / / / /#/ / / / / / / /#/ /#/ '
+'#/#/ / / / /#/ /#/#/#/ /#/ /#/#/#/#/ /#/ '
+'#/#/#/ /#/ /#/ /#/#/#/#/#/ / / /#/ /#/#/ '
+'#/ / / / / / / /#/#/#/#/#/ /#/ / / / / / '
+'#/#/#/ /#/#/#/ /#/#/#/#/#/ /#/ /#/ /#/ /#'
+'#/a/b/a/c/u/s/#/#/#/#/#/#/ /#/ / / /#/ /#'
+'#/#/#/#/ /#/#/ /#/#/#/#/#/#/#/ /#/ /#/#/#'
+'#/ /#/#/ /#/ / / /#/ /#/ / / / / / / / / '
+' / / / / / /#/ / / / / /#/ /#/ /#/#/ /#/ '
+'#/ /#/#/ / / / / /#/ /#/#/ /#/ / / / / / '
+' / / /#/ / / / /#/ / / / / /#/#/#/#/ /#/ '
+' /#/ /#/ /#/ /#/#/#/ /#/ /#/ /#/#/ / / / '
+' / / / /#/ / / / / / /#/ / / / /#/ /#/#/ '
+' /#/ /#/#/#/ /#/#/ /#/#/ /#/ /#/#/ /#/#/ '
+'#/#/ /#/ / / / / / / / / /#/ / / / / / / '
