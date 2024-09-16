@@ -4,8 +4,6 @@ You have to guess the letter
 Chris Thomas May 2024
 
 The games uses a 20k word dictionary
-currntly fixed at 13 x 13 size due to needing to create grid manually
-attempts to automate grid creation ahve not been succesful so far
 """
 import os
 import sys
@@ -89,6 +87,7 @@ class CrossNumbers(LetterGame):
     else:
     	self.gui.set_enter('Hint', position=(w-65, h+30),size=(60, 40)) 
     self.display = 'tiles'
+    self.max_items = 13
     
   def generate_word_number_pairs(self):
     """ create 2 dictionaries
@@ -105,8 +104,8 @@ class CrossNumbers(LetterGame):
     self.known_dict={number: [' ', False] for number in numbers}
     for no in choose_three:
       self.known_dict[no] =[self.solution_dict[no][0], True]
-    self.known_dict[' '] = [' ', False]
-    self.known_dict['.'] = ['.', False]
+    #self.known_dict[' '] = [' ', False]
+    #self.known_dict['.'] = ['.', False]
     
   def create_number_board(self):
     """ redraws the board with numbered squares and blank tiles for unknowns
@@ -120,21 +119,21 @@ class CrossNumbers(LetterGame):
       for c, _char in enumerate(row):
         if _char == SPACE:
           self.board_rc((r, c), self.board, BLOCK)
-    self.update_board()
+    #self.update_board()
     
-  def display_numberpairs(self, tiles, off=0):
+  def display_numberpairs(self, tiles, off=0, max_items=13):
     """ display players rack
     x position offset is used to select letters or numbers
     """   
     parent = self.gui.game_field
     _, _, w, h = self.gui.grid.bbox
     if self.gui.device.endswith('_landscape'): 
-        size =  self.gui.gs.SQ_SIZE    
+        size =  self.gui.gs.SQ_SIZE * 13 / max_items   
         x, y = 5, 0
         x = x + off* size
         for n, tile in enumerate(tiles):    
           t = Tile(Texture(Image.named(f'../gui/tileblocks/{tile}.png')), 0,  0, sq_size=size)   
-          t.position = (w + x + 3 * int(n/13) * size , h - (n % 13 +1)* size + y)
+          t.position = (w + x + 3 * int(n/max_items) * size , h - (n % max_items +1)* size + y)
           parent.add_child(t) 
     else: 
         size =  self.gui.gs.SQ_SIZE * 0.9
@@ -142,7 +141,7 @@ class CrossNumbers(LetterGame):
         y = y + off* size
         for n, tile in enumerate(tiles):    
           t = Tile(Texture(Image.named(f'../gui/tileblocks/{tile}.png')), 0,  0, sq_size=size)   
-          t.position = (x + int(n % 13 ) * size , h + (2* int(n / 13) )* size + y)
+          t.position = (x + int(n % max_items ) * size , h + (2* int(n / max_items) )* size + y)
           parent.add_child(t)         
         
   def update_board(self, hint=False, filter_placed=True):
@@ -185,7 +184,7 @@ class CrossNumbers(LetterGame):
     list_known =sorted(list_known, key = lambda x: x[1])
 
     # create a list of letters in correct order    
-    list_of_known_letters = ['_' for _ in range(26)]
+    list_of_known_letters = ['_' for _ in range(len(list_known))]
     for i, v in enumerate(list_known):
         no, l = v
         letter, _ = l 
@@ -212,8 +211,8 @@ class CrossNumbers(LetterGame):
     self.gui.update(self.board)
     # now choose text or tiles
     if self.display == 'tiles':
-        self.display_numberpairs(list(range(1, 27)))
-        self.display_numberpairs(list_of_known_letters, off=1)
+        self.display_numberpairs(list(range(1, len(list_of_known_letters)+1)), max_items=self.max_items)
+        self.display_numberpairs(list_of_known_letters, off=1, max_items=self.max_items)
     else:
         self.gui.set_moves(msg, font=('Avenir Next', 23))
     
@@ -241,9 +240,10 @@ class CrossNumbers(LetterGame):
                             length_first=False,
                             max_possibles=100)  
     # self.print_board()
-    self.check_words()
-    self.generate_word_number_pairs()
+    self.check_words()    
     self.create_number_board()
+    self.generate_word_number_pairs()
+    self.update_board()
     if self.debug:
       print(self.anagrams())
       [print(word, count) for word, count in self.word_counter.items() if count > 1]
