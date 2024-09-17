@@ -14,6 +14,7 @@ sys.path.append(parent)
 grandparent = os.path.dirname(parent)
 sys.path.append(grandparent)
 import random
+from time import sleep
 import traceback
 import numpy as np
 from NumberWord import CrossNumbers
@@ -49,8 +50,8 @@ class SkelNumbers(CrossNumbers):
     self.letters = [letter for letter in '#abcdefghijklmnopqrstuvwxyz']
     
   def print_square(self, process, color=None):
-  	# dont print
-  	return
+    # dont print
+    return
     
   def create_number_board(self):
     """ redraws the board with numbered squares and blank tiles for unknowns
@@ -79,7 +80,7 @@ class SkelNumbers(CrossNumbers):
                      [self.sizey - 1 - r, c], 
                      [self.sizey - 1 - r, self.sizex - 1 - c]]:
         try:
-        	# if mirror in blocks, remove it and add to group
+          # if mirror in blocks, remove it and add to group
           item = blocks.pop(blocks.index(mirror))
           group.append(item)
         except (IndexError, ValueError):
@@ -88,16 +89,55 @@ class SkelNumbers(CrossNumbers):
       
     self.gui.print_board(self.solution_board) # for debug
     for i, group in enumerate(groups):
-    	for item in group:
-    	 self.solution_board[tuple(item)] = '¥&€#'[i % 4]
-    	 
+      for item in group:
+       self.solution_board[tuple(item)] = '¥&€#'[i % 4]
+       
     self.number_board = np.zeros(self.board.shape, dtype=int)
     self.gui.print_board(self.solution_board) # for debug
     # letter list for player selection
     self.letters = [letter for letter in '#abcdefghijklmnopqrstuvwxyz']
-        
+    
+  def process_turn(self, move, board):
+    """ process the turn
+    move is coord, new letter
+    """    
+    if move:
+      coord, letter = move
+      if move == ((None, None), None):
+        return False
+      r,c = coord
+      if letter == 'Enter':
+        # show all incorrect squares
+        self.gui.set_prompt('Incorrect squares marked orange')
+        self.update_board(hint=True, tile_color='clear')
+        # now turn off marked squares
+        sleep(2)
+        for k,v in self.known_dict.items():
+          if not v[1]:
+            self.known_dict[k] = [' ', False]
+        self.update_board(hint=False, tile_color='clear')
+        return False
+      elif letter == 'Finish':
+        return True    
+      elif letter != '':
+        no = board[r][c]
+        if no != BLOCK:
+          correct = (self.solution_dict[no][0] == letter) or ((letter == BLOCK) and (self.solution_dict[no][0] in '¥&€#'))
+          if correct:
+            self.known_dict[no] = self.solution_dict[no]
+          else:
+            self.known_dict[no] = [letter, correct]
+          self.update_board(tile_color='clear')
+          
+          return False 
+        else:
+          return False     
+      return True
+             
   def game_over(self):
-   	return False
+    """ check for finished game   
+    no more empty letters left in bosrd"""
+    return ~np.any(self.board == SPACE)
     
 if __name__ == '__main__':
   g = SkelNumbers()
@@ -108,5 +148,6 @@ if __name__ == '__main__':
     if quit:
       break
   
+
 
 

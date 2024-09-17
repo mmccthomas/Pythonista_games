@@ -85,9 +85,9 @@ class CrossNumbers(LetterGame):
     if self.gui.device.endswith('_landscape'):
        self.gui.set_enter('Hint', position = (w+100, -50))      
     else:
-    	self.gui.set_enter('Hint', position=(w-65, h+30),size=(60, 40)) 
+      self.gui.set_enter('Hint', position=(w-65, h+30),size=(60, 40)) 
     self.display = 'tiles'
-    self.max_items = 13
+    self.max_items = 13 # items in key list
     
   def generate_word_number_pairs(self):
     """ create 2 dictionaries
@@ -128,7 +128,10 @@ class CrossNumbers(LetterGame):
     parent = self.gui.game_field
     _, _, w, h = self.gui.grid.bbox
     if self.gui.device.endswith('_landscape'): 
-        size =  self.gui.gs.SQ_SIZE * 13 / max_items   
+        if self.sizey < max_items:
+          size =  self.gui.gs.SQ_SIZE * 13 / max_items   
+        else:
+          size =  self.gui.gs.SQ_SIZE
         x, y = 5, 0
         x = x + off* size
         for n, tile in enumerate(tiles):    
@@ -144,7 +147,7 @@ class CrossNumbers(LetterGame):
           t.position = (x + int(n % max_items ) * size , h + (2* int(n / max_items) )* size + y)
           parent.add_child(t)         
         
-  def update_board(self, hint=False, filter_placed=True):
+  def update_board(self, hint=False, filter_placed=True, tile_color='yellow'):
     """ requires solution_dict from generate_word_number_pairs
                  solution_board from create_number_board 
     """
@@ -166,9 +169,9 @@ class CrossNumbers(LetterGame):
           if k != ' ':
             self.board[r][c] = k
             if hint:
-              color = 'yellow' if self.known_dict[no][1] else 'orange'
+              color = tile_color if self.known_dict[no][1] else 'orange'
             else:
-              color = 'yellow'
+              color = tile_color
             square_list.append(Squares((r,c), '', color , z_position=30, alpha = .5, stroke_color='white'))
           else:
             self.board[r][c] = ' '
@@ -259,6 +262,7 @@ class CrossNumbers(LetterGame):
         break
     
     self.gui.set_message2('Game over')
+    dialogs.hud_alert('Game Over')
     self.gui.set_message('') 
     self.gui.set_prompt('')
     sleep(4)
@@ -417,4 +421,5 @@ if __name__ == '__main__':
     if quit:
       break
   
+
 
