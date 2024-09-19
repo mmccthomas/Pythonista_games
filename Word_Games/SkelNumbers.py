@@ -18,11 +18,13 @@ from time import sleep
 import traceback
 import numpy as np
 from NumberWord import CrossNumbers
+import dialogs
 from gui.gui_interface import Squares
 from crossword_create import CrossWord
 BLOCK = '#'
 SPACE = ' '
-BLOCKS = '¥&€$'
+# use other characters to represent blocks
+BLOCKS = '¥&€█'
 
 class SkelNumbers(CrossNumbers):
   
@@ -34,7 +36,7 @@ class SkelNumbers(CrossNumbers):
     """ create 2 dictionaries
     solution contains complete number, letter pairs
     known_dict contains partial known items
-    add 4 characters to represent group of blocks (used ¥&€#)
+    add 4 characters to represent group of blocks (used ¥&€ and u'\u2588')
     """
     self.letters = [letter for letter in (BLOCKS + 'abcdefghijklmnopqrstuvwxyz')]
     numbers = list(range(1,31))
@@ -48,7 +50,7 @@ class SkelNumbers(CrossNumbers):
       self.known_dict[no] =[self.solution_dict[no][0], True]
     #self.known_dict[' '] = [' ', False]
     #self.known_dict['.'] = ['.', False]
-    self.letters = [letter for letter in (BLOCKS[-1] + 'abcdefghijklmnopqrstuvwxyz')]
+    self.letters = self.letters[3:]
     
   def print_square(self, process, color=None):
     # dont print
@@ -59,7 +61,6 @@ class SkelNumbers(CrossNumbers):
     and letters for known"""          
     # start with empty board    
     self.empty_board =np.array(self.empty_board)
-    #self.number_board = self.empty_board.copy()
     self.board = np.array(self.board) 
     self.solution_board = self.board.copy()    
     # allow for incomplete board, change space and dot to block
@@ -107,10 +108,12 @@ class SkelNumbers(CrossNumbers):
       r,c = coord
       if letter == 'Enter':
         # show all incorrect squares
-        self.gui.set_prompt('Incorrect squares marked orange')
         self.update_board(hint=True, tile_color='clear')
+        dialogs.hud_alert('Incorrect squares marked orange', duration=2)
+        #self.gui.set_prompt('Incorrect squares marked orange')
+        
         # now turn off marked squares
-        sleep(2)
+        #sleep(2)
         for k,v in self.known_dict.items():
           if not v[1]:
             self.known_dict[k] = [' ', False]
@@ -121,13 +124,12 @@ class SkelNumbers(CrossNumbers):
       elif letter != '':
         no = board[r][c]
         if no != BLOCK:
-          correct = (self.solution_dict[no][0] == letter) or ((letter == BLOCK) and (self.solution_dict[no][0] in BLOCKS))
+          correct = (self.solution_dict[no][0] == letter) or ((letter in BLOCKS) and (self.solution_dict[no][0] in BLOCKS))
           if correct:
             self.known_dict[no] = self.solution_dict[no]
           else:
             self.known_dict[no] = [letter, correct]
-          self.update_board(tile_color='clear')
-          
+          self.update_board(tile_color='clear')          
           return False 
         else:
           return False     
@@ -135,16 +137,18 @@ class SkelNumbers(CrossNumbers):
              
   def game_over(self):
     """ check for finished game   
-    no more empty letters left in board"""
+    no more empty letters left in board and all known dict items are correct"""
     no_blanks =  ~np.any(self.board == SPACE)
-    
-    letters_ok = np.all(np.bitwise_and(self.board==self.solution_board,  np.char.isalpha(self.board)))
+    letters_ok = True
+    for v in self.known_dict.values():
+    	if v[0] != SPACE and not v[1] :
+    		letters_ok = False
+    		break
     return no_blanks and letters_ok
     
 if __name__ == '__main__':
   g = SkelNumbers()
-  g.run()
-  
+  g.run()  
   while(True):
     quit = g.wait()
     if quit:

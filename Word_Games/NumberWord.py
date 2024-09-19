@@ -383,8 +383,8 @@ class CrossNumbers(LetterGame):
       prompt = f"Select from {len(possibles)} items"
       if len(possibles) == 0:
         raise (IndexError, "possible list is empty")
-      items = sorted(list(possibles)) 
-             
+      #items = sorted(list(possibles)) 
+      items = list(possibles)       
       #return selection
       self.gui.selection = ''
       selection = ''
