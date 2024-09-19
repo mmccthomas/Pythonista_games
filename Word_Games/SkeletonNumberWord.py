@@ -22,6 +22,7 @@ from gui.gui_interface import Squares
 from crossword_create import CrossWord
 BLOCK = '#'
 SPACE = ' '
+BLOCKS = '¥&€$'
 
 class SkelNumbers(CrossNumbers):
   
@@ -35,7 +36,7 @@ class SkelNumbers(CrossNumbers):
     known_dict contains partial known items
     add 4 characters to represent group of blocks (used ¥&€#)
     """
-    self.letters = [letter for letter in '¥&€#abcdefghijklmnopqrstuvwxyz']
+    self.letters = [letter for letter in (BLOCKS + 'abcdefghijklmnopqrstuvwxyz')]
     numbers = list(range(1,31))
     shuffled = random.sample(self.letters, k=len(self.letters))
     self.solution_dict = {number:[letter, True] for number, letter in zip(numbers, shuffled)}
@@ -47,7 +48,7 @@ class SkelNumbers(CrossNumbers):
       self.known_dict[no] =[self.solution_dict[no][0], True]
     #self.known_dict[' '] = [' ', False]
     #self.known_dict['.'] = ['.', False]
-    self.letters = [letter for letter in '#abcdefghijklmnopqrstuvwxyz']
+    self.letters = [letter for letter in (BLOCKS[-1] + 'abcdefghijklmnopqrstuvwxyz')]
     
   def print_square(self, process, color=None):
     # dont print
@@ -87,15 +88,13 @@ class SkelNumbers(CrossNumbers):
           continue      
       groups.append(group)
       
-    self.gui.print_board(self.solution_board) # for debug
     for i, group in enumerate(groups):
       for item in group:
-       self.solution_board[tuple(item)] = '¥&€#'[i % 4]
+       self.solution_board[tuple(item)] = BLOCKS[i % 4]
        
     self.number_board = np.zeros(self.board.shape, dtype=int)
-    self.gui.print_board(self.solution_board) # for debug
     # letter list for player selection
-    self.letters = [letter for letter in '#abcdefghijklmnopqrstuvwxyz']
+    self.letters = [letter for letter in (BLOCKS[-1] + 'abcdefghijklmnopqrstuvwxyz')]
     
   def process_turn(self, move, board):
     """ process the turn
@@ -122,7 +121,7 @@ class SkelNumbers(CrossNumbers):
       elif letter != '':
         no = board[r][c]
         if no != BLOCK:
-          correct = (self.solution_dict[no][0] == letter) or ((letter == BLOCK) and (self.solution_dict[no][0] in '¥&€#'))
+          correct = (self.solution_dict[no][0] == letter) or ((letter == BLOCK) and (self.solution_dict[no][0] in BLOCKS))
           if correct:
             self.known_dict[no] = self.solution_dict[no]
           else:
@@ -136,8 +135,11 @@ class SkelNumbers(CrossNumbers):
              
   def game_over(self):
     """ check for finished game   
-    no more empty letters left in bosrd"""
-    return ~np.any(self.board == SPACE)
+    no more empty letters left in board"""
+    no_blanks =  ~np.any(self.board == SPACE)
+    
+    letters_ok = np.all(np.bitwise_and(self.board==self.solution_board,  np.char.isalpha(self.board)))
+    return no_blanks and letters_ok
     
 if __name__ == '__main__':
   g = SkelNumbers()
@@ -147,7 +149,3 @@ if __name__ == '__main__':
     quit = g.wait()
     if quit:
       break
-  
-
-
-
