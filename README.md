@@ -65,6 +65,12 @@ Idea taken from Puzzler magazine
 
 Entry point : Word_Games/NumberWord.py
 
+SkelNumbers
+-----------
+A variant of NumberWords when you have to find the blanks also
+
+Entry point : Word_Games/SkelNumbers.py
+
 Anagram words
 -------------
 Crossword grid filled with a selection of words.
