@@ -1,3 +1,6 @@
+# https://github.com/ianastewart/tracks
+# modified for ios.
+# removed turtle graphics `CMT
 import numpy as np
 import matplotlib.pyplot as plt
 import os
@@ -24,7 +27,7 @@ def check_in_board(coord):
     return (0 <= r < SIZE) and (0 <= c < SIZE)
     
 SIZE = 1
-DEBUG = False
+DEBUG = False 
 FONT = ("sans-serif", 18, "normal")
 
 class Player():
@@ -229,7 +232,7 @@ class Layout:
         # start and end
         self.gui.gui.clear_squares()
         self.gui.gui.add_numbers([Squares((self.start, 0) , 'A', **params),   
-                                  Squares((0, self.end) , 'B', **params)])     
+                                  Squares((self.end_row, self.end) , 'B', **params)])     
 
 
     def coords(self, row, col):
@@ -266,13 +269,15 @@ class Layout:
             self.start = row
             cell.is_start = True
         if end:
-            if row != 0:
-               raise ValueError("Invalid end position")
+            #if row != 0:
+            #   raise ValueError("Invalid end position")
             self.end = col
+            self.end_row = row
             cell.is_end = True
 
         # determine adjacent cells that must connect
-        if "N" in track:
+        # modify to allow end row to be 0 or size-1
+        if "N" in track and row < self.size-1:     	
             self.layout[row + 1][col].must_connect += "S"
         if "S" in track and row > 0:
             self.layout[row - 1][col].must_connect += "N"
@@ -401,7 +406,7 @@ class Layout:
         return True
 
     def done(self, cell):
-        if cell.row == 0 and cell.col == self.end:
+        if cell.row == self.end_row and cell.col == self.end:
             if self.check_constraints(exact=True):
                 return True
         return False
@@ -409,7 +414,8 @@ class Layout:
     def move_from(self, cell, dir):
         """ move from cell in direction dir  """
         self.move_count += 1
-        
+        if DEBUG:
+        	self.gui.gui.set_moves(f'Moves {self.move_count}')
         if self.move_count == self.move_max:
             raise ValueError("Max move count reached")
         # if self.move_count == 8400:
@@ -502,6 +508,7 @@ def parse(params, gui):
         raise ValueError("Params wrong - 1")
     l = Layout(size, gui)
     l.set_constraints(bits[1])
+    
     for i in range(2, len(bits)):
         c = bits[i]
         start = False
@@ -514,18 +521,26 @@ def parse(params, gui):
             else:
                 raise ("Params wrong - 2")
         l.add_track(c[:2], int(c[2]), int(c[3]), start=start, end=end)
+    #if not start:
+    #	raise ValueError('start not specified, forgot to add "s"')
+    #if not end:
+    #	raise ValueError('end not specified, forgot to add "e"')
     return l
 
 
 def main():
-    game_item = "8:2464575286563421:NW60s:SE72:EW24:NS04e"
+    #game_item = "8:2464575286563421:NW60s:SE72:EW24:NS04e"
     #game_item = "8:3456623347853221:NW30s:SW32:SW62:NS04e" #907
     #game_item = "8:8443143523676422:NW00s:NE41:NS45:NS07e" #908
     #game_item = "8:1216564534576221:EW40s:NS03e:NS45" #909
     #game_item = "8:1225446636611544:EW60s:NS03e:EW75:SE26" #910
-    game_item = "8:1556443846643364:EW50s:NE53:SE76:NS02e"
-    game_item = "8:3552325322474243:EW30:NS17:NS04e"
-    game_item = "8:1452563325211765:EW60s:NS45:SE26:NS02e"
+    #game_item = "8:1556443846643364:EW50s:NE53:SE76:NS02e"
+    #game_item = "8:3552325322474243:EW30s:NS17:NS04e"
+    #game_item = "8:1452563325211765:EW60s:NS45:SE26:NS02e"
+    #game_item = "8:1452563356711252:EW10s:NS35:NE56:NS72e"
+    #game_item = "8:3552325334247422:EW40s:NS67:NS74e"
+    game_item = "10:13172648231465163443:EW20s:EW75:SE65:NW77:NS93e"
+    #game_item = "10:16351336251542622643:EW70s:EW82:SW25:NE57:NS96e"
     game = RandomWalk(int(game_item.split(':')[0]))
     game.gui.clear_messages()
     game.gui.set_top(f'Train Tracks\t\t{game_item}')
