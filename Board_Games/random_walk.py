@@ -17,6 +17,7 @@ from gui.gui_interface import Coord, Gui, Squares
 from enum import Enum
 from time import perf_counter
 from  scene import LabelNode, Point
+import ui
 
 def check_in_board(coord):
     r, c = coord
@@ -177,7 +178,7 @@ class Cell:
             color = "black" if erase else "white"
             if self.permanent:
                 color = "blue"
-            params = {"stroke_color": color,"line_width": 20}
+            params = {"stroke_color": color,"line_width": 30, 'line_join_style': ui.LINE_JOIN_ROUND}
             match self.track:
               case Track.NS:
                 self.gui.gui.draw_line([xy - ver, xy, xy + ver],  **params)                                                                    
@@ -266,7 +267,7 @@ class Layout:
             cell.is_start = True
         if end:
             if row != 0:
-                raise ValueError("Invalid end position")
+               raise ValueError("Invalid end position")
             self.end = col
             cell.is_end = True
 
@@ -416,6 +417,7 @@ class Layout:
         #     breakpoint()
         if DEBUG:
             cell.draw_track()
+            sleep(0.1)
         if dir == "N":
             from_dir = "S"
             new_cell = self.layout[cell.row + 1][cell.col]
@@ -521,7 +523,9 @@ def main():
     #game_item = "8:8443143523676422:NW00s:NE41:NS45:NS07e" #908
     #game_item = "8:1216564534576221:EW40s:NS03e:NS45" #909
     #game_item = "8:1225446636611544:EW60s:NS03e:EW75:SE26" #910
-
+    game_item = "8:1556443846643364:EW50s:NE53:SE76:NS02e"
+    game_item = "8:3552325322474243:EW30:NS17:NS04e"
+    game_item = "8:1452563325211765:EW60s:NS45:SE26:NS02e"
     game = RandomWalk(int(game_item.split(':')[0]))
     game.gui.clear_messages()
     game.gui.set_top(f'Train Tracks\t\t{game_item}')
