@@ -23,7 +23,8 @@ def check_in_board(coord):
     return (0 <= r < SIZE) and (0 <= c < SIZE)
     
 SIZE = 1
-DEBUG = True
+DEBUG = False
+FONT = ("sans-serif", 18, "normal")
 
 class Player():
   def __init__(self):
@@ -115,8 +116,7 @@ class RandomWalk():
        #self.run() 
                     
 
-FONT = ("sans-serif", 18, "normal")
-DEBUG = False
+
 
 """ convert from turtle graphics """
 
@@ -140,8 +140,8 @@ class Track(Enum):
 class Cell:
     def __init__(self, row, col, cell_size, gui):
         self.cell_size = cell_size
+        self.y = row
         self.x = col
-        self.y = row 
         self.row = row
         self.col = col
         self.permanent = False
@@ -152,7 +152,7 @@ class Cell:
         self.gui = gui
 
     def __str__(self):
-        return f"R:{self.row} C:{self.col} {self.content} {self.track}"
+        return f"R:{self.row} C:{self.col} {self.track}"
 
     def is_empty(self):
         return self.track is None
@@ -166,7 +166,7 @@ class Cell:
         """ Draw the track piece in the cell """
         s = self.gui.gui.gs.SQ_SIZE
         s2 = s / 2
-        xy = self.gui.gui.rc_to_pos((self.y + 0.5, self.x + 0.5))
+        xy = self.gui.gui.rc_to_pos((self.y - 0.5, self.x + 0.5))
         hor = Point(s2,0)
         ver = Point(0, s2)
         
@@ -177,20 +177,20 @@ class Cell:
             color = "black" if erase else "white"
             if self.permanent:
                 color = "blue"
-            params = {"stroke_color": color,"line_width": 10}
+            params = {"stroke_color": color,"line_width": 20}
             match self.track:
               case Track.NS:
-                self.gui.gui.draw_line([xy - hor, xy, xy + hor],  **params)                                                                    
+                self.gui.gui.draw_line([xy - ver, xy, xy + ver],  **params)                                                                    
               case Track.EW:
-                self.gui.gui.draw_line([xy - ver, xy + ver], **params)                        
-              case Track.NE:
-                self.gui.gui.draw_line([xy - hor, xy, xy + ver], **params)                
+                self.gui.gui.draw_line([xy - hor, xy + hor], **params)                        
               case Track.SE:
-                self.gui.gui.draw_line([xy + hor, xy, xy + ver], **params)                                              
-              case Track.NW:
-                self.gui.gui.draw_line([xy - hor, xy, xy - ver], **params)                                             
+                self.gui.gui.draw_line([xy + hor, xy, xy + ver], **params)                
+              case Track.NE:
+                self.gui.gui.draw_line([xy - ver, xy, xy + hor], **params)                                              
               case Track.SW:
-                self.gui.gui.draw_line([xy + hor, xy, xy - ver], **params)                                            
+                self.gui.gui.draw_line([xy - hor, xy, xy + ver], **params)                                             
+              case Track.NW:
+                self.gui.gui.draw_line([xy - ver, xy, xy - hor], **params)                                            
     
 
 class Layout:
@@ -224,11 +224,12 @@ class Layout:
         self.gui.gui.replace_column_labels(self.col_constraints)
         
         # Numbers down right side
-        self.gui.gui.replace_column_labels(self.row_constraints)        
+        self.gui.gui.replace_row_labels(self.row_constraints)        
         # start and end
         self.gui.gui.clear_squares()
         self.gui.gui.add_numbers([Squares((self.start, 0) , 'A', **params),   
-                                  Squares((0, self.end) , 'B', **params)])          
+                                  Squares((0, self.end) , 'B', **params)])     
+
 
     def coords(self, row, col):
         """ Convert row, column to screen coordinates """
@@ -407,6 +408,7 @@ class Layout:
     def move_from(self, cell, dir):
         """ move from cell in direction dir  """
         self.move_count += 1
+        
         if self.move_count == self.move_max:
             raise ValueError("Max move count reached")
         # if self.move_count == 8400:
@@ -482,6 +484,10 @@ class Layout:
         
         self.gui.gui.set_message( f"{message} in {self.move_count} moves. Time:{elapsed:.2f}s")
         
+    def reveal(self):  
+        for r, row_ in enumerate(self.layout):
+          for cell in row_:
+            cell.draw_track()
 
 
 def parse(params, gui):
@@ -511,34 +517,35 @@ def parse(params, gui):
 
 def main():
     game_item = "8:2464575286563421:NW60s:SE72:EW24:NS04e"
-    game = RandomWalk(int(game_item.split(':')[0]))
-    
-    board = parse(game_item, game) #904
-    # board = parse("8:3456623347853221:NW30s:SW32:SW62:NS04e") #907
-    # board = parse("8:8443143523676422:NW00s:NE41:NS45:NS07e") #908
-    # board = parse("8:1216564534576221:EW40s:NS03e:NS45") #909
-    # board = parse("8:1225446636611544:EW60s:NS03e:EW75:SE26") #910
+    #game_item = "8:3456623347853221:NW30s:SW32:SW62:NS04e" #907
+    #game_item = "8:8443143523676422:NW00s:NE41:NS45:NS07e" #908
+    #game_item = "8:1216564534576221:EW40s:NS03e:NS45" #909
+    #game_item = "8:1225446636611544:EW60s:NS03e:EW75:SE26" #910
 
-    # board = parse("8:4533433525853421:SW40s:NE52:NS03e")
+    game = RandomWalk(int(game_item.split(':')[0]))
+    game.gui.clear_messages()
+    game.gui.set_top(f'Train Tracks\t\t{game_item}')
+    board = parse(game_item, game) #904
     
-    #board1 = game.empty_board.copy()
-    start = Coord((randint(0, game.size//2), 0))
-    end = Coord((SIZE-1, randint(game.size//2, game.size-1)))
-  
-    board.game = game
+     
+
     #game.initialize()
     board.draw()
     try:
         start = perf_counter()
+        board.reveal()
+        
         board.solve()
     except ValueError as e:
         end = perf_counter()
         elapsed = end - start
         board.result(str(e), elapsed)
-
-
+        board.reveal()
+        
+                        
 if __name__ == '__main__':
   main()
+
 
 
 

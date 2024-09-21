@@ -500,17 +500,15 @@ class Gui():
     
   def replace_row_labels(self, label_list):
         labels = [label for label in self.game_field.children if isinstance(label, LabelNode)]
-        x,y,w,h = self.grid.bbox
-        [print(f'{label.position}, {label.text}') for label in labels]
-        
+        x,_,_,_ = self.grid.bbox        
         label_row = [label for label in labels if x-25<label.position[0]<x]
         for label, listitem in zip(reversed(label_row), label_list):
            label.text = str(listitem)
            
   def replace_column_labels(self, label_list):
         labels = [label for label in self.game_field.children if isinstance(label, LabelNode)]
-        x,y,w,h = self.grid.bbox
-        [print(f'{label.position}, {label.text}') for label in labels]
+        _,_,_,h = self.grid.bbox
+        #[print(f'{label.position}, {label.text}') for label in labels]
         label_col = [label for label in labels if h<label.position[1]<(h+25)]       
         for label, listitem in zip(label_col, label_list):
            label.text = str(listitem)
