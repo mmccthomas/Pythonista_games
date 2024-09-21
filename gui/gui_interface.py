@@ -488,9 +488,32 @@ class Gui():
                               
   def draw_line(self, coords, **kwargs):
     self.gs.draw_line(coords, **kwargs)
+    
+  def remove_lines(self, z_position=1000):
+  	'''delete all lines based on z_position'''
+  	lines = [item for item in self.game_field.children if isinstance(item, ShapeNode) and item.z_position==z_position]
+  	for line in lines:
+  		line.remove_from_parent()
                                
   def rc_to_pos(self, coord): 
     return self.gs.rc_to_pos(coord[0], coord[1])
+    
+  def replace_row_labels(self, label_list):
+        labels = [label for label in self.game_field.children if isinstance(label, LabelNode)]
+        x,y,w,h = self.grid.bbox
+        [print(f'{label.position}, {label.text}') for label in labels]
+        
+        label_row = [label for label in labels if x-25<label.position[0]<x]
+        for label, listitem in zip(reversed(label_row), label_list):
+           label.text = str(listitem)
+           
+  def replace_column_labels(self, label_list):
+        labels = [label for label in self.game_field.children if isinstance(label, LabelNode)]
+        x,y,w,h = self.grid.bbox
+        [print(f'{label.position}, {label.text}') for label in labels]
+        label_col = [label for label in labels if h<label.position[1]<(h+25)]       
+        for label, listitem in zip(label_col, label_list):
+           label.text = str(listitem)
 
 class Coord(tuple):
     """ a simple class to allow addition and slicing
@@ -537,7 +560,11 @@ class Coord(tuple):
     def nsew(self):
         """ up, down, left, right """        
         return [Coord(self.__add__(d)) for d in self.nsew_dirs]
-      
+        
+    def distance(self, other):
+        """ x y distance of self from target """
+        d = self - other
+        return abs(d[0] + d[1])
     
     
 class Squares():
@@ -561,6 +588,7 @@ class Squares():
     for k, v in kwargs.items():
       setattr(self, k, v)
       
+
 
 
 
