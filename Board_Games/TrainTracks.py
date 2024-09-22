@@ -75,6 +75,8 @@ class RandomWalk():
         self.display_rack(['┃',  '━', '┏', '┓',  '┛', '┗' ,'x', '?'] )
         self.solution_board = np.full((size, size), '-', dtype='U1')
         self.empty_board = np.full((size, size), '-', dtype='U1')
+        self.erase = True
+        
         
     def update_board(self, board):
       self.gui.update(board)
@@ -239,7 +241,8 @@ class RandomWalk():
     def run(self):    
         """
         Main method that prompts the user for input
-        """ 
+        """
+        self.gui.set_enter('Hint') 
         self.update_board(self.board)   
         while True:            
             move = self.get_player_move(self.board)         
@@ -260,8 +263,9 @@ class RandomWalk():
         if move:
           coord, letter, row = move
           r,c = coord
-          if letter == 'Enter':                                  
-            self.board=self.solution_board   
+          if letter == 'Enter':  
+            self.erase = not self.erase                                
+            self.board_obj.reveal(erase=self.erase)
             self.update_board(self.board) 
                                                       
           elif coord == (None, None):
@@ -269,12 +273,13 @@ class RandomWalk():
           elif letter != '':  # valid selection
             try:
                 r,c = coord
-                cell = self.board[(r,c)]
-                self.board[coord] = letter
+                cell = self.board_obj.layout[r][c]
+                if not cell.permanent:
+                   self.board[coord] = letter
                                                     
-                self.update_board(self.board)
-                complete = self.code_constraints(self.board)
-                return complete
+                   self.update_board(self.board)
+                   complete = self.code_constraints(self.board)
+                   return complete
             except (IndexError):
               pass             
         return 0   
@@ -370,7 +375,7 @@ class Cell:
             pass
             
         if self.track:
-            color = "white" if erase else "black"
+            color = "clear" if erase else "black"
             self.gui.solution_board[(self.y, self.x)] = '-' if erase else dir_dict[self.track.name]              
             if self.permanent:
                 color = "blue"
@@ -678,10 +683,10 @@ class Layout:
         
         self.gui.gui.set_message( f"{message} in {self.move_count} moves. Time:{elapsed:.2f}s")
         
-    def reveal(self, no_line=False):  
+    def reveal(self, no_line=False, erase=False):  
         for r, row_ in enumerate(self.layout):
           for cell in row_:
-            cell.draw_track(no_line=no_line)
+            cell.draw_track(no_line=no_line, erase=erase)
 
 
 def parse(params, gui):
@@ -716,15 +721,15 @@ def parse(params, gui):
 dirs = {'NS':'┃',  'EW': '━',  'NE': '┏', 'NW': '┓',  'SW': '┛',  'SE': '┗' }  
 
 def main():
-    #game_item = "8:2464575286563421:NW60s:SE72:EW24:NS04e"
+    #game_item = "8:2464575286563421:NW60s:SE72:EW24:NS04e" #904
     #game_item = "8:3456623347853221:NW30s:SW32:SW62:NS04e" #907
     #game_item = "8:8443143523676422:NW00s:NE41:NS45:NS07e" #908
-    #game_item = "8:1216564534576221:EW40s:NS03e:NS45" #909
-    #game_item = "8:1225446636611544:EW60s:NS03e:EW75:SE26e" #910
+    game_item = "8:1216564534576221:EW40s:NS45:NS03e" #909
+    #game_item = "8:1225446636611544:EW60s:EW75:SE26:NS03e" #910
     #game_item = "8:1556443846643364:EW50s:NE53:SE76:NS02e"
     #game_item = "8:3552325322474243:EW30s:NS17:NS04e"
     #game_item = "8:1452563325211765:EW60s:NS45:SE26:NS02e"
-    game_item = "8:1452563356711252:EW10s:NS35:NE56:NS72e"
+    #game_item = "8:1452563356711252:EW10s:NS35:NE56:NS72e"
     #game_item = "8:3552325334247422:EW40s:NS67:NS74e"
     #game_item = "10:13172648231465163443:EW20s:EW75:SE65:NW77:NS93e"
     #game_item = "10:16351336251542622643:EW70s:EW82:SW25:NE57:NS96e"
@@ -732,7 +737,7 @@ def main():
     
     game.gui.clear_messages()
     game.gui.set_top(f'Train Tracks\t\t{game_item}')
-    board = parse(game_item, game) #904         
+    board = parse(game_item, game)
 
     #game.initialize()
     board.draw()
@@ -753,6 +758,7 @@ def main():
                         
 if __name__ == '__main__':
   main()
+
 
 
 
