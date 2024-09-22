@@ -42,9 +42,12 @@ class Player():
     self.PLAYERS = [self.PLAYER_1, self.PLAYER_2]
     
     self.PIECES = [f'../gui/tileblocks/&.png', f'../gui/tileblocks/_.png', f'../gui/tileblocks/e.png', f'../gui/tileblocks/s.png',
-                   f'../gui/tileblocks/┃.png', f'../gui/tileblocks/━.png', f'../gui/tileblocks/┏.png', f'../gui/tileblocks/┓.png',
-                   f'../gui/tileblocks/┛.png', f'../gui/tileblocks/┗.png']
-    self.PIECE_NAMES = {'#': 'Black', ' ': 'White', 'e':'End', 's':'Start', '┃':'NS',  '━':'EW', '┏':'NE', '┓':'NW', '┛': 'SW',  '┗':'SE'} 
+                   f'../gui/tileblocks/NS.png', f'../gui/tileblocks/EW.png', f'../gui/tileblocks/NE.png', f'../gui/tileblocks/NW.png',
+                   f'../gui/tileblocks/SW.png', f'../gui/tileblocks/SE.png', f'../gui/tileblocks/?.png', f'../gui/tileblocks/x.png']
+                   #f'../gui/tileblocks/┃.png', f'../gui/tileblocks/━.png', f'../gui/tileblocks/┏.png', f'../gui/tileblocks/┓.png',
+                   #f'../gui/tileblocks/┛.png', f'../gui/tileblocks/┗.png', f'../gui/tileblocks/?.png', f'../gui/tileblocks/x.png']
+    self.PIECE_NAMES = {'#': 'Black', ' ': 'White', 'e':'End', 's':'Start', 
+                        '┃':'NS',  '━':'EW', '┏':'NE', '┓':'NW', '┛': 'SW',  '┗':'SE', '?': 'Poss', 'x': 'Blocked'}
     
 class RandomWalk():
     def __init__(self, size=8):
@@ -65,8 +68,8 @@ class RandomWalk():
         self.gui.setup_gui(log_moves=True, grid_fill='white')
         self.gui.build_extra_grid(size, size, grid_width_x=1, grid_width_y=1, color='black', line_width=2, offset=None, z_position=100)
         # menus can be controlled by dictionary of labels and functions without parameters
-        #self.gui.pause_menu = {'Continue': self.gui.dismiss_menu,  'Save': save, 
-        #                 'Load': load,  'Quit': self.gui.gs.close}
+        self.gui.pause_menu = {'Continue': self.gui.dismiss_menu,  'Reveal': self.reveal,
+                       'Quit': self.gui.gs.close}
         self.gui.start_menu = {'New Game': self.restart, 'Quit': self.gui.gs.close} 
         self.size =  size # 2
         self.display_rack(['┃',  '━', '┏', '┓',  '┛', '┗' ,'x', '?'] )
@@ -81,16 +84,21 @@ class RandomWalk():
     def display_rack(self, tiles, y_off=0):
         """ display players rack
         y position offset is used to select player_1 or player_2
-        """   
+        """
+        dirs = {'NS': '┃',  'EW': '━', 'NE': '┏', 'NW': '┓', 'SW': '┛', 'SE': '┗', '?':'?' , 'x':'x'}
         parent = self.gui.game_field
         _, _, w, h = self.gui.grid.bbox
         sqsize = self.gui.gs.SQ_SIZE
-        x, y = (50, h-sqsize)
+        x, y = (50, h - sqsize)
         y = y + y_off
         rack = {}
-        for n, tile in enumerate(tiles):    
-          t = Tile(Texture(Image.named(f'../gui/tileblocks/{tile}.png')), 0,  0, sq_size=sqsize)   
-          t.position = (w + x + (n %2 *(20+sqsize)) , y -  n//2 * (20+sqsize))
+        for n, tile in enumerate(tiles): 
+          for k,v in dirs.items():
+            if v == tile:
+              t_name = k
+              break   
+          t = Tile(Texture(Image.named(f'../gui/tileblocks/{t_name}.png')), 0,  0, sq_size=sqsize)   
+          t.position = (w + x + (n % 2 * (20 + sqsize)) , y -  n //2 * (20 + sqsize))
           rack[t.bbox] = tile
           parent.add_child(t)                     
         
@@ -107,8 +115,7 @@ class RandomWalk():
           #  wait on queue data, either rc selected or function to call
           sleep(0.01)
           if not self.q.empty():
-            data = self.q.get(block=False)
-            
+            data = self.q.get(block=False)            
             #self.delta_t('get')
             #self.q.task_done()
             if isinstance(data, (tuple, list, int)):
@@ -130,20 +137,14 @@ class RandomWalk():
       if board is None:
           board = self.game_board
       coord_list = []
-      #prompt = (f"Select  position (A1 - {self.COLUMN_LABELS[-1]}{self.sizey})")
       # sit here until piece place on board   
       items = 0
       
       while items < 1000: # stop lockup
-        #self.gui.set_prompt(prompt, font=('Avenir Next', 25))
-        
         move = self.wait_for_gui()
         if items == 0: st = time()
         #print('items',items, move)
         try:
-          # spot = spot.strip().upper()
-          # row = int(spot[1:]) - 1
-          # col = self.COLUMN_LABELS.index(spot[0])
           if self.log_moves:
             coord_list.append(move)
             items += 1
@@ -158,14 +159,13 @@ class RandomWalk():
           coord_list.append(move)
           return coord_list    
       return move
-
        
     def get_player_move(self, board=None):
         """Takes in the user's input and performs that move on the board, returns the coordinates of the move
         Allows for movement over board"""
         move = self._get_player_move(self.board)
         rack = self.rack
-        
+        self.gui.set_message2(f'{move[0]}..{move[-2]}')
         if move[0] == (-1, -1):
            return (None, None), 'Enter', None # pressed enter button
            
@@ -177,9 +177,12 @@ class RandomWalk():
         # get letter from rack
         for index, k in enumerate(rack):
             if k.contains_point(point):
-                letter = rack[k]
+                self.letter = rack[k]
                 rc = move[-2]
-                return rc, letter, index
+                return rc, self.letter, index
+        # single press uses previous letter       
+        if move[0] == move[-2]:
+          return move[-2], self.letter, None
         return (None, None), None, None    
               
     def initialize(self):
@@ -242,7 +245,12 @@ class RandomWalk():
             move = self.get_player_move(self.board)         
             finished = self.process_turn( move, self.board)         
             self.update_board(self.board)
+            
             if self.game_over(finished): break      
+    
+    def reveal(self):
+      self.board = self.solution_board
+      self.update_board(self.board)  
           
     def process_turn(self, move, board):
         """ process the turn
@@ -252,9 +260,10 @@ class RandomWalk():
         if move:
           coord, letter, row = move
           r,c = coord
-          if letter == 'Enter':
-            # confirm placement                       
-            no_pieces_used = len(self.letters_used)                                                 
+          if letter == 'Enter':                                  
+            self.board=self.solution_board   
+            self.update_board(self.board) 
+                                                      
           elif coord == (None, None):
             return 0                           
           elif letter != '':  # valid selection
@@ -273,20 +282,26 @@ class RandomWalk():
     def code_constraints(self, board):
        """compare constraints with actual counts
        colour the constraints to match"""
+       S = set([0,2,6,8])
+       S =  [ '━', '┏', '┓',  '┛', '┗', '┃']
+
+       @np.vectorize
+       def contained(x):
+          return x in S
        font= ('Arial Rounded MT Bold', 30)
+       
        col_known = np.array(self.board_obj.col_constraints)
-       col_sums = np.sum(self.board!='-', axis=0)
-       check_cols = np.equal(col_sums, col_known)
-       col_colors = np.where(check_cols, 'white', '#ff5b5b')
-       self.gui.replace_labels('col', col_known, colors=col_colors, font=font)
-       
+       col_sums = np.sum(contained(self.board), axis=0)
        row_known = np.flip(np.array(self.board_obj.row_constraints))
-       row_sums = np.flip(np.sum(self.board!='-', axis=1))
-       check_rows = np.equal(row_sums, row_known)
-       row_colors = np.where(check_rows, 'white', '#ff5b5b')
-       self.gui.replace_labels('row', row_known, colors=row_colors, font=font) 
-       
-       return np.all(check_rows) and np.all(check_cols)
+       row_sums = np.flip(np.sum(contained(self.board), axis=1))
+       ok=[]
+       for known, sums, dirn in [(col_known, col_sums, 'col'), (row_known, row_sums, 'row')]:
+          check = np.equal(sums, known)
+          colors = np.where(check, 'white', '#ff5b5b')
+          self.gui.replace_labels(dirn,  known, colors=colors, font=font)               
+          ok.append(np.all(check))
+          
+       return all(ok)
          
     def game_over(self, finished):
       if finished:
@@ -342,7 +357,7 @@ class Cell:
             return dir in self.track.name
 
     
-    def draw_track(self, erase=False):
+    def draw_track(self, erase=False, no_line=False):
         """ Draw the track piece in the cell """
         dir_dict = {'NS':'┃',  'EW': '━',  'NE': '┏', 'NW': '┓',  'SW': '┛',  'SE': '┗' }  
         s = self.gui.gui.gs.SQ_SIZE
@@ -365,7 +380,8 @@ class Cell:
             dir_coords_dict = {'NS': [xy - ver, xy, xy + ver],  'EW': [xy - hor, xy + hor],  
                          'NE': [xy - ver, xy, xy + hor],  'NW': [xy - ver, xy, xy - hor],  
                          'SW': [xy - hor, xy, xy + ver],  'SE': [xy + hor, xy, xy + ver]}  
-            self.gui.gui.draw_line(dir_coords_dict[self.track.name],  **params)   
+            if not no_line:
+               self.gui.gui.draw_line(dir_coords_dict[self.track.name],  **params)   
             
 class Layout:
     def __init__(self, size=8, gui=None):
@@ -389,14 +405,13 @@ class Layout:
         self.row_perm = []
 
     def draw(self, moves=False):  
-        params = {'color':'black', 'text_color':'white',               
-                 'z_position':5, 'stroke_color':'clear',
-                 'alpha':1, 'radius':5, 
+        params = {'color':'black', 'text_color':'blue',               
+                 'z_position':1000, 'stroke_color':'clear',
+                 'alpha':0.5, 'radius':5, 
                  'sqsize':1, 'offset':(0.5, -0.5), 
-                 'font': ('Avenir', 24), 'text_anchor_point':(-1, 1)}      
+                 'font': ('Arial Rounded MT Bold', 30), 'text_anchor_point':(-1, 1.2)}      
         # Numbers across the top
-        self.gui.gui.replace_labels('col', self.col_constraints, colors=None)
-        
+        self.gui.gui.replace_labels('col', self.col_constraints, colors=None)        
         # Numbers down right side
         self.gui.gui.replace_labels('row', reversed(self.row_constraints), colors=None)        
         # start and end
@@ -663,10 +678,10 @@ class Layout:
         
         self.gui.gui.set_message( f"{message} in {self.move_count} moves. Time:{elapsed:.2f}s")
         
-    def reveal(self):  
+    def reveal(self, no_line=False):  
         for r, row_ in enumerate(self.layout):
           for cell in row_:
-            cell.draw_track()
+            cell.draw_track(no_line=no_line)
 
 
 def parse(params, gui):
@@ -709,10 +724,10 @@ def main():
     #game_item = "8:1556443846643364:EW50s:NE53:SE76:NS02e"
     #game_item = "8:3552325322474243:EW30s:NS17:NS04e"
     #game_item = "8:1452563325211765:EW60s:NS45:SE26:NS02e"
-    #game_item = "8:1452563356711252:EW10s:NS35:NE56:NS72e"
+    game_item = "8:1452563356711252:EW10s:NS35:NE56:NS72e"
     #game_item = "8:3552325334247422:EW40s:NS67:NS74e"
     #game_item = "10:13172648231465163443:EW20s:EW75:SE65:NW77:NS93e"
-    game_item = "10:16351336251542622643:EW70s:EW82:SW25:NE57:NS96e"
+    #game_item = "10:16351336251542622643:EW70s:EW82:SW25:NE57:NS96e"
     game = RandomWalk(int(game_item.split(':')[0]))
     
     game.gui.clear_messages()
@@ -723,21 +738,22 @@ def main():
     board.draw()
     try:
         start = perf_counter()
-        board.reveal()        
+        board.reveal(no_line=True)        
         board.solve()
     except ValueError as e:
         end = perf_counter()
         elapsed = end - start
         board.result(str(e), elapsed)
         game.board = game.empty_board.copy()
-        #board.reveal()
-        game.gui.print_board(game.solution_board)
+        board.reveal(no_line=True)
+        game.gui.print_board(game.solution_board, 'solution')
         
         game.board_obj = board
         game.run()
                         
 if __name__ == '__main__':
   main()
+
 
 
 
