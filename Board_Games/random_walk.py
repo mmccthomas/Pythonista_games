@@ -17,6 +17,7 @@ sys.path.append(grandparent)
 greatgrandparent = os.path.dirname(grandparent)
 sys.path.append(greatgrandparent)
 from gui.gui_interface import Coord, Gui, Squares
+
 from gui.gui_scene import Tile
 from enum import Enum
 from time import perf_counter
@@ -68,46 +69,88 @@ class RandomWalk():
         self.display_rack(['┃',  '━', '┏', '┓',  '┛', '┗' ,'x', '?'] )
         self.solution_board = np.full((size, size), '-', dtype='U1')
         self.empty_board = np.full((size, size), '-', dtype='U1')
-    
+        
+    def update_board(self, board):
+      self.gui.update(board)
+      self.display_rack(['┃',  '━', '┏', '┓',  '┛', '┗' ,'x', '?'] )
+      
+      
     def display_rack(self, tiles, y_off=0):
-		    """ display players rack
-		    y position offset is used to select player_1 or player_2
-		    """   
-		    parent = self.gui.game_field
-		    _, _, w, h = self.gui.grid.bbox
-		    sqsize = self.gui.gs.SQ_SIZE
-		    x, y = (50, h-sqsize)
-		    y = y + y_off
-		    rack = {}
-		    for n, tile in enumerate(tiles):    
-		      t = Tile(Texture(Image.named(f'../gui/tileblocks/{tile}.png')), 0,  0, sq_size=sqsize)   
-		      t.position = (w + x + (n %2 *(20+sqsize)) , y -  n//2 * (20+sqsize))
-		      rack[t.bbox] = tile
-		      parent.add_child(t)     		            
-		    
-		    self.rack = rack
-		    
+        """ display players rack
+        y position offset is used to select player_1 or player_2
+        """   
+        parent = self.gui.game_field
+        _, _, w, h = self.gui.grid.bbox
+        sqsize = self.gui.gs.SQ_SIZE
+        x, y = (50, h-sqsize)
+        y = y + y_off
+        rack = {}
+        for n, tile in enumerate(tiles):    
+          t = Tile(Texture(Image.named(f'../gui/tileblocks/{tile}.png')), 0,  0, sq_size=sqsize)   
+          t.position = (w + x + (n %2 *(20+sqsize)) , y -  n//2 * (20+sqsize))
+          rack[t.bbox] = tile
+          parent.add_child(t)                     
+        
+        self.rack = rack
+        
+    def _get_player_move(self, board=None):
+      """Takes in the user's input and performs that move on the board, returns the coordinates of the move
+      Allows for movement over board"""
+      #self.delta_t('start get move')
+      if board is None:
+          board = self.game_board
+      coord_list = []
+      prompt = (f"Select  position (A1 - {self.COLUMN_LABELS[-1]}{self.sizey})")
+      # sit here until piece place on board   
+      items = 0
+      
+      while items < 1000: # stop lockup
+        #self.gui.set_prompt(prompt, font=('Avenir Next', 25))
+        
+        move = self.wait_for_gui()
+        if items == 0: st = time()
+        #print('items',items, move)
+        try:
+          # spot = spot.strip().upper()
+          # row = int(spot[1:]) - 1
+          # col = self.COLUMN_LABELS.index(spot[0])
+          if self.log_moves:
+            coord_list.append(move)
+            items += 1
+            if move == -1:
+              #self.delta_t('end get move')
+              return coord_list       
+          else:
+            break
+        except (Exception) as e:
+          print(traceback.format_exc())
+          print('except,', move, e)
+          coord_list.append(move)
+          return coord_list    
+      return move
+
+       
     def get_player_move(self, board=None):
-		    """Takes in the user's input and performs that move on the board, returns the coordinates of the move
-		    Allows for movement over board"""
-		    move = LetterGame.get_player_move(self, self.board)
-		    rack = self.rack
-		    
-		    if move[0] == (-1, -1):
-		       return (None, None), 'Enter', None # pressed enter button
-		       
-		    # deal with buttons. each returns the button text    
-		    elif move[0][0] < 0 and move[0][1] < 0:
-		      return (None, None), self.gui.gs.buttons[-move[0][0]].text, None
-		      
-		    point = self.gui.gs.start_touch - gscene.GRID_POS
-		    # get letter from rack
-		    for index, k in enumerate(rack):
-		        if k.contains_point(point):
-		            letter = rack[k]
-		            rc = move[-2]
-		            return rc, letter, index
-		    return (None, None), None, None    
+        """Takes in the user's input and performs that move on the board, returns the coordinates of the move
+        Allows for movement over board"""
+        move = self._get_player_move(self.board)
+        rack = self.rack
+        
+        if move[0] == (-1, -1):
+           return (None, None), 'Enter', None # pressed enter button
+           
+        # deal with buttons. each returns the button text    
+        elif move[0][0] < 0 and move[0][1] < 0:
+          return (None, None), self.gui.gs.buttons[-move[0][0]].text, None
+          
+        point = self.gui.gs.start_touch - gscene.GRID_POS
+        # get letter from rack
+        for index, k in enumerate(rack):
+            if k.contains_point(point):
+                letter = rack[k]
+                rc = move[-2]
+                return rc, letter, index
+        return (None, None), None, None    
               
     def initialize(self):
         """This method should only be called once, when initializing the board."""
@@ -161,50 +204,48 @@ class RandomWalk():
         self.gui.add_numbers(self.square_list )
         
     def run(self):    
-		    """
-		    Main method that prompts the user for input
-		    """    
-		    while True:            
-		        move = self.get_player_move(self.board)         
-		        pieces_used = self.process_turn( move, self.board)         
-		        self.update_board()
-		        if self.game_over(): break      
-		      
+        """
+        Main method that prompts the user for input
+        """    
+        while True:            
+            move = self.get_player_move(self.board)         
+            pieces_used = self.process_turn( move, self.board)         
+            self.update_board()
+            if self.game_over(): break      
+          
     def process_turn(self, move, board):
-		    """ process the turn
-		    move is coord, new letter, selection_row
-		    """ 
-		    rack = self.rack		    
-		    if move:
-		      coord, letter, row = move
-		      r,c = coord
-		      if letter == 'Enter':
-		        # confirm placement		        		        
-		        no_pieces_used = len(self.letters_used)		        		        		        		          
-		      elif coord == (None, None):
-		        return 0		        		           
-		      elif letter != '':  # valid selection
-		        try:
-		            r,c = coord
-		            cell = self.gamestate.board.board[r][c]
-		            # get point value of selected tile
-		            point = player.rack.tiles[row].point
-		            cell.tile = scrabble_objects.Tile(letter.upper(),point=point) 		            		            		            
-		            self.update_board()
-		            
-		        except (IndexError):
-		          pass             
-		    return 0   
+        """ process the turn
+        move is coord, new letter, selection_row
+        """ 
+        rack = self.rack        
+        if move:
+          coord, letter, row = move
+          r,c = coord
+          if letter == 'Enter':
+            # confirm placement                       
+            no_pieces_used = len(self.letters_used)                                                 
+          elif coord == (None, None):
+            return 0                           
+          elif letter != '':  # valid selection
+            try:
+                r,c = coord
+                cell = self.gamestate.board.board[r][c]
+                # get point value of selected tile
+                point = player.rack.tiles[row].point
+                cell.tile = scrabble_objects.Tile(letter.upper(),point=point)                                                 
+                self.update_board()
+                
+            except (IndexError):
+              pass             
+        return 0   
         
     def game_over(self):
-    	return False
-    	        
+      return False
+              
     def restart(self):
        self.gui.gs.close()
        self.__init__()
        #self.run() 
-                    
-
 
 
 """ convert from turtle graphics """
@@ -224,7 +265,6 @@ class Track(Enum):
         for tr in cls:
             if str[0] in tr.name and str[1] in tr.name:
                 return tr
-
 
 class Cell:
     def __init__(self, row, col, cell_size, gui):
@@ -264,7 +304,7 @@ class Cell:
             pass
             
         if self.track:
-            color = "white" if erase else "clear"
+            color = "white" if erase else "black"
             self.gui.solution_board[(self.y, self.x)] = '-' if erase else dir_dict[self.track.name]              
             if self.permanent:
                 color = "blue"
@@ -304,10 +344,10 @@ class Layout:
                  'sqsize':1, 'offset':(0.5, -0.5), 
                  'font': ('Avenir', 24), 'text_anchor_point':(-1, 1)}      
         # Numbers across the top
-        self.gui.gui.replace_column_labels(self.col_constraints)
+        self.gui.gui.replace_column_labels(self.col_constraints, colors=None)
         
         # Numbers down right side
-        self.gui.gui.replace_row_labels(self.row_constraints)        
+        self.gui.gui.replace_row_labels(self.row_constraints, colors=None)        
         # start and end
         self.gui.gui.clear_squares()
         self.gui.gui.add_numbers([Squares((self.start, 0) , 'A', **params),   
@@ -632,20 +672,21 @@ def main():
     board.draw()
     try:
         start = perf_counter()
-        board.reveal()
-        
+        board.reveal()        
         board.solve()
     except ValueError as e:
         end = perf_counter()
         elapsed = end - start
         board.result(str(e), elapsed)
+        game.board = game.empty_board.copy()
         board.reveal()
         game.gui.print_board(game.solution_board)
-        game.gui.update(game.empty_board)
-        
+        game.update_board(game.solution_board)
+        game.run()
                         
 if __name__ == '__main__':
   main()
+
 
 
 

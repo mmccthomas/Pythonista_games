@@ -498,20 +498,35 @@ class Gui():
   def rc_to_pos(self, coord): 
     return self.gs.rc_to_pos(coord[0], coord[1])
     
-  def replace_row_labels(self, label_list):
+  def replace_row_labels(self, label_list, colors=None):
         labels = [label for label in self.game_field.children if isinstance(label, LabelNode)]
         x,_,_,_ = self.grid.bbox        
         label_row = [label for label in labels if x-25<label.position[0]<x]
         for label, listitem in zip(reversed(label_row), label_list):
            label.text = str(listitem)
+        if colors:
+            if isinstance(colors, list):
+              for label, color in zip(label_row, colors):
+                 label.color = color
+            else:
+              for label in label_row:
+                 label.color = colors
            
-  def replace_column_labels(self, label_list):
+  def replace_column_labels(self, label_list,  colors=None):
         labels = [label for label in self.game_field.children if isinstance(label, LabelNode)]
         _,_,_,h = self.grid.bbox
         #[print(f'{label.position}, {label.text}') for label in labels]
-        label_col = [label for label in labels if h<label.position[1]<(h+25)]       
+        label_col = [label for label in labels if h<label.position[1]<(h+25)]    
+         
         for label, listitem in zip(label_col, label_list):
            label.text = str(listitem)
+        if colors:
+            if isinstance(colors, list):
+              for label, color in zip(label_col, colors):
+                 label.color = color
+            else:
+              for label in label_col:
+                 label.color = colors
 
 class Coord(tuple):
     """ a simple class to allow addition and slicing
