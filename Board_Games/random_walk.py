@@ -2,10 +2,9 @@
 # modified for ios.
 # removed turtle graphics `CMT
 import numpy as np
-import matplotlib.pyplot as plt
+import traceback
 import os
 import sys
-from time import sleep
 from queue import Queue
 from collections import deque
 from random import choice, randint
@@ -19,10 +18,12 @@ sys.path.append(greatgrandparent)
 from gui.gui_interface import Coord, Gui, Squares
 
 from gui.gui_scene import Tile
+import gui.gui_scene as gscene
 from enum import Enum
-from time import perf_counter
+from time import perf_counter, time, sleep
 from  scene import *
 from ui import Image
+import dialogs
 import ui
 
 def check_in_board(coord):
@@ -51,6 +52,8 @@ class RandomWalk():
         self.display_board = np.zeros((size, size), dtype=int)
         self.empty_board = self.display_board.copy()
         self.board = None
+        # allows us to get a list of rc locations
+        self.log_moves = True
         self.q = Queue()
         self.gui = Gui(self.display_board, Player())
         self.gui.gs.q = self.q # pass queue into gui
@@ -59,7 +62,7 @@ class RandomWalk():
         self.gui.require_touch_move(False)
         self.gui.allow_any_move(True)
         
-        self.gui.setup_gui(log_moves=False, grid_fill='white')
+        self.gui.setup_gui(log_moves=True, grid_fill='white')
         self.gui.build_extra_grid(size, size, grid_width_x=1, grid_width_y=1, color='black', line_width=2, offset=None, z_position=100)
         # menus can be controlled by dictionary of labels and functions without parameters
         #self.gui.pause_menu = {'Continue': self.gui.dismiss_menu,  'Save': save, 
@@ -93,6 +96,33 @@ class RandomWalk():
         
         self.rack = rack
         
+    def wait_for_gui(self):
+        # loop until dat received over queue
+        while True:
+          # if view gets closed, quit the program
+          if not self.gui.v.on_screen:
+            print('View closed, exiting')
+            sys.exit() 
+            break   
+          #  wait on queue data, either rc selected or function to call
+          sleep(0.01)
+          if not self.q.empty():
+            data = self.q.get(block=False)
+            
+            #self.delta_t('get')
+            #self.q.task_done()
+            if isinstance(data, (tuple, list, int)):
+              coord = data # self.gui.ident(data)
+              break
+            else:
+              try:
+                #print(f' trying to run {data}')
+                data()
+              except (Exception) as e:
+                print(traceback.format_exc())
+                print(f'Error in received data {data}  is {e}')
+        return coord
+        
     def _get_player_move(self, board=None):
       """Takes in the user's input and performs that move on the board, returns the coordinates of the move
       Allows for movement over board"""
@@ -100,7 +130,7 @@ class RandomWalk():
       if board is None:
           board = self.game_board
       coord_list = []
-      prompt = (f"Select  position (A1 - {self.COLUMN_LABELS[-1]}{self.sizey})")
+      #prompt = (f"Select  position (A1 - {self.COLUMN_LABELS[-1]}{self.sizey})")
       # sit here until piece place on board   
       items = 0
       
@@ -206,12 +236,13 @@ class RandomWalk():
     def run(self):    
         """
         Main method that prompts the user for input
-        """    
+        """ 
+        self.update_board(self.board)   
         while True:            
             move = self.get_player_move(self.board)         
-            pieces_used = self.process_turn( move, self.board)         
-            self.update_board()
-            if self.game_over(): break      
+            finished = self.process_turn( move, self.board)         
+            self.update_board(self.board)
+            if self.game_over(finished): break      
           
     def process_turn(self, move, board):
         """ process the turn
@@ -229,17 +260,37 @@ class RandomWalk():
           elif letter != '':  # valid selection
             try:
                 r,c = coord
-                cell = self.gamestate.board.board[r][c]
-                # get point value of selected tile
-                point = player.rack.tiles[row].point
-                cell.tile = scrabble_objects.Tile(letter.upper(),point=point)                                                 
-                self.update_board()
-                
+                cell = self.board[(r,c)]
+                self.board[coord] = letter
+                                                    
+                self.update_board(self.board)
+                complete = self.code_constraints(self.board)
+                return complete
             except (IndexError):
               pass             
         return 0   
-        
-    def game_over(self):
+    
+    def code_constraints(self, board):
+       """compare constraints with actual counts
+       colour the constraints to match"""
+       font= ('Arial Rounded MT Bold', 30)
+       col_known = np.array(self.board_obj.col_constraints)
+       col_sums = np.sum(self.board!='-', axis=0)
+       check_cols = np.equal(col_sums, col_known)
+       col_colors = np.where(check_cols, 'white', '#ff5b5b')
+       self.gui.replace_labels('col', col_known, colors=col_colors, font=font)
+       
+       row_known = np.flip(np.array(self.board_obj.row_constraints))
+       row_sums = np.flip(np.sum(self.board!='-', axis=1))
+       check_rows = np.equal(row_sums, row_known)
+       row_colors = np.where(check_rows, 'white', '#ff5b5b')
+       self.gui.replace_labels('row', row_known, colors=row_colors, font=font) 
+       
+       return np.all(check_rows) and np.all(check_cols)
+         
+    def game_over(self, finished):
+      if finished:
+        dialogs.hud_alert('Game over')
       return False
               
     def restart(self):
@@ -344,10 +395,10 @@ class Layout:
                  'sqsize':1, 'offset':(0.5, -0.5), 
                  'font': ('Avenir', 24), 'text_anchor_point':(-1, 1)}      
         # Numbers across the top
-        self.gui.gui.replace_column_labels(self.col_constraints, colors=None)
+        self.gui.gui.replace_labels('col', self.col_constraints, colors=None)
         
         # Numbers down right side
-        self.gui.gui.replace_row_labels(self.row_constraints, colors=None)        
+        self.gui.gui.replace_labels('row', reversed(self.row_constraints), colors=None)        
         # start and end
         self.gui.gui.clear_squares()
         self.gui.gui.add_numbers([Squares((self.start, 0) , 'A', **params),   
@@ -650,7 +701,7 @@ def parse(params, gui):
 dirs = {'NS':'┃',  'EW': '━',  'NE': '┏', 'NW': '┓',  'SW': '┛',  'SE': '┗' }  
 
 def main():
-    game_item = "8:2464575286563421:NW60s:SE72:EW24:NS04e"
+    #game_item = "8:2464575286563421:NW60s:SE72:EW24:NS04e"
     #game_item = "8:3456623347853221:NW30s:SW32:SW62:NS04e" #907
     #game_item = "8:8443143523676422:NW00s:NE41:NS45:NS07e" #908
     #game_item = "8:1216564534576221:EW40s:NS03e:NS45" #909
@@ -661,7 +712,7 @@ def main():
     #game_item = "8:1452563356711252:EW10s:NS35:NE56:NS72e"
     #game_item = "8:3552325334247422:EW40s:NS67:NS74e"
     #game_item = "10:13172648231465163443:EW20s:EW75:SE65:NW77:NS93e"
-    #game_item = "10:16351336251542622643:EW70s:EW82:SW25:NE57:NS96e"
+    game_item = "10:16351336251542622643:EW70s:EW82:SW25:NE57:NS96e"
     game = RandomWalk(int(game_item.split(':')[0]))
     
     game.gui.clear_messages()
@@ -679,13 +730,17 @@ def main():
         elapsed = end - start
         board.result(str(e), elapsed)
         game.board = game.empty_board.copy()
-        board.reveal()
+        #board.reveal()
         game.gui.print_board(game.solution_board)
-        game.update_board(game.solution_board)
+        
+        game.board_obj = board
         game.run()
                         
 if __name__ == '__main__':
   main()
+
+
+
 
 
 

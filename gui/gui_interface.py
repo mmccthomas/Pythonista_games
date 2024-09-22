@@ -6,7 +6,7 @@ import time
 import os
 import console
 from queue import Queue
-
+import numpy as np
 current = os.path.dirname(os.path.realpath(__file__))
 parent = os.path.dirname(current)
 sys.path.append(parent)
@@ -490,44 +490,37 @@ class Gui():
     self.gs.draw_line(coords, **kwargs)
     
   def remove_lines(self, z_position=1000):
-  	'''delete all lines based on z_position'''
-  	lines = [item for item in self.game_field.children if isinstance(item, ShapeNode) and item.z_position==z_position]
-  	for line in lines:
-  		line.remove_from_parent()
+    '''delete all lines based on z_position'''
+    lines = [item for item in self.game_field.children if isinstance(item, ShapeNode) and item.z_position==z_position]
+    for line in lines:
+      line.remove_from_parent()
                                
   def rc_to_pos(self, coord): 
     return self.gs.rc_to_pos(coord[0], coord[1])
-    
-  def replace_row_labels(self, label_list, colors=None):
+  
+  def replace_labels(self, which='row', label_list=None, colors=None, **kwargs):
+        """ replace row or column labels with custom set and colors"""
         labels = [label for label in self.game_field.children if isinstance(label, LabelNode)]
-        x,_,_,_ = self.grid.bbox        
-        label_row = [label for label in labels if x-25<label.position[0]<x]
-        for label, listitem in zip(reversed(label_row), label_list):
-           label.text = str(listitem)
-        if colors:
-            if isinstance(colors, list):
-              for label, color in zip(label_row, colors):
+        x,y,w,h = self.grid.bbox        
+        if which == 'row':
+            labels = [label for label in labels if x-25<label.position[0]<x]
+        else:
+            labels = [label for label in labels if h<label.position[1]<(h+25)]    
+            
+        for label, listitem in zip(labels, label_list):
+           label.text = str(listitem)   
+        if colors is not None:
+            if isinstance(colors, (np.ndarray, list)):
+              for label, color in zip(labels, colors):
                  label.color = color
             else:
-              for label in label_row:
-                 label.color = colors
-           
-  def replace_column_labels(self, label_list,  colors=None):
-        labels = [label for label in self.game_field.children if isinstance(label, LabelNode)]
-        _,_,_,h = self.grid.bbox
-        #[print(f'{label.position}, {label.text}') for label in labels]
-        label_col = [label for label in labels if h<label.position[1]<(h+25)]    
-         
-        for label, listitem in zip(label_col, label_list):
-           label.text = str(listitem)
-        if colors:
-            if isinstance(colors, list):
-              for label, color in zip(label_col, colors):
-                 label.color = color
-            else:
-              for label in label_col:
-                 label.color = colors
-
+              for label in labels:
+                 label.color = colors 
+        for k, v in kwargs.items():
+        	for label in labels:
+        	  setattr(label, k, v)
+                   
+  
 class Coord(tuple):
     """ a simple class to allow addition and slicing
     example: coord = Coord(rc)
@@ -601,6 +594,7 @@ class Squares():
     for k, v in kwargs.items():
       setattr(self, k, v)
       
+
 
 
 
