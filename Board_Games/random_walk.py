@@ -17,9 +17,11 @@ sys.path.append(grandparent)
 greatgrandparent = os.path.dirname(grandparent)
 sys.path.append(greatgrandparent)
 from gui.gui_interface import Coord, Gui, Squares
+from gui.gui_scene import Tile
 from enum import Enum
 from time import perf_counter
-from  scene import LabelNode, Point
+from  scene import *
+from ui import Image
 import ui
 
 def check_in_board(coord):
@@ -27,7 +29,7 @@ def check_in_board(coord):
     return (0 <= r < SIZE) and (0 <= c < SIZE)
     
 SIZE = 1
-DEBUG = False 
+DEBUG = False
 FONT = ("sans-serif", 18, "normal")
 
 class Player():
@@ -37,8 +39,10 @@ class Player():
     self.EMPTY = ' '
     self.PLAYERS = [self.PLAYER_1, self.PLAYER_2]
     
-    self.PIECES = [f'../gui/tileblocks/&.png', f'../gui/tileblocks/_.png', f'../gui/tileblocks/e.png', f'../gui/tileblocks/s.png']
-    self.PIECE_NAMES = {'#': 'Black', ' ': 'White', 'e':'End', 's':'Start'}
+    self.PIECES = [f'../gui/tileblocks/&.png', f'../gui/tileblocks/_.png', f'../gui/tileblocks/e.png', f'../gui/tileblocks/s.png',
+                   f'../gui/tileblocks/┃.png', f'../gui/tileblocks/━.png', f'../gui/tileblocks/┏.png', f'../gui/tileblocks/┓.png',
+                   f'../gui/tileblocks/┛.png', f'../gui/tileblocks/┗.png']
+    self.PIECE_NAMES = {'#': 'Black', ' ': 'White', 'e':'End', 's':'Start', '┃':'NS',  '━':'EW', '┏':'NE', '┓':'NW', '┛': 'SW',  '┗':'SE'} 
     
 class RandomWalk():
     def __init__(self, size=8):
@@ -50,17 +54,61 @@ class RandomWalk():
         self.gui = Gui(self.display_board, Player())
         self.gui.gs.q = self.q # pass queue into gui
         self.gui.set_alpha(False) 
-        self.gui.set_grid_colors(grid='lightgrey', z_position=5, grid_stroke_color='lightgrey')
+        self.gui.set_grid_colors(grid='black', z_position=5, grid_stroke_color='black')
         self.gui.require_touch_move(False)
         self.gui.allow_any_move(True)
         
-        self.gui.setup_gui(log_moves=False) #grid_fill='lightgrey')
+        self.gui.setup_gui(log_moves=False, grid_fill='white')
+        self.gui.build_extra_grid(size, size, grid_width_x=1, grid_width_y=1, color='black', line_width=2, offset=None, z_position=100)
         # menus can be controlled by dictionary of labels and functions without parameters
         #self.gui.pause_menu = {'Continue': self.gui.dismiss_menu,  'Save': save, 
         #                 'Load': load,  'Quit': self.gui.gs.close}
         self.gui.start_menu = {'New Game': self.restart, 'Quit': self.gui.gs.close} 
         self.size =  size # 2
-        
+        self.display_rack(['┃',  '━', '┏', '┓',  '┛', '┗' ,'x', '?'] )
+        self.solution_board = np.full((size, size), '-', dtype='U1')
+        self.empty_board = np.full((size, size), '-', dtype='U1')
+    
+    def display_rack(self, tiles, y_off=0):
+		    """ display players rack
+		    y position offset is used to select player_1 or player_2
+		    """   
+		    parent = self.gui.game_field
+		    _, _, w, h = self.gui.grid.bbox
+		    sqsize = self.gui.gs.SQ_SIZE
+		    x, y = (50, h-sqsize)
+		    y = y + y_off
+		    rack = {}
+		    for n, tile in enumerate(tiles):    
+		      t = Tile(Texture(Image.named(f'../gui/tileblocks/{tile}.png')), 0,  0, sq_size=sqsize)   
+		      t.position = (w + x + (n %2 *(20+sqsize)) , y -  n//2 * (20+sqsize))
+		      rack[t.bbox] = tile
+		      parent.add_child(t)     		            
+		    
+		    self.rack = rack
+		    
+    def get_player_move(self, board=None):
+		    """Takes in the user's input and performs that move on the board, returns the coordinates of the move
+		    Allows for movement over board"""
+		    move = LetterGame.get_player_move(self, self.board)
+		    rack = self.rack
+		    
+		    if move[0] == (-1, -1):
+		       return (None, None), 'Enter', None # pressed enter button
+		       
+		    # deal with buttons. each returns the button text    
+		    elif move[0][0] < 0 and move[0][1] < 0:
+		      return (None, None), self.gui.gs.buttons[-move[0][0]].text, None
+		      
+		    point = self.gui.gs.start_touch - gscene.GRID_POS
+		    # get letter from rack
+		    for index, k in enumerate(rack):
+		        if k.contains_point(point):
+		            letter = rack[k]
+		            rc = move[-2]
+		            return rc, letter, index
+		    return (None, None), None, None    
+              
     def initialize(self):
         """This method should only be called once, when initializing the board."""
         # Apply marker dots to board
@@ -112,8 +160,45 @@ class RandomWalk():
                
         self.gui.add_numbers(self.square_list )
         
+    def run(self):    
+		    """
+		    Main method that prompts the user for input
+		    """    
+		    while True:            
+		        move = self.get_player_move(self.board)         
+		        pieces_used = self.process_turn( move, self.board)         
+		        self.update_board()
+		        if self.game_over(): break      
+		      
+    def process_turn(self, move, board):
+		    """ process the turn
+		    move is coord, new letter, selection_row
+		    """ 
+		    rack = self.rack		    
+		    if move:
+		      coord, letter, row = move
+		      r,c = coord
+		      if letter == 'Enter':
+		        # confirm placement		        		        
+		        no_pieces_used = len(self.letters_used)		        		        		        		          
+		      elif coord == (None, None):
+		        return 0		        		           
+		      elif letter != '':  # valid selection
+		        try:
+		            r,c = coord
+		            cell = self.gamestate.board.board[r][c]
+		            # get point value of selected tile
+		            point = player.rack.tiles[row].point
+		            cell.tile = scrabble_objects.Tile(letter.upper(),point=point) 		            		            		            
+		            self.update_board()
+		            
+		        except (IndexError):
+		          pass             
+		    return 0   
         
-            
+    def game_over(self):
+    	return False
+    	        
     def restart(self):
        self.gui.gs.close()
        self.__init__()
@@ -168,6 +253,7 @@ class Cell:
     
     def draw_track(self, erase=False):
         """ Draw the track piece in the cell """
+        dir_dict = {'NS':'┃',  'EW': '━',  'NE': '┏', 'NW': '┓',  'SW': '┛',  'SE': '┗' }  
         s = self.gui.gui.gs.SQ_SIZE
         s2 = s / 2
         xy = self.gui.gui.rc_to_pos((self.y - 0.5, self.x + 0.5))
@@ -178,25 +264,18 @@ class Cell:
             pass
             
         if self.track:
-            color = "black" if erase else "white"
+            color = "white" if erase else "clear"
+            self.gui.solution_board[(self.y, self.x)] = '-' if erase else dir_dict[self.track.name]              
             if self.permanent:
                 color = "blue"
-            params = {"stroke_color": color,"line_width": 30, 'line_join_style': ui.LINE_JOIN_ROUND}
-            match self.track:
-              case Track.NS:
-                self.gui.gui.draw_line([xy - ver, xy, xy + ver],  **params)                                                                    
-              case Track.EW:
-                self.gui.gui.draw_line([xy - hor, xy + hor], **params)                        
-              case Track.SE:
-                self.gui.gui.draw_line([xy + hor, xy, xy + ver], **params)                
-              case Track.NE:
-                self.gui.gui.draw_line([xy - ver, xy, xy + hor], **params)                                              
-              case Track.SW:
-                self.gui.gui.draw_line([xy - hor, xy, xy + ver], **params)                                             
-              case Track.NW:
-                self.gui.gui.draw_line([xy - ver, xy, xy - hor], **params)                                            
-    
-
+                self.gui.empty_board[(self.y, self.x)] = dir_dict[self.track.name]
+                
+            params = {"stroke_color": color,"line_width": 10, 'line_join_style': ui.LINE_JOIN_ROUND, 'alpha':0.5}
+            dir_coords_dict = {'NS': [xy - ver, xy, xy + ver],  'EW': [xy - hor, xy + hor],  
+                         'NE': [xy - ver, xy, xy + hor],  'NW': [xy - ver, xy, xy - hor],  
+                         'SW': [xy - hor, xy, xy + ver],  'SE': [xy + hor, xy, xy + ver]}  
+            self.gui.gui.draw_line(dir_coords_dict[self.track.name],  **params)   
+            
 class Layout:
     def __init__(self, size=8, gui=None):
         self.size = size
@@ -277,7 +356,7 @@ class Layout:
 
         # determine adjacent cells that must connect
         # modify to allow end row to be 0 or size-1
-        if "N" in track and row < self.size-1:     	
+        if "N" in track and row < self.size-1:      
             self.layout[row + 1][col].must_connect += "S"
         if "S" in track and row > 0:
             self.layout[row - 1][col].must_connect += "N"
@@ -415,7 +494,8 @@ class Layout:
         """ move from cell in direction dir  """
         self.move_count += 1
         if DEBUG:
-        	self.gui.gui.set_moves(f'Moves {self.move_count}')
+          self.gui.gui.set_moves(f'Moves {self.move_count}')
+          self.gui.gui.update(self.gui.display_board)
         if self.move_count == self.move_max:
             raise ValueError("Max move count reached")
         # if self.move_count == 8400:
@@ -522,31 +602,31 @@ def parse(params, gui):
                 raise ("Params wrong - 2")
         l.add_track(c[:2], int(c[2]), int(c[3]), start=start, end=end)
     #if not start:
-    #	raise ValueError('start not specified, forgot to add "s"')
+    # raise ValueError('start not specified, forgot to add "s"')
     #if not end:
-    #	raise ValueError('end not specified, forgot to add "e"')
+    # raise ValueError('end not specified, forgot to add "e"')
     return l
 
+dirs = {'NS':'┃',  'EW': '━',  'NE': '┏', 'NW': '┓',  'SW': '┛',  'SE': '┗' }  
 
 def main():
-    #game_item = "8:2464575286563421:NW60s:SE72:EW24:NS04e"
+    game_item = "8:2464575286563421:NW60s:SE72:EW24:NS04e"
     #game_item = "8:3456623347853221:NW30s:SW32:SW62:NS04e" #907
     #game_item = "8:8443143523676422:NW00s:NE41:NS45:NS07e" #908
     #game_item = "8:1216564534576221:EW40s:NS03e:NS45" #909
-    #game_item = "8:1225446636611544:EW60s:NS03e:EW75:SE26" #910
+    #game_item = "8:1225446636611544:EW60s:NS03e:EW75:SE26e" #910
     #game_item = "8:1556443846643364:EW50s:NE53:SE76:NS02e"
     #game_item = "8:3552325322474243:EW30s:NS17:NS04e"
     #game_item = "8:1452563325211765:EW60s:NS45:SE26:NS02e"
     #game_item = "8:1452563356711252:EW10s:NS35:NE56:NS72e"
     #game_item = "8:3552325334247422:EW40s:NS67:NS74e"
-    game_item = "10:13172648231465163443:EW20s:EW75:SE65:NW77:NS93e"
+    #game_item = "10:13172648231465163443:EW20s:EW75:SE65:NW77:NS93e"
     #game_item = "10:16351336251542622643:EW70s:EW82:SW25:NE57:NS96e"
     game = RandomWalk(int(game_item.split(':')[0]))
+    
     game.gui.clear_messages()
     game.gui.set_top(f'Train Tracks\t\t{game_item}')
-    board = parse(game_item, game) #904
-    
-     
+    board = parse(game_item, game) #904         
 
     #game.initialize()
     board.draw()
@@ -560,10 +640,13 @@ def main():
         elapsed = end - start
         board.result(str(e), elapsed)
         board.reveal()
+        game.gui.print_board(game.solution_board)
+        game.gui.update(game.empty_board)
         
                         
 if __name__ == '__main__':
   main()
+
 
 
 
