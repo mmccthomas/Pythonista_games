@@ -1,4 +1,5 @@
 # {'NS':'┃',  'EW': '━',  'NE': '┏', 'NW': '┓',  'SW': '┛',  'SE': '┗' }  
+# Structure- Size:Constraints:track-tuple:track-tuple
 8:2464575286563421:NW60s:SE72:EW24:NS04e #904
 8:3456623347853221:NW30s:SW32:SW62:NS04e #907
 8:8443143523676422:NW00s:NE41:NS45:NS07e #908

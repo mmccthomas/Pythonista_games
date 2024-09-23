@@ -25,6 +25,7 @@ from  scene import *
 from ui import Image
 import dialogs
 import ui
+from types import SimpleNamespace
 
 
 def check_in_board(coord):
@@ -78,6 +79,49 @@ class RandomWalk():
         self.solution_board = np.full((size, size), '-', dtype='U1')
         self.empty_board = np.full((size, size), '-', dtype='U1')
         self.erase = True
+        self.edit_mode = False
+        x, y, w, h = self.gui.grid.bbox 
+        sqsize= self.gui.gs.SQ_SIZE              
+        #t.position = (w + 50 + (n % 2 * (20 + sqsize)) , h_sqsize-  n //2 * (20 + sqsize))
+        # positions of all objects for all devices
+        position_dict = {
+        'ipad13_landscape': {'rackpos': (10, 200), 'rackscale': 0.9, 'rackoff': h/8, 
+        'button1': (w+20, h/12), 'button2': (w+40, 270), 'button3': (w+200, 270),
+        'button4': (w+200, 200), 'button5': (w+140, h/6-50),
+        'box1': (w+30, h - 4*(sqsize+20)), 'box2': (w+30, 200-6), 'box3': (w+5, 2*h/3),
+        'box4': (w+5, h-50), 'font': ('Avenir Next', 24) },
+                                           
+        'ipad13_portrait': {'rackpos': (50-w, h+50), 'rackscale': 0.9, 'rackoff': h/8,
+        'button1': (w/2, h+200), 'button2': (w/2, h+50), 'button3': (w/2, h+250),
+        'button4': (w/2, h+100), 'button5': (w/2, h+150),
+        'box1': (45, h+h/8+45), 'box2': (45, h+45), 'box3': (2*w/3, h+45),
+        'box4': (2*w/3, h+200), 'font': ('Avenir Next', 24) },
+        
+        'ipad_landscape': {'rackpos': (10, 200), 'rackscale': 1.0, 'rackoff': h/8,
+        'button1': (w+10, h/6), 'button2': (w+230, h/6), 'button3': (w+120, h/6),
+        'button4': (w+230, h/6-50), 'button5': (w+120, h/6-50),
+        'box1': (w+5, 200+h/8-6), 'box2': (w+5, 200-6), 'box3': (w+5, 2*h/3),
+        'box4': (w+5, h-50), 'font': ('Avenir Next', 20) },
+        
+        'ipad_portrait': {'rackpos': (50-w, h+50), 'rackscale': 1.0, 'rackoff': h/8,
+        'button1': (9*w/15, h+190), 'button2': (9*w/15, h+30), 'button3': (9*w/15, h+150),
+        'button4': (9*w/15, h+70), 'button5': (9*w/15, h+110),
+        'box1': (45,h+h/8+45), 'box2': (45, h+45),'box3': (3*w/4, h+35),
+        'box4': (3*w/4, h+160), 'font': ('Avenir Next', 20)},
+        
+        'iphone_landscape': {'rackpos': (10, 200), 'rackscale': 1.5, 'rackoff': h/4,
+        'button1': (w+10, h/6), 'button2': (w+230, h/6), 'button3': (w+120, h/6),
+        'button4': (w+230, h/6-50), 'button5': (w+120, h/6-50),
+        'box1': (w+5, 200+h/8-6), 'box2': (w+5, 200-6), 'box3': (w+5, 2*h/3),
+        'box4': (w+5, h-50), 'font': ('Avenir Next', 15) },
+            
+        'iphone_portrait': {'rackpos': (50-w, h+50), 'rackscale': 1.5, 'rackoff': h/8,
+        'button1': (9*w/15, h+190), 'button2': (9*w/15, h+30), 'button3': (9*w/15, h+150),
+        'button4': (9*w/15, h+70), 'button5': (9*w/15, h+110),
+        'box1': (45,h+h/8+45), 'box2': (45, h+45),'box3': (3*w/4, h+35),
+        'box4': (3*w/4, h+160), 'font': ('Avenir Next', 15)},
+         }
+        self.posn = SimpleNamespace(**position_dict[self.gui.device])
         self.initialize()
                 
     def update_board(self, board):
@@ -203,6 +247,8 @@ class RandomWalk():
         self.gui.clear_messages()
         #game_item = self.load_words_from_file(TRAINS)
         self.gui.set_top(f'Train Tracks\t\t{self.game_item}')
+        self.add_boxes()
+        self.set_buttons()
         self.board_obj = parse(self.game_item, self)
 
         self.draw_initial()
@@ -239,23 +285,7 @@ class RandomWalk():
         self.gui.clear_squares()
         self.highlight_permanent((self.board_obj.start, 0), 'A')
         self.highlight_permanent((self.board_obj.end_row, self.board_obj.end), 'B')
-        
-   
-    def plot(self, board):
-        """This method should only be called once, when initializing the board."""
-        self.gui.clear_squares()
-        self.square_list =[]
-        # place dots
-        
-        for i in range(0, SIZE):
-            for j in range(0, SIZE):
-                if board[(i,j)]>0:
-                  self.square_list.append(Squares((i, j), board[(i,j)], 'black', text_color='white',
-                                                z_position=5, stroke_color='clear',alpha =1, 
-                                                radius=5, sqsize=15, offset=(0.5, -0.5), 
-                                                font = ('Avenir', 15), text_anchor_point=(-.2, 0.5)))     
-               
-        self.gui.add_numbers(self.square_list )
+       
         
     def run(self):    
         """
@@ -272,22 +302,13 @@ class RandomWalk():
     
     def reveal(self):
       self.board = self.solution_board
-      self.update_board(self.board)  
-          
-    def process_turn(self, move, board):
-        """ process the turn
-        move is coord, new letter, selection_row
-        """ 
-        @np.vectorize
-        def contained(x):
-          return x in list(self.gui.player.PIECE_NAMES.keys())[:-2]
-          
-        rack = self.rack        
-        if move:
-          coord, letter, row = move
-          r,c = coord
-          if letter == 'Enter':  
-            # place a random track piece not already placed
+      self.update_board(self.board)
+      dialogs.hud_alert('Game over')
+      sleep(2)
+      self.gui.show_start_menu() 
+       
+    def hint(self):
+      # place a random track piece not already placed
             solution_tracks = np.argwhere(self.solution_board != '-')
             existing_tracks = np.argwhere(contained(self.board))
             
@@ -306,9 +327,46 @@ class RandomWalk():
               dialogs.hud_alert('No more hints')
               return 1
             self.update_board(self.board) 
-                                                      
+            
+    def identify_tile(self):
+    	self.gui.set_prompt('identify pressed')
+    	sleep(1)
+    	self.gui.set_prompt('')
+    	
+    def test_solve(self):
+    	self.gui.set_prompt('solve pressed')
+    	sleep(1)
+    	self.gui.set_prompt('')  
+    	            
+    def process_turn(self, move, board):
+        """ process the turn
+        move is coord, new letter, selection_row
+        """ 
+        @np.vectorize
+        def contained(x):
+          return x in list(self.gui.player.PIECE_NAMES.keys())[:-2]
+          
+        rack = self.rack        
+        if move:
+          coord, letter, row = move
+          r,c = coord
+          if letter == 'Enter': 
+            finished = self.hint() 
+            if finished:
+              return 1                                                      
+          
+          elif letter == 'Edit Mode':
+              self.edit_mode = not self.edit_mode
+              self.gui.set_props(self.edit, fill_color = 'red' if self.edit_mode else 'orange')       
+        
+          elif letter == 'Identify':
+               self.identify_tile()
+      
+          elif letter == 'Solve':
+               self.test_solve() 
           elif coord == (None, None):
-            return 0                           
+            return 0 
+                                     
           elif letter != '':  # valid selection
             try:
                 r,c = coord
@@ -345,13 +403,53 @@ class RandomWalk():
     def game_over(self, finished):
       if finished:
         dialogs.hud_alert('Game over')
+        sleep(2)
+        self.gui.show_start_menu()
       return False
               
     def restart(self):
        self.gui.gs.close()
        self.__init__()
        self.run() 
-
+       
+    def add_boxes(self):
+      """ add non responsive decoration boxes"""
+      x, y, w, h = self.gui.grid.bbox 
+      tsize = self.gui.gs.SQ_SIZE
+      box = self.gui.add_button(text='', title='Tracks', position=self.posn.box1, 
+                          min_size=(2* tsize+60, 4* (tsize+20)+20), 
+                          fill_color='clear')
+      self.gui.set_props(box, font=self.posn.font)
+      box = self.gui.add_button(text='', title='Editor', position=self.posn.box2, 
+                          min_size=(2* tsize+60,  tsize+10), 
+                          fill_color='clear')
+      self.gui.set_props(box, font=self.posn.font)
+      
+    def set_buttons(self):
+      """ install set of active buttons """ 
+      x, y, w, h = self.gui.grid.bbox       
+      button = self.gui.set_enter('Hint', position=self.posn.button1,
+                                  stroke_color='black', fill_color='yellow',
+                                  color='black', font=self.posn.font)   
+      self.edit = self.gui.add_button(text='Edit Mode', title='', position=self.posn.button2, 
+                                   min_size=(80, 32), reg_touch=True,
+                                   stroke_color='black', fill_color='orange',
+                                   color='black', font=self.posn.font) 
+      button = self.gui.add_button(text='Identify', title='', position=self.posn.button3,
+                                   min_size=(100, 32), reg_touch=True,
+                                   stroke_color='black', fill_color='orange',
+                                   color='black', font=self.posn.font)
+      
+      button = self.gui.add_button(text='Solve', title='', position=self.posn.button4,
+                                   min_size=(100, 32), reg_touch=True,
+                                   stroke_color='black', fill_color='orange',
+                                   color='black', font=self.posn.font)
+      """
+      button = self.gui.add_button(text='Options', title='', position=self.posn.button5,
+                                   min_size=(100, 32), reg_touch=True,
+                                   stroke_color='black', fill_color='orange',
+                                   color='black', font=self.posn.font)
+      """     
 
 class Track(Enum):
     NE = 1
@@ -744,6 +842,9 @@ def main():
                         
 if __name__ == '__main__':
   main()
+
+
+
 
 
 
