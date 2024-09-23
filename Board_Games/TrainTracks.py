@@ -33,6 +33,7 @@ def check_in_board(coord):
 SIZE = 1
 DEBUG = False
 FONT = ("sans-serif", 18, "normal")
+TRAINS = 'traintracks.txt'
 
 class Player():
   def __init__(self):
@@ -52,6 +53,8 @@ class Player():
 class RandomWalk():
     def __init__(self, size=8):
         """Create, initialize and draw an empty board."""
+        self.game_item, size = self.load_words_from_file(TRAINS)
+        #size = int(self.game_item.split(':')[0])
         self.display_board = np.zeros((size, size), dtype=int)
         self.empty_board = self.display_board.copy()
         self.board = None
@@ -76,6 +79,7 @@ class RandomWalk():
         self.solution_board = np.full((size, size), '-', dtype='U1')
         self.empty_board = np.full((size, size), '-', dtype='U1')
         self.erase = True
+        self.initialize()
         
         
     def update_board(self, board):
@@ -182,46 +186,62 @@ class RandomWalk():
                 self.letter = rack[k]
                 rc = move[-2]
                 return rc, self.letter, index
-        # single press uses previous letter       
-        if move[0] == move[-2]:
-          return move[-2], self.letter, None
+        # single press uses previous letter
+        try:       
+          if move[0] == move[-2]:
+             return move[-2], self.letter, None
+        except (AttributeError):
+        	pass
         return (None, None), None, None    
-              
+    
+    def load_words_from_file(self, file_list, no_strip=False):
+		    # read the entire wordfile as text
+		    with open(f'{file_list}', "r", encoding='utf-8') as f:
+		      data = f.read()
+		    # removing hyphens and spaces		    
+		    data_list = data.split('\n')
+		    
+		    
+		    selected = choice(data_list[1:])
+		    size = int(selected.split(':')[0])
+		    return selected, size
+             
     def initialize(self):
         """This method should only be called once, when initializing the board."""
-        # Apply marker dots to board
-        start = Coord((randint(0, self.size-1), 0))
-        xy = start
-        dirns = start.nsew_dirs
-        XY = []
-        t=1
-        for _ in range(500):
-          dxdy = choice(dirns)  
-          if xy + dxdy in XY or not check_in_board(xy+dxdy):
-            continue
-          xy = xy + dxdy
-          XY.append(xy)
-          self.display_board[xy] = t
-          t += 1
-          
-        
+       
         self.gui.clear_messages()
-        self.square_list =[]
-        # place dots
+        #game_item = self.load_words_from_file(TRAINS)
+        self.gui.set_top(f'Train Tracks\t\t{self.game_item}')
+        self.board_obj = parse(self.game_item, self)
+
+        self.draw_initial()
+        try:
+            start = perf_counter()
+            self.board_obj.reveal(no_line=True)        
+            self.board_obj.solve()
+        except ValueError as e:
+            end = perf_counter()
+            elapsed = end - start
+            self.board_obj.result(str(e), elapsed)
+            self.board = self.empty_board.copy()
+            self.board_obj.reveal(no_line=True)
+            self.gui.print_board(self.solution_board, 'solution')
         
-        for i in range(0, self.size):
-            for j in range(0, self.size):
-                if self.display_board[(i,j)]:
-                  self.square_list.append(Squares((i, j), self.display_board[(i,j)], 'lightgreen', text_color='white',
-                                                z_position=5, stroke_color='clear',alpha =1, 
-                                                radius=5, sqsize=15, offset=(0.5, -0.5), 
-                                                font = ('Avenir', 15), text_anchor_point=(-.2, 0.5)))     
-               
-        self.gui.add_numbers(self.square_list )
-        
-        self.sq = self.gui.gs.SQ_SIZE #2  
-        self.boxes = []
-        
+    def draw_initial(self, moves=False):  
+        params = {'color':'lightblue', 'text_color':'blue',               
+                 'z_position':1000, 'stroke_color':'clear',
+                 'alpha':0.5, 'radius':5, 
+                 'sqsize':self.gui.gs.SQ_SIZE, 'offset':(0.0, 0.0), 
+                 'font': ('Arial Rounded MT Bold', 30), 'text_anchor_point':(-1, 1.2)}      
+        # Numbers across the top
+        self.gui.replace_labels('col', self.board_obj.col_constraints, colors=None)        
+        # Numbers down right side
+        self.gui.replace_labels('row', reversed(self.board_obj.row_constraints), colors=None)        
+        # start and end
+        self.gui.clear_squares()
+        self.gui.add_numbers([Squares((self.board_obj.start, 0) , 'A', **params),   
+                              Squares((self.board_obj.end_row, self.board_obj.end) , 'B', **params)])     
+   
     def plot(self, board):
         """This method should only be called once, when initializing the board."""
         self.gui.clear_squares()
@@ -402,6 +422,7 @@ class Layout:
 
         self.start = 0
         self.end = 0
+        self.end_row = 0
         self.move_count = 0
         self.move_max = 1000000
         self.col_count = []
@@ -409,22 +430,7 @@ class Layout:
         self.col_perm = []
         self.row_perm = []
 
-    def draw(self, moves=False):  
-        params = {'color':'black', 'text_color':'blue',               
-                 'z_position':1000, 'stroke_color':'clear',
-                 'alpha':0.5, 'radius':5, 
-                 'sqsize':1, 'offset':(0.5, -0.5), 
-                 'font': ('Arial Rounded MT Bold', 30), 'text_anchor_point':(-1, 1.2)}      
-        # Numbers across the top
-        self.gui.gui.replace_labels('col', self.col_constraints, colors=None)        
-        # Numbers down right side
-        self.gui.gui.replace_labels('row', reversed(self.row_constraints), colors=None)        
-        # start and end
-        self.gui.gui.clear_squares()
-        self.gui.gui.add_numbers([Squares((self.start, 0) , 'A', **params),   
-                                  Squares((self.end_row, self.end) , 'B', **params)])     
-
-
+    
     def coords(self, row, col):
         """ Convert row, column to screen coordinates """
         x = col * self.cell_size + self.cell_size / 2
@@ -718,43 +724,10 @@ def parse(params, gui):
     # raise ValueError('end not specified, forgot to add "e"')
     return l
 
-dirs = {'NS':'┃',  'EW': '━',  'NE': '┏', 'NW': '┓',  'SW': '┛',  'SE': '┗' }  
 
 def main():
-    #game_item = "8:2464575286563421:NW60s:SE72:EW24:NS04e" #904
-    #game_item = "8:3456623347853221:NW30s:SW32:SW62:NS04e" #907
-    #game_item = "8:8443143523676422:NW00s:NE41:NS45:NS07e" #908
-    game_item = "8:1216564534576221:EW40s:NS45:NS03e" #909
-    #game_item = "8:1225446636611544:EW60s:EW75:SE26:NS03e" #910
-    #game_item = "8:1556443846643364:EW50s:NE53:SE76:NS02e"
-    #game_item = "8:3552325322474243:EW30s:NS17:NS04e"
-    #game_item = "8:1452563325211765:EW60s:NS45:SE26:NS02e"
-    #game_item = "8:1452563356711252:EW10s:NS35:NE56:NS72e"
-    #game_item = "8:3552325334247422:EW40s:NS67:NS74e"
-    #game_item = "10:13172648231465163443:EW20s:EW75:SE65:NW77:NS93e"
-    #game_item = "10:16351336251542622643:EW70s:EW82:SW25:NE57:NS96e"
-    game = RandomWalk(int(game_item.split(':')[0]))
-    
-    game.gui.clear_messages()
-    game.gui.set_top(f'Train Tracks\t\t{game_item}')
-    board = parse(game_item, game)
-
-    #game.initialize()
-    board.draw()
-    try:
-        start = perf_counter()
-        board.reveal(no_line=True)        
-        board.solve()
-    except ValueError as e:
-        end = perf_counter()
-        elapsed = end - start
-        board.result(str(e), elapsed)
-        game.board = game.empty_board.copy()
-        board.reveal(no_line=True)
-        game.gui.print_board(game.solution_board, 'solution')
-        
-        game.board_obj = board
-        game.run()
+    game = RandomWalk(8)    
+    game.run()
                         
 if __name__ == '__main__':
   main()
