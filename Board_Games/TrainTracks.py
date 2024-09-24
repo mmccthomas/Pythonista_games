@@ -53,7 +53,6 @@ class RandomWalk():
         self.game_item, size = self.load_words_from_file(TRAINS)
         #size = int(self.game_item.split(':')[0])
         self.display_board = np.zeros((size, size), dtype=int)
-        self.empty_board = self.display_board.copy()
         self.board = None
         # allows us to get a list of rc locations
         self.log_moves = True
@@ -83,6 +82,7 @@ class RandomWalk():
         self.start_track='____s'
         self.end_track = '____e'
         self.identify_mode = False
+        self.save_enabled = False
         self.initialize()
                 
     def update_board(self, board):
@@ -200,6 +200,7 @@ class RandomWalk():
         data_list = [item for item in data_list if item!='' and not item.startswith('#')]
         # choice random line        
         selected = choice(data_list)
+        selected = data_list[-1]
         size = int(selected.split(':')[0])
         return selected, size
              
@@ -208,9 +209,10 @@ class RandomWalk():
         self.gui.clear_messages()
         #game_item = self.load_words_from_file(TRAINS)
         self.gui.set_top(f'Train Tracks\t\t{self.game_item}')
-        self.box_positions()
-        self.add_boxes()
-        self.set_buttons()
+        if not hasattr(self, 'edit'):
+            self.box_positions()
+            self.add_boxes()
+            self.set_buttons()
         self.board_obj = parse(self.game_item, self)
 
         self.draw_initial()
@@ -222,9 +224,13 @@ class RandomWalk():
             end = perf_counter()
             elapsed = end - start
             self.board_obj.result(str(e), elapsed)
-            self.board = self.empty_board.copy()
-            self.board_obj.reveal(no_line=True)
+            if not self.edit_mode:
+                self.board = self.empty_board.copy()
+                self.board_obj.reveal(no_line=True)
+            else:
+                pass
             self.gui.print_board(self.solution_board, 'solution')
+            return e
             
     def highlight_permanent(self, coord, text=''):
         params = {'color':'cyan', 'text_color':'blue',               
@@ -296,6 +302,8 @@ class RandomWalk():
     def start_edit_mode(self):
       self.gui.set_prompt('edit mode pressed')
       self.board = np.full((self.size, self.size), '-')
+      self.display_board = self.board.copy()
+      self.empty_board = self.display_board.copy()
       self.gui.clear_numbers()
       self.update_board(self.board)
       self.known = []
@@ -334,17 +342,21 @@ class RandomWalk():
       rc_str = ''.join([str(r), str(c)])
       dirn = self.gui.player.PIECE_NAMES[letter]
       if self.identify_mode and row is None:
-      	  self.known.append(dirn + rc_str)
-      	  self.highlight_permanent(coord)
-      	  self.identify_tile()
+          if (dirn + rc_str) in self.known:
+            self.known.remove(dirn + rc_str)
+            self.gui.clear_numbers(coord)
+          else:
+            self.known.append(dirn + rc_str)
+            self.highlight_permanent(coord)
+            self.identify_tile()
       else:
-		      try:
-		        self.gui.set_prompt(f'adding new track {letter} to {coord}')
-		        self.board[coord] = letter                                                    
-		        self.update_board(self.board)
-		        self.mark_start_end(coord, letter)
-		      except (IndexError):
-		        pass
+          try:
+            self.gui.set_prompt(f'adding new track {letter} to {coord}')
+            self.board[coord] = letter                                                    
+            self.update_board(self.board)
+            self.mark_start_end(coord, letter)
+          except (IndexError):
+            pass
       
       self.compute_constraints()
       sleep(1)
@@ -360,12 +372,14 @@ class RandomWalk():
           
       col_sums = np.sum(contained(self.board), axis=0).astype('U1')    
       row_sums = np.flip(np.sum(contained(self.board), axis=1)).astype('U1')
-      self.constraints = ':'.join([str(self.size),
-                                   ''.join(col_sums),
-                                   ''.join(row_sums),
-                                   self.start_track,
-                                   ':'.join(self.known),
+      constraintrc = ''.join(col_sums) + ''.join(row_sums)
+      if self.known:
+         self.constraints = ':'.join([str(self.size), constraintrc,
+                                   self.start_track, ':'.join(self.known),
                                    self.end_track])
+      else:
+        self.constraints = ':'.join([str(self.size), constraintrc,
+                                   self.start_track, self.end_track])
       self.gui.set_message2(self.constraints)
                                             
     def identify_tile(self):
@@ -376,10 +390,31 @@ class RandomWalk():
       self.gui.set_prompt('')
       
     def test_solve(self):
+       
       self.gui.set_prompt('solve pressed')
+      if hasattr(self, 'constraints'):
+        print(self.constraints)
+        self.game_item = self.constraints
+        self.empty_board = np.full((self.size, self.size), '-')
+        self.solution_board = self.empty_board.copy()
+        result = self.initialize()
+        if isinstance(result, ValueError) and 'Solved' in result.args:
+            self.save_enabled = True
+            self.gui.set_props(self.save, fill_color = 'orange')    
       sleep(1)
       self.gui.set_prompt('')  
-                  
+      
+      
+    def save_constraint(self):
+      if self.save_enabled:
+        comment = dialogs.input_alert('Add comment')
+        text = f'{self.constraints} #{comment}'
+        print(text)
+        with open(TRAINS, 'a')as f:
+          f.write(text +'\n')
+        self.save_enabled = False
+        self.gui.set_props(self.save, fill_color = 'grey')    
+                    
     def process_turn(self, move, board):
         """ process the turn
         move is coord, new letter, selection_row
@@ -404,6 +439,9 @@ class RandomWalk():
       
           elif letter == 'Solve':
                self.test_solve()
+               
+          elif  letter == 'Save':
+               self.save_constraint()
                 
           elif coord == (None, None):
             return 0 
@@ -427,23 +465,25 @@ class RandomWalk():
     def code_constraints(self, board):
        """compare constraints with actual counts
        colour the constraints to match"""
+       
        @np.vectorize
        def contained(x):
           return x in list(self.gui.player.PIECE_NAMES.keys())[:-2]
           
+       def compute_check(known, sums, dirn)  :
+           check = np.equal(sums, known)
+           colors = np.where(check, 'white', '#ff5b5b')
+           self.gui.replace_labels(dirn,  known, colors=colors, font=('Arial Rounded MT Bold', 30))     
+           return np.all(check)
+             
        col_known = np.array(self.board_obj.col_constraints)
        col_sums = np.sum(contained(self.board), axis=0)
        row_known = np.flip(np.array(self.board_obj.row_constraints))
        row_sums = np.flip(np.sum(contained(self.board), axis=1))
-       ok=[]
-       for known, sums, dirn in [(col_known, col_sums, 'col'), (row_known, row_sums, 'row')]:
-          check = np.equal(sums, known)
-          colors = np.where(check, 'white', '#ff5b5b')
-          self.gui.replace_labels(dirn,  known, colors=colors, font=('Arial Rounded MT Bold', 30))               
-          ok.append(np.all(check))
-          
-       return all(ok)
-         
+       
+       return all([compute_check(col_known, col_sums, 'col'),
+                   compute_check(row_known, row_sums, 'row')])      
+                  
     def game_over(self, finished):
       if finished:
         dialogs.hud_alert('Game over')
@@ -464,7 +504,7 @@ class RandomWalk():
         position_dict = {
         'ipad13_landscape': {'rackpos': (10, 200), 'rackscale': 0.9, 'rackoff': h/8, 
         'button1': (w+20, h/12), 'button2': (w+40, 270), 'button3': (w+200, 270),
-        'button4': (w+200, 200), 'button5': (w+140, h/6-50),
+        'button4': (w+200, 200), 'button5': (w+40, 200),
         'box1': (w+30, h - 4*(sqsize+20)), 'box2': (w+30, 200-6), 'box3': (w+5, 2*h/3),
         'box4': (w+5, h-50), 'font': ('Avenir Next', 24) },
                                            
@@ -532,12 +572,12 @@ class RandomWalk():
                                    min_size=(100, 32), reg_touch=True,
                                    stroke_color='black', fill_color='orange',
                                    color='black', font=self.posn.font)
-      """
-      button = self.gui.add_button(text='Options', title='', position=self.posn.button5,
+      
+      self.save = self.gui.add_button(text='Save', title='', position=self.posn.button5,
                                    min_size=(100, 32), reg_touch=True,
-                                   stroke_color='black', fill_color='orange',
+                                   stroke_color='black', fill_color='grey',
                                    color='black', font=self.posn.font)
-      """     
+          
 
 class Track(Enum):
     NE = 1
@@ -602,8 +642,8 @@ class Cell:
                 
             params = {"stroke_color": color,"line_width": 10, 'line_join_style': ui.LINE_JOIN_ROUND, 'alpha':0.5}
             dir_coords_dict = {'NS': [xy - ver, xy, xy + ver],  'EW': [xy - hor, xy + hor],  
-                         'NE': [xy - ver, xy, xy + hor],  'NW': [xy - ver, xy, xy - hor],  
-                         'SW': [xy - hor, xy, xy + ver],  'SE': [xy + hor, xy, xy + ver]}  
+                               'NE': [xy - ver, xy, xy + hor],  'NW': [xy - ver, xy, xy - hor],  
+                               'SW': [xy - hor, xy, xy + ver],  'SE': [xy + hor, xy, xy + ver]}  
             if not no_line:
                self.gui.gui.draw_line(dir_coords_dict[self.track.name],  **params)   
             
@@ -611,14 +651,8 @@ class Layout:
     def __init__(self, size=8, gui=None):
         self.size = size
         self.gui = gui
-
-        self.layout = []
-        for row in range(size):
-            col_list = []
-            for col in range(size):
-                col_list.append(Cell(row, col, 0, gui))
-            self.layout.append(col_list)
-
+        self.layout = [[Cell(row, col, 0, gui) for col in range(size)] 
+                                               for row in range(size)]
         self.start = 0
         self.end = 0
         self.end_row = 0
@@ -628,19 +662,6 @@ class Layout:
         self.row_count = []
         self.col_perm = []
         self.row_perm = []
-
-    
-    def coords(self, row, col):
-        """ Convert row, column to screen coordinates """
-        x = col * self.cell_size + self.cell_size / 2
-        y = row * self.cell_size + self.cell_size / 2
-        return x, y
-
-    def draw_moves(self, cell):
-        """ debug routine to list all possible moves from a cell """
-        pass
-        #self.turtle.goto(cell.x, cell.y)
-        #self.turtle.write(self.moves(cell))
 
     def set_constraints(self, values):
         """ Takes string of numbers representing top and right side """
@@ -664,8 +685,6 @@ class Layout:
             self.start = row
             cell.is_start = True
         if end:
-            #if row != 0:
-            #   raise ValueError("Invalid end position")
             self.end = col
             self.end_row = row
             cell.is_end = True
@@ -884,8 +903,7 @@ class Layout:
             self.move_from(new_cell, to_dir)
         raise ValueError("Failed to find solution")
 
-    def result(self, message, elapsed):
-        
+    def result(self, message, elapsed):        
         self.gui.gui.set_message( f"{message} in {self.move_count} moves. Time:{elapsed:.2f}s")
         
     def reveal(self, no_line=False, erase=False):  
@@ -930,6 +948,13 @@ def main():
                         
 if __name__ == '__main__':
   main()
+
+
+
+
+
+
+
 
 
 
