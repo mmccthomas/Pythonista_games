@@ -47,8 +47,8 @@ class Player():
     self.PIECES = [f'../gui/tileblocks/{tile}.png' for tile in self.PIECE_NAMES.values()] # use keys() for lines
     
     
-class RandomWalk():
-    def __init__(self, size=8):
+class TrainTracks():
+    def __init__(self):
         """Create, initialize and draw an empty board."""
         self.game_item, size = self.load_words_from_file(TRAINS)
         #size = int(self.game_item.split(':')[0])
@@ -200,7 +200,7 @@ class RandomWalk():
         data_list = [item for item in data_list if item!='' and not item.startswith('#')]
         # choice random line        
         selected = choice(data_list)
-        selected = data_list[-1]
+        #selected = data_list[-1]
         size = int(selected.split(':')[0])
         return selected, size
              
@@ -485,7 +485,16 @@ class RandomWalk():
                    compute_check(row_known, row_sums, 'row')])      
                   
     def game_over(self, finished):
-      if finished:
+      
+      @np.vectorize
+      def contained(x):
+          return x in list(self.gui.player.PIECE_NAMES.keys())[:-2]
+
+      board = np.where(contained(self.board), self.board, ' ')
+      soln = np.where(contained(self.solution_board), self.solution_board, ' ')
+      compare = board == soln
+      
+      if finished and np.all(compare):        
         dialogs.hud_alert('Game over')
         sleep(2)
         self.gui.show_start_menu()
@@ -493,8 +502,8 @@ class RandomWalk():
               
     def restart(self):
        self.gui.gs.close()
-       self.__init__()
-       self.run() 
+       g=TrainTracks()
+       g.run() 
        
     def box_positions(self):
         x, y, w, h = self.gui.grid.bbox 
@@ -515,9 +524,9 @@ class RandomWalk():
         'box4': (2*w/3, h+200), 'font': ('Avenir Next', 24) },
         
         'ipad_landscape': {'rackpos': (10, 200), 'rackscale': 1.0, 'rackoff': h/8,
-        'button1': (w+10, h/6), 'button2': (w+230, h/6), 'button3': (w+120, h/6),
-        'button4': (w+230, h/6-50), 'button5': (w+120, h/6-50),
-        'box1': (w+5, 200+h/8-6), 'box2': (w+5, 200-6), 'box3': (w+5, 2*h/3),
+        'button1': (w+20, h/12), 'button2': (w+35, 190), 'button3': (w+150, 190),
+        'button4': (w+150, 140), 'button5': (w+35, 140),
+        'box1': (w+30, h - 4*(sqsize+20)), 'box2': (w+30, 140-6), 'box3': (w+5, 2*h/3),
         'box4': (w+5, h-50), 'font': ('Avenir Next', 20) },
         
         'ipad_portrait': {'rackpos': (50-w, h+50), 'rackscale': 1.0, 'rackoff': h/8,
@@ -943,11 +952,12 @@ def parse(params, gui):
 
 
 def main():
-    game = RandomWalk(8)    
+    game = TrainTracks()    
     game.run()
                         
 if __name__ == '__main__':
   main()
+
 
 
 

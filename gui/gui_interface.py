@@ -326,7 +326,7 @@ class Gui():
     # modify existing button BoxedLabel object
     b = getattr(self.gs, button_str)
     if 'anchor_point' in kwargs:
-       print(f'anchor_point not supported for {button_name}')
+       print(f'anchor_point not supported for {button_str}')
        kwargs.pop('anchor_point')
     b.set_props(**kwargs)        
     
