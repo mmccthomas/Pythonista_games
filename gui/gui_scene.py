@@ -297,9 +297,9 @@ class GameBoard(Scene):
     if self.use_alpha:
       row_labels = 'A B C D E F G H I J K L M N O P Q R S T U V W X Y Z AAABACAD'
     else:
-    	if self.row_labels:
-    		 row_labels = self.row_labels
-    	else:
+      if self.row_labels:
+         row_labels = self.row_labels
+      else:
           row_labels = '0 1 2 3 4 5 6 7 8 9 101112131415161718192021222324252627282930'
     if self.column_labels:
         column_labels = self.column_labels
@@ -898,10 +898,27 @@ class GameBoard(Scene):
       r, c = row, col
     return self.squares[(r, c)]
 
-  def clear_squares(self):
-    for t in self.squares.values():
-      t.remove_from_parent()
-    self.squares = {}
+  def clear_squares(self, squares_list=None):
+    """ clear some or all squares
+    if squares_list is specified, it is [(r,c)] """
+    if squares_list is None:      
+      for t in self.squares.values():
+        t.remove_from_parent()
+        self.squares = {}
+    elif isinstance(squares_list, list):
+      for pos in squares_list:
+        for t in self.squares.values():
+          tpos = self.grid_to_rc(t.position)
+          if tpos == pos:
+            t.remove_from_parent()
+            self.squares.remove(t)
+    elif isinstance(squares_list, tuple):
+      for t in self.squares.values():
+          tpos = self.grid_to_rc(t.position)
+          if tpos == squares_list:
+            t.remove_from_parent()
+            self.squares.remove(t)
+    
           
   def tile_drop(self, rc, selected):
     """ move tile to new location   """
@@ -1087,6 +1104,7 @@ if __name__ == "__main__":
                       level=logging.WARNING)
   run(GameBoard(), LANDSCAPE, show_fps=True)
     
+
 
 
 

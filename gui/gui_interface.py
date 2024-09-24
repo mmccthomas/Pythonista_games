@@ -460,8 +460,8 @@ class Gui():
     response = console.input_alert(message)
     return response
     
-  def clear_squares(self):
-    self.gs.clear_squares()
+  def clear_squares(self, squares_list=None):
+    self.gs.clear_squares(squares_list)
     
   def clear_messages(self):
     self.set_message2('')
