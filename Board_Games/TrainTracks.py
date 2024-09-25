@@ -59,6 +59,7 @@ class TrainTracks():
     def __init__(self):
         """Create, initialize and draw an empty board."""
         self.game_item, size = self.load_words_from_file(TRAINS)
+        
         self.display_board = np.zeros((size, size), dtype=int)
         self.board = None
         # allows us to get a list of rc locations
@@ -91,6 +92,7 @@ class TrainTracks():
         self.identify_mode = False
         self.save_enabled = False
         self.letter = 'x'
+        self.constraints = self.game_item
         self.error = self.initialize()
                 
     def update_board(self, board):
@@ -231,7 +233,7 @@ class TrainTracks():
         """This method should only be called once, when initializing the board."""
         self.gui.clear_messages()
         self.gui.clear_numbers()
-        self.gui.set_top(f'Train Tracks\t\t{self.game_item}')
+        self.gui.set_top(f'Train Tracks: {self.game_item}')
         # add boxes and buttons if not already placed
         if not hasattr(self, 'edit'):
             self.box_positions()
@@ -629,9 +631,9 @@ class TrainTracks():
                              'button1': (w + 185, h / 6), 'button2': (w + 185, 245), 'button3': (w + 330, 245),
                              'button4': (w + 330, 180), 'button5': (w + 185, 180),
                              'box1': (w + 30, h - 50 -4* (sqsize +20)), 'box2': (w + 180, 165 - 6), 'box3': (w + 5, 2 * h / 3),
-                             'box4': (w + 5, h - 50), 'font': ('Avenir Next', 24)},
+                             'box4': (w + 5, h - 50), 'font': ('Avenir Next', 20)},
             
-        'iphone_portrait': {'rackpos': (-w -25, h -10), 'rackscale': 1.5, 'rackoff': h / 8, 'edit_size': (150, 200),
+        'iphone_portrait': {'rackpos': (-w -25, h -10), 'rackscale': 1.5, 'rackoff': h / 8, 'edit_size': (135, 190),
                             'button1': (9 * w / 15, h + 100), 'button2': (9 * w / 15, h + 300), 'button3': (9 * w / 15, h + 250),
                             'button4': (9 * w / 15, h + 200), 'button5': (9 * w / 15, h + 150),
                             'box1': (0, h + h / 8 + 45), 'box2': (180,  h + 145), 'box3': (3 * w / 4, h + 35),
