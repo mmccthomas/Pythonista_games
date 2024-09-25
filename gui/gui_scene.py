@@ -682,20 +682,24 @@ class GameBoard(Scene):
   
   def clear_numbers(self, number_list=None):
     """ clear some or all numbers
-    if number_list is specified, it is [(r,c)] """
+    if number_list is specified, it is [(r,c)] 
+    Need to remove both shape and labelnode
+    they have different position but same grid position
+    """
     if number_list is None:
       for t in self.numbers:
         t.remove_from_parent()
       self.numbers = []
     elif isinstance(number_list, list):
       for pos in number_list:
-        for t in self.numbers:
+        for t in self.numbers[:]:
           tpos = self.grid_to_rc(t.position)
           if tpos == pos:
             t.remove_from_parent()
             self.numbers.remove(t)
     elif isinstance(number_list, tuple):
-      for t in self.numbers:
+    	# slicing ( self.numbers[:] ) is important to avoid skipping
+      for t in self.numbers[:]:
           tpos = self.grid_to_rc(t.position)
           if tpos == number_list:
             t.remove_from_parent()
@@ -907,13 +911,13 @@ class GameBoard(Scene):
         self.squares = {}
     elif isinstance(squares_list, list):
       for pos in squares_list:
-        for t in self.squares.values():
+        for t in self.squares.values()[:]:
           tpos = self.grid_to_rc(t.position)
           if tpos == pos:
             t.remove_from_parent()
             self.squares.remove(t)
     elif isinstance(squares_list, tuple):
-      for t in self.squares.values():
+      for t in self.squares.values()[:]:
           tpos = self.grid_to_rc(t.position)
           if tpos == squares_list:
             t.remove_from_parent()
@@ -1104,6 +1108,8 @@ if __name__ == "__main__":
                       level=logging.WARNING)
   run(GameBoard(), LANDSCAPE, show_fps=True)
     
+
+
 
 
 

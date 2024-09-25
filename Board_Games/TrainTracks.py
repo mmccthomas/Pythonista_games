@@ -5,6 +5,13 @@ import numpy as np
 import traceback
 import os
 import sys
+from enum import Enum
+from time import perf_counter, time, sleep
+from scene import *
+from ui import Image
+import dialogs
+import ui
+from types import SimpleNamespace
 from queue import Queue
 from collections import deque
 from random import choice, randint
@@ -16,56 +23,50 @@ sys.path.append(grandparent)
 greatgrandparent = os.path.dirname(grandparent)
 sys.path.append(greatgrandparent)
 from gui.gui_interface import Coord, Gui, Squares
-
 from gui.gui_scene import Tile
 import gui.gui_scene as gscene
-from enum import Enum
-from time import perf_counter, time, sleep
-from  scene import *
-from ui import Image
-import dialogs
-import ui
-from types import SimpleNamespace
 
 
 def check_in_board(coord):
     r, c = coord
     return (0 <= r < SIZE) and (0 <= c < SIZE)
-    
+
+        
 SIZE = 1
-DEBUG = True
+DEBUG = False
 FONT = ("sans-serif", 18, "normal")
 TRAINS = 'traintracks.txt'
+
 
 class Player():
   def __init__(self):
     self.PLAYER_1 = WHITE = ' '
     self.PLAYER_2 = BLACK = '#'
-    self.EMPTY = ' '
-    #self.PLAYERS = [self.PLAYER_1, self.PLAYER_2]
-    self.PIECE_NAMES =  { '┃':'NS',  '━':'EW', '┓':'NW', '┏':'NE', '┗':'SE', '┛': 'SW', '?': '?', 'x': 'x'}
-    self.PIECES = [f'../gui/tileblocks/{tile}.png' for tile in self.PIECE_NAMES.values()] # use keys() for lines
-    self.NAMED_PIECES = {v:k for k,v in self.PIECE_NAMES.items()}
  
+    self.PIECE_NAMES = {'┃': 'NS',  '━': 'EW', '┓': 'NW', '┏': 'NE', '┗': 'SE', '┛': 'SW', '?': '?', 'x': 'x'}
+    self.PIECES = [f'../gui/tileblocks/{tile}.png' for tile in self.PIECE_NAMES.values()]  # use keys() for lines
+    self.NAMED_PIECES = {v: k for k, v in self.PIECE_NAMES.items()}
+
+  
 class dotdict(dict):
     """dot.notation access to dictionary attributes"""
     __getattr__ = dict.get
     __setattr__ = dict.__setitem__
-    __delattr__ = dict.__delitem__   
-    
+    __delattr__ = dict.__delitem__
+
+        
 class TrainTracks():
     def __init__(self):
         """Create, initialize and draw an empty board."""
         self.game_item, size = self.load_words_from_file(TRAINS)
-        #size = int(self.game_item.split(':')[0])
         self.display_board = np.zeros((size, size), dtype=int)
         self.board = None
         # allows us to get a list of rc locations
         self.log_moves = True
         self.q = Queue()
         self.gui = Gui(self.display_board, Player())
-        self.gui.gs.q = self.q # pass queue into gui
-        self.gui.set_alpha(False) 
+        self.gui.gs.q = self.q  # pass queue into gui
+        self.gui.set_alpha(False)
         self.gui.set_grid_colors(grid='black', z_position=5, grid_stroke_color='black')
         self.gui.require_touch_move(False)
         self.gui.allow_any_move(True)
@@ -73,29 +74,30 @@ class TrainTracks():
         self.gui.setup_gui(log_moves=True, grid_fill='white')
         self.gui.build_extra_grid(size, size, grid_width_x=1, grid_width_y=1, color='black', line_width=2, offset=None, z_position=100)
         # menus can be controlled by dictionary of labels and functions without parameters
-        self.gui.set_pause_menu({'Continue': self.gui.dismiss_menu, 
-                              'New Game': self.restart,
-                              'Reveal': self.reveal,
-                              'Quit': self.gui.gs.close})
+        self.gui.set_pause_menu({'Continue': self.gui.dismiss_menu,
+                                 'New Game': self.restart,
+                                 'Reveal': self.reveal,
+                                 'Quit': self.gui.gs.close})
       
-        self.gui.start_menu = {'New Game': self.restart, 'Quit': self.gui.gs.close} 
-        self.size =  size # 2
+        self.gui.start_menu = {'New Game': self.restart, 'Quit': self.gui.gs.close}
+        self.size = size
         self.display_rack(self.gui.player.PIECE_NAMES)
         self.solution_board = np.full((size, size), '-', dtype='U1')
         self.empty_board = np.full((size, size), '-', dtype='U1')
         self.erase = True
         self.edit_mode = False
-        self.start_track='____s'
+        self.start_track = '____s'
         self.end_track = '____e'
         self.identify_mode = False
         self.save_enabled = False
+        self.letter = 'x'
         self.error = self.initialize()
                 
     def update_board(self, board):
       self.gui.update(board)
       self.display_rack(self.gui.player.PIECE_NAMES)
             
-    def display_rack(self, tiles, y_off=0):
+    def display_rack(self, tiles, y_off=-50):
         """ display players rack
         y position offset is used to select player_1 or player_2
         """
@@ -105,11 +107,11 @@ class TrainTracks():
         x, y = (50, h - sqsize)
         y = y + y_off
         rack = {}
-        for n, tile in enumerate(tiles):           
-          t = Tile(Texture(Image.named(f'../gui/tileblocks/{tiles[tile]}.png')), 0,  0, sq_size=sqsize)   
-          t.position = (w + x + (n % 2 * (20 + sqsize)) , y -  n //2 * (20 + sqsize))
+        for n, tile in enumerate(tiles):
+          t = Tile(Texture(Image.named(f'../gui/tileblocks/{tiles[tile]}.png')), 0,  0, sq_size=sqsize)
+          t.position = (w + x + (n % 2 * (20 + sqsize)), y - n // 2 * (20 + sqsize))
           rack[t.bbox] = tile
-          parent.add_child(t)                     
+          parent.add_child(t)
         
         self.rack = rack
         
@@ -119,20 +121,20 @@ class TrainTracks():
           # if view gets closed, quit the program
           if not self.gui.v.on_screen:
             print('View closed, exiting')
-            sys.exit() 
-            break   
+            sys.exit()
+            break
           #  wait on queue data, either rc selected or function to call
           sleep(0.01)
           if not self.q.empty():
-            data = self.q.get(block=False)            
-            #self.delta_t('get')
-            #self.q.task_done()
+            data = self.q.get(block=False)
+            # self.delta_t('get')
+            # self.q.task_done()
             if isinstance(data, (tuple, list, int)):
-              coord = data # self.gui.ident(data)
+              coord = data  # self.gui.ident(data)
               break
             else:
               try:
-                #print(f' trying to run {data}')
+                # print(f' trying to run {data}')
                 data()
               except (Exception) as e:
                 print(traceback.format_exc())
@@ -142,31 +144,27 @@ class TrainTracks():
     def _get_player_move(self, board=None):
       """Takes in the user's input and performs that move on the board, returns the coordinates of the move
       Allows for movement over board"""
-      #self.delta_t('start get move')
       if board is None:
           board = self.game_board
       coord_list = []
-      # sit here until piece place on board   
+      # sit here until piece place on board
       items = 0
       
-      while items < 1000: # stop lockup
+      while items < 1000:  # stop lockup
         move = self.wait_for_gui()
-        if items == 0: st = time()
-        #print('items',items, move)
         try:
           if self.log_moves:
             coord_list.append(move)
             items += 1
             if move == -1:
-              #self.delta_t('end get move')
-              return coord_list       
+              return coord_list
           else:
             break
         except (Exception) as e:
           print(traceback.format_exc())
           print('except,', move, e)
           coord_list.append(move)
-          return coord_list    
+          return coord_list
       return move
        
     def get_player_move(self, board=None):
@@ -174,11 +172,11 @@ class TrainTracks():
         Allows for movement over board"""
         move = self._get_player_move(self.board)
         rack = self.rack
-        #self.gui.set_message2(f'{move[0]}..{move[-2]}')
+        # self.gui.set_message2(f'{move[0]}..{move[-2]}')
         if move[0] == (-1, -1):
-           return (None, None), 'Enter', None # pressed enter button
+           return (None, None), 'Enter', None  # pressed enter button
            
-        # deal with buttons. each returns the button text    
+        # deal with buttons. each returns the button text
         elif move[0][0] < 0 and move[0][1] < 0:
           return (None, None), self.gui.gs.buttons[-move[0][0]].text, None
           
@@ -190,12 +188,12 @@ class TrainTracks():
                 rc = move[-2]
                 return rc, self.letter, index
         # single press uses previous letter
-        try:       
+        try:
           if move[0] == move[-2]:
              return move[-2], self.letter, None
         except (AttributeError):
           pass
-        return (None, None), None, None    
+        return (None, None), None, None
     
     def load_words_from_file(self, file_list, no_strip=False):
         # read the entire wordfile as text
@@ -203,32 +201,34 @@ class TrainTracks():
           data = f.read()
         # split and remove comment and blank lines
         data_list = data.split('\n')
-        data_list = [item for item in data_list if item!='' and not item.startswith('#')]
-        # choice random line        
+        data_list = [item for item in data_list if item != '' and not item.startswith('#')]
+        # choice random line
         selected = choice(data_list)
-        #selected = data_list[-1]
+        # selected = data_list[10]
         size = int(selected.split(':')[0])
         return selected, size
     
     def initial_board(self):
         """ Get board layout and permanent cells from board_obj"""
-        empty_board = np.full((self.size, self.size), '-', dtype='U1')
+        pass
+        self.empty_board = np.full((self.size, self.size), '-', dtype='U1')
         board = self.convert_tracks()
         perm = self.convert_permanent()
         if not self.edit_mode:
            self.gui.clear_squares()
            self.highlight_permanent(perm.start.loc, 'A')
-           empty_board[perm.start.loc] = perm.start.track
+           self.empty_board[perm.start.loc] = perm.start.track
            self.highlight_permanent(perm.end.loc, 'B')
-           empty_board[perm.end.loc] = perm.end.track
+           self.empty_board[perm.end.loc] = perm.end.track
            for known in perm.known:
-             self.highlight_permanent(known.loc, '') 
-             empty_board[known.loc] = known.track
-           self.board = empty_board
+             self.highlight_permanent(known.loc, '')
+             self.empty_board[known.loc] = known.track
+           self.board = self.empty_board.copy()
                                     
     def initialize(self):
-        """This method should only be called once, when initializing the board."""       
+        """This method should only be called once, when initializing the board."""
         self.gui.clear_messages()
+        self.gui.clear_numbers()
         self.gui.set_top(f'Train Tracks\t\t{self.game_item}')
         # add boxes and buttons if not already placed
         if not hasattr(self, 'edit'):
@@ -252,10 +252,10 @@ class TrainTracks():
             end = perf_counter()
             elapsed = end - start
             self.board_obj.result(str(e), elapsed)
-            self.solution_board= self.convert_tracks()
+            self.solution_board = self.convert_tracks()
             if not self.edit_mode:
-                self.update_board(self.board)                   
-            else:               
+                self.update_board(self.board)
+            else:
                 self.update_board(self.solution_board)
             self.gui.print_board(self.solution_board, 'solution')
             return e
@@ -267,7 +267,7 @@ class TrainTracks():
          for c in range(self.size):
           _char = self.board_obj.layout[r][c].track
           if _char is not None:
-            board[r,c] = self.gui.player.NAMED_PIECES[_char.name]           
+            board[r, c] = self.gui.player.NAMED_PIECES[_char.name]
       return board
       
     def convert_permanent(self):
@@ -275,48 +275,47 @@ class TrainTracks():
       b = self.convert_tracks()
       start_loc = (self.board_obj.start, 0)
       end_loc = (self.board_obj.end_row, self.board_obj.end)
-      known_loc = [(r,c) for r in range(self.size) for c in range(self.size) if self.board_obj.layout[r][c].permanent]
+      known_loc = [(r, c) for r in range(self.size) for c in range(self.size) if self.board_obj.layout[r][c].permanent]
       known_loc.remove(start_loc)
       known_loc.remove(end_loc)
       # use dotdict ckass to provide simpler access
-      self.permanent = dotdict({'start': dotdict({'loc':start_loc, 'track': b[start_loc]}),
-                   'end': dotdict( {'loc':end_loc, 'track': b[end_loc]}),
-                   'known': [dotdict({'loc': loc, 'track': b[loc]}) for loc in known_loc]
-                  })
+      self.permanent = dotdict({'start': dotdict({'loc': start_loc, 'track': b[start_loc]}),
+                                'end': dotdict({'loc': end_loc, 'track': b[end_loc]}),
+                                'known': [dotdict({'loc': loc, 'track': b[loc]}) for loc in known_loc]})
       return self.permanent
       
     def highlight_permanent(self, coord, text=''):
-        params = {'color':'cyan', 'text_color':'blue',               
-                 'z_position':1000, 'stroke_color':'clear',
-                 'alpha':0.1, 'radius':5, 
-                 'sqsize':self.gui.gs.SQ_SIZE, 'offset':(0.0, 0.0), 
-                 'font': ('Arial Rounded MT Bold', 30), 'text_anchor_point':(-1, 1.2)}      
-        
-        self.gui.add_numbers([Squares(coord, text, **params)], clear_previous=False) 
+        params = {'color': 'cyan', 'text_color': 'blue',
+                  'z_position': 1000, 'stroke_color': 'clear',
+                  'alpha': 0.1, 'radius': 5,
+                  'sqsize': self.gui.gs.SQ_SIZE, 'offset': (0.0, 0.0),
+                  'font': ('Arial Rounded MT Bold', 30), 'text_anchor_point': (-1, 1)}
+        self.gui.add_numbers([Squares(coord, text, **params)], clear_previous=False)
         r, c = coord
         self.board_obj.layout[r][c].permanent = True
         
-    def draw_initial(self, moves=False):          
+    def draw_initial(self, moves=False):
         # Numbers across the top
-        self.gui.replace_labels('col', self.board_obj.col_constraints, colors=None)        
+        self.gui.replace_labels('col', self.board_obj.col_constraints, colors=None)
         # Numbers down right side
-        self.gui.replace_labels('row', reversed(self.board_obj.row_constraints), colors=None)        
+        self.gui.replace_labels('row', reversed(self.board_obj.row_constraints), colors=None)
         # start and end
-        self.gui.clear_squares()
-        self.initial_board()       
+        #self.gui.clear_squares()
+        #self.initial_board()
         
-    def run(self):    
+    def run(self):
         """
         Main method that prompts the user for input
         """
         try:
-            self.update_board(self.board)   
-            while True:            
-                move = self.get_player_move(self.board)         
-                finished = self.process_turn( move, self.board)         
-                self.update_board(self.board)            
-                if self.game_over(finished): break      
-        except(Exception)as e:
+            self.update_board(self.board)
+            while True:
+                move = self.get_player_move(self.board)
+                finished = self.process_turn(move, self.board)
+                self.update_board(self.board)
+                if self.game_over(finished):
+                  break
+        except (Exception):
           print(traceback.format_exc())
           print(self.error)
           
@@ -326,7 +325,7 @@ class TrainTracks():
       self.update_board(self.board)
       dialogs.hud_alert('Game over')
       sleep(2)
-      self.gui.show_start_menu() 
+      self.gui.show_start_menu()
        
     def hint(self):
         # place a random track piece not already placed
@@ -339,7 +338,7 @@ class TrainTracks():
             
         # find solution tracks not in existing tracks
         # https://stackoverflow.com/questions/69435359/fast-check-if-elements-in-array-are-within-another-array-2d
-        uni = np.any(np.all(solution_tracks[None, :, :] == existing_tracks[:, None, :],axis=-1, ),axis=0,)
+        uni = np.any(np.all(solution_tracks[None, :, :] == existing_tracks[:, None, :], axis=-1,), axis=0,)
             
         unplaced_sol = solution_tracks[~uni]
         try:
@@ -347,105 +346,131 @@ class TrainTracks():
             loc = tuple(unplaced_sol[idx])
             self.board[loc] = self.solution_board[loc]
             self.highlight_permanent(loc)
-            complete = self.code_constraints(self.board)
-        except(ValueError):
+            self.code_constraints(self.board)
+        except (ValueError):
             dialogs.hud_alert('No more hints')
             return 1
-        self.update_board(self.board) 
-            
+        self.update_board(self.board)
+    
+    def perm_to_str(self, dict_):
+        """ convert dotdict {'loc': xy, 'track': trackcode}
+        to 4 character NW35 """
+        r, c = dict_.loc
+        rc_str = ''.join([str(r), str(c)])
+        dir = self.gui.player.PIECE_NAMES[dict_.track]
+        return dir + rc_str
+                  
     def start_edit_mode(self):
       """ Entering edit mode modies currentle selected track set """
-      self.gui.set_prompt('edit mode pressed')
-      self.board = self.solution_board.copy()
-      #self.display_board = self.board.copy()
-      #self.empty_board = self.display_board.copy()
-      #self.gui.clear_numbers()
-      #self.update_board(self.board)
-      self.known = []
-      sleep(1)
-      self.gui.set_prompt('') 
+      self.board = self.convert_tracks()
+      perm = self.convert_permanent()
+                
+      self.start_track = self.perm_to_str(perm.start) + 's'
+      self.end_track = self.perm_to_str(perm.end) + 'e'
+      self.known = [self.perm_to_str(k) for k in perm.known]
+      self.update_board(self.board)
       
     def mark_start_end(self, coord, letter):
       """ check if new track is at edge and mark start or
       end as appropriate
       """
-      r,c = coord
-      rc_str = ''.join([str(r), str(c)])
-      dirn = self.gui.player.PIECE_NAMES[letter] 
-      
+      dict_ = dotdict({'loc': coord, 'track': letter})
+      r, c = coord
+      dirn = self.gui.player.PIECE_NAMES[letter]
       # mark start
-      if c == 0 and 'W' in dirn:
-        if not self.start_track.startswith('_'):
-          r1c1 = int(self.start_track[2]), int(self.start_track[3])
-          self.board[r1c1] = '-'
-          self.gui.clear_numbers(r1c1)
-        self.start_track = dirn + rc_str + 's'
+      if c == 0 and 'W' in dirn:        
+        self.gui.clear_numbers(self.permanent.start.loc)
+        
+        self.board[self.permanent.start.loc] = '-'
+        self.permanent.start.loc = coord
+        self.permanent.start.track = letter
         self.highlight_permanent(coord, 'A')
+        self.start_track = self.perm_to_str(dict_) + 's'
+        return True
         
       # mark end
-      if ((r == 0 and 'S' in dirn) or 
-          (r == (self.size-1) and 'N' in dirn)):
-        if not self.end_track.startswith('_'):
-          r1c1 = int(self.end_track[2]), int(self.end_track[3])
-          self.board[r1c1] = '-'
-          self.gui.clear_numbers(r1c1)
-        self.end_track = dirn + rc_str + 'e'
-        self.highlight_permanent(coord, 'B')
+      if ((r == 0 and 'S' in dirn) or (r == (self.size-1) and 'N' in dirn)):
+         self.gui.clear_numbers(self.permanent.end.loc)
          
+         self.board[self.permanent.start.loc] = '-'
+         self.permanent.end.loc = coord
+         self.permanent.end.track = letter
+         self.highlight_permanent(coord, 'B')  
+         self.end_track = self.perm_to_str(dict_) + 'e'
+         return True
+      return False
+      
+    def mark_known (self, coord, letter):
+      """ check if new track is known and mark or clear as appropriate
+      """
+      dict_ = dotdict({'loc': coord, 'track': self.board[coord]})      
+      if coord in [k.loc for k in self.permanent.known]:
+        #remove known
+        self.gui.clear_numbers(coord)
+        self.permanent.known = [kv for kv in self.permanent.known if kv.loc != coord]
+        self.known.remove(self.perm_to_str(dict_)) 
+      else:
+        # new known
+        self.permanent.known.append(dict_)
+        self.known.append(self.perm_to_str(dict_))
+        self.highlight_permanent(coord, '')              
+            
     def add_new_track(self, coord, letter, row):
-      r,c = coord
-      rc_str = ''.join([str(r), str(c)])
-      dirn = self.gui.player.PIECE_NAMES[letter]
+      dict_ = dotdict({'loc': coord, 'track': letter})
+      dir_rc = self.perm_to_str(dict_)
+      
       if self.identify_mode and row is None:
-          if (dirn + rc_str) in self.known:
-            self.known.remove(dirn + rc_str)
-            self.gui.clear_numbers(coord)
-          else:
-            self.known.append(dirn + rc_str)
-            self.highlight_permanent(coord)
-            self.toggle_identify_tile()
+          start_end = self.mark_start_end(coord, letter)
+          if not start_end:
+              self.mark_known(coord, letter) 
+          self.toggle_identify_tile()
       else:
           try:
             self.gui.set_prompt(f'adding new track {letter} to {coord}')
-            self.board[coord] = letter                                                    
+            self.board[coord] = letter
             self.update_board(self.board)
-            self.mark_start_end(coord, letter)
+            
           except (IndexError):
             pass
       
-      self.compute_constraints()
+      row, col = self.compute_constraints()
+      self.gui.replace_labels('col', col, colors=None)
+      # Numbers down right side
+      self.gui.replace_labels('row', row, colors=None)
+      self.update_board(self.board)
       sleep(1)
-      self.gui.set_prompt('')  
+      self.gui.set_prompt('')
       
     def compute_constraints(self):
       """calculate constraint string
       format is Size:ColumnConstraintsRowConstraints:track-tuple:track-tuple
-      """      
+      """
       @np.vectorize
       def contained(x):
           return x in list(self.gui.player.PIECE_NAMES.keys())[:-2]
           
-      col_sums = np.sum(contained(self.board), axis=0).astype('U1')    
+      col_sums = np.sum(contained(self.board), axis=0).astype('U1')
       row_sums = np.flip(np.sum(contained(self.board), axis=1)).astype('U1')
       constraintrc = ''.join(col_sums) + ''.join(row_sums)
       if self.known:
          self.constraints = ':'.join([str(self.size), constraintrc,
-                                   self.start_track, ':'.join(self.known),
-                                   self.end_track])
+                                     self.start_track, ':'.join(self.known),
+                                     self.end_track])
       else:
         self.constraints = ':'.join([str(self.size), constraintrc,
-                                   self.start_track, self.end_track])
+                                    self.start_track, self.end_track])
       self.gui.set_message2(self.constraints)
+      
+      return row_sums, col_sums
                                             
     def toggle_identify_tile(self):
-      self.gui.set_prompt('identify pressed')
+      """ when identify tile is pressed, allow next pressed tile to be added to or deleted from known"""
       self.identify_mode = not self.identify_mode
-      self.gui.set_props(self.identify, fill_color = 'red' if self.identify_mode else 'orange')      
-      sleep(1)
-      self.gui.set_prompt('')
+      self.gui.set_props(self.identify, fill_color='red' if self.identify_mode else 'orange')
       
     def test_solve(self):
-       
+      """ Try to solve modified track layout
+          if successful save button is enabled """
       self.gui.set_prompt('solve pressed')
       if hasattr(self, 'constraints'):
         print(self.constraints)
@@ -455,67 +480,73 @@ class TrainTracks():
         result = self.initialize()
         if isinstance(result, ValueError) and 'Solved' in result.args:
             self.save_enabled = True
-            self.gui.set_props(self.save, fill_color = 'orange')    
+            self.gui.set_props(self.save, fill_color='orange')
       sleep(1)
-      self.gui.set_prompt('')  
-      
+      self.gui.set_prompt('')
       
     def save_constraint(self):
+      """ If enabled, saves new track to end of traintracks.txt
+          Disables save afterward"""
       if self.save_enabled:
         comment = dialogs.input_alert('Add comment')
         text = f'{self.constraints} #{comment}'
         print(text)
         with open(TRAINS, 'a')as f:
-          f.write(text +'\n')
+          f.write(text + '\n')
         self.save_enabled = False
-        self.gui.set_props(self.save, fill_color = 'grey')    
+        self.gui.set_props(self.save, fill_color='grey')
                     
     def process_turn(self, move, board):
         """ process the turn
         move is coord, new letter, selection_row
-        """         
-        rack = self.rack        
+        """
         if move:
           coord, letter, row = move
-          r,c = coord
-          if letter == 'Enter': 
-            finished = self.hint() 
+          r, c = coord
+          if letter == 'Enter':
+            finished = self.hint()
             if finished:
-              return 1                                                      
+              return 1
           
           elif letter == 'Edit Mode':
               self.edit_mode = not self.edit_mode
-              self.gui.set_props(self.edit, fill_color = 'red' if self.edit_mode else 'orange')
+              self.gui.set_props(self.edit, fill_color='red' if self.edit_mode else 'orange')
               if self.edit_mode:
-                self.start_edit_mode() 
+                self.start_edit_mode()
+              else:
+                #exit edit mode, leaving new board
+                self.game_item = self.constraints
+                self.initialize()
+                #self.board = self.empty_board.copy()
+                self.update_board(self.board)
         
           elif letter == 'Identify':
-               self.toggle_identify_tile()
+              self.toggle_identify_tile()
       
           elif letter == 'Solve':
-               self.test_solve()
+              self.test_solve()
                
-          elif  letter == 'Save':
-               self.save_constraint()
+          elif letter == 'Save':
+              self.save_constraint()
                 
           elif coord == (None, None):
-            return 0 
+              return 0
                                      
           elif letter != '':  # valid selection
             if self.edit_mode:
               self.add_new_track(coord, letter, row)
             else:
                 try:
-                    r,c = coord
+                    r, c = coord
                     cell = self.board_obj.layout[r][c]
                     if not cell.permanent:
-                       self.board[coord] = letter                                                    
+                       self.board[coord] = letter
                        self.update_board(self.board)
                        complete = self.code_constraints(self.board)
                        return complete
                 except (IndexError):
-                  pass             
-        return 0   
+                  pass
+        return 0
     
     def code_constraints(self, board):
        """compare constraints with actual counts
@@ -525,10 +556,10 @@ class TrainTracks():
        def contained(x):
           return x in list(self.gui.player.PIECE_NAMES.keys())[:-2]
           
-       def compute_check(known, sums, dirn)  :
+       def compute_check(known, sums, dirn):
            check = np.equal(sums, known)
            colors = np.where(check, 'white', '#ff5b5b')
-           self.gui.replace_labels(dirn,  known, colors=colors, font=('Arial Rounded MT Bold', 30))     
+           self.gui.replace_labels(dirn, known, colors=colors, font=('Arial Rounded MT Bold', 30))
            return np.all(check)
              
        col_known = np.array(self.board_obj.col_constraints)
@@ -537,7 +568,7 @@ class TrainTracks():
        row_sums = np.flip(np.sum(contained(self.board), axis=1))
        
        return all([compute_check(col_known, col_sums, 'col'),
-                   compute_check(row_known, row_sums, 'row')])      
+                   compute_check(row_known, row_sums, 'row')])
                   
     def game_over(self, finished):
       
@@ -547,9 +578,9 @@ class TrainTracks():
   
         board = np.where(contained(self.board), self.board, ' ')
         soln = np.where(contained(self.solution_board), self.solution_board, ' ')
-        compare = board == soln
+        compare = (board == soln)
       
-        if finished and np.all(compare):        
+        if finished and np.all(compare):
           dialogs.hud_alert('Game over')
           sleep(2)
           self.gui.show_start_menu()
@@ -557,90 +588,90 @@ class TrainTracks():
               
     def restart(self):
        self.gui.gs.close()
-       g=TrainTracks()
-       g.run()  
+       g = TrainTracks()
+       g.run()
        
     def box_positions(self):
-        x, y, w, h = self.gui.grid.bbox 
-        sqsize= self.gui.gs.SQ_SIZE              
-        #t.position = (w + 50 + (n % 2 * (20 + sqsize)) , h_sqsize-  n //2 * (20 + sqsize))
+        x, y, w, h = self.gui.grid.bbox
+        sqsize = self.gui.gs.SQ_SIZE
+        # rack tiles are computed with this code
+        # t.position = (w + 50 + (n % 2 * (20 + sqsize)) , h_sqsize-  n //2 * (20 + sqsize))
+        
         # positions of all objects for all devices
         position_dict = {
-        'ipad13_landscape': {'rackpos': (10, 200), 'rackscale': 0.9, 'rackoff': h/8, 
-        'button1': (w+20, h/12), 'button2': (w+40, 270), 'button3': (w+200, 270),
-        'button4': (w+200, 200), 'button5': (w+40, 200),
-        'box1': (w+30, h - 4*(sqsize+20)), 'box2': (w+30, 200-6), 'box3': (w+5, 2*h/3),
-        'box4': (w+5, h-50), 'font': ('Avenir Next', 24) },
+        'ipad13_landscape': {'rackpos': (10, 200), 'rackscale': 0.9, 'rackoff': h / 8,
+                             'button1': (w + 40, h / 12), 'button2': (w + 40, 220), 'button3': (w + 200, 220),
+                             'button4': (w + 200, 150), 'button5': (w + 40, 150),
+                             'box1': (w + 30, h - 50 - 4 * (sqsize + 20)), 'box2': (w + 30, 150 - 6), 'box3': (w + 5, 2 * h / 3),
+                             'box4': (w + 5, h - 50), 'font': ('Avenir Next', 24)},
                                            
-        'ipad13_portrait': {'rackpos': (50-w, h+50), 'rackscale': 0.9, 'rackoff': h/8,
-        'button1': (w/2, h+200), 'button2': (w/2, h+50), 'button3': (w/2, h+250),
-        'button4': (w/2, h+100), 'button5': (w/2, h+150),
-        'box1': (45, h+h/8+45), 'box2': (45, h+45), 'box3': (2*w/3, h+45),
-        'box4': (2*w/3, h+200), 'font': ('Avenir Next', 24) },
+        'ipad13_portrait': {'rackpos': (50 - w, h + 50), 'rackscale': 0.9, 'rackoff': h / 8,
+                            'button1': (w / 2, h + 200), 'button2': (w / 2, h + 50), 'button3': (w / 2, h + 250),
+                            'button4': (w / 2, h + 100), 'button5': (w / 2, h + 150),
+                            'box1': (45, h + h / 8 + 45), 'box2': (45, h + 45), 'box3': (2 * w / 3, h + 45),
+                            'box4': (2 * w / 3, h + 200), 'font': ('Avenir Next', 24)},
         
-        'ipad_landscape': {'rackpos': (10, 200), 'rackscale': 1.0, 'rackoff': h/8,
-                'button1': (w+20, h/12), 'button2': (w+35, 190), 'button3': (w+150, 190),
-        'button4': (w+150, 140), 'button5': (w+35, 140),
-        'box1': (w+30, h - 4*(sqsize+20)), 'box2': (w+30, 140-6), 'box3': (w+5, 2*h/3),
-        'box4': (w+5, h-50), 'font': ('Avenir Next', 20) },
+        'ipad_landscape': {'rackpos': (10, 200), 'rackscale': 1.0, 'rackoff': h / 8,
+                           'button1': (w + 35, h / 12), 'button2': (w + 35, 190), 'button3': (w + 150, 190),
+                           'button4': (w + 150, 140), 'button5': (w + 35, 140),
+                           'box1': (w + 30, h - 4 * (sqsize + 20)), 'box2': (w + 30, 140-6), 'box3': (w + 5, 2 * h / 3),
+                           'box4': (w + 5, h - 50), 'font': ('Avenir Next', 20)},
         
-        'ipad_portrait': {'rackpos': (50-w, h+50), 'rackscale': 1.0, 'rackoff': h/8,
-        'button1': (9*w/15, h+190), 'button2': (9*w/15, h+30), 'button3': (9*w/15, h+150),
-        'button4': (9*w/15, h+70), 'button5': (9*w/15, h+110),
-        'box1': (45,h+h/8+45), 'box2': (45, h+45),'box3': (3*w/4, h+35),
-        'box4': (3*w/4, h+160), 'font': ('Avenir Next', 20)},
+        'ipad_portrait': {'rackpos': (50 - w, h + 50), 'rackscale': 1.0, 'rackoff': h / 8,
+                          'button1': (9 * w / 15, h + 190), 'button2': (9 * w / 15, h + 30), 'button3': (9 * w / 15, h + 150),
+                          'button4': (9 * w / 15, h + 70), 'button5': (9 * w / 15, h + 110),
+                          'box1': (45, h + h / 8 + 45), 'box2': (45, h + 45), 'box3': (3 * w / 4, h + 35),
+                          'box4': (3 * w / 4, h + 160), 'font': ('Avenir Next', 20)},
         
-        'iphone_landscape': {'rackpos': (10, 200), 'rackscale': 1.5, 'rackoff': h/4,
-        'button1': (w+10, h/6), 'button2': (w+230, h/6), 'button3': (w+120, h/6),
-        'button4': (w+230, h/6-50), 'button5': (w+120, h/6-50),
-        'box1': (w+5, 200+h/8-6), 'box2': (w+5, 200-6), 'box3': (w+5, 2*h/3),
-        'box4': (w+5, h-50), 'font': ('Avenir Next', 15) },
+        'iphone_landscape': {'rackpos': (10, 200), 'rackscale': 1.5, 'rackoff': h / 4,
+                             'button1': (w + 10, h / 6), 'button2': (w + 230, h / 6), 'button3': (w + 120, h / 6),
+                             'button4': (w + 230, h / 6 - 50), 'button5': (w + 120, h / 6 - 50),
+                             'box1': (w + 5, 200 + h / 8 - 6), 'box2': (w + 5, 200 - 6), 'box3': (w + 5, 2 * h / 3),
+                             'box4': (w + 5, h - 50), 'font': ('Avenir Next', 15)},
             
-        'iphone_portrait': {'rackpos': (50-w, h+50), 'rackscale': 1.5, 'rackoff': h/8,
-        'button1': (9*w/15, h+190), 'button2': (9*w/15, h+30), 'button3': (9*w/15, h+150),
-        'button4': (9*w/15, h+70), 'button5': (9*w/15, h+110),
-        'box1': (45,h+h/8+45), 'box2': (45, h+45),'box3': (3*w/4, h+35),
-        'box4': (3*w/4, h+160), 'font': ('Avenir Next', 15)},
+        'iphone_portrait': {'rackpos': (50 - w, h + 50), 'rackscale': 1.5, 'rackoff': h / 8,
+                            'button1': (9 * w / 15, h + 190), 'button2': (9 * w / 15, h + 30), 'button3': (9 * w / 15, h + 150),
+                            'button4': (9 * w / 15, h + 70), 'button5': (9 * w / 15, h + 110),
+                            'box1': (45, h + h / 8 + 45), 'box2': (45, h + 45), 'box3': (3 * w / 4, h + 35),
+                            'box4': (3 * w / 4, h + 160), 'font': ('Avenir Next', 15)},
          }
         self.posn = SimpleNamespace(**position_dict[self.gui.device])
         
     def add_boxes(self):
       """ add non responsive decoration boxes"""
-      x, y, w, h = self.gui.grid.bbox 
+      x, y, w, h = self.gui.grid.bbox
       tsize = self.gui.gs.SQ_SIZE
-      box = self.gui.add_button(text='', title='Tracks', position=self.posn.box1, 
-                          min_size=(2* tsize+60, 4* (tsize+20)+20), 
-                          fill_color='clear')
+      box = self.gui.add_button(text='', title='Tracks', position=self.posn.box1,
+                                min_size=(2 * tsize + 60, 4 * (tsize + 20) + 20),
+                                fill_color='clear')
       self.gui.set_props(box, font=self.posn.font)
-      box = self.gui.add_button(text='', title='Editor', position=self.posn.box2, 
-                          min_size=(2* tsize+60,  tsize+10), 
-                          fill_color='clear')
+      box = self.gui.add_button(text='', title='Editor', position=self.posn.box2,
+                                min_size=(280, 125),
+                                fill_color='clear')
       self.gui.set_props(box, font=self.posn.font)
       
     def set_buttons(self):
-      """ install set of active buttons """ 
-      x, y, w, h = self.gui.grid.bbox       
+      """ install set of active buttons """
+      x, y, w, h = self.gui.grid.bbox
       button = self.gui.set_enter('Hint', position=self.posn.button1,
                                   stroke_color='black', fill_color='yellow',
-                                  color='black', font=self.posn.font)   
-      self.edit = self.gui.add_button(text='Edit Mode', title='', position=self.posn.button2, 
-                                   min_size=(80, 32), reg_touch=True,
-                                   stroke_color='black', fill_color='orange',
-                                   color='black', font=self.posn.font) 
+                                  color='black', font=self.posn.font)
+      self.edit = self.gui.add_button(text='Edit Mode', title='', position=self.posn.button2,
+                                      min_size=(80, 32), reg_touch=True,
+                                      stroke_color='black', fill_color='orange',
+                                      color='black', font=self.posn.font)
       self.identify = self.gui.add_button(text='Identify', title='', position=self.posn.button3,
-                                   min_size=(100, 32), reg_touch=True,
-                                   stroke_color='black', fill_color='orange',
-                                   color='black', font=self.posn.font)
-      
+                                          min_size=(100, 32), reg_touch=True,
+                                          stroke_color='black', fill_color='orange',
+                                          color='black', font=self.posn.font)
       button = self.gui.add_button(text='Solve', title='', position=self.posn.button4,
                                    min_size=(100, 32), reg_touch=True,
                                    stroke_color='black', fill_color='orange',
                                    color='black', font=self.posn.font)
-      
       self.save = self.gui.add_button(text='Save', title='', position=self.posn.button5,
-                                   min_size=(100, 32), reg_touch=True,
-                                   stroke_color='black', fill_color='grey',
-                                   color='black', font=self.posn.font)
+                                      min_size=(100, 32), reg_touch=True,
+                                      stroke_color='black', fill_color='grey',
+                                      color='black', font=self.posn.font)
           
 
 class Track(Enum):
@@ -659,8 +690,9 @@ class Track(Enum):
             if str[0] in tr.name and str[1] in tr.name:
                 return tr
 
+
 class Cell:
-    def __init__(self, row, col, cell_size, gui):
+    def __init__(self, row, col, cell_size):
         self.cell_size = cell_size
         self.y = row
         self.x = col
@@ -671,7 +703,6 @@ class Cell:
         self.must_connect = ""
         self.is_start = False
         self.is_end = False
-        self.gui = gui
 
     def __str__(self):
         return f"R:{self.row} C:{self.col} {self.track}"
@@ -688,8 +719,8 @@ class Layout:
     def __init__(self, size=8, gui=None):
         self.size = size
         self.gui = gui
-        self.layout = [[Cell(row, col, 0, gui) for col in range(size)] 
-                                               for row in range(size)]
+        self.layout = [[Cell(row, col, 0) for col in range(size)]
+                       for row in range(size)]
         self.start = None
         self.end = None
         self.end_row = None
@@ -704,7 +735,7 @@ class Layout:
         """ Takes string of numbers representing top and right side """
         v = list(values)
         self.col_constraints = [int(i) for i in v[: self.size]]
-        right = v[self.size :]
+        right = v[self.size:]
         right.reverse()
         self.row_constraints = [int(i) for i in right]
 
@@ -728,7 +759,7 @@ class Layout:
 
         # determine adjacent cells that must connect
         # modify to allow end row to be 0 or size-1
-        if "N" in track and row < self.size-1:      
+        if "N" in track and row < self.size-1:
             self.layout[row + 1][col].must_connect += "S"
         if "S" in track and row > 0:
             self.layout[row - 1][col].must_connect += "N"
@@ -866,9 +897,9 @@ class Layout:
         """ move from cell in direction dir  """
         self.move_count += 1
         if DEBUG:
-          self.gui.gui.set_moves(f'Moves {self.move_count}')
+          self.gui.gui.set_moves(f'Moves {self.move_count}', position=(self.gui.gui.grid.bbox[2]+20, 20))
           self.gui.gui.update(self.gui.convert_tracks())
-          sleep(0.2)
+          sleep(0.1)
         if self.move_count == self.move_max:
             raise ValueError("Max move count reached")
         # if self.move_count == 8400:
@@ -937,10 +968,11 @@ class Layout:
             self.move_from(new_cell, to_dir)
         raise ValueError("Failed to find solution")
 
-    def result(self, message, elapsed):        
-        self.gui.gui.set_message( f"{message} in {self.move_count} moves. Time:{elapsed:.2f}s")
-        
-    
+    def result(self, message, elapsed):
+        self.gui.gui.set_message(f"{message} in {self.move_count} moves. Time:{elapsed:.2f}s")
+        if DEBUG:
+            self.gui.gui.set_moves('')
+           
 
 def parse(params, gui):
     """
@@ -949,9 +981,9 @@ def parse(params, gui):
     bits = params.split(":")
     size = int(bits[0])
     if len(bits[1]) != 2 * size:
-        raise ValueError("Params wrong - 1")
-    l = Layout(size, gui)
-    l.set_constraints(bits[1])
+        raise ValueError("Error, constraint bits wrong length")
+    layout = Layout(size, gui)
+    layout.set_constraints(bits[1])
     
     for i in range(2, len(bits)):
         c = bits[i]
@@ -962,22 +994,26 @@ def parse(params, gui):
                 start = True
             elif c[4] == "e":
                 end = True
-            #else:
-            #    raise (ValueError, "Params wrong - 2")
-        l.add_track(c[:2], int(c[2]), int(c[3]), start=start, end=end)
-    if l.start is None:
+            # else:
+            # raise (ValueError, "Params wrong - 2")
+        layout.add_track(c[:2], int(c[2]), int(c[3]), start=start, end=end)
+    if layout.start is None:
         raise ValueError('Error, start not specified, forgot to add "s"')
-    if l.end is None:
+    if layout.end is None:
         raise ValueError('Error, end not specified, forgot to add "e"')
-    return l
+    return layout
 
-
-def main():
-    game = TrainTracks()
-    game.run()
-                        
+                                                
 if __name__ == '__main__':
-  main()
+  game = TrainTracks()
+  game.run()
+
+
+
+
+
+
+
 
 
 
