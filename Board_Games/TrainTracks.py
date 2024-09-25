@@ -111,9 +111,10 @@ class TrainTracks():
         x = x + offx
         y = y + offy
         rack = {}
+        r = self.posn.rackoff
         for n, tile in enumerate(tiles):
-          t = Tile(Texture(Image.named(f'../gui/tileblocks/{tiles[tile]}.png')), 0,  0, sq_size=sqsize)
-          t.position = (w + x + (n % 2 * (20 + sqsize)), y - n // 2 * (20 + sqsize))
+          t = Tile(Texture(Image.named(f'../gui/tileblocks/{tiles[tile]}.png')), 0,  0, sq_size = sqsize * self.posn.rackscale)
+          t.position = (w + x + (n % r * (20 + sqsize * self.posn.rackscale)), y - n // r * (20 + sqsize* self.posn.rackscale))
           rack[t.bbox] = tile
           parent.add_child(t)
         
@@ -603,37 +604,39 @@ class TrainTracks():
         
         # positions of all objects for all devices
         position_dict = {
-        'ipad13_landscape': {'rackpos': (10, 200), 'rackscale': 0.9, 'rackoff': h / 8,
+        'ipad13_landscape': {'rackpos': (0, 0), 'rackscale': 1.0, 
+                             'rackoff': 2,  'edit_size': (280, 125),
                              'button1': (w + 40, h / 12), 'button2': (w + 40, 220), 'button3': (w + 200, 220),
                              'button4': (w + 200, 150), 'button5': (w + 40, 150),
                              'box1': (w + 30, h - 50 - 4 * (sqsize + 20)), 'box2': (w + 30, 150 - 6), 'box3': (w + 5, 2 * h / 3),
                              'box4': (w + 5, h - 50), 'font': ('Avenir Next', 24)},
                                            
-        'ipad13_portrait': {'rackpos': (50 - w, h + 50), 'rackscale': 0.9, 'rackoff': h / 8,
+        'ipad13_portrait': {'rackpos': (50 - w, h + 50), 'rackscale': 1.0, 
+                            'rackoff': 2, 'edit_size': (280, 125),
                             'button1': (w / 2, h + 200), 'button2': (w / 2, h + 50), 'button3': (w / 2, h + 250),
                             'button4': (w / 2, h + 100), 'button5': (w / 2, h + 150),
                             'box1': (45, h + h / 8 + 45), 'box2': (45, h + 45), 'box3': (2 * w / 3, h + 45),
                             'box4': (2 * w / 3, h + 200), 'font': ('Avenir Next', 24)},
         
-        'ipad_landscape': {'rackpos': (10, 200), 'rackscale': 1.0, 'rackoff': h / 8,
+        'ipad_landscape': {'rackpos': (0, -10), 'rackscale': 1.0, 'rackoff': 2, 'edit_size': (230, 110),
                            'button1': (w + 35, h / 12), 'button2': (w + 35, 190), 'button3': (w + 150, 190),
                            'button4': (w + 150, 140), 'button5': (w + 35, 140),
-                           'box1': (w + 30, h - 4 * (sqsize + 20)), 'box2': (w + 30, 140-6), 'box3': (w + 5, 2 * h / 3),
+                           'box1': (w + 30, h - 4 * (sqsize + 20)), 'box2': (w + 30, 125-6), 'box3': (w + 5, 2 * h / 3),
                            'box4': (w + 5, h - 50), 'font': ('Avenir Next', 20)},
         
-        'ipad_portrait': {'rackpos': (50 - w, h + 50), 'rackscale': 1.0, 'rackoff': h / 8,
-                          'button1': (9 * w / 15, h + 190), 'button2': (9 * w / 15, h + 30), 'button3': (9 * w / 15, h + 150),
-                          'button4': (9 * w / 15, h + 70), 'button5': (9 * w / 15, h + 110),
-                          'box1': (45, h + h / 8 + 45), 'box2': (45, h + 45), 'box3': (3 * w / 4, h + 35),
+        'ipad_portrait': {'rackpos': (-w, 249), 'rackscale': 0.7, 'rackoff': 4, 'edit_size': (250, 110),
+                          'button1': (690, h + 100), 'button2': (430, h +150), 'button3': (550 , h + 150),
+                          'button4': (550, h + 100), 'button5': (430, h + 100),
+                          'box1': (45, h + 55), 'box2': (420, h + 90), 'box3': (3 * w / 4, h + 35),
                           'box4': (3 * w / 4, h + 160), 'font': ('Avenir Next', 20)},
         
-        'iphone_landscape': {'rackpos': (0, -50), 'rackscale': 1.5, 'rackoff': h / 4, 'edit_size': (255, 130),
-                             'button1': (w + 185, h / 6), 'button2': (w + 185, 245), 'button3': (w + 330, 245),
+        'iphone_landscape': {'rackpos': (0, -50), 'rackscale': 1.5, 'rackoff': 2, 'edit_size': (255, 130),
+                             'button1': (w + 185, h / 6), 'button2': (w + 185, 230), 'button3': (w + 330, 245),
                              'button4': (w + 330, 180), 'button5': (w + 185, 180),
                              'box1': (w + 30, h - 50 -4* (sqsize +20)), 'box2': (w + 180, 165 - 6), 'box3': (w + 5, 2 * h / 3),
                              'box4': (w + 5, h - 50), 'font': ('Avenir Next', 20)},
             
-        'iphone_portrait': {'rackpos': (-w -25, h -10), 'rackscale': 1.5, 'rackoff': h / 8, 'edit_size': (135, 190),
+        'iphone_portrait': {'rackpos': (-w -25, h -10), 'rackscale': 1.5, 'rackoff': 2, 'edit_size': (135, 190),
                             'button1': (9 * w / 15, h + 100), 'button2': (9 * w / 15, h + 300), 'button3': (9 * w / 15, h + 250),
                             'button4': (9 * w / 15, h + 200), 'button5': (9 * w / 15, h + 150),
                             'box1': (0, h + h / 8 + 45), 'box2': (180,  h + 145), 'box3': (3 * w / 4, h + 35),
@@ -644,9 +647,11 @@ class TrainTracks():
     def add_boxes(self):
       """ add non responsive decoration boxes"""
       x, y, w, h = self.gui.grid.bbox
+      r = self.posn.rackoff
+      t = self.posn.rackscale
       tsize = self.gui.gs.SQ_SIZE
       box = self.gui.add_button(text='', title='Tracks', position=self.posn.box1,
-                                min_size=(2 * tsize + 60, 4 * (tsize + 20) + 20),
+                                min_size=(r * t*tsize + 60, 8/r * (t*tsize + 20) + 20),
                                 fill_color='clear')
       self.gui.set_props(box, font=self.posn.font)
       
