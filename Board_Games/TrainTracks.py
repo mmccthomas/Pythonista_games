@@ -81,7 +81,7 @@ class TrainTracks():
       
         self.gui.start_menu = {'New Game': self.restart, 'Quit': self.gui.gs.close}
         self.size = size
-        self.display_rack(self.gui.player.PIECE_NAMES)
+        #self.display_rack(self.gui.player.PIECE_NAMES)
         self.solution_board = np.full((size, size), '-', dtype='U1')
         self.empty_board = np.full((size, size), '-', dtype='U1')
         self.erase = True
@@ -105,7 +105,9 @@ class TrainTracks():
         _, _, w, h = self.gui.grid.bbox
         sqsize = self.gui.gs.SQ_SIZE
         x, y = (50, h - sqsize)
-        y = y + y_off
+        offx, offy = self.posn.rackpos
+        x = x + offx
+        y = y + offy
         rack = {}
         for n, tile in enumerate(tiles):
           t = Tile(Texture(Image.named(f'../gui/tileblocks/{tiles[tile]}.png')), 0,  0, sq_size=sqsize)
@@ -623,16 +625,16 @@ class TrainTracks():
                           'box1': (45, h + h / 8 + 45), 'box2': (45, h + 45), 'box3': (3 * w / 4, h + 35),
                           'box4': (3 * w / 4, h + 160), 'font': ('Avenir Next', 20)},
         
-        'iphone_landscape': {'rackpos': (10, 200), 'rackscale': 1.5, 'rackoff': h / 4,
-                             'button1': (w + 10, h / 6), 'button2': (w + 230, h / 6), 'button3': (w + 120, h / 6),
-                             'button4': (w + 230, h / 6 - 50), 'button5': (w + 120, h / 6 - 50),
-                             'box1': (w + 5, 200 + h / 8 - 6), 'box2': (w + 5, 200 - 6), 'box3': (w + 5, 2 * h / 3),
-                             'box4': (w + 5, h - 50), 'font': ('Avenir Next', 15)},
+        'iphone_landscape': {'rackpos': (0, -50), 'rackscale': 1.5, 'rackoff': h / 4, 'edit_size': (255, 130),
+                             'button1': (w + 185, h / 6), 'button2': (w + 185, 245), 'button3': (w + 330, 245),
+                             'button4': (w + 330, 180), 'button5': (w + 185, 180),
+                             'box1': (w + 30, h - 50 -4* (sqsize +20)), 'box2': (w + 180, 165 - 6), 'box3': (w + 5, 2 * h / 3),
+                             'box4': (w + 5, h - 50), 'font': ('Avenir Next', 24)},
             
-        'iphone_portrait': {'rackpos': (50 - w, h + 50), 'rackscale': 1.5, 'rackoff': h / 8,
-                            'button1': (9 * w / 15, h + 190), 'button2': (9 * w / 15, h + 30), 'button3': (9 * w / 15, h + 150),
-                            'button4': (9 * w / 15, h + 70), 'button5': (9 * w / 15, h + 110),
-                            'box1': (45, h + h / 8 + 45), 'box2': (45, h + 45), 'box3': (3 * w / 4, h + 35),
+        'iphone_portrait': {'rackpos': (-w -25, h -10), 'rackscale': 1.5, 'rackoff': h / 8, 'edit_size': (150, 200),
+                            'button1': (9 * w / 15, h + 100), 'button2': (9 * w / 15, h + 300), 'button3': (9 * w / 15, h + 250),
+                            'button4': (9 * w / 15, h + 200), 'button5': (9 * w / 15, h + 150),
+                            'box1': (0, h + h / 8 + 45), 'box2': (180,  h + 145), 'box3': (3 * w / 4, h + 35),
                             'box4': (3 * w / 4, h + 160), 'font': ('Avenir Next', 15)},
          }
         self.posn = SimpleNamespace(**position_dict[self.gui.device])
@@ -645,8 +647,9 @@ class TrainTracks():
                                 min_size=(2 * tsize + 60, 4 * (tsize + 20) + 20),
                                 fill_color='clear')
       self.gui.set_props(box, font=self.posn.font)
+      
       box = self.gui.add_button(text='', title='Editor', position=self.posn.box2,
-                                min_size=(280, 125),
+                                min_size=self.posn.edit_size,
                                 fill_color='clear')
       self.gui.set_props(box, font=self.posn.font)
       
