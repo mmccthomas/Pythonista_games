@@ -33,7 +33,7 @@ def check_in_board(coord):
     return (0 <= r < SIZE) and (0 <= c < SIZE)
     
 SIZE = 1
-DEBUG = False
+DEBUG = True
 FONT = ("sans-serif", 18, "normal")
 TRAINS = 'traintracks.txt'
 
@@ -45,7 +45,13 @@ class Player():
     #self.PLAYERS = [self.PLAYER_1, self.PLAYER_2]
     self.PIECE_NAMES =  { '┃':'NS',  '━':'EW', '┓':'NW', '┏':'NE', '┗':'SE', '┛': 'SW', '?': '?', 'x': 'x'}
     self.PIECES = [f'../gui/tileblocks/{tile}.png' for tile in self.PIECE_NAMES.values()] # use keys() for lines
-    
+    self.NAMED_PIECES = {v:k for k,v in self.PIECE_NAMES.items()}
+ 
+class dotdict(dict):
+    """dot.notation access to dictionary attributes"""
+    __getattr__ = dict.get
+    __setattr__ = dict.__setitem__
+    __delattr__ = dict.__delitem__   
     
 class TrainTracks():
     def __init__(self):
@@ -83,7 +89,7 @@ class TrainTracks():
         self.end_track = '____e'
         self.identify_mode = False
         self.save_enabled = False
-        self.initialize()
+        self.error = self.initialize()
                 
     def update_board(self, board):
       self.gui.update(board)
@@ -203,35 +209,82 @@ class TrainTracks():
         #selected = data_list[-1]
         size = int(selected.split(':')[0])
         return selected, size
-             
+    
+    def initial_board(self):
+        """ Get board layout and permanent cells from board_obj"""
+        empty_board = np.full((self.size, self.size), '-', dtype='U1')
+        board = self.convert_tracks()
+        perm = self.convert_permanent()
+        if not self.edit_mode:
+           self.gui.clear_squares()
+           self.highlight_permanent(perm.start.loc, 'A')
+           empty_board[perm.start.loc] = perm.start.track
+           self.highlight_permanent(perm.end.loc, 'B')
+           empty_board[perm.end.loc] = perm.end.track
+           for known in perm.known:
+             self.highlight_permanent(known.loc, '') 
+             empty_board[known.loc] = known.track
+           self.board = empty_board
+                                    
     def initialize(self):
         """This method should only be called once, when initializing the board."""       
         self.gui.clear_messages()
-        #game_item = self.load_words_from_file(TRAINS)
         self.gui.set_top(f'Train Tracks\t\t{self.game_item}')
+        # add boxes and buttons if not already placed
         if not hasattr(self, 'edit'):
             self.box_positions()
             self.add_boxes()
             self.set_buttons()
-        self.board_obj = parse(self.game_item, self)
-
+        try:
+           self.board_obj = parse(self.game_item, self)
+        except ValueError as e:
+           self.gui.set_prompt(str(e))
+           return e
         self.draw_initial()
         try:
             start = perf_counter()
-            self.board_obj.reveal(no_line=True)        
+            self.initial_board()
+            self.update_board(self.board)
+            self.convert_permanent()
+            
             self.board_obj.solve()
         except ValueError as e:
             end = perf_counter()
             elapsed = end - start
             self.board_obj.result(str(e), elapsed)
+            self.solution_board= self.convert_tracks()
             if not self.edit_mode:
-                self.board = self.empty_board.copy()
-                self.board_obj.reveal(no_line=True)
-            else:
-                pass
+                self.update_board(self.board)                   
+            else:               
+                self.update_board(self.solution_board)
             self.gui.print_board(self.solution_board, 'solution')
             return e
             
+    def convert_tracks(self):
+      """get layout from board_obj and create array"""
+      board = np.full((self.size, self.size), '-', dtype='U1')
+      for r in range(self.size):
+         for c in range(self.size):
+          _char = self.board_obj.layout[r][c].track
+          if _char is not None:
+            board[r,c] = self.gui.player.NAMED_PIECES[_char.name]           
+      return board
+      
+    def convert_permanent(self):
+      """get permanent locations from layout and produce permanent dictionary"""
+      b = self.convert_tracks()
+      start_loc = (self.board_obj.start, 0)
+      end_loc = (self.board_obj.end_row, self.board_obj.end)
+      known_loc = [(r,c) for r in range(self.size) for c in range(self.size) if self.board_obj.layout[r][c].permanent]
+      known_loc.remove(start_loc)
+      known_loc.remove(end_loc)
+      # use dotdict ckass to provide simpler access
+      self.permanent = dotdict({'start': dotdict({'loc':start_loc, 'track': b[start_loc]}),
+                   'end': dotdict( {'loc':end_loc, 'track': b[end_loc]}),
+                   'known': [dotdict({'loc': loc, 'track': b[loc]}) for loc in known_loc]
+                  })
+      return self.permanent
+      
     def highlight_permanent(self, coord, text=''):
         params = {'color':'cyan', 'text_color':'blue',               
                  'z_position':1000, 'stroke_color':'clear',
@@ -250,22 +303,23 @@ class TrainTracks():
         self.gui.replace_labels('row', reversed(self.board_obj.row_constraints), colors=None)        
         # start and end
         self.gui.clear_squares()
-        self.highlight_permanent((self.board_obj.start, 0), 'A')
-        self.highlight_permanent((self.board_obj.end_row, self.board_obj.end), 'B')
-       
+        self.initial_board()       
         
     def run(self):    
         """
         Main method that prompts the user for input
         """
-        #self.gui.set_enter('Hint') 
-        self.update_board(self.board)   
-        while True:            
-            move = self.get_player_move(self.board)         
-            finished = self.process_turn( move, self.board)         
-            self.update_board(self.board)            
-            if self.game_over(finished): break      
-    
+        try:
+            self.update_board(self.board)   
+            while True:            
+                move = self.get_player_move(self.board)         
+                finished = self.process_turn( move, self.board)         
+                self.update_board(self.board)            
+                if self.game_over(finished): break      
+        except(Exception)as e:
+          print(traceback.format_exc())
+          print(self.error)
+          
     def reveal(self):
       """finish the game by revealing solution"""
       self.board = self.solution_board
@@ -300,12 +354,13 @@ class TrainTracks():
         self.update_board(self.board) 
             
     def start_edit_mode(self):
+      """ Entering edit mode modies currentle selected track set """
       self.gui.set_prompt('edit mode pressed')
-      self.board = np.full((self.size, self.size), '-')
-      self.display_board = self.board.copy()
-      self.empty_board = self.display_board.copy()
-      self.gui.clear_numbers()
-      self.update_board(self.board)
+      self.board = self.solution_board.copy()
+      #self.display_board = self.board.copy()
+      #self.empty_board = self.display_board.copy()
+      #self.gui.clear_numbers()
+      #self.update_board(self.board)
       self.known = []
       sleep(1)
       self.gui.set_prompt('') 
@@ -348,7 +403,7 @@ class TrainTracks():
           else:
             self.known.append(dirn + rc_str)
             self.highlight_permanent(coord)
-            self.identify_tile()
+            self.toggle_identify_tile()
       else:
           try:
             self.gui.set_prompt(f'adding new track {letter} to {coord}')
@@ -382,7 +437,7 @@ class TrainTracks():
                                    self.start_track, self.end_track])
       self.gui.set_message2(self.constraints)
                                             
-    def identify_tile(self):
+    def toggle_identify_tile(self):
       self.gui.set_prompt('identify pressed')
       self.identify_mode = not self.identify_mode
       self.gui.set_props(self.identify, fill_color = 'red' if self.identify_mode else 'orange')      
@@ -435,7 +490,7 @@ class TrainTracks():
                 self.start_edit_mode() 
         
           elif letter == 'Identify':
-               self.identify_tile()
+               self.toggle_identify_tile()
       
           elif letter == 'Solve':
                self.test_solve()
@@ -486,24 +541,24 @@ class TrainTracks():
                   
     def game_over(self, finished):
       
-      @np.vectorize
-      def contained(x):
-          return x in list(self.gui.player.PIECE_NAMES.keys())[:-2]
-
-      board = np.where(contained(self.board), self.board, ' ')
-      soln = np.where(contained(self.solution_board), self.solution_board, ' ')
-      compare = board == soln
+        @np.vectorize
+        def contained(x):
+            return x in list(self.gui.player.PIECE_NAMES.keys())[:-2]
+  
+        board = np.where(contained(self.board), self.board, ' ')
+        soln = np.where(contained(self.solution_board), self.solution_board, ' ')
+        compare = board == soln
       
-      if finished and np.all(compare):        
-        dialogs.hud_alert('Game over')
-        sleep(2)
-        self.gui.show_start_menu()
-      return False
+        if finished and np.all(compare):        
+          dialogs.hud_alert('Game over')
+          sleep(2)
+          self.gui.show_start_menu()
+        return False
               
     def restart(self):
        self.gui.gs.close()
        g=TrainTracks()
-       g.run() 
+       g.run()  
        
     def box_positions(self):
         x, y, w, h = self.gui.grid.bbox 
@@ -524,7 +579,7 @@ class TrainTracks():
         'box4': (2*w/3, h+200), 'font': ('Avenir Next', 24) },
         
         'ipad_landscape': {'rackpos': (10, 200), 'rackscale': 1.0, 'rackoff': h/8,
-        'button1': (w+20, h/12), 'button2': (w+35, 190), 'button3': (w+150, 190),
+                'button1': (w+20, h/12), 'button2': (w+35, 190), 'button3': (w+150, 190),
         'button4': (w+150, 140), 'button5': (w+35, 140),
         'box1': (w+30, h - 4*(sqsize+20)), 'box2': (w+30, 140-6), 'box3': (w+5, 2*h/3),
         'box4': (w+5, h-50), 'font': ('Avenir Next', 20) },
@@ -628,33 +683,6 @@ class Cell:
         if self.track:
             return dir in self.track.name
 
-    
-    def draw_track(self, erase=False, no_line=False):
-        """ Draw the track piece in the cell """
-        dir_dict = {'NS':'┃',  'EW': '━',  'NE': '┏', 'NW': '┓',  'SW': '┛',  'SE': '┗' }  
-        s = self.gui.gui.gs.SQ_SIZE
-        s2 = s / 2
-        xy = self.gui.gui.rc_to_pos((self.y - 0.5, self.x + 0.5))
-        hor = Point(s2,0)
-        ver = Point(0, s2)
-        
-        if DEBUG and self.must_connect:
-            pass
-            
-        if self.track:
-            color = "clear" if erase else "black"
-            self.gui.solution_board[(self.y, self.x)] = '-' if erase else dir_dict[self.track.name]              
-            if self.permanent:
-                color = "blue"
-                self.gui.empty_board[(self.y, self.x)] = dir_dict[self.track.name]
-                self.gui.highlight_permanent((self.y, self.x))
-                
-            params = {"stroke_color": color,"line_width": 10, 'line_join_style': ui.LINE_JOIN_ROUND, 'alpha':0.5}
-            dir_coords_dict = {'NS': [xy - ver, xy, xy + ver],  'EW': [xy - hor, xy + hor],  
-                               'NE': [xy - ver, xy, xy + hor],  'NW': [xy - ver, xy, xy - hor],  
-                               'SW': [xy - hor, xy, xy + ver],  'SE': [xy + hor, xy, xy + ver]}  
-            if not no_line:
-               self.gui.gui.draw_line(dir_coords_dict[self.track.name],  **params)   
             
 class Layout:
     def __init__(self, size=8, gui=None):
@@ -662,9 +690,9 @@ class Layout:
         self.gui = gui
         self.layout = [[Cell(row, col, 0, gui) for col in range(size)] 
                                                for row in range(size)]
-        self.start = 0
-        self.end = 0
-        self.end_row = 0
+        self.start = None
+        self.end = None
+        self.end_row = None
         self.move_count = 0
         self.move_max = 1000000
         self.col_count = []
@@ -839,15 +867,14 @@ class Layout:
         self.move_count += 1
         if DEBUG:
           self.gui.gui.set_moves(f'Moves {self.move_count}')
-          self.gui.gui.update(self.gui.display_board)
+          self.gui.gui.update(self.gui.convert_tracks())
+          sleep(0.2)
         if self.move_count == self.move_max:
             raise ValueError("Max move count reached")
         # if self.move_count == 8400:
         #     self.draw()
         #     breakpoint()
-        if DEBUG:
-            cell.draw_track()
-            sleep(0.1)
+        
         if dir == "N":
             from_dir = "S"
             new_cell = self.layout[cell.row + 1][cell.col]
@@ -900,8 +927,6 @@ class Layout:
         if not new_cell.permanent:
             new_cell.track = None
         if not cell.permanent:
-            if DEBUG:
-                cell.draw_track(erase=True)
             cell.track = None
 
     def solve(self):
@@ -915,11 +940,7 @@ class Layout:
     def result(self, message, elapsed):        
         self.gui.gui.set_message( f"{message} in {self.move_count} moves. Time:{elapsed:.2f}s")
         
-    def reveal(self, no_line=False, erase=False):  
-        for r, row_ in enumerate(self.layout):
-          for cell in row_:
-            cell.draw_track(no_line=no_line, erase=erase)
-
+    
 
 def parse(params, gui):
     """
@@ -941,56 +962,22 @@ def parse(params, gui):
                 start = True
             elif c[4] == "e":
                 end = True
-            else:
-                raise ("Params wrong - 2")
+            #else:
+            #    raise (ValueError, "Params wrong - 2")
         l.add_track(c[:2], int(c[2]), int(c[3]), start=start, end=end)
-    #if not start:
-    # raise ValueError('start not specified, forgot to add "s"')
-    #if not end:
-    # raise ValueError('end not specified, forgot to add "e"')
+    if l.start is None:
+        raise ValueError('Error, start not specified, forgot to add "s"')
+    if l.end is None:
+        raise ValueError('Error, end not specified, forgot to add "e"')
     return l
 
 
 def main():
-    game = TrainTracks()    
+    game = TrainTracks()
     game.run()
                         
 if __name__ == '__main__':
   main()
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
