@@ -195,7 +195,7 @@ class TrainTracks():
         data_list = [item for item in data_list if item != '' and not item.startswith('#')]
         # choice random line
         selected = choice(data_list)
-        selected = data_list[-1]
+        # selected = data_list[-1]
         size = int(selected.split(':')[0])
         return selected, size
         
