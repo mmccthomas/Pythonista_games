@@ -113,6 +113,15 @@ This is WIP as the game is not very interesting at present
 
 Entry point : Word_Games/Quoteword.py
 
+TrainTracks
+-----------
+A game published by puzzle books and newspapers to guess the route
+of train tracks from A to B, using clues which number the tracks  in each row and column.
+An editor to produce new puzzles is included.
+
+The solver is taken from https://github.com/ianastewart/tracks with turtle graphics removed 
+
+Entry point : Board_Games/TrainTracks.py
 
 Tetris
 ------

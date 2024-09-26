@@ -22,7 +22,7 @@ from gui.gui_interface import Coord, Gui, Squares
 from gui.gui_scene import Tile
 import gui.gui_scene as gscene
 
-DEBUG = 1
+DEBUG = False
 TRAINS = 'traintracks.txt'
 
 
