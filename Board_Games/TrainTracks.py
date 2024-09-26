@@ -334,25 +334,19 @@ class TrainTracks():
        
     def hint(self):
         # place a random track piece not already placed
-        @np.vectorize
-        def contained(x):
-          return x in list(self.gui.player.PIECE_NAMES.keys())[:-2]
-          
-        solution_tracks = np.argwhere(self.solution_board != '-')
-        existing_tracks = np.argwhere(contained(self.board))
-            
-        # find solution tracks not in existing tracks
-        # https://stackoverflow.com/questions/69435359/fast-check-if-elements-in-array-are-within-another-array-2d
-        uni = np.any(np.all(solution_tracks[None, :, :] == existing_tracks[:, None, :], axis=-1,), axis=0,)
-            
-        unplaced_sol = solution_tracks[~uni]
+        # filter out ?  and x         
+        self.board1 = self.board.copy()
+        self.board1[self.board1 == 'x'] = '-'
+        self.board1[self.board1 == '?'] = '-'        
+        unplaced_locs = np.argwhere(self.solution_board != self.board1)
+        
         try:
-            idx = randint(0, len(unplaced_sol)-1)
-            loc = tuple(unplaced_sol[idx])
+            idx = randint(0, len(unplaced_locs)-1)
+            loc = tuple(unplaced_locs[idx])
             self.board[loc] = self.solution_board[loc]
             self.highlight_permanent(loc)
             self.code_constraints(self.board)
-        except (ValueError):
+        except (ValueError) as e:
             dialogs.hud_alert('No more hints')
             return 1
         self.update_board(self.board)
@@ -385,7 +379,7 @@ class TrainTracks():
       # mark start
       if c == 0 and 'W' in dirn:        
         self.gui.clear_numbers(self.permanent.start.loc)
-        
+               
         self.board[self.permanent.start.loc] = '-'
         self.permanent.start.loc = coord
         self.permanent.start.track = letter
@@ -396,7 +390,7 @@ class TrainTracks():
       # mark end
       if ((r == 0 and 'S' in dirn) or (r == (self.size-1) and 'N' in dirn)):
          self.gui.clear_numbers(self.permanent.end.loc)
-         
+                  
          self.board[self.permanent.start.loc] = '-'
          self.permanent.end.loc = coord
          self.permanent.end.track = letter
@@ -608,38 +602,44 @@ class TrainTracks():
                              'rackoff': 2,  'edit_size': (280, 125),
                              'button1': (w + 40, h / 12), 'button2': (w + 40, 220), 'button3': (w + 200, 220),
                              'button4': (w + 200, 150), 'button5': (w + 40, 150),
-                             'box1': (w + 30, h - 50 - 4 * (sqsize + 20)), 'box2': (w + 30, 150 - 6), 'box3': (w + 5, 2 * h / 3),
+                             'box1': (w + 30, h - 10 - 4 * (sqsize + 20)), 
+                             'box2': (w + 30, 150 - 6), 'box3': (w + 5, 2 * h / 3),
                              'box4': (w + 5, h - 50), 'font': ('Avenir Next', 24)},
                                            
         'ipad13_portrait': {'rackpos': (50 - w, h + 50), 'rackscale': 1.0, 
                             'rackoff': 2, 'edit_size': (280, 125),
                             'button1': (w / 2, h + 200), 'button2': (w / 2, h + 50), 'button3': (w / 2, h + 250),
                             'button4': (w / 2, h + 100), 'button5': (w / 2, h + 150),
-                            'box1': (45, h + h / 8 + 45), 'box2': (45, h + 45), 'box3': (2 * w / 3, h + 45),
+                            'box1': (45, h + h / 8 + 45), 
+                            'box2': (45, h + 45), 'box3': (2 * w / 3, h + 45),
                             'box4': (2 * w / 3, h + 200), 'font': ('Avenir Next', 24)},
         
         'ipad_landscape': {'rackpos': (0, -10), 'rackscale': 1.0, 'rackoff': 2, 'edit_size': (230, 110),
                            'button1': (w + 35, h / 12), 'button2': (w + 35, 190), 'button3': (w + 150, 190),
                            'button4': (w + 150, 140), 'button5': (w + 35, 140),
-                           'box1': (w + 30, h - 4 * (sqsize + 20)), 'box2': (w + 30, 125-6), 'box3': (w + 5, 2 * h / 3),
+                           'box1': (w + 30, h - 4 * (sqsize + 20)), 
+                           'box2': (w + 30, 125-6), 'box3': (w + 5, 2 * h / 3),
                            'box4': (w + 5, h - 50), 'font': ('Avenir Next', 20)},
         
         'ipad_portrait': {'rackpos': (-w, 249), 'rackscale': 0.7, 'rackoff': 4, 'edit_size': (250, 110),
                           'button1': (690, h + 100), 'button2': (430, h +150), 'button3': (550 , h + 150),
                           'button4': (550, h + 100), 'button5': (430, h + 100),
-                          'box1': (45, h + 55), 'box2': (420, h + 90), 'box3': (3 * w / 4, h + 35),
+                          'box1': (45, h + 55), 
+                          'box2': (420, h + 90), 'box3': (3 * w / 4, h + 35),
                           'box4': (3 * w / 4, h + 160), 'font': ('Avenir Next', 20)},
         
         'iphone_landscape': {'rackpos': (0, -50), 'rackscale': 1.5, 'rackoff': 2, 'edit_size': (255, 130),
                              'button1': (w + 185, h / 6), 'button2': (w + 185, 230), 'button3': (w + 330, 245),
                              'button4': (w + 330, 180), 'button5': (w + 185, 180),
-                             'box1': (w + 30, h - 50 -4* (sqsize +20)), 'box2': (w + 180, 165 - 6), 'box3': (w + 5, 2 * h / 3),
+                             'box1': (w + 30, h - 50 -4* (sqsize +20)), 
+                             'box2': (w + 180, 165 - 6), 'box3': (w + 5, 2 * h / 3),
                              'box4': (w + 5, h - 50), 'font': ('Avenir Next', 20)},
             
         'iphone_portrait': {'rackpos': (-w -25, h -10), 'rackscale': 1.5, 'rackoff': 2, 'edit_size': (135, 190),
                             'button1': (9 * w / 15, h + 100), 'button2': (9 * w / 15, h + 300), 'button3': (9 * w / 15, h + 250),
                             'button4': (9 * w / 15, h + 200), 'button5': (9 * w / 15, h + 150),
-                            'box1': (0, h + h / 8 + 45), 'box2': (180,  h + 145), 'box3': (3 * w / 4, h + 35),
+                            'box1': (0, h + h / 8 + 45), 
+                            'box2': (180,  h + 145), 'box3': (3 * w / 4, h + 35),
                             'box4': (3 * w / 4, h + 160), 'font': ('Avenir Next', 15)},
          }
         self.posn = SimpleNamespace(**position_dict[self.gui.device])
@@ -1017,6 +1017,7 @@ def parse(params, gui):
 if __name__ == '__main__':
   game = TrainTracks()
   game.run()
+
 
 
 
