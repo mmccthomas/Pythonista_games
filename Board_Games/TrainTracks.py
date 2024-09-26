@@ -18,23 +18,11 @@ from random import choice, randint
 current = os.path.dirname(os.path.realpath(__file__))
 parent = os.path.dirname(current)
 sys.path.append(parent)
-grandparent = os.path.dirname(parent)
-sys.path.append(grandparent)
-greatgrandparent = os.path.dirname(grandparent)
-sys.path.append(greatgrandparent)
 from gui.gui_interface import Coord, Gui, Squares
 from gui.gui_scene import Tile
 import gui.gui_scene as gscene
 
-
-def check_in_board(coord):
-    r, c = coord
-    return (0 <= r < SIZE) and (0 <= c < SIZE)
-
-        
-SIZE = 1
-DEBUG = 0
-FONT = ("sans-serif", 18, "normal")
+DEBUG = 1
 TRAINS = 'traintracks.txt'
 
 
@@ -79,10 +67,8 @@ class TrainTracks():
                                  'New Game': self.restart,
                                  'Reveal': self.reveal,
                                  'Quit': self.gui.gs.close})
-      
         self.gui.start_menu = {'New Game': self.restart, 'Quit': self.gui.gs.close}
         self.size = size
-        #self.display_rack(self.gui.player.PIECE_NAMES)
         self.solution_board = np.full((size, size), '-', dtype='U1')
         self.empty_board = np.full((size, size), '-', dtype='U1')
         self.erase = True
@@ -111,8 +97,10 @@ class TrainTracks():
         rack = {}
         r = self.posn.rackoff
         for n, tile in enumerate(tiles):
-          t = Tile(Texture(Image.named(f'../gui/tileblocks/{tiles[tile]}.png')), 0,  0, sq_size = sqsize * self.posn.rackscale)
-          t.position = (w + x + (n % r * (20 + sqsize * self.posn.rackscale)), y - n // r * (20 + sqsize* self.posn.rackscale))
+          t = Tile(Texture(Image.named(f'../gui/tileblocks/{tiles[tile]}.png')), 0,  0,
+                   sq_size=sqsize * self.posn.rackscale)
+          t.position = (w + x + (n % r * (20 + sqsize * self.posn.rackscale)),
+                        y - n // r * (20 + sqsize * self.posn.rackscale))
           rack[t.bbox] = tile
           parent.add_child(t)
         
@@ -210,7 +198,14 @@ class TrainTracks():
         selected = data_list[-1]
         size = int(selected.split(':')[0])
         return selected, size
-    
+        
+    def show_perm(self,):
+        self.gui.clear_squares()
+        self.highlight_permanent(self.permanent.start.loc, 'A')        
+        self.highlight_permanent(self.permanent.end.loc, 'B')        
+        for known in self.permanent.known:
+            self.highlight_permanent(known.loc, '')
+        
     def initial_board(self):
         """ Get board layout and permanent cells from board_obj"""
         pass
@@ -218,21 +213,19 @@ class TrainTracks():
         board = self.convert_tracks()
         perm = self.convert_permanent()
         if not self.edit_mode:
-           self.gui.clear_squares()
-           self.highlight_permanent(perm.start.loc, 'A')
-           self.empty_board[perm.start.loc] = perm.start.track
-           self.highlight_permanent(perm.end.loc, 'B')
+           self.show_perm()
+           self.empty_board[perm.start.loc] = perm.start.track  
            self.empty_board[perm.end.loc] = perm.end.track
            for known in perm.known:
-             self.highlight_permanent(known.loc, '')
-             self.empty_board[known.loc] = known.track
+               self.empty_board[known.loc] = known.track
            self.board = self.empty_board.copy()
-                                    
+                            
     def initialize(self):
         """This method should only be called once, when initializing the board."""
         self.gui.clear_messages()
         self.gui.clear_numbers()
         self.gui.set_top(f'Train Tracks: {self.game_item}')
+        self.gui.set_enter('Hint')
         # add boxes and buttons if not already placed
         if not hasattr(self, 'edit'):
             self.box_positions()
@@ -248,13 +241,14 @@ class TrainTracks():
             start = perf_counter()
             self.initial_board()
             self.update_board(self.board)
-            self.convert_permanent()            
+            self.convert_permanent()
             self.board_obj.solve()
         except ValueError as e:
             end = perf_counter()
             elapsed = end - start
             self.board_obj.result(str(e), elapsed)
             self.solution_board = self.convert_tracks()
+            self.show_perm()
             if not self.edit_mode:
                 self.update_board(self.board)
             else:
@@ -327,10 +321,10 @@ class TrainTracks():
        
     def hint(self):
         # place a random track piece not already placed
-        # filter out ?  and x         
+        # filter out ? and x
         self.board1 = self.board.copy()
         self.board1[self.board1 == 'x'] = '-'
-        self.board1[self.board1 == '?'] = '-'        
+        self.board1[self.board1 == '?'] = '-'
         unplaced_locs = np.argwhere(self.solution_board != self.board1)
         
         try:
@@ -345,7 +339,7 @@ class TrainTracks():
     
     def perm_str(self, dict_, end=''):
         """ convert dotdict {'loc': rc, 'track': trackcode}
-            to 4 character {trackname}{r}{c}{end} 
+            to 4 character {trackname}{r}{c}{end}
         """
         r, c = dict_.loc
         rc_str = ''.join([str(r), str(c)])
@@ -369,9 +363,9 @@ class TrainTracks():
       dirn = self.gui.player.PIECE_NAMES[letter]
       print('old', self.permanent)
       # mark start
-      if c == 0 and 'W' in dirn:        
-      	#clear existing start
-        self.gui.clear_numbers(self.permanent.start.loc)               
+      if c == 0 and 'W' in dirn:
+        # clear existing start
+        self.gui.clear_numbers(self.permanent.start.loc)
         self.board[self.permanent.start.loc] = '-'
         # set new start
         self.permanent.start.loc = coord
@@ -382,30 +376,30 @@ class TrainTracks():
         
       # mark end
       if ((r == 0 and 'S' in dirn) or (r == (self.size-1) and 'N' in dirn)):
-      	 # clear existing end
-         self.gui.clear_numbers(self.permanent.end.loc)                 
+         # clear existing end
+         self.gui.clear_numbers(self.permanent.end.loc)
          self.board[self.permanent.end.loc] = '-'
          # set new end
          self.permanent.end.loc = coord
          self.permanent.end.track = letter
-         self.highlight_permanent(coord, 'B')  
+         self.highlight_permanent(coord, 'B')
          print('new', self.permanent)
          return True
       return False
       
-    def mark_known (self, coord, letter):
+    def mark_known(self, coord, letter):
       """ check if new track is known and mark or clear as appropriate
       """
       print('old', self.permanent)
-      dict_ = dotdict({'loc': coord, 'track': self.board[coord]})      
+      dict_ = dotdict({'loc': coord, 'track': self.board[coord]})
       if coord in [k.loc for k in self.permanent.known]:
-        #remove known
+        # remove known
         self.gui.clear_numbers(coord)
         self.permanent.known = [kv for kv in self.permanent.known if kv.loc != coord]
       else:
         # new known
         self.permanent.known.append(dict_)
-        self.highlight_permanent(coord, '')              
+        self.highlight_permanent(coord, '')
       print('new', self.permanent)
             
     def add_new_track(self, coord, letter, row):
@@ -413,13 +407,13 @@ class TrainTracks():
       if self.identify_mode and row is None:
           start_end = self.mark_start_end(coord, letter)
           if not start_end:
-              self.mark_known(coord, letter) 
+              self.mark_known(coord, letter)
           self.toggle_identify_tile()
       else:
           try:
             self.gui.set_prompt(f'adding new track {letter} to {coord}')
             self.board[coord] = letter
-            self.update_board(self.board)            
+            self.update_board(self.board)
           except (IndexError):
             pass
       
@@ -442,7 +436,7 @@ class TrainTracks():
       constraintrc = ''.join(col_sums) + ''.join(row_sums)
       if self.permanent.known:
          self.constraints = ':'.join([str(self.size), constraintrc,
-                                      self.perm_str(self.permanent.start, end='s'), 
+                                      self.perm_str(self.permanent.start, end='s'),
                                       ':'.join([self.perm_str(k) for k in self.permanent.known]),
                                       self.perm_str(self.permanent.end, end='e')])
       else:
@@ -470,7 +464,7 @@ class TrainTracks():
         result = self.initialize()
         if isinstance(result, ValueError) and 'Solved' in result.args:
             self.save_enabled = True
-            self.gui.set_props(self.save, fill_color='orange')     
+            self.gui.set_props(self.save, fill_color='orange')
       
     def save_constraint(self):
       """ If enabled, saves new track to end of traintracks.txt
@@ -502,10 +496,10 @@ class TrainTracks():
               if self.edit_mode:
                 self.start_edit_mode()
               else:
-                #exit edit mode, leaving new board
+                # exit edit mode, leaving new board
                 self.game_item = self.constraints
                 self.initialize()
-                #self.board = self.empty_board.copy()
+                # self.board = self.empty_board.copy()
                 self.update_board(self.board)
         
           elif letter == 'Identify':
@@ -587,47 +581,47 @@ class TrainTracks():
         
         # positions of all objects for all devices
         position_dict = {
-        'ipad13_landscape': {'rackpos': (0, 0), 'rackscale': 1.0, 
+        'ipad13_landscape': {'rackpos': (0, 0), 'rackscale': 1.0,
                              'rackoff': 2,  'edit_size': (280, 125),
                              'button1': (w + 40, h / 12), 'button2': (w + 40, 220), 'button3': (w + 200, 220),
                              'button4': (w + 200, 150), 'button5': (w + 40, 150),
-                             'box1': (w + 30, h - 10 - 4 * (sqsize + 20)), 
+                             'box1': (w + 30, h - 10 - 4 * (sqsize + 20)),
                              'box2': (w + 30, 150 - 6), 'box3': (w + 5, 2 * h / 3),
                              'box4': (w + 5, h - 50), 'font': ('Avenir Next', 24)},
                                            
-        'ipad13_portrait': {'rackpos': (50 - w, h + 50), 'rackscale': 1.0, 
+        'ipad13_portrait': {'rackpos': (50 - w, h + 50), 'rackscale': 1.0,
                             'rackoff': 2, 'edit_size': (280, 125),
                             'button1': (w / 2, h + 200), 'button2': (w / 2, h + 50), 'button3': (w / 2, h + 250),
                             'button4': (w / 2, h + 100), 'button5': (w / 2, h + 150),
-                            'box1': (45, h + h / 8 + 45), 
+                            'box1': (45, h + h / 8 + 45),
                             'box2': (45, h + 45), 'box3': (2 * w / 3, h + 45),
                             'box4': (2 * w / 3, h + 200), 'font': ('Avenir Next', 24)},
         
         'ipad_landscape': {'rackpos': (0, -10), 'rackscale': 1.0, 'rackoff': 2, 'edit_size': (230, 110),
                            'button1': (w + 35, h / 12), 'button2': (w + 35, 190), 'button3': (w + 150, 190),
                            'button4': (w + 150, 140), 'button5': (w + 35, 140),
-                           'box1': (w + 30, h - 4 * (sqsize + 20)), 
+                           'box1': (w + 30, h - 4 * (sqsize + 20)),
                            'box2': (w + 30, 125-6), 'box3': (w + 5, 2 * h / 3),
                            'box4': (w + 5, h - 50), 'font': ('Avenir Next', 20)},
         
         'ipad_portrait': {'rackpos': (-w, 249), 'rackscale': 0.7, 'rackoff': 4, 'edit_size': (250, 110),
-                          'button1': (690, h + 100), 'button2': (430, h +150), 'button3': (550 , h + 150),
+                          'button1': (690, h + 100), 'button2': (430, h + 150), 'button3': (550, h + 150),
                           'button4': (550, h + 100), 'button5': (430, h + 100),
-                          'box1': (45, h + 55), 
+                          'box1': (45, h + 55),
                           'box2': (420, h + 90), 'box3': (3 * w / 4, h + 35),
                           'box4': (3 * w / 4, h + 160), 'font': ('Avenir Next', 20)},
         
         'iphone_landscape': {'rackpos': (0, -50), 'rackscale': 1.5, 'rackoff': 2, 'edit_size': (255, 130),
                              'button1': (w + 185, h / 6), 'button2': (w + 185, 230), 'button3': (w + 330, 245),
                              'button4': (w + 330, 180), 'button5': (w + 185, 180),
-                             'box1': (w + 30, h - 50 -4* (sqsize +20)), 
+                             'box1': (w + 30, h - 50 - 4 * (sqsize + 20)),
                              'box2': (w + 180, 165 - 6), 'box3': (w + 5, 2 * h / 3),
                              'box4': (w + 5, h - 50), 'font': ('Avenir Next', 20)},
             
-        'iphone_portrait': {'rackpos': (-w -25, h -10), 'rackscale': 1.5, 'rackoff': 2, 'edit_size': (135, 190),
+        'iphone_portrait': {'rackpos': (-w - 25, h - 10), 'rackscale': 1.5, 'rackoff': 2, 'edit_size': (135, 190),
                             'button1': (9 * w / 15, h + 100), 'button2': (9 * w / 15, h + 300), 'button3': (9 * w / 15, h + 250),
                             'button4': (9 * w / 15, h + 200), 'button5': (9 * w / 15, h + 150),
-                            'box1': (0, h + h / 8 + 45), 
+                            'box1': (0, h + h / 8 + 45),
                             'box2': (180,  h + 145), 'box3': (3 * w / 4, h + 35),
                             'box4': (3 * w / 4, h + 160), 'font': ('Avenir Next', 15)},
          }
@@ -1006,6 +1000,8 @@ def parse(params, gui):
 if __name__ == '__main__':
   game = TrainTracks()
   game.run()
+
+
 
 
 
