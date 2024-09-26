@@ -33,7 +33,7 @@ def check_in_board(coord):
 
         
 SIZE = 1
-DEBUG = False
+DEBUG = 0
 FONT = ("sans-serif", 18, "normal")
 TRAINS = 'traintracks.txt'
 
@@ -87,8 +87,6 @@ class TrainTracks():
         self.empty_board = np.full((size, size), '-', dtype='U1')
         self.erase = True
         self.edit_mode = False
-        self.start_track = '____s'
-        self.end_track = '____e'
         self.identify_mode = False
         self.save_enabled = False
         self.letter = 'x'
@@ -99,7 +97,7 @@ class TrainTracks():
       self.gui.update(board)
       self.display_rack(self.gui.player.PIECE_NAMES)
             
-    def display_rack(self, tiles, y_off=-50):
+    def display_rack(self, tiles):
         """ display players rack
         y position offset is used to select player_1 or player_2
         """
@@ -209,7 +207,7 @@ class TrainTracks():
         data_list = [item for item in data_list if item != '' and not item.startswith('#')]
         # choice random line
         selected = choice(data_list)
-        # selected = data_list[10]
+        selected = data_list[-1]
         size = int(selected.split(':')[0])
         return selected, size
     
@@ -250,8 +248,7 @@ class TrainTracks():
             start = perf_counter()
             self.initial_board()
             self.update_board(self.board)
-            self.convert_permanent()
-            
+            self.convert_permanent()            
             self.board_obj.solve()
         except ValueError as e:
             end = perf_counter()
@@ -277,16 +274,16 @@ class TrainTracks():
       
     def convert_permanent(self):
       """get permanent locations from layout and produce permanent dictionary"""
-      b = self.convert_tracks()
+      board = self.convert_tracks()
       start_loc = (self.board_obj.start, 0)
       end_loc = (self.board_obj.end_row, self.board_obj.end)
       known_loc = [(r, c) for r in range(self.size) for c in range(self.size) if self.board_obj.layout[r][c].permanent]
       known_loc.remove(start_loc)
       known_loc.remove(end_loc)
       # use dotdict ckass to provide simpler access
-      self.permanent = dotdict({'start': dotdict({'loc': start_loc, 'track': b[start_loc]}),
-                                'end': dotdict({'loc': end_loc, 'track': b[end_loc]}),
-                                'known': [dotdict({'loc': loc, 'track': b[loc]}) for loc in known_loc]})
+      self.permanent = dotdict({'start': dotdict({'loc': start_loc, 'track': board[start_loc]}),
+                                'end': dotdict({'loc': end_loc, 'track': board[end_loc]}),
+                                'known': [dotdict({'loc': loc, 'track': board[loc]}) for loc in known_loc]})
       return self.permanent
       
     def highlight_permanent(self, coord, text=''):
@@ -304,9 +301,6 @@ class TrainTracks():
         self.gui.replace_labels('col', self.board_obj.col_constraints, colors=None)
         # Numbers down right side
         self.gui.replace_labels('row', reversed(self.board_obj.row_constraints), colors=None)
-        # start and end
-        #self.gui.clear_squares()
-        #self.initial_board()
         
     def run(self):
         """
@@ -322,7 +316,6 @@ class TrainTracks():
                   break
         except (Exception):
           print(traceback.format_exc())
-          print(self.error)
           
     def reveal(self):
       """finish the game by revealing solution"""
@@ -341,8 +334,7 @@ class TrainTracks():
         unplaced_locs = np.argwhere(self.solution_board != self.board1)
         
         try:
-            idx = randint(0, len(unplaced_locs)-1)
-            loc = tuple(unplaced_locs[idx])
+            loc = tuple(unplaced_locs[randint(0, len(unplaced_locs)-1)])
             self.board[loc] = self.solution_board[loc]
             self.highlight_permanent(loc)
             self.code_constraints(self.board)
@@ -351,73 +343,73 @@ class TrainTracks():
             return 1
         self.update_board(self.board)
     
-    def perm_to_str(self, dict_):
-        """ convert dotdict {'loc': xy, 'track': trackcode}
-        to 4 character NW35 """
+    def perm_str(self, dict_, end=''):
+        """ convert dotdict {'loc': rc, 'track': trackcode}
+            to 4 character {trackname}{r}{c}{end} 
+        """
         r, c = dict_.loc
         rc_str = ''.join([str(r), str(c)])
         dir = self.gui.player.PIECE_NAMES[dict_.track]
-        return dir + rc_str
+        return dir + rc_str + end
                   
     def start_edit_mode(self):
       """ Entering edit mode modies currentle selected track set """
       self.board = self.convert_tracks()
-      perm = self.convert_permanent()
-                
-      self.start_track = self.perm_to_str(perm.start) + 's'
-      self.end_track = self.perm_to_str(perm.end) + 'e'
-      self.known = [self.perm_to_str(k) for k in perm.known]
+      self.convert_permanent()
       self.update_board(self.board)
       
     def mark_start_end(self, coord, letter):
       """ check if new track is at edge and mark start or
       end as appropriate
+      TODO not working properly
+      fails to swap start and end
       """
       dict_ = dotdict({'loc': coord, 'track': letter})
       r, c = coord
       dirn = self.gui.player.PIECE_NAMES[letter]
+      print('old', self.permanent)
       # mark start
       if c == 0 and 'W' in dirn:        
-        self.gui.clear_numbers(self.permanent.start.loc)
-               
+      	#clear existing start
+        self.gui.clear_numbers(self.permanent.start.loc)               
         self.board[self.permanent.start.loc] = '-'
+        # set new start
         self.permanent.start.loc = coord
         self.permanent.start.track = letter
         self.highlight_permanent(coord, 'A')
-        self.start_track = self.perm_to_str(dict_) + 's'
+        print('new', self.permanent)
         return True
         
       # mark end
       if ((r == 0 and 'S' in dirn) or (r == (self.size-1) and 'N' in dirn)):
-         self.gui.clear_numbers(self.permanent.end.loc)
-                  
-         self.board[self.permanent.start.loc] = '-'
+      	 # clear existing end
+         self.gui.clear_numbers(self.permanent.end.loc)                 
+         self.board[self.permanent.end.loc] = '-'
+         # set new end
          self.permanent.end.loc = coord
          self.permanent.end.track = letter
          self.highlight_permanent(coord, 'B')  
-         self.end_track = self.perm_to_str(dict_) + 'e'
+         print('new', self.permanent)
          return True
       return False
       
     def mark_known (self, coord, letter):
       """ check if new track is known and mark or clear as appropriate
       """
+      print('old', self.permanent)
       dict_ = dotdict({'loc': coord, 'track': self.board[coord]})      
       if coord in [k.loc for k in self.permanent.known]:
         #remove known
         self.gui.clear_numbers(coord)
         self.permanent.known = [kv for kv in self.permanent.known if kv.loc != coord]
-        self.known.remove(self.perm_to_str(dict_)) 
       else:
         # new known
         self.permanent.known.append(dict_)
-        self.known.append(self.perm_to_str(dict_))
         self.highlight_permanent(coord, '')              
+      print('new', self.permanent)
             
     def add_new_track(self, coord, letter, row):
-      dict_ = dotdict({'loc': coord, 'track': letter})
-      dir_rc = self.perm_to_str(dict_)
-      
+      """ add track or identify existing track as permanent """
       if self.identify_mode and row is None:
           start_end = self.mark_start_end(coord, letter)
           if not start_end:
@@ -427,17 +419,14 @@ class TrainTracks():
           try:
             self.gui.set_prompt(f'adding new track {letter} to {coord}')
             self.board[coord] = letter
-            self.update_board(self.board)
-            
+            self.update_board(self.board)            
           except (IndexError):
             pass
       
       row, col = self.compute_constraints()
       self.gui.replace_labels('col', col, colors=None)
-      # Numbers down right side
       self.gui.replace_labels('row', row, colors=None)
       self.update_board(self.board)
-      sleep(1)
       self.gui.set_prompt('')
       
     def compute_constraints(self):
@@ -451,13 +440,15 @@ class TrainTracks():
       col_sums = np.sum(contained(self.board), axis=0).astype('U1')
       row_sums = np.flip(np.sum(contained(self.board), axis=1)).astype('U1')
       constraintrc = ''.join(col_sums) + ''.join(row_sums)
-      if self.known:
+      if self.permanent.known:
          self.constraints = ':'.join([str(self.size), constraintrc,
-                                     self.start_track, ':'.join(self.known),
-                                     self.end_track])
+                                      self.perm_str(self.permanent.start, end='s'), 
+                                      ':'.join([self.perm_str(k) for k in self.permanent.known]),
+                                      self.perm_str(self.permanent.end, end='e')])
       else:
         self.constraints = ':'.join([str(self.size), constraintrc,
-                                    self.start_track, self.end_track])
+                                     self.perm_str(self.permanent.start, end='s'),
+                                     self.perm_str(self.permanent.end, end='e')])
       self.gui.set_message2(self.constraints)
       
       return row_sums, col_sums
@@ -479,9 +470,7 @@ class TrainTracks():
         result = self.initialize()
         if isinstance(result, ValueError) and 'Solved' in result.args:
             self.save_enabled = True
-            self.gui.set_props(self.save, fill_color='orange')
-      sleep(1)
-      self.gui.set_prompt('')
+            self.gui.set_props(self.save, fill_color='orange')     
       
     def save_constraint(self):
       """ If enabled, saves new track to end of traintracks.txt
@@ -909,7 +898,7 @@ class Layout:
         if DEBUG:
           self.gui.gui.set_moves(f'Moves {self.move_count}', position=(self.gui.gui.grid.bbox[2]+20, 20))
           self.gui.gui.update(self.gui.convert_tracks())
-          sleep(0.1)
+          (0.01)
         if self.move_count == self.move_max:
             raise ValueError("Max move count reached")
         # if self.move_count == 8400:
@@ -1017,6 +1006,7 @@ def parse(params, gui):
 if __name__ == '__main__':
   game = TrainTracks()
   game.run()
+
 
 
 
