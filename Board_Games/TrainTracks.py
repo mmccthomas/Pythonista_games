@@ -18,40 +18,30 @@ from random import choice, randint
 current = os.path.dirname(os.path.realpath(__file__))
 parent = os.path.dirname(current)
 sys.path.append(parent)
-from gui.gui_interface import Coord, Gui, Squares
+from gui.gui_interface import Coord, Gui, Squares, dotdict
 from gui.gui_scene import Tile
 import gui.gui_scene as gscene
-
-DEBUG = False
+DEBUG = 0
 TRAINS = 'traintracks.txt'
 
 
 class Player():
   def __init__(self):
-    self.PLAYER_1 = WHITE = ' '
-    self.PLAYER_2 = BLACK = '#'
- 
+    self.PLAYER_1  = ' ' 
     self.PIECE_NAMES = {'┃': 'NS',  '━': 'EW', '┓': 'NW', '┏': 'NE', '┗': 'SE', '┛': 'SW', '?': '?', 'x': 'x'}
     self.PIECES = [f'../gui/tileblocks/{tile}.png' for tile in self.PIECE_NAMES.values()]  # use keys() for lines
     self.NAMED_PIECES = {v: k for k, v in self.PIECE_NAMES.items()}
-
-  
-class dotdict(dict):
-    """dot.notation access to dictionary attributes"""
-    __getattr__ = dict.get
-    __setattr__ = dict.__setitem__
-    __delattr__ = dict.__delitem__
 
         
 class TrainTracks():
     def __init__(self):
         """Create, initialize and draw an empty board."""
-        self.game_item, size = self.load_words_from_file(TRAINS)
-        
+        self.debug = True
+        self.puzzle_select = None
+        self.game_item, size = self.load_words_from_file(TRAINS)        
         self.display_board = np.zeros((size, size), dtype=int)
         self.board = None
-        # allows us to get a list of rc locations
-        self.log_moves = True
+        self.log_moves = True # allows us to get a list of rc locations
         self.q = Queue()
         self.gui = Gui(self.display_board, Player())
         self.gui.gs.q = self.q  # pass queue into gui
@@ -61,7 +51,8 @@ class TrainTracks():
         self.gui.allow_any_move(True)
         
         self.gui.setup_gui(log_moves=True, grid_fill='white')
-        self.gui.build_extra_grid(size, size, grid_width_x=1, grid_width_y=1, color='black', line_width=2, offset=None, z_position=100)
+        self.gui.build_extra_grid(size, size, grid_width_x=1, grid_width_y=1, 
+                                  color='black', line_width=2, offset=None, z_position=100)
         # menus can be controlled by dictionary of labels and functions without parameters
         self.gui.set_pause_menu({'Continue': self.gui.dismiss_menu,
                                  'New Game': self.restart,
@@ -163,7 +154,7 @@ class TrainTracks():
         Allows for movement over board"""
         move = self._get_player_move(self.board)
         rack = self.rack
-        # self.gui.set_message2(f'{move[0]}..{move[-2]}')
+
         if move[0] == (-1, -1):
            return (None, None), 'Enter', None  # pressed enter button
            
@@ -193,13 +184,16 @@ class TrainTracks():
         # split and remove comment and blank lines
         data_list = data.split('\n')
         data_list = [item for item in data_list if item != '' and not item.startswith('#')]
-        # choice random line
-        selected = choice(data_list)
-        # selected = data_list[-1]
+        # choice random or selected 
+        if self.puzzle_select:
+            selected = data_list[self.puzzle_select]
+        else:
+            selected = choice(data_list)
         size = int(selected.split(':')[0])
         return selected, size
         
-    def show_perm(self,):
+    def show_perm(self):
+        """ clear and display permanent squares """
         self.gui.clear_squares()
         self.highlight_permanent(self.permanent.start.loc, 'A')        
         self.highlight_permanent(self.permanent.end.loc, 'B')        
@@ -231,12 +225,13 @@ class TrainTracks():
             self.box_positions()
             self.add_boxes()
             self.set_buttons()
+        # parse constraint line
         try:
            self.board_obj = parse(self.game_item, self)
         except ValueError as e:
            self.gui.set_prompt(str(e))
            return e
-        self.draw_initial()
+        self.draw_constraints()
         try:
             start = perf_counter()
             self.initial_board()
@@ -253,7 +248,7 @@ class TrainTracks():
                 self.update_board(self.board)
             else:
                 self.update_board(self.solution_board)
-            self.gui.print_board(self.solution_board, 'solution')
+            self.gui.set_prompt('')
             return e
             
     def convert_tracks(self):
@@ -290,11 +285,12 @@ class TrainTracks():
         r, c = coord
         self.board_obj.layout[r][c].permanent = True
         
-    def draw_initial(self, moves=False):
+    def draw_constraints(self):
         # Numbers across the top
         self.gui.replace_labels('col', self.board_obj.col_constraints, colors=None)
         # Numbers down right side
         self.gui.replace_labels('row', reversed(self.board_obj.row_constraints), colors=None)
+        self.gui.set_message2(f'{sum(self.board_obj.col_constraints)}, {sum(self.board_obj.row_constraints)}')
         
     def run(self):
         """
@@ -819,13 +815,11 @@ class Layout:
             if exact:
                 if count != self.row_constraints[row]:
                     if DEBUG:
-                        print(
-                            f"Exact Row {row} failure {count} != {self.row_constraints[row]}"
-                        )
+                       print(f"Exact Row {row} failure {count} != {self.row_constraints[row]}")
                     return False
             elif count > self.row_constraints[row]:
                 if DEBUG:
-                    print(f"Row {row} failure {count} > {self.row_constraints[row]}")
+                   print(f"Row {row} failure {count} > {self.row_constraints[row]}")
                 return False
         for col in range(self.size):
             count = 0
@@ -889,15 +883,12 @@ class Layout:
     def move_from(self, cell, dir):
         """ move from cell in direction dir  """
         self.move_count += 1
-        if DEBUG:
-          self.gui.gui.set_moves(f'Moves {self.move_count}', position=(self.gui.gui.grid.bbox[2]+20, 20))
+        if self.gui.debug:
+          self.gui.gui.set_prompt(f'Moves {self.move_count}')
           self.gui.gui.update(self.gui.convert_tracks())
-          (0.01)
+        
         if self.move_count == self.move_max:
             raise ValueError("Max move count reached")
-        # if self.move_count == 8400:
-        #     self.draw()
-        #     breakpoint()
         
         if dir == "N":
             from_dir = "S"
@@ -945,8 +936,9 @@ class Layout:
                             new_cell.track = Track.identify(from_dir + to_dir)
                         self.move_from(new_cell, to_dir)
             else:
-                if DEBUG:
-                    print("Would be trapped")
+                pass
+                #if DEBUG:
+                #    print("Would be trapped")
         # Get here if all moves fail and we need to backtrack
         if not new_cell.permanent:
             new_cell.track = None
@@ -1000,6 +992,7 @@ def parse(params, gui):
 if __name__ == '__main__':
   game = TrainTracks()
   game.run()
+
 
 
 
