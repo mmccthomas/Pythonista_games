@@ -5,6 +5,8 @@ import numpy as np
 import traceback
 import os
 import sys
+from collections import defaultdict
+from math import sqrt
 from enum import Enum
 from time import perf_counter, time, sleep
 from scene import *
@@ -14,7 +16,8 @@ import ui
 from types import SimpleNamespace
 from queue import Queue
 from collections import deque
-from random import choice, randint
+from random import choice, randint, shuffle
+from time import time
 current = os.path.dirname(os.path.realpath(__file__))
 parent = os.path.dirname(current)
 sys.path.append(parent)
@@ -982,7 +985,93 @@ class Layout:
         self.gui.gui.set_message(f"{message} in {self.move_count} moves. Time:{elapsed:.2f}s")
         if DEBUG:
             self.gui.gui.set_moves('')
-           
+
+# This class represents a directed graph 
+# using adjacency list representation
+class Graph:
+      
+  def __init__(self, vertices, board):
+          # No. of vertices
+          self.V = vertices 
+          self.select =  int((vertices + (2 * sqrt(vertices) -1)) /2)
+          self.no = 0
+          self.allpaths =[]
+          self.lengths =[]
+          self.max_paths = 1
+          self.t = time()
+          
+          # default dictionary to store graph
+          self.graph = self.adj(board)
+        
+  def adj(self, board):
+        xmax, ymax = board.shape
+        adjdict = {}
+        for r in range(ymax):
+          for c in range(xmax):
+            neighbours = []
+            #random.shuffle(a)
+            for dir in [(1,0), (0, -1), (-1, 0), (0, 1)]:
+              yd, xd = dir
+              if 0<=(r + yd)<ymax and 0<=(c + xd)<xmax:
+                neighbours.append(board[r+yd][c+xd])
+            shuffle(neighbours)
+            adjdict[board[r, c]] = neighbours
+        return adjdict     
+      
+        
+  def printAllPathsUtil(self, u, d, visited, path):
+          '''A recursive function to print all paths from 'u' to 'd'.
+        visited[] keeps track of vertices in current path.
+        path[] stores actual vertices and path_index is current
+        index in path[]'''
+          if self.finished:
+            return True
+          # Mark the current node as visited and store in path
+          visited[u]= True
+          path.append(u)
+      
+          # If current vertex is same as destination, then print
+          # current path[]
+          if u == d:
+            #print (self.no, path)
+            p = path.copy()
+            if len(p) == self.select:
+               self.allpaths.append(p)
+               self.lengths.append(len(p))
+               if len(self.allpaths) == self.max_paths:
+                 #path =[]
+                 return True
+            self.no += 1
+            
+          else:
+            # If current vertex is not destination
+            # Recur for all the vertices adjacent to this vertex
+            for i in self.graph[u]:
+              if visited[i]== False:
+                self.finished =  self.printAllPathsUtil(i, d, visited, path)
+                if self.finished:
+                  return True
+                
+          # Remove current vertex from path[] and mark it as unvisited
+          path.pop()
+          visited[u]= False
+          return False
+      
+      
+        
+  def printAllPaths(self, s, d):
+          # Prints all paths from 's' to 'd'
+          # Mark all the vertices as not visited
+          visited =[False]*(self.V)
+          
+          # Create an array to store paths
+          path = []
+          
+          self.t = time()
+          self.finished = False
+          # Call the recursive helper function to print all paths
+          self.printAllPathsUtil(s, d, visited, path)
+          print('time', self.no, time()-self.t)          
 
 def parse(params, gui):
     """
@@ -1013,8 +1102,25 @@ def parse(params, gui):
         raise ValueError('Error, end not specified, forgot to add "e"')
     return layout
 
+def find_random_path(n=8):                  
+      # Python program to print all paths from a source to destination.                  
+      # This code is contributed by Neelam Yadav
+      
+      board = np.arange(n*n).reshape((n,n))
+      start = board[(randint(0,n-1), 0)]
+      end = board[(n-1, randint(0,n-1))]
+      for _ in range(1):       
+         g = Graph(n*n, board)
+         g.max_paths = 1
+         g.printAllPaths(start, end)
+         print(f'{n=},{g.no=}')
+         for p in g.allpaths:
+            print(p)
+      print(board)
+
                                                 
 if __name__ == '__main__':
+  find_random_path(8)
   game = TrainTracks()
   game.run()
 
