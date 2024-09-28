@@ -517,8 +517,8 @@ class Gui():
               for label in labels:
                  label.color = colors 
         for k, v in kwargs.items():
-        	for label in labels:
-        	  setattr(label, k, v)
+          for label in labels:
+            setattr(label, k, v)
                    
   
 class Coord(tuple):
@@ -563,15 +563,22 @@ class Coord(tuple):
     def all_neighbours(self):
       return [Coord(self.__add__(d)) for d in self.all_dirs]
       
-    def nsew(self):
-        """ up, down, left, right """        
-        return [Coord(self.__add__(d)) for d in self.nsew_dirs]
+    def nsew(self, sizex=None, sizey=None):
+        """ up, down, left, right """ 
+        if sizex is None:
+            return [Coord(self.__add__(d)) for d in self.nsew_dirs]
+        else:
+            return [Coord(self.__add__(d)) for d in self.nsew_dirs if self.in_board(Coord(self.__add__(d)), sizex, sizey) ]
         
     def distance(self, other):
         """ x y distance of self from target """
         d = self - other
         return abs(d[0] + d[1])
     
+    def in_board(self, coord, sizex, sizey):
+      r, c = coord
+      return (0 <= r < sizey) and (0 <= c < sizex)
+      
     
 class Squares():
   ''' holds parameters for coloured squares'''
@@ -599,6 +606,7 @@ class dotdict(dict):
     __getattr__ = dict.get
     __setattr__ = dict.__setitem__
     __delattr__ = dict.__delitem__      
+
 
 
 

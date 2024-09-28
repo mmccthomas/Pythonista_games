@@ -22,6 +22,7 @@ current = os.path.dirname(os.path.realpath(__file__))
 parent = os.path.dirname(current)
 sys.path.append(parent)
 from gui.gui_interface import Coord, Gui, Squares, dotdict
+from track_solver import Graph, Layout
 from gui.gui_scene import Tile
 import gui.gui_scene as gscene
 DEBUG = 0
@@ -39,7 +40,7 @@ class Player():
 class TrainTracks():
     def __init__(self):
         """Create, initialize and draw an empty board."""
-        self.debug = True
+        self.debug = False
         self.puzzle_select = None
         self.game_item, size = self.load_words_from_file(TRAINS)        
         self.display_board = np.zeros((size, size), dtype=int)
@@ -357,15 +358,36 @@ class TrainTracks():
         return dir + rc_str
                   
     def start_edit_mode(self):
-      """ Entering edit mode modies currentle selected track set """
-      self.board = self.convert_tracks()
-      perm = self.convert_permanent()
-                
-      self.start_track = self.perm_to_str(perm.start) + 's'
-      self.end_track = self.perm_to_str(perm.end) + 'e'
-      self.known = [self.perm_to_str(k) for k in perm.known]
-      self.update_board(self.board)
+         """ Entering edit mode modies currentle selected track set """      
+         self.board = self.convert_tracks()
+         perm = self.convert_permanent()
+                 
+         self.start_track = self.perm_to_str(perm.start) + 's'
+         self.end_track = self.perm_to_str(perm.end) + 'e'
+         self.known = [self.perm_to_str(k) for k in perm.known]
       
+         self.update_board(self.board)
+      
+    def place_random(self):
+       if self.edit_mode:
+       	  self.gui.set_message('Computing random track route')
+          g = Graph(self.size)
+          self.gui.print_board(g.board)
+          self.board = g.board          
+          self.gui.clear_numbers()
+          self.gui.set_message('')
+          self.permanent = dotdict({'start': None,
+                                    'end': None,
+                                    'known': []})
+          self.mark_start_end(g.start_loc, self.board[g.start_loc])
+          self.mark_start_end(g.end_loc, self.board[g.end_loc])
+          row, col = self.compute_constraints()
+          self.gui.replace_labels('col', col, colors=None)          
+          self.gui.replace_labels('row', row, colors=None)
+          self.gui.set_top(self.constraints)
+          self.update_board(self.board)
+          
+          
     def mark_start_end(self, coord, letter):
       """ check if new track is at edge and mark start or
       end as appropriate
@@ -374,23 +396,25 @@ class TrainTracks():
       r, c = coord
       dirn = self.gui.player.PIECE_NAMES[letter]
       # mark start
-      if c == 0 and 'W' in dirn:        
-        self.gui.clear_numbers(self.permanent.start.loc)
-        
-        self.board[self.permanent.start.loc] = '-'
-        self.permanent.start.loc = coord
-        self.permanent.start.track = letter
+      if c == 0 and 'W' in dirn:
+        try:       
+            self.gui.clear_numbers(self.permanent.start.loc)
+            self.board[self.permanent.start.loc] = '-'
+        except (AttributeError):
+          pass       
+        self.permanent.start = dict_
         self.highlight_permanent(coord, 'A')
         self.start_track = self.perm_to_str(dict_) + 's'
         return True
         
       # mark end
       if ((r == 0 and 'S' in dirn) or (r == (self.size-1) and 'N' in dirn)):
-         self.gui.clear_numbers(self.permanent.end.loc)
-         
-         self.board[self.permanent.start.loc] = '-'
-         self.permanent.end.loc = coord
-         self.permanent.end.track = letter
+         try:
+             self.gui.clear_numbers(self.permanent.end.loc)         
+             self.board[self.permanent.start.loc] = '-'
+         except (AttributeError):
+             pass
+         self.permanent.end = dict_
          self.highlight_permanent(coord, 'B')  
          self.end_track = self.perm_to_str(dict_) + 'e'
          return True
@@ -448,7 +472,7 @@ class TrainTracks():
       col_sums = np.sum(contained(self.board), axis=0).astype('U1')
       row_sums = np.flip(np.sum(contained(self.board), axis=1)).astype('U1')
       constraintrc = ''.join(col_sums) + ''.join(row_sums)
-      if self.known:
+      if self.permanent.known:
          self.constraints = ':'.join([str(self.size), constraintrc,
                                      self.start_track, ':'.join(self.known),
                                      self.end_track])
@@ -507,6 +531,7 @@ class TrainTracks():
           elif letter == 'Edit Mode':
               self.edit_mode = not self.edit_mode
               self.gui.set_props(self.edit, fill_color='red' if self.edit_mode else 'orange')
+              self.gui.set_props(self.random, fill_color='orange' if self.edit_mode else 'grey')
               if self.edit_mode:
                 self.start_edit_mode()
               else:
@@ -524,6 +549,9 @@ class TrainTracks():
                
           elif letter == 'Save':
               self.save_constraint()
+              
+          elif letter == 'Random':
+              self.place_random()
                 
           elif coord == (None, None):
               return 0
@@ -595,41 +623,41 @@ class TrainTracks():
         
         # positions of all objects for all devices
         position_dict = {
-        'ipad13_landscape': {'rackpos': (0, 0), 'rackscale': 1.0, 
+        'ipad13_landscape': {'rackpos': (0, -45), 'rackscale': 1.0, 
                              'rackoff': 2,  'edit_size': (280, 125),
                              'button1': (w + 40, h / 12), 'button2': (w + 40, 220), 'button3': (w + 200, 220),
-                             'button4': (w + 200, 150), 'button5': (w + 40, 150),
+                             'button4': (w + 200, 170), 'button5': (w + 40, 120), 'button6': (w+40, 170),
                              'box1': (w + 30, h - 50 - 4 * (sqsize + 20)), 'box2': (w + 30, 150 - 6), 'box3': (w + 5, 2 * h / 3),
                              'box4': (w + 5, h - 50), 'font': ('Avenir Next', 24)},
                                            
         'ipad13_portrait': {'rackpos': (50 - w, h + 50), 'rackscale': 1.0, 
                             'rackoff': 2, 'edit_size': (280, 125),
                             'button1': (w / 2, h + 200), 'button2': (w / 2, h + 50), 'button3': (w / 2, h + 250),
-                            'button4': (w / 2, h + 100), 'button5': (w / 2, h + 150),
+                            'button4': (w / 2, h + 100), 'button5': (w / 2, h + 150), 'button6': (w / 2, h + 150),
                             'box1': (45, h + h / 8 + 45), 'box2': (45, h + 45), 'box3': (2 * w / 3, h + 45),
                             'box4': (2 * w / 3, h + 200), 'font': ('Avenir Next', 24)},
         
         'ipad_landscape': {'rackpos': (0, -10), 'rackscale': 1.0, 'rackoff': 2, 'edit_size': (230, 110),
                            'button1': (w + 35, h / 12), 'button2': (w + 35, 190), 'button3': (w + 150, 190),
-                           'button4': (w + 150, 140), 'button5': (w + 35, 140),
+                           'button4': (w + 150, 140), 'button5': (w + 35, 90), 'button6': (w + 35, 140), 
                            'box1': (w + 30, h - 4 * (sqsize + 20)), 'box2': (w + 30, 125-6), 'box3': (w + 5, 2 * h / 3),
                            'box4': (w + 5, h - 50), 'font': ('Avenir Next', 20)},
         
         'ipad_portrait': {'rackpos': (-w, 249), 'rackscale': 0.7, 'rackoff': 4, 'edit_size': (250, 110),
                           'button1': (690, h + 100), 'button2': (430, h +150), 'button3': (550 , h + 150),
-                          'button4': (550, h + 100), 'button5': (430, h + 100),
+                          'button4': (550, h + 100), 'button5': (430, h + 100), 'button6': (430, h + 100),
                           'box1': (45, h + 55), 'box2': (420, h + 90), 'box3': (3 * w / 4, h + 35),
                           'box4': (3 * w / 4, h + 160), 'font': ('Avenir Next', 20)},
         
         'iphone_landscape': {'rackpos': (0, -50), 'rackscale': 1.5, 'rackoff': 2, 'edit_size': (255, 130),
                              'button1': (w + 185, h / 6), 'button2': (w + 185, 230), 'button3': (w + 330, 245),
-                             'button4': (w + 330, 180), 'button5': (w + 185, 180),
+                             'button4': (w + 330, 180), 'button5': (w + 185, 180), 'button6': (9 * w / 15, h + 150),
                              'box1': (w + 30, h - 50 -4* (sqsize +20)), 'box2': (w + 180, 165 - 6), 'box3': (w + 5, 2 * h / 3),
                              'box4': (w + 5, h - 50), 'font': ('Avenir Next', 20)},
             
         'iphone_portrait': {'rackpos': (-w -25, h -10), 'rackscale': 1.5, 'rackoff': 2, 'edit_size': (135, 190),
                             'button1': (9 * w / 15, h + 100), 'button2': (9 * w / 15, h + 300), 'button3': (9 * w / 15, h + 250),
-                            'button4': (9 * w / 15, h + 200), 'button5': (9 * w / 15, h + 150),
+                            'button4': (9 * w / 15, h + 200), 'button5': (9 * w / 15, h + 150), 'button6': (9 * w / 15, h + 150),
                             'box1': (0, h + h / 8 + 45), 'box2': (180,  h + 145), 'box3': (3 * w / 4, h + 35),
                             'box4': (3 * w / 4, h + 160), 'font': ('Avenir Next', 15)},
          }
@@ -673,390 +701,12 @@ class TrainTracks():
                                       min_size=(100, 32), reg_touch=True,
                                       stroke_color='black', fill_color='grey',
                                       color='black', font=self.posn.font)
+      self.random = self.gui.add_button(text='Random', title='', position=self.posn.button6,
+                                        min_size=(100, 32), reg_touch=True,
+                                        stroke_color='black', fill_color='grey',
+                                        color='black', font=self.posn.font)
           
-
-class Track(Enum):
-    NE = 1
-    SE = 2
-    SW = 3
-    NW = 4
-    NS = 5
-    EW = 6
-    TEMP = 7
-
-    @classmethod
-    def identify(cls, str):
-        """ return matching enum from 2 char string, order undefined"""
-        for tr in cls:
-            if str[0] in tr.name and str[1] in tr.name:
-                return tr
-
-
-class Cell:
-    def __init__(self, row, col, cell_size):
-        self.cell_size = cell_size
-        self.y = row
-        self.x = col
-        self.row = row
-        self.col = col
-        self.permanent = False
-        self.track = None
-        self.must_connect = ""
-        self.is_start = False
-        self.is_end = False
-
-    def __str__(self):
-        return f"R:{self.row} C:{self.col} {self.track}"
-
-    def is_empty(self):
-        return self.track is None
-
-    def has_dir(self, dir):
-        if self.track:
-            return dir in self.track.name
-
-            
-class Layout:
-    def __init__(self, size=8, gui=None):
-        self.size = size
-        self.gui = gui
-        self.layout = [[Cell(row, col, 0) for col in range(size)]
-                       for row in range(size)]
-        self.start = None
-        self.end = None
-        self.end_row = None
-        self.move_count = 0
-        self.move_max = 1000000
-        self.col_count = []
-        self.row_count = []
-        self.col_perm = []
-        self.row_perm = []
-
-    def set_constraints(self, values):
-        """ Takes string of numbers representing top and right side """
-        v = list(values)
-        self.col_constraints = [int(i) for i in v[: self.size]]
-        right = v[self.size:]
-        right.reverse()
-        self.row_constraints = [int(i) for i in right]
-
-    def add_track(self, track, row, col, start=False, end=False):
-        """
-        Add a permanent piece of track to the layout
-        Start and end are special cases
-        """
-        cell = self.layout[row][col]
-        cell.permanent = True
-        cell.track = Track[track]
-        if start:
-            if col != 0:
-                raise ValueError("Invalid start position")
-            self.start = row
-            cell.is_start = True
-        if end:
-            self.end = col
-            self.end_row = row
-            cell.is_end = True
-
-        # determine adjacent cells that must connect
-        # modify to allow end row to be 0 or size-1
-        if "N" in track and row < self.size-1:
-            self.layout[row + 1][col].must_connect += "S"
-        if "S" in track and row > 0:
-            self.layout[row - 1][col].must_connect += "N"
-        if "W" in track and col > 0:
-            self.layout[row][col - 1].must_connect += "E"
-        if "E" in track:
-            self.layout[row][col + 1].must_connect += "W"
-
-    def moves(self, cell):
-        """ return a list of possible moves from a cell """
-
-        result = []
-        r1 = cell.row - 1
-        r2 = cell.row + 1
-        c1 = cell.col - 1
-        c2 = cell.col + 1
-
-        if r2 < self.size and (not cell.track or cell.has_dir("N")):
-            new_cell = self.layout[r2][cell.col]
-            if not new_cell.track or new_cell.has_dir("S"):
-                result.append("N")
-        if r1 >= 0 and (not cell.track or cell.has_dir("S")):
-            new_cell = self.layout[r1][cell.col]
-            if not new_cell.track or new_cell.has_dir("N"):
-                result.append("S")
-        if c1 >= 0 and (not cell.track or cell.has_dir("W")):
-            new_cell = self.layout[cell.row][c1]
-            if not new_cell.track or new_cell.has_dir("E"):
-                result.append("W")
-        if c2 < self.size and (not cell.track or cell.has_dir("E")):
-            new_cell = self.layout[cell.row][c2]
-            if not new_cell.track or new_cell.has_dir("W"):
-                result.append("E")
-        if cell.is_start and "W" in result:
-            result.remove("W")
-        if cell.is_end and "S" in result:
-            result.remove("S")
-        return result
-
-    def check_constraints(self, exact=False):
-        """ Returns true if all cell counts within limits """
-        self.row_count = (
-            []
-        )  # difference between actual count of occupied cells and expected count
-        self.row_perm = []  # number of permanent cells in this row
-        self.col_count = []
-        self.col_perm = []
-        for row in range(self.size):
-            count = 0
-            perm = 0
-            for col in range(self.size):
-                cell = self.layout[row][col]
-                if cell.track:
-                    count += 1
-                if cell.permanent:
-                    perm += 1
-                if exact:
-                    if cell.must_connect and not cell.track:
-                        if DEBUG:
-                            print("Must connect failure")
-                        return False
-            self.row_count.append(self.row_constraints[row] - count)
-            self.row_perm.append(perm)
-            if exact:
-                if count != self.row_constraints[row]:
-                    if DEBUG:
-                       print(f"Exact Row {row} failure {count} != {self.row_constraints[row]}")
-                    return False
-            elif count > self.row_constraints[row]:
-                if DEBUG:
-                   print(f"Row {row} failure {count} > {self.row_constraints[row]}")
-                return False
-        for col in range(self.size):
-            count = 0
-            perm = 0
-            for row in range(self.size):
-                cell = self.layout[row][col]
-                if cell.track:
-                    count += 1
-                if cell.permanent:
-                    perm += 1
-            self.col_count.append(self.col_constraints[col] - count)
-            self.col_perm.append(perm)
-            if exact:
-                if count != self.col_constraints[col]:
-                    if DEBUG:
-                        print(
-                            f"Exact column {col} failure {count} != {self.col_constraints[col]}"
-                        )
-                    return False
-            elif count > self.col_constraints[col]:
-                if DEBUG:
-                    print(f"Column {col} failure {count} > {self.col_constraints[col]}")
-                return False
-        return True
-
-    def not_trapped(self, cell):
-        """ Return false if trapped one side of a full row or col and need to get to the other side """
-
-        for c in range(1, self.size - 1):
-            if self.col_count[c] == 0:
-                # ignore cols with a permanent track - if not connected, it may be a path back to other side
-                if self.col_perm[c] == 0:
-                    if cell.col < c:
-                        for i in range(c + 1, self.size):
-                            if self.col_count[i] > 0:
-                                return False
-                    elif cell.col > c:
-                        for i in range(0, c):
-                            if self.col_count[i] > 0:
-                                return False
-        for r in range(1, self.size - 1):
-            if self.row_count[r] == 0:
-                # ignore rows with a permanent track - if not connected, it may be a path back to other side
-                if self.row_perm[r] == 0:
-                    if cell.row < r:
-                        for i in range(r + 1, self.size):
-                            if self.row_count[i] > 0:
-                                return False
-                    if cell.row > r:
-                        for i in range(0, 2):
-                            if self.row_count[i] > 0:
-                                return False
-        return True
-
-    def done(self, cell):
-        if cell.row == self.end_row and cell.col == self.end:
-            if self.check_constraints(exact=True):
-                return True
-        return False
-
-    def move_from(self, cell, dir):
-        """ move from cell in direction dir  """
-        self.move_count += 1
-        if self.gui.debug:
-          self.gui.gui.set_prompt(f'Moves {self.move_count}')
-          self.gui.gui.update(self.gui.convert_tracks())
-        
-        if self.move_count == self.move_max:
-            raise ValueError("Max move count reached")
-        
-        if dir == "N":
-            from_dir = "S"
-            new_cell = self.layout[cell.row + 1][cell.col]
-        elif dir == "S":
-            from_dir = "N"
-            new_cell = self.layout[cell.row - 1][cell.col]
-        elif dir == "E":
-            from_dir = "W"
-            new_cell = self.layout[cell.row][cell.col + 1]
-        elif dir == "W":
-            from_dir = "E"
-            new_cell = self.layout[cell.row][cell.col - 1]
-        undo = False
-        # temporarily add a track if empty so can calculate constraints
-        if not new_cell.track:
-            new_cell.track = Track.TEMP
-        if self.done(new_cell):
-            raise ValueError("Solved")
-        if self.check_constraints():
-            if self.not_trapped(new_cell):
-                if new_cell.track == Track.TEMP:
-                    new_cell.track = None
-                moves = self.moves(new_cell)
-                if from_dir in moves:
-                    moves.remove(from_dir)
-                bad_move = False
-                # must connect cells are special case not handled in move generation
-                if new_cell.must_connect:
-                    if from_dir in new_cell.must_connect:
-                        to_dir = new_cell.must_connect.replace(from_dir, "")
-                        if to_dir:
-                            moves = to_dir
-                    else:
-                        if len(new_cell.must_connect) == 1:
-                            moves = new_cell.must_connect
-                        else:
-                            # must connect cell is already fully connected
-                            bad_move = True
-
-                if not bad_move:
-                    # Recursively explore each possible move, depth first
-                    for to_dir in moves:
-                        if not new_cell.track:
-                            new_cell.track = Track.identify(from_dir + to_dir)
-                        self.move_from(new_cell, to_dir)
-            else:
-                pass
-                #if DEBUG:
-                #    print("Would be trapped")
-        # Get here if all moves fail and we need to backtrack
-        if not new_cell.permanent:
-            new_cell.track = None
-        if not cell.permanent:
-            cell.track = None
-
-    def solve(self):
-        """ Initiate the recursive solver """
-        new_cell = self.layout[self.start][0]
-        moves = self.moves(new_cell)
-        for to_dir in moves:
-            self.move_from(new_cell, to_dir)
-        raise ValueError("Failed to find solution")
-
-    def result(self, message, elapsed):
-        self.gui.gui.set_message(f"{message} in {self.move_count} moves. Time:{elapsed:.2f}s")
-        if DEBUG:
-            self.gui.gui.set_moves('')
-
-# This class represents a directed graph 
-# using adjacency list representation
-class Graph:
-      
-  def __init__(self, vertices, board):
-          # No. of vertices
-          self.V = vertices 
-          self.select =  int((vertices + (2 * sqrt(vertices) -1)) /2)
-          self.no = 0
-          self.allpaths =[]
-          self.lengths =[]
-          self.max_paths = 1
-          self.t = time()
           
-          # default dictionary to store graph
-          self.graph = self.adj(board)
-        
-  def adj(self, board):
-        xmax, ymax = board.shape
-        adjdict = {}
-        for r in range(ymax):
-          for c in range(xmax):
-            neighbours = []
-            #random.shuffle(a)
-            for dir in [(1,0), (0, -1), (-1, 0), (0, 1)]:
-              yd, xd = dir
-              if 0<=(r + yd)<ymax and 0<=(c + xd)<xmax:
-                neighbours.append(board[r+yd][c+xd])
-            shuffle(neighbours)
-            adjdict[board[r, c]] = neighbours
-        return adjdict     
-      
-        
-  def printAllPathsUtil(self, u, d, visited, path):
-          '''A recursive function to print all paths from 'u' to 'd'.
-        visited[] keeps track of vertices in current path.
-        path[] stores actual vertices and path_index is current
-        index in path[]'''
-          if self.finished:
-            return True
-          # Mark the current node as visited and store in path
-          visited[u]= True
-          path.append(u)
-      
-          # If current vertex is same as destination, then print
-          # current path[]
-          if u == d:
-            #print (self.no, path)
-            p = path.copy()
-            if len(p) == self.select:
-               self.allpaths.append(p)
-               self.lengths.append(len(p))
-               if len(self.allpaths) == self.max_paths:
-                 #path =[]
-                 return True
-            self.no += 1
-            
-          else:
-            # If current vertex is not destination
-            # Recur for all the vertices adjacent to this vertex
-            for i in self.graph[u]:
-              if visited[i]== False:
-                self.finished =  self.printAllPathsUtil(i, d, visited, path)
-                if self.finished:
-                  return True
-                
-          # Remove current vertex from path[] and mark it as unvisited
-          path.pop()
-          visited[u]= False
-          return False
-      
-      
-        
-  def printAllPaths(self, s, d):
-          # Prints all paths from 's' to 'd'
-          # Mark all the vertices as not visited
-          visited =[False]*(self.V)
-          
-          # Create an array to store paths
-          path = []
-          
-          self.t = time()
-          self.finished = False
-          # Call the recursive helper function to print all paths
-          self.printAllPathsUtil(s, d, visited, path)
-          print('time', self.no, time()-self.t)          
-
 def parse(params, gui):
     """
     Structure: Size:Constraints:track-tuple:track-tuple
@@ -1086,29 +736,16 @@ def parse(params, gui):
         raise ValueError('Error, end not specified, forgot to add "e"')
     return layout
 
-def find_random_path(n=8):                  
-      # Python program to print all paths from a source to destination.                  
-      # This code is contributed by Neelam Yadav
-      
-      board = np.arange(n*n).reshape((n,n))
-      start = board[(randint(0,n-3), 0)]
-      end = board[(n-1, randint(4,n-1))]
-      for _ in range(1):       
-         g = Graph(n*n, board)
-         g.max_paths = 1
-         g.printAllPaths(start, end)
-         print(f'{n=},{g.no=}')
-         for p in g.allpaths:
-            print(p)
-            coords =[divmod(rc, n) for rc in p]
-            print(coords)
-      print(board)
-
                                                 
 if __name__ == '__main__':
-  find_random_path(8)
+
   game = TrainTracks()
   game.run()
+
+
+
+
+
 
 
 
