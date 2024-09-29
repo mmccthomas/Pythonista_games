@@ -330,16 +330,16 @@ class TrainTracks():
         @np.vectorize
         def contained(x):
           return x in list(self.gui.player.PIECE_NAMES.keys())[:-2]
-          
-        solution_tracks = np.argwhere(self.solution_board != '-')
-        existing_tracks = np.argwhere(contained(self.board))
-            
-        # find solution tracks not in existing tracks
-        unplaced_sol = solution_tracks[~uni]
+         # place a random track piece not already placed
+        # filter out ? and x
+        self.board1 = self.board.copy()
+        self.board1[self.board1 == 'x'] = '-'
+        self.board1[self.board1 == '?'] = '-'
+        unplaced_locs = np.argwhere(self.solution_board != self.board1)
+        
         try:
-            idx = randint(0, len(unplaced_sol)-1)
-            loc = tuple(unplaced_sol[idx])
-            self.board[loc] = self.solution_board[loc]
+            loc = tuple(unplaced_locs[randint(0, len(unplaced_locs)-1)])
+            self.board[loc] = self.solution_board[loc]  
             self.highlight_permanent(loc)
             self.code_constraints(self.board)
         except (ValueError):
