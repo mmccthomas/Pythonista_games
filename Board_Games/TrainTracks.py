@@ -70,8 +70,6 @@ class TrainTracks():
         self.empty_board = np.full((size, size), '-', dtype='U1')
         self.erase = True
         self.edit_mode = False
-        self.start_track = '____s'
-        self.end_track = '____e'
         self.identify_mode = False
         self.save_enabled = False
         self.letter = 'x'
@@ -198,7 +196,7 @@ class TrainTracks():
         size = int(selected.split(':')[0])
         return selected, size
         
-    def show_perm(self):
+    def show_permanent(self):
         """ clear and display permanent squares """
         self.gui.clear_squares()
         self.highlight_permanent(self.permanent.start.loc, 'A')        
@@ -211,21 +209,17 @@ class TrainTracks():
         pass
         self.empty_board = np.full((self.size, self.size), '-', dtype='U1')
         board = self.convert_tracks()
-        perm = self.convert_permanent()
+        perm = self.convert_permanent_from_layout()
         if not self.edit_mode:
-           self.gui.clear_squares()
-           self.highlight_permanent(perm.start.loc, 'A')
+        	 self.show_permanent()
            self.empty_board[perm.start.loc] = perm.start.track
-           self.highlight_permanent(perm.end.loc, 'B')
-           self.empty_board[perm.end.loc] = perm.end.track
-           for known in perm.known:
-             self.highlight_permanent(known.loc, '')
-             self.empty_board[known.loc] = known.track
+           self.empty_board[perm.end.loc] = perm.end.track           
            self.board = self.empty_board.copy()
                                     
     def initialize(self):
         """This method should only be called once, when initializing the board."""
         self.gui.clear_messages()
+        self.gui.set_enter('Hint')
         self.gui.clear_numbers()
         self.gui.set_top(f'Train Tracks: {self.game_item}')
         # add boxes and buttons if not already placed
@@ -244,8 +238,7 @@ class TrainTracks():
             start = perf_counter()
             self.initial_board()
             self.update_board(self.board)
-            self.convert_permanent()
-            
+            self.convert_permanent_from_layout()            
             self.board_obj.solve()
         except ValueError as e:
             end = perf_counter()
@@ -269,7 +262,7 @@ class TrainTracks():
             board[r, c] = self.gui.player.NAMED_PIECES[_char.name]
       return board
       
-    def convert_permanent(self):
+    def convert_permanent_from_layout(self):
       """get permanent locations from layout and produce permanent dictionary"""
       b = self.convert_tracks()
       start_loc = (self.board_obj.start, 0)
@@ -349,28 +342,26 @@ class TrainTracks():
             return 1
         self.update_board(self.board)
     
-    def perm_to_str(self, dict_):
+    def perm_to_str(self, dict_, terminator=None):
         """ convert dotdict {'loc': xy, 'track': trackcode}
         to 4 character NW35 """
         r, c = dict_.loc
         rc_str = ''.join([str(r), str(c)])
         dir = self.gui.player.PIECE_NAMES[dict_.track]
-        return dir + rc_str
+        if terminator:
+            return dir + rc_str + terminator
+        else:
+            return dir + rc_str
                   
     def start_edit_mode(self):
-         """ Entering edit mode modies currentle selected track set """      
+         """ Entering edit mode modies currently selected track set """      
          self.board = self.convert_tracks()
-         perm = self.convert_permanent()
-                 
-         self.start_track = self.perm_to_str(perm.start) + 's'
-         self.end_track = self.perm_to_str(perm.end) + 'e'
-         self.known = [self.perm_to_str(k) for k in perm.known]
-      
+         self.convert_permanent_from_layout()                      
          self.update_board(self.board)
       
     def place_random(self):
        if self.edit_mode:
-       	  self.gui.set_message('Computing random track route')
+          self.gui.set_message('Computing random track route')
           g = Graph(self.size)
           self.gui.print_board(g.board)
           self.board = g.board          
@@ -401,10 +392,9 @@ class TrainTracks():
             self.gui.clear_numbers(self.permanent.start.loc)
             self.board[self.permanent.start.loc] = '-'
         except (AttributeError):
-          pass       
+            pass       
         self.permanent.start = dict_
         self.highlight_permanent(coord, 'A')
-        self.start_track = self.perm_to_str(dict_) + 's'
         return True
         
       # mark end
@@ -416,7 +406,6 @@ class TrainTracks():
              pass
          self.permanent.end = dict_
          self.highlight_permanent(coord, 'B')  
-         self.end_track = self.perm_to_str(dict_) + 'e'
          return True
       return False
       
@@ -428,11 +417,9 @@ class TrainTracks():
         #remove known
         self.gui.clear_numbers(coord)
         self.permanent.known = [kv for kv in self.permanent.known if kv.loc != coord]
-        self.known.remove(self.perm_to_str(dict_)) 
       else:
         # new known
         self.permanent.known.append(dict_)
-        self.known.append(self.perm_to_str(dict_))
         self.highlight_permanent(coord, '')              
             
     def add_new_track(self, coord, letter, row):
@@ -446,12 +433,11 @@ class TrainTracks():
           self.toggle_identify_tile()
       else:
           try:
-            self.gui.set_prompt(f'adding new track {letter} to {coord}')
-            self.board[coord] = letter
-            self.update_board(self.board)
-            
+              self.gui.set_prompt(f'adding new track {letter} to {coord}')
+              self.board[coord] = letter
+              self.update_board(self.board)            
           except (IndexError):
-            pass
+              pass
       
       row, col = self.compute_constraints()
       self.gui.replace_labels('col', col, colors=None)
@@ -472,19 +458,23 @@ class TrainTracks():
       col_sums = np.sum(contained(self.board), axis=0).astype('U1')
       row_sums = np.flip(np.sum(contained(self.board), axis=1)).astype('U1')
       constraintrc = ''.join(col_sums) + ''.join(row_sums)
+      
       if self.permanent.known:
+         known = [self.perm_to_str(k) for k in self.permanent.known]
          self.constraints = ':'.join([str(self.size), constraintrc,
-                                     self.start_track, ':'.join(self.known),
-                                     self.end_track])
+                                     self.perm_to_str(self.permanent.start, 's'), 
+                                     ':'.join(known),
+                                     self.perm_to_str(self.permanent.end, 'e')])
       else:
         self.constraints = ':'.join([str(self.size), constraintrc,
-                                    self.start_track, self.end_track])
-      self.gui.set_message2(self.constraints)
-      
+                                    self.perm_to_str(self.permanent.start, 's'), 
+                                    self.perm_to_str(self.permanent.end, 'e')])
+                                    
+      self.gui.set_message2(self.constraints)      
       return row_sums, col_sums
                                             
     def toggle_identify_tile(self):
-      """ when identify tile is pressed, allow next pressed tile to be added to or deleted from known"""
+      """ when identify button is pressed, allow next pressed tile to be added to or deleted from known"""
       self.identify_mode = not self.identify_mode
       self.gui.set_props(self.identify, fill_color='red' if self.identify_mode else 'orange')
       
@@ -493,7 +483,7 @@ class TrainTracks():
           if successful save button is enabled """
       self.gui.set_prompt('solve pressed')
       if hasattr(self, 'constraints'):
-        print(self.constraints)
+        print('trying to solve', self.constraints)
         self.game_item = self.constraints
         self.empty_board = np.full((self.size, self.size), '-')
         self.solution_board = self.empty_board.copy()
@@ -501,6 +491,9 @@ class TrainTracks():
         if isinstance(result, ValueError) and 'Solved' in result.args:
             self.save_enabled = True
             self.gui.set_props(self.save, fill_color='orange')
+            self.show_permanent()
+      else:
+      	  self.gui.set_message('Constraints not set')
       sleep(1)
       self.gui.set_prompt('')
       
@@ -624,10 +617,10 @@ class TrainTracks():
         # positions of all objects for all devices
         position_dict = {
         'ipad13_landscape': {'rackpos': (0, -45), 'rackscale': 1.0, 
-                             'rackoff': 2,  'edit_size': (280, 125),
+                             'rackoff': 2,  'edit_size': (280, 150),
                              'button1': (w + 40, h / 12), 'button2': (w + 40, 220), 'button3': (w + 200, 220),
                              'button4': (w + 200, 170), 'button5': (w + 40, 120), 'button6': (w+40, 170),
-                             'box1': (w + 30, h - 50 - 4 * (sqsize + 20)), 'box2': (w + 30, 150 - 6), 'box3': (w + 5, 2 * h / 3),
+                             'box1': (w + 30, h - 50 - 4 * (sqsize + 20)), 'box2': (w + 30, 120 - 6), 'box3': (w + 5, 2 * h / 3),
                              'box4': (w + 5, h - 50), 'font': ('Avenir Next', 24)},
                                            
         'ipad13_portrait': {'rackpos': (50 - w, h + 50), 'rackscale': 1.0, 
@@ -741,6 +734,7 @@ if __name__ == '__main__':
 
   game = TrainTracks()
   game.run()
+
 
 
 
