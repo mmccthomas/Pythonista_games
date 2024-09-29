@@ -1,15 +1,9 @@
-# https://github.com/ianastewart/tracks
-# modified for ios.
-# removed turtle graphics `CMT
 import numpy as np
 import traceback
 import os
 import sys
-from collections import defaultdict
-from math import sqrt
-from enum import Enum
 from time import perf_counter, time, sleep
-from scene import *
+from scene import Texture
 from ui import Image
 import dialogs
 import ui
@@ -31,9 +25,11 @@ TRAINS = 'traintracks.txt'
 
 class Player():
   def __init__(self):
-    self.PLAYER_1  = ' ' 
-    self.PIECE_NAMES = {'┃': 'NS',  '━': 'EW', '┓': 'NW', '┏': 'NE', '┗': 'SE', '┛': 'SW', '?': '?', 'x': 'x'}
-    self.PIECES = [f'../gui/tileblocks/{tile}.png' for tile in self.PIECE_NAMES.values()]  # use keys() for lines
+    self.PLAYER_1 = ' '
+    self.PIECE_NAMES = {'┃': 'NS',  '━': 'EW', '┓': 'NW',
+                        '┏': 'NE', '┗': 'SE', '┛': 'SW', '?': '?', 'x': 'x'}
+    self.PIECES = [f'../gui/tileblocks/{tile}.png' for tile in self.PIECE_NAMES.values()]
+    # use keys() instead of values() for lines
     self.NAMED_PIECES = {v: k for k, v in self.PIECE_NAMES.items()}
 
         
@@ -42,30 +38,33 @@ class TrainTracks():
         """Create, initialize and draw an empty board."""
         self.debug = False
         self.puzzle_select = None
-        self.game_item, size = self.load_words_from_file(TRAINS)        
+        self.game_item, size = self.load_words_from_file(TRAINS)
         self.display_board = np.zeros((size, size), dtype=int)
         self.board = None
-        self.log_moves = True # allows us to get a list of rc locations
+        self.log_moves = True  # allows us to get a list of rc locations
         self.q = Queue()
         self.gui = Gui(self.display_board, Player())
         self.gui.gs.q = self.q  # pass queue into gui
         self.gui.set_alpha(False)
-        self.gui.set_grid_colors(grid='black', z_position=5, grid_stroke_color='black')
+        self.gui.set_grid_colors(grid='black', z_position=5,
+                                 grid_stroke_color='black')
         self.gui.require_touch_move(False)
         self.gui.allow_any_move(True)
         
         self.gui.setup_gui(log_moves=True, grid_fill='white')
-        self.gui.build_extra_grid(size, size, grid_width_x=1, grid_width_y=1, 
-                                  color='black', line_width=2, offset=None, z_position=100)
-        # menus can be controlled by dictionary of labels and functions without parameters
+        self.gui.build_extra_grid(size, size, grid_width_x=1, grid_width_y=1,
+                                  color='black', line_width=2, offset=None,
+                                  z_position=100)
+        # menus can be controlled by dictionary of labels and
+        # functions without parameters
         self.gui.set_pause_menu({'Continue': self.gui.dismiss_menu,
                                  'New Game': self.restart,
                                  'Reveal': self.reveal,
                                  'Quit': self.gui.gs.close})
       
-        self.gui.start_menu = {'New Game': self.restart, 'Quit': self.gui.gs.close}
+        self.gui.start_menu = {'New Game': self.restart,
+                               'Quit': self.gui.gs.close}
         self.size = size
-        #self.display_rack(self.gui.player.PIECE_NAMES)
         self.solution_board = np.full((size, size), '-', dtype='U1')
         self.empty_board = np.full((size, size), '-', dtype='U1')
         self.erase = True
@@ -94,8 +93,10 @@ class TrainTracks():
         rack = {}
         r = self.posn.rackoff
         for n, tile in enumerate(tiles):
-          t = Tile(Texture(Image.named(f'../gui/tileblocks/{tiles[tile]}.png')), 0,  0, sq_size = sqsize * self.posn.rackscale)
-          t.position = (w + x + (n % r * (20 + sqsize * self.posn.rackscale)), y - n // r * (20 + sqsize* self.posn.rackscale))
+          t = Tile(Texture(Image.named(f'../gui/tileblocks/{tiles[tile]}.png')),
+                   0,  0, sq_size=sqsize * self.posn.rackscale)
+          t.position = (w + x + (n % r * (20 + sqsize * self.posn.rackscale)),
+                        y - n // r * (20 + sqsize * self.posn.rackscale))
           rack[t.bbox] = tile
           parent.add_child(t)
         
@@ -128,8 +129,9 @@ class TrainTracks():
         return coord
         
     def _get_player_move(self, board=None):
-      """Takes in the user's input and performs that move on the board, returns the coordinates of the move
-      Allows for movement over board"""
+      """Takes in the user's input and performs that move on the board,
+         returns the coordinates of the move
+         Allows for movement over board"""
       if board is None:
           board = self.game_board
       coord_list = []
@@ -154,8 +156,9 @@ class TrainTracks():
       return move
        
     def get_player_move(self, board=None):
-        """Takes in the user's input and performs that move on the board, returns the coordinates of the move
-        Allows for movement over board"""
+        """Takes in the user's input and performs that move on the board,
+           returns the coordinates of the move
+           Allows for movement over board"""
         move = self._get_player_move(self.board)
         rack = self.rack
 
@@ -187,8 +190,9 @@ class TrainTracks():
           data = f.read()
         # split and remove comment and blank lines
         data_list = data.split('\n')
-        data_list = [item for item in data_list if item != '' and not item.startswith('#')]
-        # choice random or selected 
+        data_list = [item for item in data_list if item != '' and 
+                     not item.startswith('#')]
+        # choice random or selected
         if self.puzzle_select:
             selected = data_list[self.puzzle_select]
         else:
@@ -199,10 +203,13 @@ class TrainTracks():
     def show_permanent(self):
         """ clear and display permanent squares """
         self.gui.clear_squares()
-        self.highlight_permanent(self.permanent.start.loc, 'A')        
-        self.highlight_permanent(self.permanent.end.loc, 'B')        
+        self.highlight_permanent(self.permanent.start.loc, 'A')
+        self.highlight_permanent(self.permanent.end.loc, 'B')
+        self.empty_board[self.permanent.start.loc] = self.permanent.start.track
+        self.empty_board[self.permanent.end.loc] = self.permanent.end.track
         for known in self.permanent.known:
             self.highlight_permanent(known.loc, '')
+            self.empty_board[known.loc] = known.track
         
     def initial_board(self):
         """ Get board layout and permanent cells from board_obj"""
@@ -211,13 +218,12 @@ class TrainTracks():
         board = self.convert_tracks()
         perm = self.convert_permanent_from_layout()
         if not self.edit_mode:
-        	 self.show_permanent()
-           self.empty_board[perm.start.loc] = perm.start.track
-           self.empty_board[perm.end.loc] = perm.end.track           
+           self.show_permanent()
            self.board = self.empty_board.copy()
                                     
     def initialize(self):
-        """This method should only be called once, when initializing the board."""
+        """This method should only be called once,
+        when initializing the board."""
         self.gui.clear_messages()
         self.gui.set_enter('Hint')
         self.gui.clear_numbers()
@@ -238,7 +244,7 @@ class TrainTracks():
             start = perf_counter()
             self.initial_board()
             self.update_board(self.board)
-            self.convert_permanent_from_layout()            
+            self.convert_permanent_from_layout()
             self.board_obj.solve()
         except ValueError as e:
             end = perf_counter()
@@ -263,11 +269,13 @@ class TrainTracks():
       return board
       
     def convert_permanent_from_layout(self):
-      """get permanent locations from layout and produce permanent dictionary"""
+      """get permanent locations from layout
+      and produce permanent dictionary"""
       b = self.convert_tracks()
       start_loc = (self.board_obj.start, 0)
       end_loc = (self.board_obj.end_row, self.board_obj.end)
-      known_loc = [(r, c) for r in range(self.size) for c in range(self.size) if self.board_obj.layout[r][c].permanent]
+      known_loc = [(r, c) for r in range(self.size) for c in range(self.size)
+                   if self.board_obj.layout[r][c].permanent]
       known_loc.remove(start_loc)
       known_loc.remove(end_loc)
       # use dotdict ckass to provide simpler access
@@ -279,9 +287,10 @@ class TrainTracks():
     def highlight_permanent(self, coord, text=''):
         params = {'color': 'cyan', 'text_color': 'blue',
                   'z_position': 1000, 'stroke_color': 'clear',
-                  'alpha': 0.1, 'radius': 5,
+                  'alpha': 0.25, 'radius': 5,
                   'sqsize': self.gui.gs.SQ_SIZE, 'offset': (0.0, 0.0),
-                  'font': ('Arial Rounded MT Bold', 30), 'text_anchor_point': (-1, 1)}
+                  'font': ('Arial Rounded MT Bold', 30),
+                  'text_anchor_point': (-1, 1)}
         self.gui.add_numbers([Squares(coord, text, **params)], clear_previous=False)
         r, c = coord
         self.board_obj.layout[r][c].permanent = True
@@ -289,9 +298,8 @@ class TrainTracks():
     def draw_constraints(self):
         # Numbers across the top
         self.gui.replace_labels('col', self.board_obj.col_constraints, colors=None)
-        # Numbers down right side
+        # Numbers down left side
         self.gui.replace_labels('row', reversed(self.board_obj.row_constraints), colors=None)
-        self.gui.set_message2(f'{sum(self.board_obj.col_constraints)}, {sum(self.board_obj.row_constraints)}')
         
     def run(self):
         """
@@ -327,9 +335,6 @@ class TrainTracks():
         existing_tracks = np.argwhere(contained(self.board))
             
         # find solution tracks not in existing tracks
-        # https://stackoverflow.com/questions/69435359/fast-check-if-elements-in-array-are-within-another-array-2d
-        uni = np.any(np.all(solution_tracks[None, :, :] == existing_tracks[:, None, :], axis=-1,), axis=0,)
-            
         unplaced_sol = solution_tracks[~uni]
         try:
             idx = randint(0, len(unplaced_sol)-1)
@@ -354,17 +359,18 @@ class TrainTracks():
             return dir + rc_str
                   
     def start_edit_mode(self):
-         """ Entering edit mode modies currently selected track set """      
-         self.board = self.convert_tracks()
-         self.convert_permanent_from_layout()                      
-         self.update_board(self.board)
+        """ Entering edit mode modies currently selected track set """
+        self.board = self.convert_tracks()
+        self.convert_permanent_from_layout()
+        self.update_board(self.board)
       
     def place_random(self):
        if self.edit_mode:
           self.gui.set_message('Computing random track route')
           g = Graph(self.size)
-          self.gui.print_board(g.board)
-          self.board = g.board          
+          g.gui = self.gui
+          coords, self.board = g.compute_random_path(self.size)
+          self.gui.print_board(self.board)
           self.gui.clear_numbers()
           self.gui.set_message('')
           self.permanent = dotdict({'start': None,
@@ -372,13 +378,20 @@ class TrainTracks():
                                     'known': []})
           self.mark_start_end(g.start_loc, self.board[g.start_loc])
           self.mark_start_end(g.end_loc, self.board[g.end_loc])
+          # mark up to 4 tracks as known
+          track_length = len(coords)
+          indexes = set([randint(3, track_length - 3) for _ in range(randint(1,4))])
+          for idx in indexes:
+            k = coords[idx]
+            self.permanent.known.append(dotdict({'loc': k, 'track': self.board[k]}))
+            self.highlight_permanent(k, '')
+            
           row, col = self.compute_constraints()
-          self.gui.replace_labels('col', col, colors=None)          
+          self.gui.replace_labels('col', col, colors=None)
           self.gui.replace_labels('row', row, colors=None)
           self.gui.set_top(self.constraints)
           self.update_board(self.board)
-          
-          
+                    
     def mark_start_end(self, coord, letter):
       """ check if new track is at edge and mark start or
       end as appropriate
@@ -388,11 +401,11 @@ class TrainTracks():
       dirn = self.gui.player.PIECE_NAMES[letter]
       # mark start
       if c == 0 and 'W' in dirn:
-        try:       
+        try:
             self.gui.clear_numbers(self.permanent.start.loc)
             self.board[self.permanent.start.loc] = '-'
         except (AttributeError):
-            pass       
+            pass
         self.permanent.start = dict_
         self.highlight_permanent(coord, 'A')
         return True
@@ -400,27 +413,28 @@ class TrainTracks():
       # mark end
       if ((r == 0 and 'S' in dirn) or (r == (self.size-1) and 'N' in dirn)):
          try:
-             self.gui.clear_numbers(self.permanent.end.loc)         
+             self.gui.clear_numbers(self.permanent.end.loc)
              self.board[self.permanent.start.loc] = '-'
          except (AttributeError):
              pass
          self.permanent.end = dict_
-         self.highlight_permanent(coord, 'B')  
+         self.highlight_permanent(coord, 'B')
          return True
       return False
       
-    def mark_known (self, coord, letter):
+    def mark_known(self, coord, letter):
       """ check if new track is known and mark or clear as appropriate
       """
-      dict_ = dotdict({'loc': coord, 'track': self.board[coord]})      
+      dict_ = dotdict({'loc': coord, 'track': self.board[coord]})
       if coord in [k.loc for k in self.permanent.known]:
-        #remove known
+        # remove known
         self.gui.clear_numbers(coord)
-        self.permanent.known = [kv for kv in self.permanent.known if kv.loc != coord]
+        self.permanent.known = [kv for kv in self.permanent.known
+                                if kv.loc != coord]
       else:
         # new known
         self.permanent.known.append(dict_)
-        self.highlight_permanent(coord, '')              
+        self.highlight_permanent(coord, '')
             
     def add_new_track(self, coord, letter, row):
       dict_ = dotdict({'loc': coord, 'track': letter})
@@ -429,13 +443,13 @@ class TrainTracks():
       if self.identify_mode and row is None:
           start_end = self.mark_start_end(coord, letter)
           if not start_end:
-              self.mark_known(coord, letter) 
+              self.mark_known(coord, letter)
           self.toggle_identify_tile()
       else:
           try:
               self.gui.set_prompt(f'adding new track {letter} to {coord}')
               self.board[coord] = letter
-              self.update_board(self.board)            
+              self.update_board(self.board)
           except (IndexError):
               pass
       
@@ -462,15 +476,15 @@ class TrainTracks():
       if self.permanent.known:
          known = [self.perm_to_str(k) for k in self.permanent.known]
          self.constraints = ':'.join([str(self.size), constraintrc,
-                                     self.perm_to_str(self.permanent.start, 's'), 
-                                     ':'.join(known),
-                                     self.perm_to_str(self.permanent.end, 'e')])
+                                      self.perm_to_str(self.permanent.start, 's'),
+                                      ':'.join(known),
+                                      self.perm_to_str(self.permanent.end, 'e')])
       else:
         self.constraints = ':'.join([str(self.size), constraintrc,
-                                    self.perm_to_str(self.permanent.start, 's'), 
-                                    self.perm_to_str(self.permanent.end, 'e')])
+                                     self.perm_to_str(self.permanent.start, 's'),
+                                     self.perm_to_str(self.permanent.end, 'e')])
                                     
-      self.gui.set_message2(self.constraints)      
+      self.gui.set_message2(self.constraints)
       return row_sums, col_sums
                                             
     def toggle_identify_tile(self):
@@ -493,7 +507,7 @@ class TrainTracks():
             self.gui.set_props(self.save, fill_color='orange')
             self.show_permanent()
       else:
-      	  self.gui.set_message('Constraints not set')
+          self.gui.set_message('Constraints not set')
       sleep(1)
       self.gui.set_prompt('')
       
@@ -523,15 +537,17 @@ class TrainTracks():
           
           elif letter == 'Edit Mode':
               self.edit_mode = not self.edit_mode
-              self.gui.set_props(self.edit, fill_color='red' if self.edit_mode else 'orange')
-              self.gui.set_props(self.random, fill_color='orange' if self.edit_mode else 'grey')
+              self.gui.set_props(self.edit, fill_color='red'
+                                 if self.edit_mode else 'orange')
+              self.gui.set_props(self.random, fill_color='orange'
+                                 if self.edit_mode else 'grey')
               if self.edit_mode:
                 self.start_edit_mode()
               else:
-                #exit edit mode, leaving new board
+                # exit edit mode, leaving new board
                 self.game_item = self.constraints
                 self.initialize()
-                #self.board = self.empty_board.copy()
+                # self.board = self.empty_board.copy()
                 self.update_board(self.board)
         
           elif letter == 'Identify':
@@ -576,7 +592,8 @@ class TrainTracks():
        def compute_check(known, sums, dirn):
            check = np.equal(sums, known)
            colors = np.where(check, 'white', '#ff5b5b')
-           self.gui.replace_labels(dirn, known, colors=colors, font=('Arial Rounded MT Bold', 30))
+           self.gui.replace_labels(dirn, known, colors=colors,
+                                   font=('Arial Rounded MT Bold', 30))
            return np.all(check)
              
        col_known = np.array(self.board_obj.col_constraints)
@@ -611,29 +628,28 @@ class TrainTracks():
     def box_positions(self):
         x, y, w, h = self.gui.grid.bbox
         sqsize = self.gui.gs.SQ_SIZE
-        # rack tiles are computed with this code
-        # t.position = (w + 50 + (n % 2 * (20 + sqsize)) , h_sqsize-  n //2 * (20 + sqsize))
-        
         # positions of all objects for all devices
         position_dict = {
-        'ipad13_landscape': {'rackpos': (0, -45), 'rackscale': 1.0, 
+        'ipad13_landscape': {'rackpos': (0, -45), 'rackscale': 1.0,
                              'rackoff': 2,  'edit_size': (280, 150),
-                             'button1': (w + 40, h / 12), 'button2': (w + 40, 220), 'button3': (w + 200, 220),
-                             'button4': (w + 200, 170), 'button5': (w + 40, 120), 'button6': (w+40, 170),
-                             'box1': (w + 30, h - 50 - 4 * (sqsize + 20)), 'box2': (w + 30, 120 - 6), 'box3': (w + 5, 2 * h / 3),
-                             'box4': (w + 5, h - 50), 'font': ('Avenir Next', 24)},
+                             'button1': (w + 40, h / 12), 'button2': (w + 40, 220),
+                             'button3': (w + 200, 220), 'button4': (w + 200, 170),
+                             'button5': (w + 40, 120), 'button6': (w+40, 170),
+                             'box1': (w + 30, h - 50 - 4 * (sqsize + 20)), 'box2': (w + 30, 120 - 6),
+                             'box3': (w + 5, 2 * h / 3),
+                             'box4': (w + 5, h - 50), 'font': ('Avenir Next', 20)},
                                            
-        'ipad13_portrait': {'rackpos': (50 - w, h + 50), 'rackscale': 1.0, 
+        'ipad13_portrait': {'rackpos': (50 - w, h + 50), 'rackscale': 1.0,
                             'rackoff': 2, 'edit_size': (280, 125),
                             'button1': (w / 2, h + 200), 'button2': (w / 2, h + 50), 'button3': (w / 2, h + 250),
                             'button4': (w / 2, h + 100), 'button5': (w / 2, h + 150), 'button6': (w / 2, h + 150),
                             'box1': (45, h + h / 8 + 45), 'box2': (45, h + 45), 'box3': (2 * w / 3, h + 45),
                             'box4': (2 * w / 3, h + 200), 'font': ('Avenir Next', 24)},
         
-        'ipad_landscape': {'rackpos': (0, -10), 'rackscale': 1.0, 'rackoff': 2, 'edit_size': (230, 110),
-                           'button1': (w + 35, h / 12), 'button2': (w + 35, 190), 'button3': (w + 150, 190),
+        'ipad_landscape': {'rackpos': (0, -10), 'rackscale': 1.0, 'rackoff': 2, 'edit_size': (230, 140),
+                           'button1': (w + 35, 20), 'button2': (w + 35, 190), 'button3': (w + 150, 190),
                            'button4': (w + 150, 140), 'button5': (w + 35, 90), 'button6': (w + 35, 140), 
-                           'box1': (w + 30, h - 4 * (sqsize + 20)), 'box2': (w + 30, 125-6), 'box3': (w + 5, 2 * h / 3),
+                           'box1': (w + 30, h -10 - 4 * (sqsize + 20)), 'box2': (w + 30, 90-6), 'box3': (w + 5, 2 * h / 3),
                            'box4': (w + 5, h - 50), 'font': ('Avenir Next', 20)},
         
         'ipad_portrait': {'rackpos': (-w, 249), 'rackscale': 0.7, 'rackoff': 4, 'edit_size': (250, 110),
@@ -662,12 +678,14 @@ class TrainTracks():
       r = self.posn.rackoff
       t = self.posn.rackscale
       tsize = self.gui.gs.SQ_SIZE
-      box = self.gui.add_button(text='', title='Tracks', position=self.posn.box1,
-                                min_size=(r * t*tsize + 60, 8/r * (t*tsize + 20) + 20),
+      box = self.gui.add_button(text='', title='Tracks',
+                                position=self.posn.box1,
+                                min_size=(r * t * tsize + 60, 8 / r * (t * tsize + 20) + 20),
                                 fill_color='clear')
       self.gui.set_props(box, font=self.posn.font)
       
-      box = self.gui.add_button(text='', title='Editor', position=self.posn.box2,
+      box = self.gui.add_button(text='', title='Editor',
+                                position=self.posn.box2,
                                 min_size=self.posn.edit_size,
                                 fill_color='clear')
       self.gui.set_props(box, font=self.posn.font)
@@ -678,23 +696,28 @@ class TrainTracks():
       button = self.gui.set_enter('Hint', position=self.posn.button1,
                                   stroke_color='black', fill_color='yellow',
                                   color='black', font=self.posn.font)
-      self.edit = self.gui.add_button(text='Edit Mode', title='', position=self.posn.button2,
+      self.edit = self.gui.add_button(text='Edit Mode', title='',
+                                      position=self.posn.button2,
                                       min_size=(80, 32), reg_touch=True,
                                       stroke_color='black', fill_color='orange',
                                       color='black', font=self.posn.font)
-      self.identify = self.gui.add_button(text='Identify', title='', position=self.posn.button3,
+      self.identify = self.gui.add_button(text='Identify', title='',
+                                          position=self.posn.button3,
                                           min_size=(100, 32), reg_touch=True,
                                           stroke_color='black', fill_color='orange',
                                           color='black', font=self.posn.font)
-      button = self.gui.add_button(text='Solve', title='', position=self.posn.button4,
+      button = self.gui.add_button(text='Solve', title='',
+                                   position=self.posn.button4,
                                    min_size=(100, 32), reg_touch=True,
                                    stroke_color='black', fill_color='orange',
                                    color='black', font=self.posn.font)
-      self.save = self.gui.add_button(text='Save', title='', position=self.posn.button5,
+      self.save = self.gui.add_button(text='Save', title='',
+                                      position=self.posn.button5,
                                       min_size=(100, 32), reg_touch=True,
                                       stroke_color='black', fill_color='grey',
                                       color='black', font=self.posn.font)
-      self.random = self.gui.add_button(text='Random', title='', position=self.posn.button6,
+      self.random = self.gui.add_button(text='Random', title='',
+                                        position=self.posn.button6,
                                         min_size=(100, 32), reg_touch=True,
                                         stroke_color='black', fill_color='grey',
                                         color='black', font=self.posn.font)
@@ -734,6 +757,7 @@ if __name__ == '__main__':
 
   game = TrainTracks()
   game.run()
+
 
 
 

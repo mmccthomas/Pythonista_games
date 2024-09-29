@@ -1,21 +1,19 @@
 # classes to implement track solution from constraints
-# class to find a random path in a grid
-
+# original code from
 # https://github.com/ianastewart/tracks
-# modified for ios.
-# removed turtle graphics `CMT
+# modified for ios and removed turtle graphics `CMT
+
+# class to find a random path in a grid
 import numpy as np
-import traceback
 import os
 import sys
-from collections import defaultdict
 from enum import Enum
-from time import perf_counter, time, sleep
-from random import choice, randint, shuffle
+from time import time
+from random import randint, shuffle
 current = os.path.dirname(os.path.realpath(__file__))
 parent = os.path.dirname(current)
 sys.path.append(parent)
-from gui.gui_interface import Coord,  dotdict
+from gui.gui_interface import Coord
 
 DEBUG = False
 
@@ -147,9 +145,8 @@ class Layout:
 
     def check_constraints(self, exact=False):
         """ Returns true if all cell counts within limits """
-        self.row_count = (
-            []
-        )  # difference between actual count of occupied cells and expected count
+        # difference between actual count of occupied cells and expected count
+        self.row_count = []
         self.row_perm = []  # number of permanent cells in this row
         self.col_count = []
         self.col_perm = []
@@ -198,16 +195,19 @@ class Layout:
                     return False
             elif count > self.col_constraints[col]:
                 if DEBUG:
-                    print(f"Column {col} failure {count} > {self.col_constraints[col]}")
+                    print(
+                      f"Column {col} failure {count} > {self.col_constraints[col]}")
                 return False
         return True
 
     def not_trapped(self, cell):
-        """ Return false if trapped one side of a full row or col and need to get to the other side """
+        """ Return false if trapped one side of a full row or col
+        and need to get to the other side """
 
         for c in range(1, self.size - 1):
             if self.col_count[c] == 0:
-                # ignore cols with a permanent track - if not connected, it may be a path back to other side
+                # ignore cols with a permanent track
+                # - if not connected, it may be a path back to other side
                 if self.col_perm[c] == 0:
                     if cell.col < c:
                         for i in range(c + 1, self.size):
@@ -219,7 +219,8 @@ class Layout:
                                 return False
         for r in range(1, self.size - 1):
             if self.row_count[r] == 0:
-                # ignore rows with a permanent track - if not connected, it may be a path back to other side
+                # ignore rows with a permanent track
+                # - if not connected, it may be a path back to other side
                 if self.row_perm[r] == 0:
                     if cell.row < r:
                         for i in range(r + 1, self.size):
@@ -259,7 +260,6 @@ class Layout:
         elif dir == "W":
             from_dir = "E"
             new_cell = self.layout[cell.row][cell.col - 1]
-        undo = False
         # temporarily add a track if empty so can calculate constraints
         if not new_cell.track:
             new_cell.track = Track.TEMP
@@ -273,7 +273,8 @@ class Layout:
                 if from_dir in moves:
                     moves.remove(from_dir)
                 bad_move = False
-                # must connect cells are special case not handled in move generation
+                # must connect cells are special case not handled
+                # in move generation
                 if new_cell.must_connect:
                     if from_dir in new_cell.must_connect:
                         to_dir = new_cell.must_connect.replace(from_dir, "")
@@ -293,9 +294,8 @@ class Layout:
                             new_cell.track = Track.identify(from_dir + to_dir)
                         self.move_from(new_cell, to_dir)
             else:
-                pass
-                #if DEBUG:
-                #    print("Would be trapped")
+                if DEBUG:
+                   print("Would be trapped")
         # Get here if all moves fail and we need to backtrack
         if not new_cell.permanent:
             new_cell.track = None
@@ -311,40 +311,44 @@ class Layout:
         raise ValueError("Failed to find solution")
 
     def result(self, message, elapsed):
-        self.gui.gui.set_message(f"{message} in {self.move_count} moves. Time:{elapsed:.2f}s")
+        self.gui.gui.set_message(
+          f"{message} in {self.move_count} moves. Time:{elapsed:.2f}s")
         if DEBUG:
             self.gui.gui.set_moves('')
 
-# This class represents a directed graph 
-# using adjacency list representation
+
 class Graph:
-      
+  """This class represents a directed graph
+  using adjacency list representation
+  """
   def __init__(self, size):
-          # No. of vertices
-          self.size = size
-          self.span = 4
-          self.select_min =  int((size*size  + (2 * size - 1)) / 2)
-          self.select_max = self.select_min + self.span
-          self.no = 0
-          self.found_path = None
-          self.t = time()
-          board = np.arange(size * size).reshape((size, size))
-          # default dictionary to store graph
-          self.graph = self.adjacency(board)
-          _, self.board = self.compute_random_path(size)
+      # No. of vertices
+      self.size = size
+      self.span = 4
+      self.select_min = int((size*size + (2 * size - 1)) / 2)
+      self.select_max = self.select_min + self.span
+      self.no = 0
+      self.found_path = None
+      self.t = time()
+      self.iter = 0
+      board = np.arange(size * size).reshape((size, size))
+      # default dictionary to store graph
+      self.graph = self.adjacency(board)
+      # _, self.board = self.compute_random_path(size)
           
-  def compute_random_path(self, n=8):                  
-      # Python program to print all paths from a source to destination.                  
+  def compute_random_path(self, n=8):
+      # Compute a random path from a source to destination
       # This code is contributed by Neelam Yadav
-      nsew_dirs = {(-1, 0):'N', (0, 1): 'W',  (1, 0): 'S', (0, -1): 'E'}
-      PIECE = {'NS': '┃', 'EW': '━', 'NW': '┓', 'NE': '┏', 'SE': '┗', 'SW': '┛'}
-      #construct opposite of keys
-      PIECE = PIECE  | {k[::-1]: v for k, v in PIECE.items()}
+      nsew_dirs = {(-1, 0): 'N', (0, 1): 'W', (1, 0): 'S', (0, -1): 'E'}
+      PIECE = {'NS': '┃', 'EW': '━', 'NW': '┓', 
+               'NE': '┏', 'SE': '┗', 'SW': '┛'}
+      # construct opposite of keys
+      PIECE = PIECE | {k[::-1]: v for k, v in PIECE.items()}
       	      
-      board = np.arange(n*n).reshape((n,n)) # numbers 0 to n*n
-      char_board = np.full((n,n), '-')
-      self.start_loc = (randint(1,n-3), 0)
-      self.end_loc = (n-1, randint(3,n-1)) # (choice([0, n-1]), randint(3,n-1))
+      board = np.arange(n * n).reshape((n, n))  # numbers 0 to n*n
+      char_board = np.full((n, n), '-')
+      self.start_loc = (randint(1, n - 3), 0)
+      self.end_loc = (n - 1, randint(3, n - 1))
       start = board[self.start_loc]
       end = board[self.end_loc]
       
@@ -361,71 +365,74 @@ class Graph:
         
         if index == len(coords) - 1:
             dir_to = 'S' if rc.r == 0 else 'N'
-        else: 
+        else:
             dir_to = nsew_dirs[rc - Coord(coords[index+1])]
-        char_board[rc] = PIECE[dir_from + dir_to]        
+        char_board[rc] = PIECE[dir_from + dir_to]
         
-      return(coords, char_board )
+      return coords, char_board
             
   def adjacency(self, board):
-        """construct adjacency matrix
-        neighbours are shuffled to force random path 
-        board is a numpy 2d array of ints
-        """
-        xmax, ymax = board.shape
-        adjdict = {}
-        for r in range(ymax):
+      """construct adjacency matrix
+      neighbours are shuffled to force random path
+      board is a numpy 2d array of ints
+      """
+      xmax, ymax = board.shape
+      adjdict = {}
+      for r in range(ymax):
           for c in range(xmax):
-            rc = Coord((r, c))
-            neighbours = []
-            for dir in rc.nsew_dirs:
-              yd, xd = dir
-              if 0 <= (r + yd) < ymax and 0 <= (c + xd) < xmax:
-                neighbours.append(board[r + yd][c + xd])
-            shuffle(neighbours)
-            adjdict[board[r, c]] = neighbours
-        return adjdict     
-      
-        
+              rc = Coord((r, c))
+              neighbours = []
+              for dir in rc.nsew_dirs:
+                  yd, xd = dir
+                  if 0 <= (r + yd) < ymax and 0 <= (c + xd) < xmax:
+                      neighbours.append(board[r + yd][c + xd])
+              shuffle(neighbours)
+              adjdict[board[r, c]] = neighbours
+      return adjdict
+              
   def find_path_util(self, u, d, visited, path):
-          '''A recursive function to print all paths from 'u' to 'd'.
-        visited[] keeps track of vertices in current path.
-        path[] stores actual vertices and path_index is current
-        index in path[]'''
-          if self.finished:
-            return True
-          # Mark the current node as visited and store in path
-          visited[u]= True
-          path.append(u)
+      '''A recursive function to print all paths from 'u' to 'd'.
+      visited[] keeps track of vertices in current path.
+      path[] stores actual vertices and path_index is current
+      index in path[]'''
+      if self.finished:
+          return True
+      # Mark the current node as visited and store in path
+      visited[u] = True
+      path.append(u)
       
-          # If current vertex is same as destination, then finish
-          # if path length is between (selected length, selected length + 4)
-          # current path[]
-          if u == d:
-            p = path[:]
-            if self.select_min <= len(p) <= self.select_max:
-               self.found_path = p
-               return True
-            self.no += 1 # increment paths counter
+      # If current vertex is same as destination, then finish
+      # if path length is between (selected length, selected length + 4)
+      # current path[]
+      if u == d:
+          p = path[:]
+          if self.select_min <= len(p) <= self.select_max:
+              self.found_path = p
+              return True
             
-          else:
-            # If current vertex is not destination
-            # Recur for all the vertices adjacent to this vertex
-            for i in self.graph[u]:
-              if visited[i]== False:
-                self.finished =  self.find_path_util(i, d, visited, path)
+          self.no += 1  # increment paths counter
+            
+      else:
+          # If current vertex is not destination
+          # Recur for all the vertices adjacent to this vertex
+          self.iter += 1
+          if self.iter % 100 == 0:
+              self.gui.set_message(f'Computing random track route {self.iter}')
+          for i in self.graph[u]:
+              if visited[i] is False:
+                self.finished = self.find_path_util(i, d, visited, path)
                 if self.finished:
                   return True
                 
-          # Remove current vertex from path[] and mark it as unvisited
-          path.pop()
-          visited[u]= False
-          return False      
+      # Remove current vertex from path[] and mark it as unvisited
+      path.pop()
+      visited[u] = False
+      return False
         
   def find_path(self, s, d):
       # finds a random path from 's' to 'd'
       # Mark all the vertices as not visited
-      visited =[False] * (self.size * self.size)
+      visited = [False] * (self.size * self.size)
           
       # Create an array to store paths
       path = []
@@ -434,6 +441,7 @@ class Graph:
       self.finished = False
       # Call the recursive helper function to print all paths
       self.find_path_util(s, d, visited, path)
-      print(f'Number paths checked {self.no}, time  to find path {time() - self.t:.6f}')
-      return self.found_path   
+      print(
+        f'paths checked {self.no}, time to find path {time() - self.t:.6f}')
+      return self.found_path
 

@@ -298,11 +298,17 @@ class Gui():
       setattr(self.gs.msg_label_b, k, v)
     self.gs.msg_label_b.text = msg
     
+  def get_message(self):
+    return self.gs.msg_label_b.text
+    
   def set_message2(self, msg, **kwargs):
     # message below box
     for k, v in kwargs.items():
       setattr(self.gs.msg_label_b2, k, v)
     self.gs.msg_label_b2.text = msg
+    
+  def get_message2(self):
+    return self.gs.msg_label_b2.text
     
   def set_top(self, msg, **kwargs):
     # message above box
