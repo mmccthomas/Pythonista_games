@@ -37,7 +37,7 @@ class TrainTracks():
     def __init__(self):
         """Create, initialize and draw an empty board."""
         self.debug = False
-        self.puzzle_select = None
+        self.puzzle_select = 10
         self.game_item, size = self.load_words_from_file(TRAINS)
         self.display_board = np.zeros((size, size), dtype=int)
         self.board = None

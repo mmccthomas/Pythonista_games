@@ -331,9 +331,10 @@ class Graph:
       self.found_path = None
       self.t = time()
       self.iter = 0
-      board = np.arange(size * size).reshape((size, size))
+      self.max_iter = 1000000
+      self.board = np.arange(size * size).reshape((size, size))
       # default dictionary to store graph
-      self.graph = self.adjacency(board)
+      #self.graph = self.adjacency(board)
       # _, self.board = self.compute_random_path(size)
           
   def compute_random_path(self, n=8):
@@ -418,6 +419,10 @@ class Graph:
           self.iter += 1
           if self.iter % 100 == 0:
               self.gui.set_message(f'Computing random track route {self.iter}')
+              # abaondon this attempt if too many
+              if self.iter > self.max_iter:
+                 self.finished = True
+                 return True
           for i in self.graph[u]:
               if visited[i] is False:
                 self.finished = self.find_path_util(i, d, visited, path)
@@ -431,17 +436,18 @@ class Graph:
         
   def find_path(self, s, d):
       # finds a random path from 's' to 'd'
-      # Mark all the vertices as not visited
-      visited = [False] * (self.size * self.size)
-          
-      # Create an array to store paths
-      path = []
-          
-      self.t = time()
-      self.finished = False
-      # Call the recursive helper function to print all paths
-      self.find_path_util(s, d, visited, path)
-      print(
-        f'paths checked {self.no}, time to find path {time() - self.t:.6f}')
+      #allow a path to be aborted and try again
+      while not self.found_path:
+          # Mark all the vertices as not visited
+          visited = [False] * (self.size * self.size)              
+          # Create an array to store paths
+          path = []              
+          self.t = time()          
+          # Call the recursive helper function to print all paths     
+          self.finished = False
+          self.graph = self.adjacency(self.board)
+          self.find_path_util(s, d, visited, path)
+          print(
+             f'paths checked {self.no}, time to find path {time() - self.t:.6f}')
       return self.found_path
 
