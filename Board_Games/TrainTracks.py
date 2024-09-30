@@ -635,16 +635,16 @@ class TrainTracks():
                              'button1': (w + 40, h / 12), 'button2': (w + 40, 220),
                              'button3': (w + 200, 220), 'button4': (w + 200, 170),
                              'button5': (w + 40, 120), 'button6': (w+40, 170),
-                             'box1': (w + 30, h - 50 - 4 * (sqsize + 20)), 'box2': (w + 30, 120 - 6),
+                             'box1': (w + 38, h - 39 - 4 * (sqsize + 20)), 'box2': (w + 30, 120 - 6),
                              'box3': (w + 5, 2 * h / 3),
                              'box4': (w + 5, h - 50), 'font': ('Avenir Next', 20)},
                                            
-        'ipad13_portrait': {'rackpos': (50 - w, h + 50), 'rackscale': 1.0,
-                            'rackoff': 2, 'edit_size': (280, 125),
-                            'button1': (w / 2, h + 200), 'button2': (w / 2, h + 50), 'button3': (w / 2, h + 250),
-                            'button4': (w / 2, h + 100), 'button5': (w / 2, h + 150), 'button6': (w / 2, h + 150),
-                            'box1': (45, h + h / 8 + 45), 'box2': (45, h + 45), 'box3': (2 * w / 3, h + 45),
-                            'box4': (2 * w / 3, h + 200), 'font': ('Avenir Next', 24)},
+        'ipad13_portrait':{'rackpos': (-w, 305), 'rackscale': 0.7, 'rackoff': 4, 'edit_size': (235, 150),
+                          'button1': (750, h + 100), 'button2': (480, h + 200), 'button3': (600 , h + 200),
+                          'button4': (600, h + 150), 'button5': (480, h + 100), 'button6': (480, h + 150),
+                          'box1': (42, h + 68), 'box2': (475, h + 90), 'box3': (3 * w / 4, h + 35),
+                          'box4': (3 * w / 4, h + 160), 'font': ('Avenir Next', 20)},
+        
         
         'ipad_landscape': {'rackpos': (0, -10), 'rackscale': 1.0, 'rackoff': 2, 'edit_size': (230, 140),
                            'button1': (w + 35, 20), 'button2': (w + 35, 190), 'button3': (w + 150, 190),
@@ -678,9 +678,13 @@ class TrainTracks():
       r = self.posn.rackoff
       t = self.posn.rackscale
       tsize = self.gui.gs.SQ_SIZE
+      # position bottomleft of 1st tile w+x, y
+      # position of topright last tile w + x + t *(t*tsize+20)
+      #position = (w + x + (n % r * (20 + sqsize * self.posn.rackscale)),
+      #                  y - n // r * (20 + sqsize * self.posn.rackscale))
       box = self.gui.add_button(text='', title='Tracks',
                                 position=self.posn.box1,
-                                min_size=(r * t * tsize + 60, 8 / r * (t * tsize + 20) + 20),
+                                min_size=(r * (t * tsize + 20), 8 / r * (t * tsize + 20)),
                                 fill_color='clear')
       self.gui.set_props(box, font=self.posn.font)
       
