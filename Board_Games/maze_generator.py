@@ -1,6 +1,6 @@
-## Maze Generator
-## Wilson's Loop Erased Random Walk Algorithm
-## Author: CaptainFlint
+# Maze Generator
+#  Wilson's Loop Erased Random Walk Algorithm
+# Author: CaptainFlint
 # https://artofproblemsolving.com/community/c3090h2221709_wilsons_maze_generator_implementation
 """
 Wilson's Algorithm is an algorithm to generate a
@@ -26,46 +26,47 @@ Source: http://people.cs.ksu.edu/~ashley78/wiki.ashleycoleman.me/index.php/Wilso
 import random
 import numpy as np
 from time import time
- 
+
+
 class WilsonMazeGenerator:
     """Maze Generator using Wilson's Loop Erased Random Walk Algorithm"""
  
-    def __init__(self,height,width):
-        """WilsonMazeGenerator(int,int) -> WilsonMazeGenerator
-        Creates a maze generator with specified width and height.
-        width: width of generated mazes
-        height: height of generated mazes"""        
-        self.width = 2*(width//2) + 1   # Make width odd
-        self.height = 2*(height//2) + 1 # Make height odd
+    def __init__(self, height, width):
+        """ Creates a maze generator with specified width and height"""
+        self.width = 2 * (width // 2) + 1    # Make width odd
+        self.height = 2 * (height // 2) + 1  # Make height odd
         self._initialize_grid()
  
         # valid directions in random walk
-        self.directions_np = np.array([[0,1],[1,0],[0,-1],[-1,0]])
+        self.directions_np = np.array([[0, 1], [1, 0], [0, -1], [-1, 0]])
         # indicates whether a maze is generated
         self.generated = False
  
         # shortest solution
         self.solution = []
         self.showSolution = False
-        self.start = (self.height-1,0)
-        self.end = (0,self.width-1)
- 
+        self.start = (self.height - 1, 0)
+        self.end = (0, self.width - 1)
+        
+    def endpoints(self, start, end):
+        self.start = start
+        self.end = end
+        
     def __str__(self):
-        """WilsonMazeGenerator.__str__() -> str
-        outputs a string version of the grid"""
-        block = u'\u2588'
+        """ outputs a string version of the grid"""
+        block = u'\u2588'  # block character
         grid_disp = self.grid_np.copy().astype('U1')
         grid_disp[grid_disp == '0'] = block
         grid_disp[grid_disp == '1'] = ' '
                
         if self.showSolution:
-        	grid_disp[tuple(np.array(self.solution).T)] = '.'
-        	
-        #produce frame with blocks around each edge and insert grid
+          grid_disp[tuple(np.array(self.solution).T)] = '.'
+          
+        # produce frame with blocks around each edge and insert grid
         frame = np.full((self.height + 2, self.width + 2), block)
         frame[1:-1, 1:-1] = grid_disp
-        frame[(self.height, 0)] = '1'        
-        frame[(0, self.width)] = '2'  
+        frame[self.start] = '1'
+        frame[self.end] = '2'
         # produce integer version for export
         # 0=space, 1=block, 2=end, 3=start, 4=solution
         frame_int = frame.copy()
@@ -73,8 +74,8 @@ class WilsonMazeGenerator:
         frame_int[frame_int == '1'] = '3'
         frame_int[frame_int == block] = '1'
         frame_int[frame_int == '.'] = '4'
-        self.frame = frame_int.astype(int) 	
-        return ''.join([''.join(row) +'\n' for row in frame])      
+        self.frame = frame_int.astype(int)
+        return ''.join([''.join(row) + '\n' for row in frame])
  
     def get_solution(self):
         """
@@ -82,7 +83,7 @@ class WilsonMazeGenerator:
         of tuples"""
         return self.solution
  
-    def show_solution(self,show):
+    def show_solution(self, show):
         """
         Set whether WilsonMazeGenerator.__str__() outputs the
         solution or not"""
@@ -97,45 +98,45 @@ class WilsonMazeGenerator:
  
         # choose the first cell to put in the visited list
         # see Step 1 of the algorithm.
-        current = self.unvisited.pop(random.randint(0,len(self.unvisited)-1))
+        current = self.unvisited.pop(random.randint(0, len(self.unvisited) - 1))
         self.visited.append(current)
         self._cut(current)
  
         # loop until all cells have been visited
         while len(self.unvisited) > 0:
             # choose a random cell to start the walk (Step 2)
-            first = self.unvisited[random.randint(0,len(self.unvisited)-1)]
+            first = self.unvisited[random.randint(0, len(self.unvisited) - 1)]
             current = first
             # loop until the random walk reaches a visited cell
             while True:
                 # choose direction to walk (Step 3)
-                dirNum = random.randint(0,3)
+                dirNum = random.randint(0, 3)
                 # check if direction is valid. If not, choose new direction
-                while not self._is_valid_direction(current,dirNum):
-                    dirNum = random.randint(0,3)
+                while not self._is_valid_direction(current, dirNum):
+                    dirNum = random.randint(0, 3)
                 # save the cell and direction in the path
                 self.path[current] = dirNum
                 # get the next cell in that direction
-                current = self._get_next_cell(current,dirNum,2)
-                if (current in self.visited): # visited cell is reached (Step 5)
+                current = self._get_next_cell(current, dirNum, 2)
+                if (current in self.visited):  # visited cell is reached (Step 5)
                     break
  
-            current = first # go to start of path
+            current = first  # go to start of path
             # loop until the end of path is reached
             while True:
                 # add cell to visited and cut into the maze
                 self.visited.append(current)
-                self.unvisited.remove(current) # (Step 6.b)
+                self.unvisited.remove(current)  # (Step 6.b)
                 self._cut(current)
  
                 # follow the direction to next cell (Step 6.a)
                 dirNum = self.path[current]
-                crossed = self._get_next_cell(current,dirNum,1)
-                self._cut(crossed) # cut crossed edge
+                crossed = self._get_next_cell(current, dirNum, 1)
+                self._cut(crossed)  # cut crossed edge
  
-                current = self._get_next_cell(current,dirNum,2)
-                if (current in self.visited): # end of path is reached
-                    self.path = dict() # clear the path
+                current = self._get_next_cell(current, dirNum, 2)
+                if (current in self.visited):  # end of path is reached
+                    self.path = dict()  # clear the path
                     break
  
         self.generated = True
@@ -158,38 +159,35 @@ class WilsonMazeGenerator:
                 # choose valid direction
                 # must remain in the grid
                 # also must not cross a wall
-                dirNum = random.randint(0,3)
-                adjacent = self._get_next_cell(current,dirNum,1)
-                if self._is_valid_direction(current,dirNum):
-                    hasWall = self.grid_np[adjacent] == 0                    
+                dirNum = random.randint(0, 3)
+                adjacent = self._get_next_cell(current, dirNum, 1)
+                if self._is_valid_direction(current, dirNum):
+                    hasWall = self.grid_np[adjacent] == 0
                     if not hasWall:
                         break
             # add cell and direction to path
             self.path[current] = dirNum
  
             # get next cell
-            current = self._get_next_cell(current,dirNum,2)
-            if current == self.end: 
-                break # break if ending cell is reached
+            current = self._get_next_cell(current, dirNum, 2)
+            if current == self.end:
+                break  # break if ending cell is reached
  
         # go to start of path
         current = self.start
         self.solution.append(current)
         # loop until end of path is reached
         while not (current == self.end):
-            dirNum = self.path[current] # get direction
+            dirNum = self.path[current]  # get direction
             # add adjacent and crossed cells to solution
-            crossed = self._get_next_cell(current,dirNum,1)
-            current = self._get_next_cell(current,dirNum,2)
+            crossed = self._get_next_cell(current, dirNum, 1)
+            current = self._get_next_cell(current, dirNum, 2)
             self.solution.append(crossed)
             self.solution.append(current)
  
         self.path = dict()
  
-    ## Private Methods ##
-    ## Do Not Use Outside This Class ##
- 
-    def _get_next_cell(self,cell,dirNum,fact):
+    def _get_next_cell(self, cell, dirNum, fact):
         """
         Outputs the next cell when moved a distance fact in the the
         direction specified by dirNum from the initial cell.
@@ -197,46 +195,48 @@ class WilsonMazeGenerator:
         dirNum: int with values 0,1,2,3
         fact: int distance to next cell"""
         dirTup_np = self.directions_np[dirNum]
-        next = np.array(cell) + fact * dirTup_np       
+        next = np.array(cell) + fact * dirTup_np
         return tuple(next)
  
-    def _is_valid_direction(self,cell,dirNum):
+    def _is_valid_direction(self, cell, dirNum):
         """WilsonMazeGenerator(tuple,int) -> boolean
         Checks if the adjacent cell in the direction specified by
         dirNum is within the grid
         cell: tuple (y,x) representing position of initial cell
         dirNum: int with values 0,1,2,3"""
-        newCell = self._get_next_cell(cell,dirNum,2)
+        newCell = self._get_next_cell(cell, dirNum, 2)
         r, c = tuple(newCell)
-        return  (0 <= c < self.width and 0 <= r < self.height)
+        return (0 <= c < self.width and 0 <= r < self.height)
  
     def _initialize_grid(self):
         """
         Resets the maze grid to blank before generating a maze."""
-        self.grid_np = np.zeros((self.height, self.width), dtype=int)         
-        # fill up unvisited cells            
-        self.unvisited = [(r,c) for c in range(0, self.width, 2) for r in range(0, self.height, 2)] 
+        self.grid_np = np.zeros((self.height, self.width), dtype=int)
+        # fill up unvisited cells
+        self.unvisited = [(r, c) for c in range(0, self.width, 2) for r in range(0, self.height, 2)]
         self.visited = []
         self.path = dict()
         self.generated = False
  
-    def _cut(self,cell):
+    def _cut(self, cell):
         """
         Sets the value of the grid at the location specified by cell
         to 1
         cell: tuple (y,x) location of where to cut"""
         self.grid_np[cell] = 1
  
-################
+
 if __name__ == '__main__':
-		gen = WilsonMazeGenerator(200,150)
-		t=time()
-		gen.generate_maze()
-		print('Maze Generated', time()-t)
-		gen.solve_maze()
-		print("Solution Generated", time()-t)
-		# quest = input("Do you want the solution shown? (Y/N) ")
-		gen.show_solution(True) #quest.strip().lower() == "y")
-		print(gen)
-		pass
+    gen = WilsonMazeGenerator(200, 150)
+    t = time()
+    gen.generate_maze()
+    print('Maze Generated', time() - t)
+    gen.solve_maze()
+    print("Solution Generated", time() - t)
+    # quest = input("Do you want the solution shown? (Y/N) ")
+    gen.show_solution(True)  # quest.strip().lower() == "y")
+    print(gen)
+    pass
+
+
 
