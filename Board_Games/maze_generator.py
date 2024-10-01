@@ -25,9 +25,10 @@ Source: http://people.cs.ksu.edu/~ashley78/wiki.ashleycoleman.me/index.php/Wilso
  
 import random
 import numpy as np
-from time import time
-
-
+from time import time, sleep
+from random import sample, randint, choice
+import matplotlib.pyplot as plt
+                        
 class WilsonMazeGenerator:
     """Maze Generator using Wilson's Loop Erased Random Walk Algorithm"""
  
@@ -224,10 +225,166 @@ class WilsonMazeGenerator:
         to 1
         cell: tuple (y,x) location of where to cut"""
         self.grid_np[cell] = 1
- 
+        
+class HunterKillerMaze():
+  
+  def __init__(self, width, height):
+    self.NORTH = 0
+    self.EAST = 1
+    
+    self.width = width
+    self.height = height
+    self.grid = np.zeros((width, height, 2), bool)
+    # a grid to track if the cell has been visited
+    self.visited = np.zeros((self.width, self.height), bool)
+    self.dirn = {(1, 0): 'E', (-1, 0): 'W', (0, 1): 'S', (0, -1): 'N'}
+        
+  def north(self, cell):
+        return cell[0], cell[1] + 1
 
+  def south(self, cell):
+        return cell[0], cell[1] - 1
+        
+  def east(self, cell):
+        return cell[0] + 1, cell[1]
+    
+  def west(self, cell):
+        return cell[0] - 1, cell[1]
+    
+  def can_go_north(self, cell):
+      return self.grid[cell][self.NORTH]
+      
+  def can_go_east(self, cell):
+      return  self.grid[cell][self.EAST]
+      
+  def can_go_south(self, cell):
+      self.grid[self.south(cell)][self.NORTH]
+      
+  def can_go_west(self, cell):
+      return self.grid[self.west(cell)][self.EAST]
+
+  def draw_maze(self):
+    
+    fig, ax = plt.subplots()
+    ax.set_aspect('equal')
+
+    width = self.grid.shape[0]
+    height = self.grid.shape[1]
+
+    # draw the south and west outer walls
+    plt.plot([0, width], [0, 0], color="black")
+    plt.plot([0, 0], [0, height], color="black")
+
+    for j in range(height):
+        for i in range(width):
+            value = self.grid[i, self.height-1- j]
+
+            if not value[self.EAST]:
+                # draw a east wall
+                plt.plot([i + 1, i + 1], [j, j + 1], color="black")
+
+            if not value[self.NORTH]:
+                # draw a north wall
+                plt.plot([i, i + 1], [j + 1, j + 1], color="black")
+
+    plt.show()
+
+  def check_in_grid(self, new_cell):
+       return   0 <= new_cell[0] < self.width and  0 <= new_cell[1] < self.height
+              
+  def possible_moves(self, cell: (int, int)):
+      moves = []  
+      for direction in [self.north, self.south, 
+                        self.east, self.west]:
+          new_cell = direction(cell)
+          if not self.check_in_grid(new_cell) or self.visited[new_cell]:
+              continue      
+          moves.append(new_cell)  
+      return moves
+  
+
+  def get_adjacent_visited(self, cell):
+      cells = []
+      for direction in [self.north, self.south, 
+                        self.east, self.west]:
+          new_cell = direction(cell)  
+          if not self.check_in_grid(new_cell):
+              continue     
+          if self.visited[new_cell]:
+              cells.append(new_cell)
+  
+      return cells
+  
+  def hunt(self):
+      """ choose a new starting point next to a visited cell """
+      for j in range(self.height):
+          for i in range(self.width):
+              if self.visited[(i, j)]:
+                  continue                  
+              adjacent = self.get_adjacent_visited((i, j))
+              if len(adjacent) == 0:
+                  continue                      
+              new_cell = random.choice(adjacent)
+              return new_cell, (i, j)
+              
+  def link_cells(self, current_cell, new_cell):
+    ''' link it to a cell next to it that has already been visited
+    linking is removing wall'''
+    c, r = current_cell
+    c1, r1 = new_cell
+    dirn = self.dirn[(c1 - c, r1 - r)]
+    #print(f'moving {dirn} {current_cell=}, {new_cell=}')
+    match dirn:
+      case 'E':      
+        self.grid[current_cell][self.EAST] = True    
+      case 'S':      
+        self.grid[new_cell][self.NORTH] = True    
+      case 'W':
+        self.grid[new_cell][self.EAST] = True
+      case 'N':      
+        self.grid[current_cell][self.NORTH] = True
+      
+  def generate_maze(self):
+  
+      # set the current cell to a random value
+      current_cell = (random.randint(0, self.width - 1), random.randint(0, self.height - 1))
+  
+      
+      unvisited_count = self.width * self.height
+  
+      self.visited[current_cell] = True
+      unvisited_count -= 1
+  
+      while unvisited_count > 0:
+          
+          #self.draw_maze()
+          #sleep(.1)
+          moves = self.possible_moves(current_cell)          
+          if len(moves) > 0:
+              new_cell = random.choice(moves)
+          else:
+              current_cell, new_cell = self.hunt()  
+              
+          self.link_cells(current_cell, new_cell)  
+          self.visited[new_cell] = True
+          unvisited_count -= 1  
+          current_cell = new_cell
+  
+  def convert_grid(self):
+  	""" convert grid into simple block and space"""
+  	self.display_grid = np.zeros((2*self.height, 2*self.width), dtype=int)
+  	self.display_grid[:,0]=1
+  	self.display_grid[2*self.height-1,:] = 1
+  	for c in range(self.width):
+  		for r in range(self.height):
+  			 if self.grid[(c, r)][self.EAST]:
+  			 	 self.display_grid[(2*r + 1,2*c +2)] = 1
+  			 if self.grid[(c, r)][self.NORTH]:
+  			 	 self.display_grid[(2 * r,2*c +1)] = 1
+  	return self.display_grid
+                        
 if __name__ == '__main__':
-    gen = WilsonMazeGenerator(200, 150)
+    gen = WilsonMazeGenerator(50, 50)
     t = time()
     gen.generate_maze()
     print('Maze Generated', time() - t)
@@ -236,7 +393,40 @@ if __name__ == '__main__':
     # quest = input("Do you want the solution shown? (Y/N) ")
     gen.show_solution(True)  # quest.strip().lower() == "y")
     print(gen)
-    pass
+    # hunt kill algorithm
+    """
+    grid_str = []
+    for r in range(0, maze.height):
+          row = maze.grid[r, :]
+          row[row>0]=1
+          row_str = ''.join(row.astype('U1')) + '\n'
+          grid_str.append(row_str)
+    print(''.join(grid_str))
+    
+    grid_str = []
+    for r in range(0, grid.shape[0]):
+          row = grid[r, :]
+          row[row>0]=1
+          row_str = ''.join(row.astype('U1')) + '\n'
+          grid_str.append(row_str)
+    print(''.join(grid_str))
+    """
+    h = HunterKillerMaze(40,40)
+    h.generate_maze()
+    h.draw_maze()
+    block = u'\u2588'  # block character
+    frame = h.convert_grid()
+    frame_int = frame.astype('U1')
+    frame_int[frame_int == '0'] = ' '
+    frame_int[frame_int == '1'] = block
+    print(''.join([''.join(row) + '\n' for row in frame_int]))
+
+
+
+
+
+
+
 
 
 

@@ -132,7 +132,7 @@ class MazeTrial():
            returns the coordinates of the move
            Allows for movement over board"""
         move = self._get_player_move(self.board)
-
+        print(move)
         if move[0] == (-1, -1):
            return (None, None), 'Enter', None  # pressed enter button
         # deal with buttons. each returns the button text
@@ -253,6 +253,7 @@ class MazeTrial():
         """ process the turn
         move is coord, new letter, selection_row
         """
+        print(move)
         if isinstance(move, list):
           for coord in move[:-2]:
             if self.board[coord] == 0:
