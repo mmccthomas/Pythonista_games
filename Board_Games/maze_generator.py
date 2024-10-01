@@ -76,6 +76,7 @@ class WilsonMazeGenerator:
         frame_int[frame_int == block] = '1'
         frame_int[frame_int == '.'] = '4'
         self.frame = frame_int.astype(int)
+        print(self.frame.shape)
         return ''.join([''.join(row) + '\n' for row in frame])
  
     def get_solution(self):
@@ -274,7 +275,7 @@ class HunterKillerMaze():
     # draw the south and west outer walls
     plt.plot([0, width], [0, 0], color="black")
     plt.plot([0, 0], [0, height], color="black")
-
+    # upside down
     for j in range(height):
         for i in range(width):
             value = self.grid[i, self.height-1- j]
@@ -344,9 +345,9 @@ class HunterKillerMaze():
       case 'N':      
         self.grid[current_cell][self.NORTH] = True
       
-  def generate_maze(self):
-  
+  def generate_maze(self):  
       # set the current cell to a random value
+      t= time()
       current_cell = (random.randint(0, self.width - 1), random.randint(0, self.height - 1))
   
       
@@ -369,22 +370,38 @@ class HunterKillerMaze():
           self.visited[new_cell] = True
           unvisited_count -= 1  
           current_cell = new_cell
+      print('time to generate ', time() -t)
+      return self.grid
   
   def convert_grid(self):
   	""" convert grid into simple block and space"""
-  	self.display_grid = np.zeros((2*self.height, 2*self.width), dtype=int)
+  	self.display_grid = np.full((2*self.height+1,2*self.width+1),0, dtype=int)
   	self.display_grid[:,0]=1
-  	self.display_grid[2*self.height-1,:] = 1
-  	for c in range(self.width):
-  		for r in range(self.height):
-  			 if self.grid[(c, r)][self.EAST]:
-  			 	 self.display_grid[(2*r + 1,2*c +2)] = 1
-  			 if self.grid[(c, r)][self.NORTH]:
-  			 	 self.display_grid[(2 * r,2*c +1)] = 1
-  	return self.display_grid
+  	self.display_grid[-1,:] = 1
+  	grid = self.grid.transpose(1,0,2)
+  	
+  	
+  		 	 
+  	dirgrid = np.full((self.height, self.width), '. ', dtype='U2')
+  	for r in range(self.height):
+  		for c in range(self.width):
+  			 text = [' ', ' ']
+  			 if not grid[(r, c)][self.EAST]:
+  			 	 text[1] = 'E'
+  			 if not grid[(r, c)][self.NORTH]:
+  			 	 text[0] = 'N'
+  			 dirgrid[(r,c)] = ''.join(text)
+  			 
+  	for r in range(self.height):
+  		for c in range(self.width):
+  			 if 'N' in dirgrid[(r, c)]:
+  			 	 self.display_grid[2*r, 2*c :2*c+2] = 1
+  			 if 'E' in dirgrid[(r, c)]:
+  			 	 self.display_grid[2 * r : 2*r+2, 2*c +2] = 1		 
+  	return self.display_grid, dirgrid
                         
 if __name__ == '__main__':
-    gen = WilsonMazeGenerator(50, 50)
+    gen = WilsonMazeGenerator(10,10)
     t = time()
     gen.generate_maze()
     print('Maze Generated', time() - t)
@@ -394,33 +411,18 @@ if __name__ == '__main__':
     gen.show_solution(True)  # quest.strip().lower() == "y")
     print(gen)
     # hunt kill algorithm
-    """
-    grid_str = []
-    for r in range(0, maze.height):
-          row = maze.grid[r, :]
-          row[row>0]=1
-          row_str = ''.join(row.astype('U1')) + '\n'
-          grid_str.append(row_str)
-    print(''.join(grid_str))
     
-    grid_str = []
-    for r in range(0, grid.shape[0]):
-          row = grid[r, :]
-          row[row>0]=1
-          row_str = ''.join(row.astype('U1')) + '\n'
-          grid_str.append(row_str)
-    print(''.join(grid_str))
-    """
-    h = HunterKillerMaze(40,40)
+    h = HunterKillerMaze(20,20)
     h.generate_maze()
     h.draw_maze()
     block = u'\u2588'  # block character
-    frame = h.convert_grid()
+    frame, dirgrid= h.convert_grid()
     frame_int = frame.astype('U1')
     frame_int[frame_int == '0'] = ' '
     frame_int[frame_int == '1'] = block
+    #frame_int[frame_int == '2'] = '-'
     print(''.join([''.join(row) + '\n' for row in frame_int]))
-
+    print(dirgrid)
 
 
 

@@ -12,7 +12,7 @@ current = os.path.dirname(os.path.realpath(__file__))
 parent = os.path.dirname(current)
 sys.path.append(parent)
 from gui.gui_interface import Gui
-from maze_generator import WilsonMazeGenerator
+from maze_generator import WilsonMazeGenerator, HunterKillerMaze
 DEBUG = 0
 TRAINS = 'traintracks.txt'
 
@@ -30,7 +30,7 @@ class MazeTrial():
     def __init__(self):
         """Create, initialize and draw an empty board."""
         self.debug = False
-        size = 31
+        size = 51
         
         self.display_board = np.zeros((size, size), dtype=int)
         self.board = None
@@ -189,12 +189,18 @@ class MazeTrial():
         # self.maze.endpoints(self.start, self.end)
         self.maze.generate_maze()
         _ = str(self.maze)
-        self.board = self.maze.frame
+        maze = HunterKillerMaze(self.size-2, self.size-2)
+        maze.generate_maze()
+        self.board, _ = maze.convert_grid()
+        self.maze.grid_np = self.board.copy()
+        #maze.solve_maze()
+        maze.draw_maze()
+        #self.board = self.maze.frame
         self.update_board(self.board)
-        self.maze.solve_maze()
-        self.maze.show_solution(False)
-        _ = str(self.maze)
-        self.board = self.maze.frame
+        #self.maze.solve_maze()
+        #self.maze.show_solution(False)
+        #_ = str(self.maze)
+        #self.board = self.maze.frame
         self.create_line_borders()
         # self.board = self.empty_board.copy()
                                     
