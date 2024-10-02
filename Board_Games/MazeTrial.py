@@ -7,7 +7,7 @@ import dialogs
 from ui import LINE_CAP_ROUND
 from queue import Queue
 from random import randint, seed
-from time import sleep
+from time import sleep, time
 current = os.path.dirname(os.path.realpath(__file__))
 parent = os.path.dirname(current)
 sys.path.append(parent)
@@ -15,7 +15,7 @@ from gui.gui_interface import Gui
 from maze_generator import WilsonMazeGenerator, HunterKillerMaze
 DEBUG = 0
 TRAINS = 'traintracks.txt'
-seed(1)
+
 
 class Player():
   def __init__(self):
@@ -30,7 +30,7 @@ class MazeTrial():
     def __init__(self):
         """Create, initialize and draw an empty board."""
         self.debug = False
-        size = 51
+        size = 50
         
         self.display_board = np.zeros((size, size), dtype=int)
         self.board = None
@@ -39,12 +39,12 @@ class MazeTrial():
         self.gui = Gui(self.display_board, Player())
         self.gui.gs.q = self.q  # pass queue into gui
         self.gui.set_alpha(False)
-        self.gui.set_grid_colors(grid='black', z_position=5,
-                                 grid_stroke_color='black')
+        self.gui.set_grid_colors(grid='white', z_position=5,
+                                 grid_stroke_color='white')
         self.gui.require_touch_move(False)
         self.gui.allow_any_move(True)
         
-        self.gui.setup_gui(log_moves=True, grid_fill='black')
+        self.gui.setup_gui(log_moves=True, grid_fill='white')
         # self.gui.build_extra_grid(size, size, grid_width_x=1, grid_width_y=1,
         #                          color='black', line_width=2, offset=None,
         #                          z_position=100)
@@ -67,8 +67,8 @@ class MazeTrial():
         self.letter = 'x'
         self.gui.replace_labels('row', [''for n in range(self.size)][::-1], color='white', font=('Avenir', 15))
         self.gui.replace_labels('col', ['' for n in range(self.size)], color='white', font=('Avenir', 15))
-        self.start = (randint(0, self.size-1), randint(0, self.size-1))
-        self.end = (randint(0, self.size-1), randint(0, self.size-1))
+        self.start = (self.size-1, 0) # akways bottom left
+        self.end = (randint(0, self.size-1), randint(self.size//2, self.size-1))
         self.error = self.initialize()
         
     def update_board(self, board):
@@ -157,51 +157,73 @@ class MazeTrial():
           p = np.cumsum(np.append(0, z))[:-1]  # positions
           return (z, p, ia[i])
           
-    def create_line_borders(self):
-        """ find blocks and create lines vertical and horizontal """
-        sq = self.gui.gs.SQ_SIZE
-        p5 = 0.5
-        params = {'line_width': 8, 'line_cap_style': LINE_CAP_ROUND}
+    def create_line_borders(self, board):
+        """ find blocks and create lines vertical and horizontal
+        board is nxmx2 where axis 2 is North, East
+        use run length encoding to reduce number of lines """
+
+        params = {'line_width': 2, 'line_cap_style': LINE_CAP_ROUND, 'stroke_color': 'black'}
+        # bottom line
+        self.gui.draw_line([self.gui.rc_to_pos((self.size -1,  0)),
+                            self.gui.rc_to_pos((self.size -1, self.size))],
+                            **params)
+        # left line 
+        self.gui.draw_line([self.gui.rc_to_pos((-1 , 0)),
+                            self.gui.rc_to_pos((self.size - 1, 0))],
+                            **params)       
         # draw horizontal lines
-        for r in range(0, self.size, 2):
-          row = self.board[r, :]
+        for r in range(self.size):
+          row = board[r, :, 0] #north
           lengths, positions, values = self.rle(row)
           for length, position, value in zip(lengths, positions, values):
-             if value == 1 and length > 1:
-                self.gui.draw_line([self.gui.rc_to_pos((r - p5, position + p5)),
-                                    self.gui.rc_to_pos((r - p5, position - p5 + length))],
+             if not(value) :
+                self.gui.draw_line([self.gui.rc_to_pos((r - 1, position)),
+                                    self.gui.rc_to_pos((r - 1, position + length))],
                                    **params)
+                
         # draw vertcal lines
-        for c in range(0, self.size, 2):
-          col = self.board[:, c]
+        for c in range(self.size):
+          col = board[:, c, 1] #east
           lengths, positions, values = self.rle(col)
           for length, position, value in zip(lengths, positions, values):
-             if value == 1 and length > 1:
-                self.gui.draw_line([self.gui.rc_to_pos((position - p5, c + p5)),
-                                    self.gui.rc_to_pos((position - 1 - p5 + length, c + p5))],
+             if not(value):
+                self.gui.draw_line([self.gui.rc_to_pos((position - 1, c + 1)),
+                                    self.gui.rc_to_pos((position - 1 + length, c + 1))],
                                    **params)
     
     def initial_board(self):
         """ Get board layout and permanent cells from board_obj"""
-        pass
-        self.empty_board = np.full((self.size, self.size), '-', dtype='U1')
+        self.board = np.full((self.size, self.size), 6, dtype=int)
+        self.empty_board = np.full((self.size, self.size), 6, dtype=int)
+        self.empty_board[self.start] = 3
+        self.empty_board[self.end] = 2
+        self.board[self.start] = 3
+        self.board[self.end] = 2
         self.maze = WilsonMazeGenerator(self.size-2, self.size-2)
         # self.maze.endpoints(self.start, self.end)
         self.maze.generate_maze()
         _ = str(self.maze)
-        maze = HunterKillerMaze(self.size-2, self.size-2)
+        maze = HunterKillerMaze(self.size, self.size)
+        maze.endpoints(self.start, self.end)
+        t = time()
         maze.generate_maze()
-        self.board, _ = maze.convert_grid()
-        self.maze.grid_np = self.board.copy()
-        #maze.solve_maze()
-        maze.draw_maze()
+        print('generate time', time() -t)
+        #self.maze.grid_np = self.board.copy()
+        t = time()
+        path = maze.solve_maze(method='bfs')
+        print('solve time', time() -t)
+        self.solution_board = self.board.copy()
+        for p in path[:-1]:
+          self.solution_board[p] = 5
+   
+        #maze.draw_maze()
         #self.board = self.maze.frame
-        self.update_board(self.board)
-        self.maze.solve_maze()
+        self.update_board(self.empty_board)
+        #self.maze.solve_maze()
         #self.maze.show_solution(False)
         #_ = str(self.maze)
         #self.board = self.maze.frame
-        self.create_line_borders()
+        self.create_line_borders(maze.grid)
         # self.board = self.empty_board.copy()
                                     
     def initialize(self):
@@ -214,7 +236,7 @@ class MazeTrial():
         
         try:
             self.initial_board()
-            self.update_board(self.board)
+            self.update_board(self.empty_board)
             
         except ValueError as e:
             
@@ -241,10 +263,10 @@ class MazeTrial():
           
     def reveal(self):
       """finish the game by revealing solution"""
-      self.maze.show_solution(True)
-      _ = str(self.maze)
+      #self.maze.show_solution(True)
+      #_ = str(self.maze)
         
-      self.board = self.maze.frame
+      self.board = self.solution_board
       
       self.update_board(self.board)
       dialogs.hud_alert('Game over')

@@ -26,12 +26,13 @@ Source: http://people.cs.ksu.edu/~ashley78/wiki.ashleycoleman.me/index.php/Wilso
 import random
 import numpy as np
 from time import time, sleep
-from random import sample, randint, choice
+from random import sample, randint, choice, shuffle
 import matplotlib.pyplot as plt
 import traceback
+from queue import Queue
 NORTH = 0
 EAST = 1     
-
+random.seed(1)
                                     
 class WilsonMazeGenerator:
     """Maze Generator using Wilson's Loop Erased Random Walk Algorithm"""
@@ -268,6 +269,10 @@ class HunterKillerMaze():
       r, c = cell 
       return r, c - 1
       
+  def endpoints(self, start, end):
+        self.start = start
+        self.end = end
+           
   def can_move(self, dir_str, cell):
     """ return if cell in direction dir_str N,S,E,W is reachable"""
     dy, dx = self.inv_dirn[dir_str]
@@ -416,57 +421,86 @@ class HunterKillerMaze():
       self.generated = True
       return self.grid
   
-  def solve_maze(self):
+  def adjacency(self):
+      """construct adjacency matrix
+      neighbours are shuffled to force random path
+      board is a numpy 3d array of booleans
+      """
+      adjdict = {}
+      for r in range(self.height):
+          for c in range(self.width):
+              rc = r, c
+              neighbours = []
+              for dir_str in  'NSEW':
+                    if self.can_move(dir_str, rc):
+                       yd, xd = self.inv_dirn[dir_str]    
+                       neighbours.append((r + yd, c + xd))
+              #shuffle(neighbours)
+              adjdict[(r, c)]= neighbours
+      return adjdict
+  
+    
+  def dfs(self, node, graph, visited, path, stop=None):
+    #component.append(node)  # Store answer
+    if node == stop:
+       return True
+    visited[node] = True  # Mark visited
+    if node == stop:
+          #component.append(node) 
+          return 
+    # Traverse to each adjacent node of a node
+    for coord in graph[node]:
+                 
+        if not visited[coord]:  # Check whether the node is visited or not
+            path[coord] = node
+            finished =self.dfs(coord, graph, visited, path, stop)  # Call the dfs recursively  
+            if finished:
+            	return True
+        
+  
+  def bfs(self, node, graph, visited, path,stop=None): #function for BFS
+    """ This will return all child node of starting node
+    return is a list of dictianaries {'word_obj', 'depth' 'parent'} """
+    queue = Queue()
+    visited[node] = True
+    queue.put(node)
+    
+    while not queue.empty():    # Creating loop to visit each node      
+      node = queue.get() # from front of queue     
+      if node == stop:
+          return     
+      for coord in graph[node]:        
+        if  not visited[coord]:
+          visited[coord] = True
+          queue.put(coord)
+          path[coord] = node
+    return   
+            
+  def solve_maze(self, method='bfs'):
         """
         Solves the maze according to the Wilson Loop Erased Random
         Walk Algorithm"""
         # if there is no maze to solve, cut the method
         if not self.generated:
             return None
- 
-        # initialize with empty path at starting cell
-        self.path = dict()
-        try:
-            current = self.start
-     
-            # loop until the ending cell is reached
-            while True:
-                while True:
-                    # choose valid direction
-                    # must remain in the grid
-                    # also must not cross a wall
-                    dirNum = random.randint(0, 3) # N, S, E, W
-                    dir_str = 'NSEW'[dirNum]
-                    can_move = self.can_move(dir_str, current)            
-                    if can_move:
-                         break
-                # add cell and direction to path
-                self.path[current] = dirNum
-                print(f'{self.path=}')
-     
-                # get next cell
-                current = self._get_next_cell(current, dirNum, 2)
-                if current == self.end:
-                    break  # break if ending cell is reached
-     
-            # go to start of path
-            current = self.start
-            self.solution.append(current)
-            # loop until end of path is reached
-            while not (current == self.end):
-                dirNum = self.path[current]  # get direction
-                # add adjacent and crossed cells to solution
-                crossed = self._get_next_cell(current, dirNum, 1)
-                current = self._get_next_cell(current, dirNum, 2)
-                self.solution.append(crossed)
-                self.solution.append(current)
-     
-            self.path = dict()
-            
-        except (IndexError):
-           print(traceback.format_exc())
-        return self.solution
-         
+        if method == 'dfs':
+        	fn = self.dfs
+        else:
+        	fn = self.bfs
+        	
+        path = {}
+        visited = np.zeros((self.height, self.width), dtype=bool)
+        adj = self.adjacency()
+        fn(self.start, adj, visited, path, self.end)
+        
+        index = self.end
+        path_list = []
+        while index != self.start:
+        	path_list.append(path[index])
+        	index = path[index]
+        #path_list.append(self.start)	
+        return path_list
+      
   def convert_grid(self):
     """ convert grid into simple block and space"""
     self.display_grid = np.full((2*self.height+1,2*self.width+1),0, dtype=int)
@@ -503,7 +537,7 @@ if __name__ == '__main__':
     print(gen)
     # hunt kill algorithm
     
-    h = HunterKillerMaze(11, 11)
+    h = HunterKillerMaze(10,10)
     h.generate_maze()
     h.draw_maze()
 
@@ -513,10 +547,15 @@ if __name__ == '__main__':
     #frame_int[frame_int == '0'] = '0'
     #frame_int[frame_int == '1'] = 
     #frame_int[frame_int == '2'] = '-'
-    print(''.join([''.join(row) + '\n' for row in frame_int]))
-    print(dirgrid)
+    #print(''.join([''.join(row) + '\n' for row in frame_int]))
+    #print(dirgrid)
     path = h.solve_maze()
     print(path)
+
+
+
+
+
 
 
 
