@@ -28,7 +28,11 @@ import numpy as np
 from time import time, sleep
 from random import sample, randint, choice
 import matplotlib.pyplot as plt
-                        
+import traceback
+NORTH = 0
+EAST = 1     
+
+                                    
 class WilsonMazeGenerator:
     """Maze Generator using Wilson's Loop Erased Random Walk Algorithm"""
  
@@ -230,16 +234,23 @@ class WilsonMazeGenerator:
 class HunterKillerMaze():
   
   def __init__(self, width, height):
-    self.NORTH = 0
-    self.EAST = 1
-    
+    """ initialises maze
+    self.grid has format n x m x 2,
+    where axis 2 is not North border, not East border 
+    TODO change indexing to r,c too confusing
+    """
     self.width = width
     self.height = height
     self.grid = np.zeros((width, height, 2), bool)
     # a grid to track if the cell has been visited
     self.visited = np.zeros((self.width, self.height), bool)
-    self.dirn = {(1, 0): 'E', (-1, 0): 'W', (0, 1): 'S', (0, -1): 'N'}
-        
+    self.dirn = { (0, -1): 'N', (0, 1): 'S', (1, 0): 'E', (-1, 0): 'W'}
+    self.generated = False
+    self.directions = [self.north, self.south, 
+                        self.east, self.west]
+    self.start = (self.height - 1, 0)
+    self.end = (0, self.width - 1)
+    
   def north(self, cell):
         return cell[0], cell[1] + 1
 
@@ -251,18 +262,29 @@ class HunterKillerMaze():
     
   def west(self, cell):
         return cell[0] - 1, cell[1]
-    
+        
+  def can_move(self, dir_str, cell):
+    match dir_str:
+      case 'E':      
+        return self.grid[cell][EAST]
+      case 'S':      
+        return self.grid[self.south(cell)][NORTH]
+      case 'W':
+        return self.grid[self.west(cell)][EAST]
+      case 'N':      
+        return self.grid[cell][NORTH]
+        
   def can_go_north(self, cell):
-      return self.grid[cell][self.NORTH]
+      return self.grid[cell][NORTH]
       
   def can_go_east(self, cell):
-      return  self.grid[cell][self.EAST]
+      return  self.grid[cell][EAST]
       
   def can_go_south(self, cell):
-      self.grid[self.south(cell)][self.NORTH]
+      self.grid[self.south(cell)][NORTH]
       
   def can_go_west(self, cell):
-      return self.grid[self.west(cell)][self.EAST]
+      return self.grid[self.west(cell)][EAST]
 
   def draw_maze(self):
     
@@ -280,11 +302,11 @@ class HunterKillerMaze():
         for i in range(width):
             value = self.grid[i, self.height-1- j]
 
-            if not value[self.EAST]:
+            if not value[EAST]:
                 # draw a east wall
                 plt.plot([i + 1, i + 1], [j, j + 1], color="black")
 
-            if not value[self.NORTH]:
+            if not value[NORTH]:
                 # draw a north wall
                 plt.plot([i, i + 1], [j + 1, j + 1], color="black")
 
@@ -295,8 +317,7 @@ class HunterKillerMaze():
               
   def possible_moves(self, cell: (int, int)):
       moves = []  
-      for direction in [self.north, self.south, 
-                        self.east, self.west]:
+      for direction in self.directions:
           new_cell = direction(cell)
           if not self.check_in_grid(new_cell) or self.visited[new_cell]:
               continue      
@@ -306,8 +327,7 @@ class HunterKillerMaze():
 
   def get_adjacent_visited(self, cell):
       cells = []
-      for direction in [self.north, self.south, 
-                        self.east, self.west]:
+      for direction in self.directions:
           new_cell = direction(cell)  
           if not self.check_in_grid(new_cell):
               continue     
@@ -337,14 +357,35 @@ class HunterKillerMaze():
     #print(f'moving {dirn} {current_cell=}, {new_cell=}')
     match dirn:
       case 'E':      
-        self.grid[current_cell][self.EAST] = True    
+        self.grid[current_cell][EAST] = True    
       case 'S':      
-        self.grid[new_cell][self.NORTH] = True    
+        self.grid[new_cell][NORTH] = True    
       case 'W':
-        self.grid[new_cell][self.EAST] = True
+        self.grid[new_cell][EAST] = True
       case 'N':      
-        self.grid[current_cell][self.NORTH] = True
-      
+        self.grid[current_cell][NORTH] = True
+  
+  def _get_next_cell(self, cell, dirNum, fact):
+        """
+        Outputs the next cell when moved a distance fact in the the
+        direction specified by dirNum from the initial cell.
+        cell: tuple (y,x) representing position of initial cell
+        dirNum: int with values 0,1,2,3
+        fact: int distance to next cell"""
+        dirTup = np.array(list(self.dirn.keys())[dirNum])
+        next = np.array(cell) + fact * dirTup
+        return tuple(next)
+        
+  def _is_valid_direction(self, cell, dirNum):
+        """WilsonMazeGenerator(tuple,int) -> boolean
+        Checks if the adjacent cell in the direction specified by
+        dirNum is within the grid
+        cell: tuple (y,x) representing position of initial cell
+        dirNum: int with values 0,1,2,3"""
+        newCell = self._get_next_cell(cell, dirNum, 2)
+        r, c = tuple(newCell)
+        return (0 <= c < self.width and 0 <= r < self.height)
+                  
   def generate_maze(self):  
       # set the current cell to a random value
       t= time()
@@ -371,34 +412,85 @@ class HunterKillerMaze():
           unvisited_count -= 1  
           current_cell = new_cell
       print('time to generate ', time() -t)
+      self.generated = True
       return self.grid
   
+  def solve_maze(self):
+        """
+        Solves the maze according to the Wilson Loop Erased Random
+        Walk Algorithm"""
+        # if there is no maze to solve, cut the method
+        if not self.generated:
+            return None
+ 
+        # initialize with empty path at starting cell
+        self.path = dict()
+        try:
+            current = self.start
+     
+            # loop until the ending cell is reached
+            while True:
+                while True:
+                    # choose valid direction
+                    # must remain in the grid
+                    # also must not cross a wall
+                    dirNum = random.randint(0, 3) # N, S, E, W
+                    dir_str = 'NSEW'[dirNum]
+                    can_move = self.can_move(dir_str, current) and self._is_valid_direction(current, dirNum)             
+                    if can_move:
+                         break
+                # add cell and direction to path
+                self.path[current] = dirNum
+     
+                # get next cell
+                current = self._get_next_cell(current, dirNum, 2)
+                if current == self.end:
+                    break  # break if ending cell is reached
+     
+            # go to start of path
+            current = self.start
+            self.solution.append(current)
+            # loop until end of path is reached
+            while not (current == self.end):
+                dirNum = self.path[current]  # get direction
+                # add adjacent and crossed cells to solution
+                crossed = self._get_next_cell(current, dirNum, 1)
+                current = self._get_next_cell(current, dirNum, 2)
+                self.solution.append(crossed)
+                self.solution.append(current)
+     
+            self.path = dict()
+            
+        except (IndexError):
+           print(traceback.format_exc())
+        return self.solution
+         
   def convert_grid(self):
-  	""" convert grid into simple block and space"""
-  	self.display_grid = np.full((2*self.height+1,2*self.width+1),0, dtype=int)
-  	self.display_grid[:,0]=1
-  	self.display_grid[-1,:] = 1
-  	grid = self.grid.transpose(1,0,2)
-  	
-  	
-  		 	 
-  	dirgrid = np.full((self.height, self.width), '. ', dtype='U2')
-  	for r in range(self.height):
-  		for c in range(self.width):
-  			 text = [' ', ' ']
-  			 if not grid[(r, c)][self.EAST]:
-  			 	 text[1] = 'E'
-  			 if not grid[(r, c)][self.NORTH]:
-  			 	 text[0] = 'N'
-  			 dirgrid[(r,c)] = ''.join(text)
-  			 
-  	for r in range(self.height):
-  		for c in range(self.width):
-  			 if 'N' in dirgrid[(r, c)]:
-  			 	 self.display_grid[2*r, 2*c :2*c+2] = 1
-  			 if 'E' in dirgrid[(r, c)]:
-  			 	 self.display_grid[2 * r : 2*r+2, 2*c +2] = 1		 
-  	return self.display_grid, dirgrid
+    """ convert grid into simple block and space"""
+    self.display_grid = np.full((2*self.height+1,2*self.width+1),0, dtype=int)
+    self.display_grid[:,0]=1
+    self.display_grid[-1,:] = 1
+    grid = self.grid.transpose(1,0,2)
+    
+    
+         
+    dirgrid = np.full((self.height, self.width), '. ', dtype='U2')
+    for r in range(self.height):
+      for c in range(self.width):
+         text = [' ', ' ']
+         if not grid[(r, c)][EAST]:
+           text[1] = 'E'
+         if not grid[(r, c)][NORTH]:
+           text[0] = 'N'
+         dirgrid[(r,c)] = ''.join(text)
+         
+    for r in range(self.height):
+      for c in range(self.width):
+         if 'N' in dirgrid[(r, c)]:
+           self.display_grid[2*r, 2*c :2*c+2] = 1
+         if 'E' in dirgrid[(r, c)]:
+           self.display_grid[2 * r : 2*r+2, 2*c +2] = 1    
+    return self.display_grid, dirgrid
                         
 if __name__ == '__main__':
     gen = WilsonMazeGenerator(10,10)
@@ -412,17 +504,21 @@ if __name__ == '__main__':
     print(gen)
     # hunt kill algorithm
     
-    h = HunterKillerMaze(20,20)
+    h = HunterKillerMaze(10,10)
     h.generate_maze()
     h.draw_maze()
+    path = h.solve_maze()
+    print(path)
     block = u'\u2588'  # block character
     frame, dirgrid= h.convert_grid()
     frame_int = frame.astype('U1')
-    frame_int[frame_int == '0'] = ' '
-    frame_int[frame_int == '1'] = block
+    #frame_int[frame_int == '0'] = '0'
+    #frame_int[frame_int == '1'] = 
     #frame_int[frame_int == '2'] = '-'
     print(''.join([''.join(row) + '\n' for row in frame_int]))
     print(dirgrid)
+
+
 
 
 

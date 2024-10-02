@@ -6,7 +6,7 @@ import sys
 import dialogs
 from ui import LINE_CAP_ROUND
 from queue import Queue
-from random import randint
+from random import randint, seed
 from time import sleep
 current = os.path.dirname(os.path.realpath(__file__))
 parent = os.path.dirname(current)
@@ -15,7 +15,7 @@ from gui.gui_interface import Gui
 from maze_generator import WilsonMazeGenerator, HunterKillerMaze
 DEBUG = 0
 TRAINS = 'traintracks.txt'
-
+seed(1)
 
 class Player():
   def __init__(self):
@@ -197,7 +197,7 @@ class MazeTrial():
         maze.draw_maze()
         #self.board = self.maze.frame
         self.update_board(self.board)
-        #self.maze.solve_maze()
+        self.maze.solve_maze()
         #self.maze.show_solution(False)
         #_ = str(self.maze)
         #self.board = self.maze.frame
