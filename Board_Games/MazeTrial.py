@@ -154,7 +154,7 @@ class MazeTrial():
       sqsize=self.gui.gs.SQ_SIZE
     
       #adjust text position relative to size
-      y = 1 + self.size // 30
+      y = 1 + self.size // 6
       square_list = []
       for  coord in coords:
         square_list.append(Squares(coord, text, color, z_position=30, sqsize=rel_size * sqsize,

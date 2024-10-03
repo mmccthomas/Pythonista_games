@@ -32,7 +32,7 @@ import traceback
 from queue import Queue
 NORTH = 0
 EAST = 1     
-random.seed(1)
+
                                     
 class WilsonMazeGenerator:
     """Maze Generator using Wilson's Loop Erased Random Walk Algorithm"""
