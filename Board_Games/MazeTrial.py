@@ -320,10 +320,15 @@ class MazeTrial():
           moves = move[0]
           moves.pop(-1)
           moves = uniquify(moves)
+          # use sets to filter moves, most obvious and efficient
+          # find moves in previous moves
           common = list(set(moves).intersection(set(self.moves)))
+          # find moves that are not in previuos moves
           difference = list(set(moves).difference(set(common)))
+          
           if common:
               self.gui.clear_numbers(common)
+              # remove common from previous moves
               self.moves = list(set(self.moves).difference(set(common)))
           self.moves.extend(difference)                      
           self.highlight(difference, '', 'orange', rel_size=0.5)
