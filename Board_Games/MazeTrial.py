@@ -11,7 +11,7 @@ from time import sleep, time
 current = os.path.dirname(os.path.realpath(__file__))
 parent = os.path.dirname(current)
 sys.path.append(parent)
-from gui.gui_interface import Gui
+from gui.gui_interface import Gui, Squares
 from maze_generator import WilsonMazeGenerator, HunterKillerMaze
 DEBUG = 0
 TRAINS = 'traintracks.txt'
@@ -30,7 +30,15 @@ class MazeTrial():
     def __init__(self):
         """Create, initialize and draw an empty board."""
         self.debug = False
-        size = 50
+        select = dialogs.list_dialog('Maze size', ['Small', 'Medium', 'Large'])
+        match select:
+          case 'Small':
+            size = 10
+          case 'Medium':
+            size = 30
+          case 'Large':
+            size = 50
+        
         
         self.display_board = np.zeros((size, size), dtype=int)
         self.board = None
@@ -142,6 +150,17 @@ class MazeTrial():
           return move, None, None
         return (None, None), None, None
         
+    def highlight(self, coords, text, color):
+      sqsize=self.gui.gs.SQ_SIZE
+      #adjust text position relative to size
+      y = 1 + self.size // 30
+      square_list = []
+      for  coord in coords:
+        square_list.append(Squares(coord, text, color, z_position=30, sqsize=0.9*sqsize,
+                                        alpha=0.5, font=('Avenir Next', sqsize), offset=(.05, -0.05),
+                                        text_anchor_point=(-1, y)))
+      self.gui.add_numbers(square_list, clear_previous=False)
+        
     def rle(self, inarray):
         """ run length encoding. Partial credit to R rle function.
         Multi datatype arrays catered for including non Numpy
@@ -195,14 +214,16 @@ class MazeTrial():
         """ Get board layout and permanent cells from board_obj"""
         self.board = np.full((self.size, self.size), 6, dtype=int)
         self.empty_board = np.full((self.size, self.size), 6, dtype=int)
-        self.empty_board[self.start] = 3
-        self.empty_board[self.end] = 2
-        self.board[self.start] = 3
-        self.board[self.end] = 2
+        #self.empty_board[self.start] = 3
+        #self.empty_board[self.end] = 2
+        #self.board[self.start] = 3
+        #self.board[self.end] = 2
+        self.highlight([self.start], 'S', 'red')
+        self.highlight([self.end], 'E', 'green')
         self.maze = WilsonMazeGenerator(self.size-2, self.size-2)
         # self.maze.endpoints(self.start, self.end)
-        self.maze.generate_maze()
-        _ = str(self.maze)
+        #self.maze.generate_maze()
+        #_ = str(self.maze)
         maze = HunterKillerMaze(self.size, self.size)
         maze.endpoints(self.start, self.end)
         t = time()
@@ -210,10 +231,10 @@ class MazeTrial():
         print('generate time', time() -t)
         #self.maze.grid_np = self.board.copy()
         t = time()
-        path = maze.solve_maze(method='bfs')
+        self.path = maze.solve_maze(method='bfs')
         print('solve time', time() -t)
         self.solution_board = self.board.copy()
-        for p in path[:-1]:
+        for p in self.path[:-1]:
           self.solution_board[p] = 5
    
         #maze.draw_maze()
@@ -265,8 +286,8 @@ class MazeTrial():
       """finish the game by revealing solution"""
       #self.maze.show_solution(True)
       #_ = str(self.maze)
-        
-      self.board = self.solution_board
+      self.highlight(self.path[:-1], '', 'cyan')  
+      #self.board = self.solution_board
       
       self.update_board(self.board)
       dialogs.hud_alert('Game over')
@@ -274,9 +295,15 @@ class MazeTrial():
       self.gui.show_start_menu()
        
     def hint(self):
-        # place a random track piece not already placed
-        pass
-                    
+        # place a random piece if the solution path        
+        try: 
+            idx = randint(0, len(self.path) - 1)
+            p = self.path.pop(idx)
+            self.highlight([p], '', 'cyan')
+        except (IndexError, ValueError):
+          dialogs.hud_alert('No more hints')          
+          self.gui.show_start_menu()
+        
     def process_turn(self, move, board):
         """ process the turn
         move is coord, new letter, selection_row
@@ -332,6 +359,8 @@ if __name__ == '__main__':
 
   game = MazeTrial()
   game.run()
+
+
 
 
 

@@ -95,7 +95,28 @@ class WilsonMazeGenerator:
         Set whether WilsonMazeGenerator.__str__() outputs the
         solution or not"""
         self.showSolution = show
- 
+        
+    def generate_north_east(self):
+        """ convert frame to nxmx2 grid"""
+        self.grid3d = np.full((self.height, self.width, 2), False, dtype=bool)
+        index = 0
+        for r in range(1, self.height, 2):
+          
+          row = self.frame[r, :] #north
+          blocks = self.frame[r-1, :]
+          self.grid3d[index, :, 0] = blocks==1
+          index += 1
+          
+        index = 0      
+        for c in range(1, self.width, 2):
+          
+          col = self.frame[:, c] #east
+          blocks = self.frame[:, c+1]
+          self.grid3d[:, index, 1] = blocks==1
+          index += 1    
+        
+          
+    
     def generate_maze(self):
         """
         Generates the maze according to the Wilson Loop Erased Random
@@ -455,7 +476,7 @@ class HunterKillerMaze():
             path[coord] = node
             finished =self.dfs(coord, graph, visited, path, stop)  # Call the dfs recursively  
             if finished:
-            	return True
+              return True
         
   
   def bfs(self, node, graph, visited, path,stop=None): #function for BFS
@@ -484,10 +505,10 @@ class HunterKillerMaze():
         if not self.generated:
             return None
         if method == 'dfs':
-        	fn = self.dfs
+          fn = self.dfs
         else:
-        	fn = self.bfs
-        	
+          fn = self.bfs
+          
         path = {}
         visited = np.zeros((self.height, self.width), dtype=bool)
         adj = self.adjacency()
@@ -496,9 +517,9 @@ class HunterKillerMaze():
         index = self.end
         path_list = []
         while index != self.start:
-        	path_list.append(path[index])
-        	index = path[index]
-        #path_list.append(self.start)	
+          path_list.append(path[index])
+          index = path[index]
+        #path_list.append(self.start) 
         return path_list
       
   def convert_grid(self):
@@ -535,6 +556,7 @@ if __name__ == '__main__':
     # quest = input("Do you want the solution shown? (Y/N) ")
     gen.show_solution(True)  # quest.strip().lower() == "y")
     print(gen)
+    # gen.generate_north_east()
     # hunt kill algorithm
     
     h = HunterKillerMaze(10,10)
@@ -551,6 +573,7 @@ if __name__ == '__main__':
     #print(dirgrid)
     path = h.solve_maze()
     print(path)
+
 
 
 
