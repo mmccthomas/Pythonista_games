@@ -32,7 +32,6 @@ import traceback
 from queue import Queue
 NORTH = 0
 EAST = 1     
-
                                     
 class WilsonMazeGenerator:
     """Maze Generator using Wilson's Loop Erased Random Walk Algorithm"""
@@ -81,7 +80,6 @@ class WilsonMazeGenerator:
         frame_int[frame_int == block] = '1'
         frame_int[frame_int == '.'] = '4'
         self.frame = frame_int.astype(int)
-        print(self.frame.shape)
         return ''.join([''.join(row) + '\n' for row in frame])
  
     def get_solution(self):
@@ -98,24 +96,23 @@ class WilsonMazeGenerator:
         
     def generate_north_east(self):
         """ convert frame to nxmx2 grid"""
-        self.grid3d = np.full((self.height, self.width, 2), False, dtype=bool)
+        self.grid3d = np.full(((self.height+1)//2, (self.width+1)//2, 2), False, dtype=bool)
+        
         index = 0
-        for r in range(1, self.height, 2):
-          
-          row = self.frame[r, :] #north
-          blocks = self.frame[r-1, :]
-          self.grid3d[index, :, 0] = blocks==1
+        for r in range(1, self.height+2, 2):          
+          # row = self.frame[r, 1::2] #north
+          blocks = self.frame[r-1, 1::2]
+          self.grid3d[index, :, NORTH] = ~(blocks==1)
           index += 1
           
         index = 0      
-        for c in range(1, self.width, 2):
-          
-          col = self.frame[:, c] #east
-          blocks = self.frame[:, c+1]
-          self.grid3d[:, index, 1] = blocks==1
+        for c in range(1, self.width+2, 2):          
+          # col = self.frame[1::2, c] #east
+          blocks = self.frame[1::2, c+1]
+          self.grid3d[:, index, EAST] = ~(blocks==1)
           index += 1    
         
-          
+        return self.grid3d  
     
     def generate_maze(self):
         """
@@ -416,7 +413,7 @@ class HunterKillerMaze():
                   
   def generate_maze(self):  
       # set the current cell to a random value
-      t = time()
+
       current_cell = (random.randint(0, self.height - 1), random.randint(0, self.width - 1))
         
       unvisited_count = self.width * self.height
@@ -438,10 +435,10 @@ class HunterKillerMaze():
           self.visited[new_cell] = True
           unvisited_count -= 1  
           current_cell = new_cell
-      print('time to generate ', time() -t)
+      
       self.generated = True
       return self.grid
-  
+        
   def adjacency(self):
       """construct adjacency matrix
       neighbours are shuffled to force random path
@@ -556,11 +553,12 @@ if __name__ == '__main__':
     # quest = input("Do you want the solution shown? (Y/N) ")
     gen.show_solution(True)  # quest.strip().lower() == "y")
     print(gen)
-    # gen.generate_north_east()
+    gen.generate_north_east()
     # hunt kill algorithm
     
     h = HunterKillerMaze(10,10)
     h.generate_maze()
+    #h.generate_wilson_maze()
     h.draw_maze()
 
     block = u'\u2588'  # block character
