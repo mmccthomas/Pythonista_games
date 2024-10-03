@@ -358,7 +358,8 @@ class LetterGame():
       # human play
       #self.gui.set_top('Human turn')           
       self.print_board()
-      move = self.get_player_move(self.board)               
+      move = self.get_player_move(self.board)     
+      print(move)          
       #hit = self.check_hit(move ,self.board)
       move = self.process_turn( move, self.board)
       #self.gui.set_message(f"Message", font=('Avenir Next', 25)) 

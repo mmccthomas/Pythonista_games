@@ -19,7 +19,7 @@ TRAINS = 'traintracks.txt'
 
 class Player():
   def __init__(self):
-    self.PLAYER_1 = ' '
+    self.PLAYER_1 = 0
     self.PIECE_NAMES = {0: '_', 1: '&', 2: 'e', 3: 's', 4: 'blue', 5: 'cyan'}
     self.PIECES = [f'../gui/tileblocks/{tile}.png' for tile in self.PIECE_NAMES.values()]
     # use keys() instead of values() for lines
@@ -32,17 +32,15 @@ class MazeTrial():
         self.debug = False
         select = dialogs.list_dialog('Maze size', ['Small', 'Medium', 'Large'])
         match select:
-          case 'Small':
-            size = 10
-          case 'Medium':
-            size = 30
-          case 'Large':
-            size = 50
-        
-        
+          case 'Small': size = 10
+          case 'Medium': size = 30
+          case 'Large': size = 50
+          case _: size = 30
+               
         self.display_board = np.zeros((size, size), dtype=int)
         self.board = None
         self.log_moves = True  # allows us to get a list of rc locations
+        self.straight_lines_only = False
         self.q = Queue()
         self.gui = Gui(self.display_board, Player())
         self.gui.gs.q = self.q  # pass queue into gui
@@ -53,9 +51,7 @@ class MazeTrial():
         self.gui.allow_any_move(True)
         
         self.gui.setup_gui(log_moves=True, grid_fill='white')
-        # self.gui.build_extra_grid(size, size, grid_width_x=1, grid_width_y=1,
-        #                          color='black', line_width=2, offset=None,
-        #                          z_position=100)
+
         # menus can be controlled by dictionary of labels and
         # functions without parameters
         self.gui.set_pause_menu({'Continue': self.gui.dismiss_menu,
@@ -79,60 +75,64 @@ class MazeTrial():
         self.end = (randint(0, self.size-1), randint(self.size//2, self.size-1))
         self.error = self.initialize()
         
+        
     def update_board(self, board):
       self.gui.update(board)
     
     def wait_for_gui(self):
-        # loop until dat received over queue
-        while True:
-          # if view gets closed, quit the program
-          if not self.gui.v.on_screen:
-            print('View closed, exiting')
-            sys.exit()
+      # loop until dat received over queue
+      while True:
+        # if view gets closed, quit the program
+        if not self.gui.v.on_screen:
+          print('View closed, exiting')
+          sys.exit() 
+          break   
+        #  wait on queue data, either rc selected or function to call
+        sleep(0.001)
+        if not self.q.empty():
+          data = self.q.get(block=False)
+          
+          #self.delta_t('get')
+          #self.q.task_done()
+          if isinstance(data, (tuple, list, int)):
+            coord = data # self.gui.ident(data)
             break
-          #  wait on queue data, either rc selected or function to call
-          sleep(0.01)
-          if not self.q.empty():
-            data = self.q.get(block=False)
-            # self.delta_t('get')
-            # self.q.task_done()
-            if isinstance(data, (tuple, list, int)):
-              coord = data  # self.gui.ident(data)
-              break
-            else:
-              try:
-                # print(f' trying to run {data}')
-                data()
-              except (Exception) as e:
-                print(traceback.format_exc())
-                print(f'Error in received data {data}  is {e}')
-        return coord
+          else:
+            try:
+              #print(f' trying to run {data}')
+              data()
+            except (Exception) as e:
+              print(traceback.format_exc())
+              print(f'Error in received data {data}  is {e}')
+      return coord
         
     def _get_player_move(self, board=None):
-      """Takes in the user's input and performs that move on the board,
-         returns the coordinates of the move
-         Allows for movement over board"""
+      """Takes in the user's input and performs that move on the board, returns the coordinates of the move
+      Allows for movement over board"""
       if board is None:
           board = self.game_board
       coord_list = []
-      # sit here until piece place on board
+      
+      # sit here until piece place on board   
       items = 0
       
-      while items < 1000:  # stop lockup
+      while items < 1000: # stop lockup        
         move = self.wait_for_gui()
+        if items == 0: st = time()
+        #print('items',items, move)
         try:
           if self.log_moves:
             coord_list.append(move)
             items += 1
             if move == -1:
-              return coord_list
+              return coord_list       
           else:
             break
         except (Exception) as e:
           print(traceback.format_exc())
           print('except,', move, e)
           coord_list.append(move)
-          return coord_list
+          return coord_list    
       return move
        
     def get_player_move(self, board=None):
@@ -140,7 +140,7 @@ class MazeTrial():
            returns the coordinates of the move
            Allows for movement over board"""
         move = self._get_player_move(self.board)
-        print(move)
+        
         if move[0] == (-1, -1):
            return (None, None), 'Enter', None  # pressed enter button
         # deal with buttons. each returns the button text
@@ -150,14 +150,16 @@ class MazeTrial():
           return move, None, None
         return (None, None), None, None
         
-    def highlight(self, coords, text, color):
+    def highlight(self, coords, text, color, rel_size=0.9):
       sqsize=self.gui.gs.SQ_SIZE
+    
       #adjust text position relative to size
       y = 1 + self.size // 30
       square_list = []
       for  coord in coords:
-        square_list.append(Squares(coord, text, color, z_position=30, sqsize=0.9*sqsize,
-                                        alpha=0.5, font=('Avenir Next', sqsize), offset=(.05, -0.05),
+        square_list.append(Squares(coord, text, color, z_position=30, sqsize=rel_size * sqsize,
+                                        alpha=0.5, font=('Avenir Next', sqsize), 
+                                        offset=((1.0-rel_size)/2, -(1.0-rel_size)/2),
                                         text_anchor_point=(-1, y)))
       self.gui.add_numbers(square_list, clear_previous=False)
         
@@ -236,6 +238,7 @@ class MazeTrial():
         self.solution_board = self.board.copy()
         for p in self.path[:-1]:
           self.solution_board[p] = 5
+        self.moves = []
    
         #maze.draw_maze()
         #self.board = self.maze.frame
@@ -286,7 +289,7 @@ class MazeTrial():
       """finish the game by revealing solution"""
       #self.maze.show_solution(True)
       #_ = str(self.maze)
-      self.highlight(self.path[:-1], '', 'cyan')  
+      self.highlight(self.path[:-1], '', 'cyan', 0.8)  
       #self.board = self.solution_board
       
       self.update_board(self.board)
@@ -301,22 +304,33 @@ class MazeTrial():
             p = self.path.pop(idx)
             self.highlight([p], '', 'cyan')
         except (IndexError, ValueError):
-          dialogs.hud_alert('No more hints')          
-          self.gui.show_start_menu()
+            dialogs.hud_alert('No more hints')          
+            self.gui.show_start_menu()
+            return True
         
     def process_turn(self, move, board):
         """ process the turn
         move is coord, new letter, selection_row
         """
-        print(move)
-        if isinstance(move, list):
-          for coord in move[:-2]:
-            if self.board[coord] == 0:
-               self.board[coord] = 5
-          self.update_board(self.board)
+        def uniquify(moves):
+            """ filters list into unique elements retaining order"""
+            return list(dict.fromkeys(moves))     
+                    
+        if isinstance(move[0], list):
+          moves = move[0]
+          moves.pop(-1)
+          moves = uniquify(moves)
+          common = list(set(moves).intersection(set(self.moves)))
+          difference = list(set(moves).difference(set(common)))
+          if common:
+              self.gui.clear_numbers(common)
+              self.moves = list(set(self.moves).difference(set(common)))
+          self.moves.extend(difference)                      
+          self.highlight(difference, '', 'orange', rel_size=0.5)
+            
         elif move:
           coord, letter, row = move
-          r, c = coord
+                    
           if letter == 'Enter':
             finished = self.hint()
             if finished:
@@ -328,6 +342,7 @@ class MazeTrial():
           elif letter != '':  # valid selection
               try:
                   r, c = coord
+                  self.highlight([coord], '', 'orange', rel_size=0.5)
               except (IndexError):
                   pass
         return 0
