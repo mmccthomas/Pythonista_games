@@ -1614,3 +1614,251 @@ D PU EL D.
 19 Type of crab • Wood
 20 Taken away
 21 Pared • Lethal, fatal
+
+484_4:
+''
+7, 5
+123
+
+484_4_frame:
+Y RNDEA DTRA I 
+ICEE TDNEO IBER
+N DTE  I WOR N 
+O OE MLAU A DGE
+SEDROAE LDVI A 
+E GE IDEE E ISE
+ELLVE TED NOUMA
+G A OD W SS  IN
+GAGOR PEL LASEN
+POT MIIAR EACAV
+ER SE M EK ROR 
+REP NOPEDEACRIP
+AGENCHT E R AT 
+T S HEEARPEA AP
+EATPERR IA CHT 
+SIE I R HGLOONE
+ N ATHILE E N X
+HCO E N ABIG RE
+O LST DELYLE F 
+TOOI G K  E CIS
+T BMBEDECWRI L 
+
+484_4_text:
+1 Awful experience• Sturgeon's roe
+2 Front tooth used in cutting food
+3 Deteriorate, decline• Slashed, torn
+4 Loan shark
+5 Horse of mixed colour•
+  Cover with thin slabs
+6 Script update
+7 Probe, dig• Famous, well known
+8 Eccentricity
+9 Interior colour scheme•
+  Extended collar of a coat
+10 Old cloth measure
+11 Shipping hazard • Suggested,
+   gave hints to
+12 Joke, wisecrack
+13 Show malicious satisfaction•
+   Tiny winged insect
+14 Pacify, placate
+15 Stretch of water between two
+   headlands• Disorganised sound
+16 Least complicated
+17 Carried off, stole • Kit
+18 Jetsam gatherer
+19 Act of sending a missile into
+   space• Thick soup
+20 Scottish plant
+21 Lower-pitched • Show again
+
+484_113:
+''
+7, 5
+2813113105031923090621260130250420152432080002171634123329221427071018
+
+484_113_frame:
+EM COSR MSOCLIS
+RATH PE AI A C 
+ N A ODANPETHAS
+S EUNYR A TET P
+ARNK MREPNITED 
+L ZISEY T O REV
+FOOT AISERACT T
+E LALV EXE HECH
+REAM OB PESOP E
+RAKRN  COT AK R
+T ETEDDAPEFT PA
+EAS S  S D YREL
+P D X ESSESIE A
+ JUSTYD WRADAU 
+H B REITE G T P
+ H  R ONEG BREC
+EAULISO COBOED 
+LP AL MPTS BE C
+ C BYSMEN F INC
+LATA E L HALN L
+ YERIEAILURESNO
+
+484_113_text:
+1 Leaf from the base of a flower•
+Deep hole
+2 Instrument descended from the
+shawm• Middle Eastern sweet made
+of sesame flour and honey•Clear
+(an amount of money)
+3 Broom made from twigs•
+Type of bay window
+4 Garment covering the foot•
+Take exams again•Feeble
+5 Marched ceremonially
+6 Small seabird•Alter
+7 Caesar salad lettuce
+8 Chic, well-dressed •Level high ground
+9 Authentic•High-pitched Dark
+10 Pronounce 's' as th'• Duckling s
+father•Prayer word of agreement
+11 Overhang•Light pertume,
+de cologne
+12 Keypad symbol denoting number•
+Creature, animal •Water carrer
+13 Abound (with) • Foot complaint
+14 Fertiliser•Changed with
+circumstances
+15 Judo level
+16 Cut, engrave • Alcove set back in
+the wall
+17 Breathed out
+18 One who believes they are socially
+superior •Food without solid pieces•
+Specify
+19 Astringent cosmetic liquid•
+Happening,brewing
+20 Radio code word between delta and
+foxtrot • Light fabric with a wrinkled
+surface•Ship's port side
+21 Unoccupied •Car tyre's pattern
+
+484_150:
+''
+7, 5
+0304301116271226242922021318210609170514190732330801202800153410252331
+
+484_150_frame:
+E GFLUOUTCURBIN
+LY E NR OU E N 
+ U TENM RR BIGO
+TINP MS UYREAST
+   RAPS R. D.  
+TMAE LUCEA. IFE
+MPEHUG O. K G A
+ R. S. TEWINORB
+GINLITK X.  N B
+USHGEDICAGILSAY
+D EI E O G OS. 
+IVYZ VBOAE W. P
+E KD.   TACE N 
+ CA. BO.  C NG 
+ A AILPRALANU F
+L F A FLU L ZOO
+OBINDIE ITTIA U
+G B U WAL Z RET
+G CT D.  U LI I
+EGOE AOWAN OS N
+T BDLY A NANHUG
+
+484_150_text:
+1 Restraining, keeping in check•
+  Puffed (of a steam train)
+2 One's sell-esteem
+3 Narrow-minded, intolerant person•
+  Intensive series of air raids
+4 Contagious isease•Collection of
+  exotic animals
+5 Caring for, looking after
+6 Excursion made on foot• Become
+  anxious
+7 Person who sells tickets illegally•
+  Cover With precious metal
+8 Due for payment
+9 Four-wheeled carriage for a baby
+  Long high-pitched cry of grief
+10 Chewing
+11 Hip-hop vocal style • With the sceptre,
+   a symbol of royalty
+12 Person who goes to sea to
+   rescue people
+13 Expresses in words • Ancient harp-like
+   musical instrument
+14 Mountain ash tree
+15 Dark red or purplish-brown colour•
+   Dog's name in Peter Pan
+16 Smoke-duct in a chimney•
+   Sudden or copious stream
+17 Spitefully
+18 Card below the Jack• Climbing plant
+   with shiny leaves
+19 Urge forward• Small surface of
+   a crystal
+20 Wide sash worn with a kimono
+21 Embracing closely • In a dull and
+   Insipid manner
+
+484_64:
+''
+7, 5
+2918012232143023101703113402080728043320263115061600091219210513272425
+
+484_64_frame:
+  TRON.O R L L 
+SPU U IAIEXPTAL
+ L URGSS B.  C 
+PUMTE EMBR IOWE
+ M EROL OSONR. 
+LEA E LOO. TDOS
+EST I L PA K I 
+  CUNGL OIREOCH
+ICH SUE LN W. E
+SET. E I H PETA
+W ABICHEWUSE. W
+ODDI TE. N SAKE
+OSEL. G TS RL I
+W LEFTHOWU ALEG
+EIL L E IR NY H
+DEAI. NEELEMBAT
+ C OUT A   S T 
+AKAN UORRFAHSTU
+GUT ROUBEOTIPRO
+E. GRE E L. E L
+RRO O SLEABSRPA
+  
+484_64_text:
+1 Washtub • Tine of a fork• Londons
+Underground railway system
+2 Exploit • Question word
+3 Momentarily daze•Sudden rushor
+swell•Land surrounded py water
+4 Pluck, mettle• Take it easy
+5 Standing point in darts• Munch
+6 Slip-up• Suitable position in life or
+in employment
+7 In favour of
+8 Remove all traces of•Romantic affair
+9 Go one better than
+10 Symbolic badge•Futile
+11 Market vendor's booth
+12 Natural skin-brush•Descend by rope
+13 Dog show winner's ribbon badge
+14 Lett behind(a habit)、Related to
+vigorous exercise
+15 Mismatched (socks)
+16 Bathroom cloth•Flower "leaf’
+17 Incentive • Threads crossing the warp
+18 Medicinal amount • Large pool of
+fresh water
+18 Mountain lion, cougar •Genuflect•
+Thought
+20 Extreme annoyance•Limb where
+the hamstring is found
+21 Tilt •Anxiety, concern•
+New Zealand war dance

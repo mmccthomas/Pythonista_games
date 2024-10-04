@@ -26,7 +26,7 @@ BREAD
 BROILING
 4
 SANDPIPER
-SAVOY
+SAVOY#
 SEAM
 SHY
 SLIGO
@@ -1474,3 +1474,267 @@ Puzzle17_frame:
 ' / / / / / / / / / / /u/ '
 ' / / / / /l/a/i/r/e/12s/ / '
 ' / / /13/ / / / / / / / / '
+
+Puzzle18:
+#484_154
+1
+BED
+BITTER
+BLONDE
+BORE
+BYE
+2
+CAKE
+CAPO
+CENT
+CORONET
+3
+GAG
+GAINSAY
+GLADE
+GRUEL
+4
+FAINT
+FIN
+FOOTHILLS
+FUR
+5
+UPTAKE
+URGED
+USER
+USURY
+6
+ORB
+OVATE
+OVINE
+7
+MAOIST
+MEASURE
+MET
+MINARET
+8
+DEVOTION
+DISPUTE
+DROWSY
+9
+PASTEL
+PROFIT
+PROOF
+10
+SEAHORSE
+SEAT
+SET
+SPROUTED
+SQUAT
+11
+TAIL
+TAN
+TEE
+THREAD
+TOUCH
+12
+PIN
+PIT
+PLAN
+PLATEAU
+POSTCARD
+13
+NEARER
+NEGATE
+NIHILISM
+14
+EEL
+ELL
+ERNE
+ETCHING
+
+Puzzle18_frame:
+' / / /1/ / / / / / / / / '
+' / / / / / / / / / / / / '
+' / / / / / / / / / / / /n'
+' / / / / / / / /2/ / /i/ '
+'3/ / / / / / / / / /4f/ / '
+' / / / /5/ / / / /o/ / /6'
+' / / / / / / / /o/ / / / '
+' /7/ / / /8/ /t/ / / /9/ '
+' / / / / / /h/ / /10/ / / '
+' / / / / /i/11/ / / / / / '
+' / / /12/l/ / / / / / / / '
+' / / /l/ / / /13/ / / / / '
+' / /s/ / / / / / / /14/ / '
+
+Puzzle19:
+#484_123
+1
+MACAROON
+MADEIRA
+MARBLE
+MERINGUE
+MUFFIN
+2
+SATURATE
+SETT
+SOFA
+STERLING
+SURF
+3
+EBONY
+EFT
+ELF
+EMBRACE
+EMU
+ERADICATE
+ERR
+4
+ZEBRA
+ZERO
+ZINC
+ZONE
+5
+ABUT
+ACCLAIM
+AGREE
+ALLERGY
+AVID
+6
+BELFRY
+BIOLOGY
+BRIEFS
+BYE
+7
+MAGPIE
+MANACLES
+MEALIE
+MILITIA
+MOBSTER
+8
+AESOP
+ALTER
+AMMETER
+9
+PANG
+PEA
+PENALTY
+PLEA
+POND
+10
+FACILITY
+FEEBLE
+FIT
+FLEA
+FLEW
+FOLK
+11
+SEA
+SEE
+SILO
+SPAR
+SUM
+12
+BARB
+BEMOANED
+BREW
+BUFF
+
+Puzzle19_frame:
+' / / / / / / /1/ / / / / '
+' / / /2/ / / / / / / / / '
+' / / / / / / / / / /3/ / '
+' / / / / / / / / / / / / '
+' / / / / / / / / / / / / '
+' / / / / / / / /4/ / / / '
+' / / / / /5a/ / / / / /6/ '
+' /7/ / / /c/l/ / / / / / '
+' / / / / /c/ /l/ / / / /8'
+'9/ / / / /l/ /10/e/ / / / '
+' / / /11/ /a/ / / /r/ / / '
+' / / / / /i/ / / / /g/ / '
+' / / / / /m/ /12/ / / /y/ '
+
+Puzzle20:
+#484_21
+1
+CAFFEINE
+CAREFREE
+CHEERY
+CHEESE
+CHUFFED
+2
+CAKE
+CANTEEN
+COAX
+COLA
+COMEDY
+3
+RAY
+REBUFF
+RUN
+RYE
+4
+SKUA
+SONOROUS
+SPEAR
+SPOOR
+5
+BAFFLE
+BEETROOT
+BELL
+BINDWEED
+BLESSED
+BRAN
+BREEZE
+BRIE
+6
+ADDRESS
+AGA
+AIDE
+ANYONE
+ARCHERY
+7
+CLANGER
+CLARET
+CLEMENCY
+CLIENT
+CURRY
+8
+WAND
+WIN
+WOE
+9
+GOLFERS
+GREENERY
+GREY
+GRUYERE
+GUM
+10
+ACT
+AEON
+AIL
+AIR
+AWE
+AWL
+11
+BLUR
+BOA
+BOER
+BUS
+12
+TEDDY
+TESTATE
+TONIC
+TREE
+
+Puzzle20_frame:
+' / / /e/ /1/ / / / / / / '
+' / / /z/ / / / / /2/ / / '
+' / /3/e/ / / / / / / / / '
+' / / /e/ / / / / / / / / '
+' / / /r/ / / / / / / /4/ '
+' / / /5b/l/e/s/s/e/d/ / / '
+' / / / / / / /6/ / / / / '
+'7/ / / / / / / / / / / / '
+' / / / / / / / / / /8/ / '
+' / / / / / / / / / / / /9'
+' / /10/ / / / / / /11/ / / '
+' / / / / / / / / / / / / '
+' / / / / /12/ / / / / / / '

@@ -453,7 +453,7 @@ class HunterKillerMaze():
                     if self.can_move(dir_str, rc):
                        yd, xd = self.inv_dirn[dir_str]    
                        neighbours.append((r + yd, c + xd))
-              #shuffle(neighbours)
+              shuffle(neighbours)
               adjdict[(r, c)]= neighbours
       return adjdict
   

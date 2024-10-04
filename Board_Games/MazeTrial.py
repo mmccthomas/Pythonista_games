@@ -11,7 +11,7 @@ import sys
 import dialogs
 from ui import LINE_CAP_ROUND
 from queue import Queue
-from random import randint, seed
+from random import randint, seed, choice
 from time import sleep, time
 current = os.path.dirname(os.path.realpath(__file__))
 parent = os.path.dirname(current)
@@ -35,29 +35,21 @@ class MazeTrial():
     def __init__(self):
         """Create, initialize and draw an empty board."""
         self.debug = False
-        select = dialogs.list_dialog('Maze size', ['Hunter Small', 'Hunter Medium', 'Hunter Large', 'Wilson Small', 'Wilson Medium', 'Wilson Large'])
+        generator = choice(['Hunter', 'Wilson'])
+        select = dialogs.list_dialog('Maze size', ['Small', 'Medium', 'Large',  'Hunter SuperLarge'])
         match select:
-          case 'Hunter Small': 
-            size = 10
+          case 'Small': 
+            size = 10          
+          case 'Medium': 
+            size = 30            
+          case 'Large': 
+            size = 50          
+          case  'Hunter SuperLarge': 
+            size = 80
             generator = 'Hunter'
-          case 'Hunter Medium': 
-            size = 30
-            generator = 'Hunter'
-          case 'Hunter Large': 
-            size = 50
-            generator = 'Hunter'
-          case 'Wilson Small': 
-            size=10
-            generator = 'Wilson'
-          case 'Wilson Medium': 
-            size = 30
-            generator = 'Wilson'
-          case  'Wilson Large': 
-            size = 50
-            generator = 'Wilson'
           case _: 
             size = 30
-            generator = 'Hunter'
+            
                
         self.display_board = np.zeros((size, size), dtype=int)
         self.log_moves = True  # allows us to get a list of rc locations
@@ -169,9 +161,12 @@ class MazeTrial():
         
     def highlight(self, coords, text, color, rel_size=0.9):
       sqsize=self.gui.gs.SQ_SIZE
-      text_y_pos = {30: 2.5, 10: 1.5, 50: 6}
+      text_y_pos = {30: 2.5, 10: 1.5, 50: 6, 100:6}
       #adjust text position relative to size
-      y = text_y_pos[self.size]
+      try:
+         y = text_y_pos[self.size]
+      except (KeyError):
+       	 y= 2.5
       square_list = []
       for  coord in coords:
         square_list.append(Squares(coord, text, color, z_position=30, sqsize = rel_size * sqsize,
