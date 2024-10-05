@@ -1,3 +1,7 @@
+#TODO modify to use selectable generators from mazelib
+# use routine to convert blocks and spaces  grid to 3d northband east grid as this is efficient
+# wilson does not produce very nice mazes
+
 # Maze Generator
 #  Wilson's Loop Erased Random Walk Algorithm
 # Author: CaptainFlint
@@ -27,9 +31,28 @@ import random
 import numpy as np
 from time import time, sleep
 from random import sample, randint, choice, shuffle
-import matplotlib.pyplot as plt
 import traceback
 from queue import Queue
+from Mazelib.mazelib import Maze
+from Mazelib.mazelib.generate.MazeGenAlgo import MazeGenAlgo
+from Mazelib.mazelib.generate.AldousBroder import AldousBroder
+from Mazelib.mazelib.generate.BacktrackingGenerator import BacktrackingGenerator
+from Mazelib.mazelib.generate.BinaryTree import BinaryTree
+from Mazelib.mazelib.generate.CellularAutomaton import CellularAutomaton
+from Mazelib.mazelib.generate.Division import Division
+from Mazelib.mazelib.generate.DungeonRooms import DungeonRooms
+from Mazelib.mazelib.generate.Ellers import Ellers
+from Mazelib.mazelib.generate.GrowingTree import GrowingTree
+from Mazelib.mazelib.generate.HuntAndKill import HuntAndKill
+from Mazelib.mazelib.generate.Kruskal import Kruskal
+from Mazelib.mazelib.generate.Prims import Prims
+from Mazelib.mazelib.generate.Sidewinder import Sidewinder
+from Mazelib.mazelib.generate.TrivialMaze import TrivialMaze
+from Mazelib.mazelib.generate.Wilsons import Wilsons
+import matplotlib.pyplot as plt
+from matplotlib.path import Path
+from matplotlib.patches import PathPatch
+
 NORTH = 0
 EAST = 1     
                                     
@@ -542,9 +565,162 @@ class HunterKillerMaze():
          if 'E' in dirgrid[(r, c)]:
            self.display_grid[2 * r : 2*r+2, 2*c +2] = 1    
     return self.display_grid, dirgrid
-                        
+
+class SelectableMaze(HunterKillerMaze):
+  
+  def __init__(self, width, height, mazetype=None):
+      super().__init__(width, height)
+      self.height, self.width = height, width
+      self.maze = Maze()
+      self.mazetypes = [AldousBroder, BacktrackingGenerator,
+                        BinaryTree, CellularAutomaton,
+                        Division, DungeonRooms,
+                        Ellers, GrowingTree,
+                        HuntAndKill, Kruskal,
+                        Prims, Sidewinder,
+                        TrivialMaze, Wilsons]
+      if mazetype is None:
+        self.maze_fn = choice(self.mazetypes)                 
+      else:
+        try:
+          self.maze_fn = globals()[mazetype]
+        except (KeyError):
+          raise KeyError(f'Maze type {mazetype} not known')
+      self.maze.generator = self.maze_fn(width, height)
+      
+      #m.solve()
+      
+  def generate_maze(self):
+      """ generate a maze and return a block grid and 3d grid """
+      t = time()
+      self.block_grid = self.maze.generate()
+      self.maze.generate_entrances(self.start, self.end)
+      self.block_grid = self.maze.grid
+      a = self.block_grid.shape
+      self.grid = self.generate_north_east()
+      print(f'{self.maze_fn} generate time {time() - t}')
+      self.generated = True
+    
+  def generate_north_east(self):
+      """ convert frame to nxmx2 grid"""
+      self.grid = np.full((self.height, self.width, 2), False, dtype=bool)
+        
+      index = 0
+      for r in range(1, self.grid.shape[1], 2):          
+          blocks = self.block_grid[r-1, 1::2]
+          self.grid[index, :, NORTH] = ~(blocks==1)
+          index += 1
+          
+      index = 0      
+      for c in range(1, self.grid.shape[0], 2):          
+          blocks = self.block_grid[1::2, c+1]
+          self.grid[:, index, EAST] = ~(blocks==1)
+          index += 1    
+        
+      return self.grid  
+             
+  def showPNG(self,grid):
+    """Generate a simple image of the maze."""
+    plt.figure(figsize=(10, 5))
+    plt.imshow(grid, cmap=plt.cm.binary, interpolation='nearest')
+    plt.xticks([]), plt.yticks([])
+    plt.show() 
+    
+  def plotXKCD(self, grid):
+    """ Generate an XKCD-styled line-drawn image of the maze. """
+    
+    def use_run(codes, vertices, run):
+        """Helper method for plotXKCD. Updates path with newest run."""
+        if run:
+            codes += [Path.MOVETO] + [Path.LINETO] * (len(run) - 1)
+            vertices += run
+        
+    H = len(grid)
+    W = len(grid[0])
+    h = (H - 1) // 2
+    w = (W - 1) // 2
+
+    with plt.xkcd(0,0,0):
+        fig = plt.figure()
+        ax = fig.add_subplot(111)
+
+        vertices = []
+        codes = []
+
+        # loop over horizontals
+        for r,rr in enumerate(range(1, H, 2)):
+            run = []
+            for c,cc in enumerate(range(1, W, 2)):
+                if grid[rr-1,cc]:
+                    if not run:
+                        run = [(r,c)]
+                    run += [(r,c+1)]
+                else:
+                    use_run(codes, vertices, run)
+                    run = []
+            use_run(codes, vertices, run)
+
+        # grab bottom side of last row
+        run = []
+        for c,cc in enumerate(range(1, W, 2)):
+            if grid[H-1,cc]:
+                if not run:
+                    run = [(H//2,c)]
+                run += [(H//2,c+1)]
+            else:
+                use_run(codes, vertices, run)
+                run = []
+            use_run(codes, vertices, run)
+
+        # loop over verticles
+        for c,cc in enumerate(range(1, W, 2)):
+            run = []
+            for r,rr in enumerate(range(1, H, 2)):
+                if grid[rr,cc-1]:
+                    if not run:
+                        run = [(r,c)]
+                    run += [(r+1,c)]
+                else:
+                    use_run(codes, vertices, run)
+                    run = []
+            use_run(codes, vertices, run)
+
+        # grab far right column
+        run = []
+        for r,rr in enumerate(range(1, H, 2)):
+            if grid[rr,W-1]:
+                if not run:
+                    run = [(r,W//2)]
+                run += [(r+1,W//2)]
+            else:
+                use_run(codes, vertices, run)
+                run = []
+            use_run(codes, vertices, run)
+
+        vertices = np.array(vertices, float)
+        path = Path(vertices, codes)
+
+        # for a line maze
+        pathpatch = PathPatch(path, facecolor='None', edgecolor='black', lw=2)
+        ax.add_patch(pathpatch)
+
+        # hide axis and labels
+        ax.axis('off')
+        #ax.set_title('XKCD Maze')
+        ax.dataLim.update_from_data_xy([(-0.1,-0.1), (h + 0.1, w + 0.1)])
+        ax.autoscale_view()
+
+        plt.show()
+                                    
 if __name__ == '__main__':
-    gen = WilsonMazeGenerator(10,10)
+    width, height = 10, 10
+    g = SelectableMaze(width, height)
+    g.generate_maze()
+    print(str(g.maze_fn), time() -t)
+    g.plotXKCD(g.block_grid)
+    g.showPNG(g.block_grid)
+    path = g.solve_maze()
+    gen = WilsonMazeGenerator(width, height)
     t = time()
     gen.generate_maze()
     print('Maze Generated', time() - t)
@@ -556,7 +732,7 @@ if __name__ == '__main__':
     gen.generate_north_east()
     # hunt kill algorithm
     
-    h = HunterKillerMaze(10,10)
+    h = HunterKillerMaze(width, height)
     h.generate_maze()
     #h.generate_wilson_maze()
     h.draw_maze()
@@ -571,21 +747,6 @@ if __name__ == '__main__':
     #print(dirgrid)
     path = h.solve_maze()
     print(path)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 

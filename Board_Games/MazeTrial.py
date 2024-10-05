@@ -17,7 +17,7 @@ current = os.path.dirname(os.path.realpath(__file__))
 parent = os.path.dirname(current)
 sys.path.append(parent)
 from gui.gui_interface import Gui, Squares
-from maze_generator import WilsonMazeGenerator, HunterKillerMaze
+from maze_generator import WilsonMazeGenerator, HunterKillerMaze, SelectableMaze
 DEBUG = 0
 TRAINS = 'traintracks.txt'
 
@@ -228,7 +228,8 @@ class MazeTrial():
         
         self.highlight([self.start], 'S', 'red')
         self.highlight([self.end], 'E', 'green')
-        self.maze = WilsonMazeGenerator(2*self.size-2, 2*self.size-2)
+        maze = SelectableMaze(self.size, self.size, mazetype=None)
+        #self.maze = WilsonMazeGenerator(2*self.size-2, 2*self.size-2)
         
         t = time()
         self.maze.generate_maze()

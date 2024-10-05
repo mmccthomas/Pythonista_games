@@ -186,6 +186,7 @@ class PieceWord(LetterGame):
     index = 0
     images = {}
     try:
+      
       for y in range(img_count_v):
         for x in range(img_count_h):
           index += 1
