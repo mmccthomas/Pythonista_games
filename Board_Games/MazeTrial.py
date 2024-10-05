@@ -35,8 +35,8 @@ class MazeTrial():
     def __init__(self):
         """Create, initialize and draw an empty board."""
         self.debug = False
-        generator = None # 'HuntAndKill' #(['Hunter', 'Wilson'])
-        select = dialogs.list_dialog('Maze size', ['Small', 'Medium', 'Large',  'Hunter SuperLarge'])
+        generator = None
+        select = dialogs.list_dialog('Maze size', ['Small', 'Medium', 'Large',  'SuperLarge'])
         match select:
           case 'Small': 
             size = 10          
@@ -44,9 +44,8 @@ class MazeTrial():
             size = 30            
           case 'Large': 
             size = 50          
-          case  'Hunter SuperLarge': 
+          case  'SuperLarge': 
             size = 80
-            generator = 'Hunter'
           case _: 
             size = 30
             
@@ -195,7 +194,7 @@ class MazeTrial():
         board is nxmx2 where axis 2 is North, East
         use run length encoding to reduce number of lines """
 
-        params = {'line_width': 2, 'line_cap_style': LINE_CAP_ROUND, 'stroke_color': 'black'}
+        params = {'line_width': 4, 'line_cap_style': LINE_CAP_ROUND, 'stroke_color': 'black'}
         # bottom line
         self.gui.draw_line([self.gui.rc_to_pos((self.size -1,  0)),
                             self.gui.rc_to_pos((self.size -1, self.size))],
@@ -233,7 +232,9 @@ class MazeTrial():
         maze.endpoints(self.start, self.end)
         t = time()
         maze.generate_maze()
-        print('Maze time', time() - t)
+        elapsed = time() - t
+        # print('Maze time', elapsed)
+        self.gui.set_prompt(f'Generated in {elapsed:.3f} secs')
         display_grid, dirgrid = maze.convert_grid()
         #maze.showPNG(maze.block_grid)
         #maze.showPNG(display_grid)
@@ -241,7 +242,7 @@ class MazeTrial():
         # only use HunterKiller solve routine
         t = time()
         self.path = maze.solve_maze()
-        print('solve time', time() -t)      
+        #print('solve time', time() -t)      
         
         fn_name = str(maze.maze_fn).split(".")[-1][:-2]
         self.gui.set_top(f'Maze: Generator:  {fn_name} Size: {self.size}')      
@@ -273,7 +274,7 @@ class MazeTrial():
                 move = self.get_player_move()
                 finished = self.process_turn(move)
                 if self.game_over(finished):
-                  break
+                	  self.reveal()
         except (Exception):
           print(traceback.format_exc())
           print(self.error)
@@ -336,15 +337,20 @@ class MazeTrial():
           elif letter != '':  # valid selection
               try:
                   r, c = coord
-                  self.highlight([coord], '', 'orange', rel_size=0.5)
+                  if (0 <= r < self.size) and (0 <= c < self.size):
+                    self.highlight([coord], '', 'orange', rel_size=0.5)
               except (IndexError):
                   pass
         return 0
                   
     def game_over(self, finished):
-        pass
-        
-              
+        """ finish if coorect moves within 5 of solution """
+        intersection = set(self.moves).intersection(set(self.path))
+        correct = len(intersection)
+        path_length = len(self.path)
+        if path_length - 5 <= correct <= path_length:
+        	return True
+                    
     def restart(self):
        self.gui.gs.close()
        g = MazeTrial()

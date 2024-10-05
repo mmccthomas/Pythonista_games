@@ -360,12 +360,10 @@ class SelectableMaze(HunterKillerMaze):
       
   def generate_maze(self):
       """ generate a maze and return a block grid and 3d grid """
-      t = time()
       self.maze.generate()
       self.maze.generate_entrances(self.start, self.end)
       self.block_grid = self.maze.grid.copy()
       self.grid = self.generate_north_east()
-      print(f'{self.maze_fn} generate time {time() - t}')
       self.generated = True
     
   def generate_north_east(self):
@@ -479,19 +477,9 @@ class SelectableMaze(HunterKillerMaze):
         plt.show()
                                     
 if __name__ == '__main__':
-    width, height = 30,30
-    g = SelectableMaze(height, width, 'AldousBroder')
-    t = time()
-    g.generate_maze()
-    print(str(g.maze_fn), time() -t)
-    display_grid, dirgrid = g.convert_grid()
-    g.showPNG(g.block_grid)
-    g.showPNG(display_grid)
-    g.draw_maze()
-    #g.plotXKCD(g.block_grid)
-   
-    path = g.solve_maze()
-    print(path)
+    """ test all suitable generators """
+    width, height = 50, 50
+    
     for fn in [AldousBroder, BacktrackingGenerator,
                         CellularAutomaton,
                         DungeonRooms,
@@ -503,15 +491,17 @@ if __name__ == '__main__':
         g = SelectableMaze(height, width, fn_string)
         t = time()
         g.generate_maze()
-        print(fn_string, time() -t)
+        elapsed = time() - t
         display_grid, dirgrid = g.convert_grid()
         #g.showPNG(g.block_grid)
         #g.showPNG(display_grid)
         g.draw_maze()
+        print(fn_string, elapsed)
         #g.plotXKCD(g.block_grid)
        
         path = g.solve_maze()
-        print(path)
+        #print(path)
+
 
 
 
