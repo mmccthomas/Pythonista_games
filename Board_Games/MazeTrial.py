@@ -17,7 +17,7 @@ current = os.path.dirname(os.path.realpath(__file__))
 parent = os.path.dirname(current)
 sys.path.append(parent)
 from gui.gui_interface import Gui, Squares
-from maze_generator import WilsonMazeGenerator, HunterKillerMaze, SelectableMaze
+from maze_generator import HunterKillerMaze, SelectableMaze
 DEBUG = 0
 TRAINS = 'traintracks.txt'
 
@@ -35,7 +35,7 @@ class MazeTrial():
     def __init__(self):
         """Create, initialize and draw an empty board."""
         self.debug = False
-        generator = choice(['Hunter', 'Wilson'])
+        generator = None # 'HuntAndKill' #(['Hunter', 'Wilson'])
         select = dialogs.list_dialog('Maze size', ['Small', 'Medium', 'Large',  'Hunter SuperLarge'])
         match select:
           case 'Small': 
@@ -225,37 +225,28 @@ class MazeTrial():
     
     def initial_board(self):
         """ Display board and generate maze"""
-        
+        width, height = 30,30
+    
         self.highlight([self.start], 'S', 'red')
         self.highlight([self.end], 'E', 'green')
-        maze = SelectableMaze(self.size, self.size, mazetype=None)
-        #self.maze = WilsonMazeGenerator(2*self.size-2, 2*self.size-2)
-        
-        t = time()
-        self.maze.generate_maze()
-        str(self.maze)
-        grid = self.maze.generate_north_east()
-        print('Wilson generate time', time() - t)
-        maze = HunterKillerMaze(self.size, self.size)
+        maze = SelectableMaze(self.size, self.size, mazetype=self.generator)
         maze.endpoints(self.start, self.end)
         t = time()
         maze.generate_maze()
-        print('Hunter generate time', time() - t)
-        
-        if self.generator == 'Wilson':
-          maze.grid = grid
-        # only use HunterKiller sove routine
+        print('Maze time', time() - t)
+        display_grid, dirgrid = maze.convert_grid()
+        #maze.showPNG(maze.block_grid)
+        #maze.showPNG(display_grid)
+        #maze.draw_maze()
+        # only use HunterKiller solve routine
         t = time()
-        self.path = maze.solve_maze(method='bfs')
-        print('solve time', time() -t)
-                
-        self.moves = []
+        self.path = maze.solve_maze()
+        print('solve time', time() -t)      
         
-        if self.generator == 'Wilson':
-           self.create_line_borders(grid)
-        else:
-           self.create_line_borders(maze.grid)
-        # self.board = self.empty_board.copy()
+        fn_name = str(maze.maze_fn).split(".")[-1][:-2]
+        self.gui.set_top(f'Maze: Generator:  {fn_name} Size: {self.size}')      
+        
+        self.create_line_borders(maze.grid)
                                     
     def initialize(self):
         """This method should only be called once,
@@ -264,8 +255,8 @@ class MazeTrial():
         self.gui.clear_messages()
         self.gui.set_enter('Hint', position=(w+50,0) if self.gui.device.endswith('_landscape') else (w-100,h+10))
         self.gui.clear_numbers()
-        self.gui.set_top(f'Maze: {self.generator} {self.size}')
-        
+
+        self.moves = []  
         try:
             self.initial_board()
             

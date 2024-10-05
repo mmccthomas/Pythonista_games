@@ -4,7 +4,7 @@ import numpy as np
 try:
     from cython import compiled
 except (ModuleNotFoundError):
-    from MazeGenAlgo import MazeGenAlgo
+    from mazelib.generate.MazeGenAlgo import MazeGenAlgo
 
 RANDOM = 1
 SERPENTINE = 2

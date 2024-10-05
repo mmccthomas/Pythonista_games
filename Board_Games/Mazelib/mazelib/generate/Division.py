@@ -5,7 +5,7 @@ from random import randrange
 try:
     from cython import compiled
 except (ModuleNotFoundError):
-    from MazeGenAlgo import MazeGenAlgo
+    from mazelib.generate.MazeGenAlgo import MazeGenAlgo
 
 # CONSTANTS
 VERTICAL = 0

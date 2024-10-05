@@ -6,27 +6,12 @@
 #  Wilson's Loop Erased Random Walk Algorithm
 # Author: CaptainFlint
 # https://artofproblemsolving.com/community/c3090h2221709_wilsons_maze_generator_implementation
-"""
-Wilson's Algorithm is an algorithm to generate a
-uniform spanning tree using a loop erased random walk.
-Algorithm:
-1. Choose a random cell and add it to the visited list
-2. Choose another random cell (Don’t add to visited list).
-   This is the current cell.
-3. Choose a random cell that is adjacent to the current cell
-   (Don’t add to visited list). This is your new current cell.
-4. Save the direction that you traveled on the previous cell.
-5. If the current cell is not in the visited cells list:
-   a. Go to 3
-6. Else:
-   a. Starting at the cell selected in step 2, follow the arrows
-      and remove the edges that are crossed.
-   b. Add all cells that are passed into the visited list
-7. If all cells have not been visited
-   a. Go to 2
-Source: http://people.cs.ksu.edu/~ashley78/wiki.ashleycoleman.me/index.php/Wilson's_Algorithm.html
-"""
- 
+import os
+import sys
+current = os.path.dirname(os.path.realpath(__file__))
+parent = os.path.dirname(current)
+sys.path.append(parent) 
+sys.path.append(current + '/Mazelib')
 import random
 import numpy as np
 from time import time, sleep
@@ -56,222 +41,6 @@ from matplotlib.patches import PathPatch
 NORTH = 0
 EAST = 1     
                                     
-class WilsonMazeGenerator:
-    """Maze Generator using Wilson's Loop Erased Random Walk Algorithm"""
- 
-    def __init__(self, height, width):
-        """ Creates a maze generator with specified width and height"""
-        self.width = 2 * (width // 2) + 1    # Make width odd
-        self.height = 2 * (height // 2) + 1  # Make height odd
-        self._initialize_grid()
- 
-        # valid directions in random walk
-        self.directions_np = np.array([[0, 1], [1, 0], [0, -1], [-1, 0]])
-        # indicates whether a maze is generated
-        self.generated = False
- 
-        # shortest solution
-        self.solution = []
-        self.showSolution = False
-        self.start = (self.height - 1, 0)
-        self.end = (0, self.width - 1)
-        
-    def endpoints(self, start, end):
-        self.start = start
-        self.end = end
-        
-    def __str__(self):
-        """ outputs a string version of the grid"""
-        block = u'\u2588'  # block character
-        grid_disp = self.grid_np.copy().astype('U1')
-        grid_disp[grid_disp == '0'] = block
-        grid_disp[grid_disp == '1'] = ' '
-               
-        if self.showSolution:
-          grid_disp[tuple(np.array(self.solution).T)] = '.'
-          
-        # produce frame with blocks around each edge and insert grid
-        frame = np.full((self.height + 2, self.width + 2), block)
-        frame[1:-1, 1:-1] = grid_disp
-        frame[self.start] = '1'
-        frame[self.end] = '2'
-        # produce integer version for export
-        # 0=space, 1=block, 2=end, 3=start, 4=solution
-        frame_int = frame.copy()
-        frame_int[frame_int == ' '] = '0'
-        frame_int[frame_int == '1'] = '3'
-        frame_int[frame_int == block] = '1'
-        frame_int[frame_int == '.'] = '4'
-        self.frame = frame_int.astype(int)
-        return ''.join([''.join(row) + '\n' for row in frame])
- 
-    def get_solution(self):
-        """
-        Returns the solution to the maze as a list
-        of tuples"""
-        return self.solution
- 
-    def show_solution(self, show):
-        """
-        Set whether WilsonMazeGenerator.__str__() outputs the
-        solution or not"""
-        self.showSolution = show
-        
-    def generate_north_east(self):
-        """ convert frame to nxmx2 grid"""
-        self.grid3d = np.full(((self.height+1)//2, (self.width+1)//2, 2), False, dtype=bool)
-        
-        index = 0
-        for r in range(1, self.height+2, 2):          
-          # row = self.frame[r, 1::2] #north
-          blocks = self.frame[r-1, 1::2]
-          self.grid3d[index, :, NORTH] = ~(blocks==1)
-          index += 1
-          
-        index = 0      
-        for c in range(1, self.width+2, 2):          
-          # col = self.frame[1::2, c] #east
-          blocks = self.frame[1::2, c+1]
-          self.grid3d[:, index, EAST] = ~(blocks==1)
-          index += 1    
-        
-        return self.grid3d  
-    
-    def generate_maze(self):
-        """
-        Generates the maze according to the Wilson Loop Erased Random
-        Walk Algorithm"""
-        # reset the grid before generation
-        self._initialize_grid()
- 
-        # choose the first cell to put in the visited list
-        # see Step 1 of the algorithm.
-        current = self.unvisited.pop(random.randint(0, len(self.unvisited) - 1))
-        self.visited.append(current)
-        self._cut(current)
- 
-        # loop until all cells have been visited
-        while len(self.unvisited) > 0:
-            # choose a random cell to start the walk (Step 2)
-            first = self.unvisited[random.randint(0, len(self.unvisited) - 1)]
-            current = first
-            # loop until the random walk reaches a visited cell
-            while True:
-                # choose direction to walk (Step 3)
-                dirNum = random.randint(0, 3)
-                # check if direction is valid. If not, choose new direction
-                while not self._is_valid_direction(current, dirNum):
-                    dirNum = random.randint(0, 3)
-                # save the cell and direction in the path
-                self.path[current] = dirNum
-                # get the next cell in that direction
-                current = self._get_next_cell(current, dirNum, 2)
-                if (current in self.visited):  # visited cell is reached (Step 5)
-                    break
- 
-            current = first  # go to start of path
-            # loop until the end of path is reached
-            while True:
-                # add cell to visited and cut into the maze
-                self.visited.append(current)
-                self.unvisited.remove(current)  # (Step 6.b)
-                self._cut(current)
- 
-                # follow the direction to next cell (Step 6.a)
-                dirNum = self.path[current]
-                crossed = self._get_next_cell(current, dirNum, 1)
-                self._cut(crossed)  # cut crossed edge
- 
-                current = self._get_next_cell(current, dirNum, 2)
-                if (current in self.visited):  # end of path is reached
-                    self.path = dict()  # clear the path
-                    break
- 
-        self.generated = True
- 
-    def solve_maze(self):
-        """
-        Solves the maze according to the Wilson Loop Erased Random
-        Walk Algorithm"""
-        # if there is no maze to solve, cut the method
-        if not self.generated:
-            return None
- 
-        # initialize with empty path at starting cell
-        self.path = dict()
-        current = self.start
- 
-        # loop until the ending cell is reached
-        while True:
-            while True:
-                # choose valid direction
-                # must remain in the grid
-                # also must not cross a wall
-                dirNum = random.randint(0, 3)
-                adjacent = self._get_next_cell(current, dirNum, 1)
-                if self._is_valid_direction(current, dirNum):
-                    hasWall = self.grid_np[adjacent] == 0
-                    if not hasWall:
-                        break
-            # add cell and direction to path
-            self.path[current] = dirNum
- 
-            # get next cell
-            current = self._get_next_cell(current, dirNum, 2)
-            if current == self.end:
-                break  # break if ending cell is reached
- 
-        # go to start of path
-        current = self.start
-        self.solution.append(current)
-        # loop until end of path is reached
-        while not (current == self.end):
-            dirNum = self.path[current]  # get direction
-            # add adjacent and crossed cells to solution
-            crossed = self._get_next_cell(current, dirNum, 1)
-            current = self._get_next_cell(current, dirNum, 2)
-            self.solution.append(crossed)
-            self.solution.append(current)
- 
-        self.path = dict()
- 
-    def _get_next_cell(self, cell, dirNum, fact):
-        """
-        Outputs the next cell when moved a distance fact in the the
-        direction specified by dirNum from the initial cell.
-        cell: tuple (y,x) representing position of initial cell
-        dirNum: int with values 0,1,2,3
-        fact: int distance to next cell"""
-        dirTup_np = self.directions_np[dirNum]
-        next = np.array(cell) + fact * dirTup_np
-        return tuple(next)
- 
-    def _is_valid_direction(self, cell, dirNum):
-        """WilsonMazeGenerator(tuple,int) -> boolean
-        Checks if the adjacent cell in the direction specified by
-        dirNum is within the grid
-        cell: tuple (y,x) representing position of initial cell
-        dirNum: int with values 0,1,2,3"""
-        newCell = self._get_next_cell(cell, dirNum, 2)
-        r, c = tuple(newCell)
-        return (0 <= c < self.width and 0 <= r < self.height)
- 
-    def _initialize_grid(self):
-        """
-        Resets the maze grid to blank before generating a maze."""
-        self.grid_np = np.zeros((self.height, self.width), dtype=int)
-        # fill up unvisited cells
-        self.unvisited = [(r, c) for c in range(0, self.width, 2) for r in range(0, self.height, 2)]
-        self.visited = []
-        self.path = dict()
-        self.generated = False
- 
-    def _cut(self, cell):
-        """
-        Sets the value of the grid at the location specified by cell
-        to 1
-        cell: tuple (y,x) location of where to cut"""
-        self.grid_np[cell] = 1
         
 class HunterKillerMaze():
   
@@ -282,7 +51,7 @@ class HunterKillerMaze():
     """
     self.width = width
     self.height = height
-    self.grid = np.zeros((height, width, 2), bool)
+    #self.grid = np.zeros((height, width, 2), bool)
     # a grid to track if the cell has been visited
     self.visited = np.zeros((self.height, self.width), bool)
     self.solution = []
@@ -524,16 +293,16 @@ class HunterKillerMaze():
         # if there is no maze to solve, cut the method
         if not self.generated:
             return None
-        if method == 'dfs':
-          fn = self.dfs
-        else:
-          fn = self.bfs
+            
+        solve_fn = self.dfs if method == 'dfs' else self.bfs
           
-        path = {}
         visited = np.zeros((self.height, self.width), dtype=bool)
         adj = self.adjacency()
-        fn(self.start, adj, visited, path, self.end)
+        path = {}
+        solve_fn(self.start, adj, visited, path, stop=self.end)
         
+        # path is a dictionary of form {parent_node: child node} """
+        # convert to simple path list from end to start
         index = self.end
         path_list = []
         while index != self.start:
@@ -543,11 +312,11 @@ class HunterKillerMaze():
         return path_list
       
   def convert_grid(self):
-    """ convert grid into simple block and space"""
-    self.display_grid = np.full((2*self.height+1,2*self.width+1),0, dtype=int)
-    self.display_grid[:,0]=1
-    self.display_grid[-1,:] = 1       
-         
+    """ convert grid into simple block and space to compare with generated grid"""
+    self.display_grid = np.full((2 * self.height + 1, 2 * self.width + 1), 0, dtype=int)
+    self.display_grid[:, 0] = 1
+    self.display_grid[-1, :] = 1       
+    # this is for visibility and debugging     
     dirgrid = np.full((self.height, self.width), '. ', dtype='U2')
     for r in range(self.height):
       for c in range(self.width):
@@ -561,61 +330,58 @@ class HunterKillerMaze():
     for r in range(self.height):
       for c in range(self.width):
          if 'N' in dirgrid[(r, c)]:
-           self.display_grid[2*r, 2*c :2*c+2] = 1
+           self.display_grid[2*r, 2*c :2*c+3] = 1
          if 'E' in dirgrid[(r, c)]:
-           self.display_grid[2 * r : 2*r+2, 2*c +2] = 1    
+           self.display_grid[2 * r : 2*r+3, 2*c +2] = 1    
     return self.display_grid, dirgrid
 
 class SelectableMaze(HunterKillerMaze):
   
-  def __init__(self, width, height, mazetype=None):
+  def __init__(self, height, width, mazetype=None):
       super().__init__(width, height)
       self.height, self.width = height, width
       self.maze = Maze()
       self.mazetypes = [AldousBroder, BacktrackingGenerator,
-                        BinaryTree, CellularAutomaton,
-                        Division, DungeonRooms,
-                        Ellers, GrowingTree,
+                        CellularAutomaton,
+                        DungeonRooms,
+                        GrowingTree,
                         HuntAndKill, Kruskal,
                         Prims, Sidewinder,
-                        TrivialMaze, Wilsons]
+                        Wilsons]
       if mazetype is None:
         self.maze_fn = choice(self.mazetypes)                 
       else:
         try:
+          # convert from string to class
           self.maze_fn = globals()[mazetype]
         except (KeyError):
           raise KeyError(f'Maze type {mazetype} not known')
-      self.maze.generator = self.maze_fn(width, height)
-      
-      #m.solve()
+      self.maze.generator = self.maze_fn(height, width)
       
   def generate_maze(self):
       """ generate a maze and return a block grid and 3d grid """
       t = time()
-      self.block_grid = self.maze.generate()
+      self.maze.generate()
       self.maze.generate_entrances(self.start, self.end)
-      self.block_grid = self.maze.grid
-      a = self.block_grid.shape
+      self.block_grid = self.maze.grid.copy()
       self.grid = self.generate_north_east()
       print(f'{self.maze_fn} generate time {time() - t}')
       self.generated = True
     
   def generate_north_east(self):
-      """ convert frame to nxmx2 grid"""
+      """ convert block maze to n x m x 2 grid
+          grid represents ability to move north or east from east cell
+          1=clear, 0=blocked
+      """
       self.grid = np.full((self.height, self.width, 2), False, dtype=bool)
-        
-      index = 0
-      for r in range(1, self.grid.shape[1], 2):          
-          blocks = self.block_grid[r-1, 1::2]
-          self.grid[index, :, NORTH] = ~(blocks==1)
-          index += 1
-          
-      index = 0      
-      for c in range(1, self.grid.shape[0], 2):          
-          blocks = self.block_grid[1::2, c+1]
-          self.grid[:, index, EAST] = ~(blocks==1)
-          index += 1    
+      # north
+      for index, r in enumerate(range(1, self.block_grid.shape[0], 2)):          
+          blocks = self.block_grid[r - 1, 1::2]
+          self.grid[index, :, NORTH] = np.logical_not(blocks==1)         
+      # east      
+      for index, c in enumerate(range(1, self.block_grid.shape[1], 2)):          
+          blocks = self.block_grid[1::2, c + 1]
+          self.grid[:, index, EAST] = np.logical_not(blocks==1)          
         
       return self.grid  
              
@@ -713,40 +479,39 @@ class SelectableMaze(HunterKillerMaze):
         plt.show()
                                     
 if __name__ == '__main__':
-    width, height = 10, 10
-    g = SelectableMaze(width, height)
+    width, height = 30,30
+    g = SelectableMaze(height, width, 'AldousBroder')
+    t = time()
     g.generate_maze()
     print(str(g.maze_fn), time() -t)
-    g.plotXKCD(g.block_grid)
+    display_grid, dirgrid = g.convert_grid()
     g.showPNG(g.block_grid)
+    g.showPNG(display_grid)
+    g.draw_maze()
+    #g.plotXKCD(g.block_grid)
+   
     path = g.solve_maze()
-    gen = WilsonMazeGenerator(width, height)
-    t = time()
-    gen.generate_maze()
-    print('Maze Generated', time() - t)
-    gen.solve_maze()
-    print("Solution Generated", time() - t)
-    # quest = input("Do you want the solution shown? (Y/N) ")
-    gen.show_solution(True)  # quest.strip().lower() == "y")
-    print(gen)
-    gen.generate_north_east()
-    # hunt kill algorithm
-    
-    h = HunterKillerMaze(width, height)
-    h.generate_maze()
-    #h.generate_wilson_maze()
-    h.draw_maze()
-
-    block = u'\u2588'  # block character
-    frame, dirgrid= h.convert_grid()
-    frame_int = frame.astype('U1')
-    #frame_int[frame_int == '0'] = '0'
-    #frame_int[frame_int == '1'] = 
-    #frame_int[frame_int == '2'] = '-'
-    #print(''.join([''.join(row) + '\n' for row in frame_int]))
-    #print(dirgrid)
-    path = h.solve_maze()
     print(path)
+    for fn in [AldousBroder, BacktrackingGenerator,
+                        CellularAutomaton,
+                        DungeonRooms,
+                        GrowingTree,
+                        HuntAndKill, Kruskal,
+                        Prims, Sidewinder,
+                        Wilsons]:
+        fn_string = str(fn).split('.')[-1][:-2]
+        g = SelectableMaze(height, width, fn_string)
+        t = time()
+        g.generate_maze()
+        print(fn_string, time() -t)
+        display_grid, dirgrid = g.convert_grid()
+        #g.showPNG(g.block_grid)
+        #g.showPNG(display_grid)
+        g.draw_maze()
+        #g.plotXKCD(g.block_grid)
+       
+        path = g.solve_maze()
+        print(path)
 
 
 

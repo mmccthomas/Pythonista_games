@@ -4,7 +4,7 @@ from random import choice
 try:
     from cython import compiled
 except (ModuleNotFoundError):
-    from MazeGenAlgo import MazeGenAlgo
+    from mazelib.generate.MazeGenAlgo import MazeGenAlgo
 
 class BinaryTree(MazeGenAlgo):
     """For every cell in the grid, knock down a wall either North or West."""
