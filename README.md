@@ -178,6 +178,19 @@ modified from DotsAndBoxes M Sokhail Zakir/ Ammara Riaz
 
 Entry point : Board_Games/Dots.py
 
+MazeGame
+--------
+Displays a grid maze using one of several generating algorithms.
+Best played using a pencil or larger grids.
+May form basis of other maze games.
+
+End point is randomly placed.
+Solution is automatically calculated, and compared with path being drawn.
+
+Uses mazelib from https://github.com/john-science/mazelib
+(small change to remove invalid import cython )
+
+Entry point : Board_Games/MazeGame.py
 
 Tiles
 -----
