@@ -1,6 +1,5 @@
-# This program produces a maze using one of two algorithms
-# Wilson's Loop Erased Random Walk  and
-# Hunter Killer algorithm 
+# This program produces a maze using one of severalalgorithms
+#
 # sizes selectable are 10x10, 30x30 and 50x50
 # best played using a pencil or similar
 # solution uses  breadth-first search, depth-first search is optional at line 261
@@ -17,9 +16,8 @@ current = os.path.dirname(os.path.realpath(__file__))
 parent = os.path.dirname(current)
 sys.path.append(parent)
 from gui.gui_interface import Gui, Squares
-from maze_generator import HunterKillerMaze, SelectableMaze
+from maze_generator import SelectableMaze
 DEBUG = 0
-TRAINS = 'traintracks.txt'
 
 
 class Player():
@@ -38,17 +36,16 @@ class MazeTrial():
         generator = None
         select = dialogs.list_dialog('Maze size', ['Small', 'Medium', 'Large',  'SuperLarge'])
         match select:
-          case 'Small': 
-            size = 10          
-          case 'Medium': 
-            size = 30            
-          case 'Large': 
-            size = 50          
-          case  'SuperLarge': 
-            size = 80
-          case _: 
+          case 'Small':
+            size = 10
+          case 'Medium':
             size = 30
-            
+          case 'Large':
+            size = 50
+          case  'SuperLarge':
+            size = 80
+          case _:
+            size = 30
                
         self.display_board = np.zeros((size, size), dtype=int)
         self.log_moves = True  # allows us to get a list of rc locations
@@ -83,7 +80,7 @@ class MazeTrial():
         self.letter = 'x'
         self.gui.replace_labels('row', [''for n in range(self.size)][::-1], color='white', font=('Avenir', 15))
         self.gui.replace_labels('col', ['' for n in range(self.size)], color='white', font=('Avenir', 15))
-        self.start = (self.size-1, 0) # always bottom left
+        self.start = (self.size-1, 0)  # always bottom left
         # top right quadrant
         self.end = (randint(0, self.size // 2), randint(self.size//2, self.size-1))
         self.error = self.initialize()
@@ -94,21 +91,21 @@ class MazeTrial():
         # if view gets closed, quit the program
         if not self.gui.v.on_screen:
           print('View closed, exiting')
-          sys.exit() 
-          break   
+          sys.exit()
+          break
         #  wait on queue data, either rc selected or function to call
         sleep(0.001)
         if not self.q.empty():
           data = self.q.get(block=False)
           
-          #self.delta_t('get')
-          #self.q.task_done()
+          # self.delta_t('get')
+          # self.q.task_done()
           if isinstance(data, (tuple, list, int)):
-            coord = data # self.gui.ident(data)
+            coord = data  # self.gui.ident(data)
             break
           else:
             try:
-              #print(f' trying to run {data}')
+              # print(f' trying to run {data}')
               data()
             except (Exception) as e:
               print(traceback.format_exc())
@@ -121,26 +118,25 @@ class MazeTrial():
       
       coord_list = []
       
-      # sit here until piece place on board   
+      # sit here until piece place on board
       items = 0
       
-      while items < 1000: # stop lockup        
+      while items < 1000:  # stop lockup
         move = self.wait_for_gui()
-        if items == 0: st = time()
-        #print('items',items, move)
+        # print('items',items, move)
         try:
           if self.log_moves:
             coord_list.append(move)
             items += 1
             if move == -1:
-              return coord_list       
+              return coord_list
           else:
             break
         except (Exception) as e:
           print(traceback.format_exc())
           print('except,', move, e)
           coord_list.append(move)
-          return coord_list    
+          return coord_list
       return move
        
     def get_player_move(self):
@@ -159,17 +155,17 @@ class MazeTrial():
         return (None, None), None, None
         
     def highlight(self, coords, text, color, rel_size=0.9):
-      sqsize=self.gui.gs.SQ_SIZE
-      text_y_pos = {30: 2.5, 10: 1.5, 50: 6, 100:6}
-      #adjust text position relative to size
+      sqsize = self.gui.gs.SQ_SIZE
+      text_y_pos = {30: 2.5, 10: 1.5, 50: 6, 100: 6}
+      # adjust text position relative to size
       try:
          y = text_y_pos[self.size]
       except (KeyError):
-       	 y= 2.5
+         y = 2.5
       square_list = []
-      for  coord in coords:
-        square_list.append(Squares(coord, text, color, z_position=30, sqsize = rel_size * sqsize,
-                                   alpha=0.5, font=('Avenir Next', sqsize), 
+      for coord in coords:
+        square_list.append(Squares(coord, text, color, z_position=30, sqsize=rel_size * sqsize,
+                                   alpha=0.5, font=('Avenir Next', sqsize),
                                    offset=((1.0 - rel_size) / 2, -(1.0 - rel_size) / 2),
                                    text_anchor_point=(-1, y)))
       self.gui.add_numbers(square_list, clear_previous=False)
@@ -196,35 +192,34 @@ class MazeTrial():
 
         params = {'line_width': 4, 'line_cap_style': LINE_CAP_ROUND, 'stroke_color': 'black'}
         # bottom line
-        self.gui.draw_line([self.gui.rc_to_pos((self.size -1,  0)),
-                            self.gui.rc_to_pos((self.size -1, self.size))],
-                            **params)
-        # left line 
-        self.gui.draw_line([self.gui.rc_to_pos((-1 , 0)),
+        self.gui.draw_line([self.gui.rc_to_pos((self.size - 1,  0)),
+                            self.gui.rc_to_pos((self.size - 1, self.size))],
+                           **params)
+        # left line
+        self.gui.draw_line([self.gui.rc_to_pos((-1, 0)),
                             self.gui.rc_to_pos((self.size - 1, 0))],
-                            **params)       
+                           **params)
         # draw horizontal lines
         for r in range(self.size):
-          row = board[r, :, 0] #north
+          row = board[r, :, 0]  # north
           lengths, positions, values = self.rle(row)
           for length, position, value in zip(lengths, positions, values):
-             if not(value) :
+             if not value:
                 self.gui.draw_line([self.gui.rc_to_pos((r - 1, position)),
                                     self.gui.rc_to_pos((r - 1, position + length))],
-                                   **params)                
+                                   **params)
         # draw vertcal lines
         for c in range(self.size):
-          col = board[:, c, 1] #east
+          col = board[:, c, 1]  # east
           lengths, positions, values = self.rle(col)
           for length, position, value in zip(lengths, positions, values):
-             if not(value):
+             if not value:
                 self.gui.draw_line([self.gui.rc_to_pos((position - 1, c + 1)),
                                     self.gui.rc_to_pos((position - 1 + length, c + 1))],
                                    **params)
     
     def initial_board(self):
         """ Display board and generate maze"""
-        width, height = 30,30
     
         self.highlight([self.start], 'S', 'red')
         self.highlight([self.end], 'E', 'green')
@@ -236,32 +231,31 @@ class MazeTrial():
         # print('Maze time', elapsed)
         self.gui.set_prompt(f'Generated in {elapsed:.3f} secs')
         display_grid, dirgrid = maze.convert_grid()
-        #maze.showPNG(maze.block_grid)
-        #maze.showPNG(display_grid)
-        #maze.draw_maze()
-        # only use HunterKiller solve routine
+        # maze.showPNG(maze.block_grid)
+        # maze.draw_maze()
+        
         t = time()
         self.path = maze.solve_maze()
-        #print('solve time', time() -t)      
+        # print('solve time', time() -t)
         
         fn_name = str(maze.maze_fn).split(".")[-1][:-2]
-        self.gui.set_top(f'Maze: Generator:  {fn_name} Size: {self.size}')      
+        self.gui.set_top(f'Maze: Generator:  {fn_name} Size: {self.size}')
         
         self.create_line_borders(maze.grid)
                                     
     def initialize(self):
         """This method should only be called once,
         when initializing the board."""
-        _,_,w,h = self.gui.grid.bbox
+        _, _, w, h = self.gui.grid.bbox
         self.gui.clear_messages()
-        self.gui.set_enter('Hint', position=(w+50,0) if self.gui.device.endswith('_landscape') else (w-100,h+10))
+        self.gui.set_enter('Hint', position=(w + 50, 0) if self.gui.device.endswith('_landscape') else (w - 100, h + 10))
         self.gui.clear_numbers()
 
-        self.moves = []  
+        self.moves = []
         try:
             self.initial_board()
             
-        except ValueError as e:           
+        except ValueError as e:
             self.gui.set_prompt('')
             return e
     
@@ -274,27 +268,25 @@ class MazeTrial():
                 move = self.get_player_move()
                 finished = self.process_turn(move)
                 if self.game_over(finished):
-                	  self.reveal()
+                   self.reveal()
         except (Exception):
           print(traceback.format_exc())
-          print(self.error)
           
     def reveal(self):
       """finish the game by revealing solution"""
-      self.highlight(self.path[:-1], '', 'cyan', 0.8)      
-      
+      self.highlight(self.path[:-1], '', 'cyan', 0.8)
       dialogs.hud_alert('Game over')
       sleep(2)
       self.gui.show_start_menu()
        
     def hint(self):
-        # place a random piece if the solution path        
-        try: 
+        # place a random piece if the solution path
+        try:
             idx = randint(0, len(self.path) - 1)
             p = self.path.pop(idx)
             self.highlight([p], '', 'cyan')
         except (IndexError, ValueError):
-            dialogs.hud_alert('No more hints')          
+            dialogs.hud_alert('No more hints')
             self.gui.show_start_menu()
             return True
         
@@ -304,7 +296,7 @@ class MazeTrial():
         """
         def uniquify(moves):
             """ filters list into unique elements retaining order"""
-            return list(dict.fromkeys(moves))     
+            return list(dict.fromkeys(moves))
                     
         if isinstance(move[0], list):
           moves = move[0]
@@ -320,7 +312,7 @@ class MazeTrial():
               self.gui.clear_numbers(common)
               # remove common from previous moves
               self.moves = list(set(self.moves).difference(set(common)))
-          self.moves.extend(difference)                      
+          self.moves.extend(difference)
           self.highlight(difference, '', 'orange', rel_size=0.5)
             
         elif move:
@@ -349,7 +341,7 @@ class MazeTrial():
         correct = len(intersection)
         path_length = len(self.path)
         if path_length - 5 <= correct <= path_length:
-        	return True
+            return True
                     
     def restart(self):
        self.gui.gs.close()
@@ -358,36 +350,6 @@ class MazeTrial():
        
     
 if __name__ == '__main__':
-
   game = MazeTrial()
   game.run()
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
