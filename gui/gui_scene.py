@@ -20,6 +20,7 @@ sys.path.append(parent)
 grandparent = os.path.dirname(parent)
 sys.path.append(grandparent)
 from gui.game_menu import MenuScene
+
 screen_width, screen_height = get_screen_size()
 
 logging.basicConfig(format='%(asctime)s  %(funcName)s %(message)s',
@@ -122,7 +123,7 @@ class GameBoard(Scene):
     self.Player = None
     
     # this is just for test
-    self.board = [['.'] * 7 for i in range(6)]
+    self.board = [['.'] * 10 for i in range(10)]
     self.board[3][4] = self.board[4][3] = 'o'
     self.board[4][4] = self.board[3][3] = '@'
     self.DIMENSION_Y = len(self.board)
@@ -418,6 +419,11 @@ class GameBoard(Scene):
     points = [self.rc_to_pos(r - 1, c) for r, c in rcs]
     self.draw_line(points, line_width=1,
                    stroke_color='black', set_line_dash=[10, 2])
+    x, y = -.75, 1.25
+    self.add_numbers([Squares((0,0), 'A', 'red', z_position=30, sqsize=self.SQ_SIZE,
+                                   alpha=0.5, font=('Avenir Next', self.SQ_SIZE),
+                                   offset=(0, 0),
+                                   text_anchor_point=(x, y))])
    
   def draw_line(self, coords, **kwargs):
     ''' coords is an array of Point objects from rc_to_point
@@ -668,8 +674,8 @@ class GameBoard(Scene):
         #  unmodified text point is centre of cell
         # text anchor point will be -1 to +1
         tposx, tposy = item.text_anchor_point
-        tpos_x = (self.SQ_SIZE / 2) + tposx * (self.SQ_SIZE / 2 - 5)
-        tpos_y = (self.SQ_SIZE / 2) + tposy * (self.SQ_SIZE / 2 - 5)
+        tpos_x = (self.SQ_SIZE / 2) + tposx * (self.SQ_SIZE / 2) # - 5)
+        tpos_y = (self.SQ_SIZE / 2) + tposy * (self.SQ_SIZE / 2) # - 5)
         pos1 = self.rc_to_pos(r, c)
         pos = add(self.rc_to_pos(r, c), (tpos_x, tpos_y))
         t1 = LabelNode(str(item.text), color=item.text_color,
@@ -698,7 +704,7 @@ class GameBoard(Scene):
             t.remove_from_parent()
             self.numbers.remove(t)
     elif isinstance(number_list, tuple):
-    	# slicing ( self.numbers[:] ) is important to avoid skipping
+      # slicing ( self.numbers[:] ) is important to avoid skipping
       for t in self.numbers[:]:
           tpos = self.grid_to_rc(t.position)
           if tpos == number_list:
@@ -1104,10 +1110,12 @@ class MyMenu(MenuScene):
 
 
 if __name__ == "__main__":
+  from gui.gui_interface import Squares
   logging.basicConfig(format='%(asctime)s  %(funcName)s %(message)s',
                       level=logging.WARNING)
   run(GameBoard(), LANDSCAPE, show_fps=True)
     
+
 
 
 

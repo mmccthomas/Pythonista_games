@@ -17,7 +17,6 @@ parent = os.path.dirname(current)
 sys.path.append(parent)
 from gui.gui_interface import Gui, Squares
 from maze_generator import SelectableMaze
-DEBUG = 0
 
 
 class Player():
@@ -28,26 +27,21 @@ class Player():
     # use keys() instead of values() for lines
     self.NAMED_PIECES = {v: k for k, v in self.PIECE_NAMES.items()}
 
-        
+MAZE_GENERATORS = ['AldousBroder', 'BacktrackingGenerator',
+                   'CellularAutomaton', 'DungeonRooms',
+                   'GrowingTree', 'HuntAndKill', 'Kruskal',
+                   'Prims', 'Sidewinder', 'Wilsons']
+                
 class MazeTrial():
     def __init__(self):
         """Create, initialize and draw an empty board."""
         self.debug = False
-        generator = None
+        self.generator = None
+        sizes = {'Small': 10, 'Medium': 30, 'Large': 50, 'SuperLarge': 80}
         select = dialogs.list_dialog('Maze size', ['Small', 'Medium', 'Large',  'SuperLarge'])
-        match select:
-          case 'Small':
-            size = 10
-          case 'Medium':
-            size = 30
-          case 'Large':
-            size = 50
-          case  'SuperLarge':
-            size = 80
-          case _:
-            size = 30
-               
-        self.display_board = np.zeros((size, size), dtype=int)
+        self.size = sizes.get(select, 30)
+          
+        self.display_board = np.zeros((self.size, self.size), dtype=int)
         self.log_moves = True  # allows us to get a list of rc locations
         self.straight_lines_only = False
         self.q = Queue()
@@ -70,9 +64,7 @@ class MazeTrial():
       
         self.gui.start_menu = {'New Game': self.restart,
                                'Quit': self.gui.gs.close}
-        self.size = size
-        self.generator = generator
-        
+           
         self.erase = True
         self.edit_mode = False
         self.identify_mode = False
@@ -156,18 +148,10 @@ class MazeTrial():
         
     def highlight(self, coords, text, color, rel_size=0.9):
       sqsize = self.gui.gs.SQ_SIZE
-      text_y_pos = {30: 2.5, 10: 1.5, 50: 6, 100: 6}
-      # adjust text position relative to size
-      try:
-         y = text_y_pos[self.size]
-      except (KeyError):
-         y = 2.5
-      square_list = []
-      for coord in coords:
-        square_list.append(Squares(coord, text, color, z_position=30, sqsize=rel_size * sqsize,
-                                   alpha=0.5, font=('Avenir Next', sqsize),
-                                   offset=((1.0 - rel_size) / 2, -(1.0 - rel_size) / 2),
-                                   text_anchor_point=(-1, y)))
+      square_list = [Squares(coord, text, color, z_position=30, sqsize=rel_size * sqsize,
+                             alpha=0.5, font=('Avenir Next', sqsize),
+                             offset=((1.0 - rel_size) / 2, -(1.0 - rel_size) / 2),
+                             text_anchor_point=(-0.75, 1.35)) for coord in coords]
       self.gui.add_numbers(square_list, clear_previous=False)
         
     def rle(self, inarray):
@@ -238,7 +222,7 @@ class MazeTrial():
         self.path = maze.solve_maze()
         # print('solve time', time() -t)
         
-        fn_name = str(maze.maze_fn).split(".")[-1][:-2]
+        fn_name = maze.mazetype
         self.gui.set_top(f'Maze: Generator:  {fn_name} Size: {self.size}')
         
         self.create_line_borders(maze.grid)

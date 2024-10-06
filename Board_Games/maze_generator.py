@@ -1,11 +1,7 @@
-#TODO modify to use selectable generators from mazelib
+#Uses selectable generators from mazelib
+# use dynamic import for generator types
 # use routine to convert blocks and spaces  grid to 3d northband east grid as this is efficient
 # wilson does not produce very nice mazes
-
-# Maze Generator
-#  Wilson's Loop Erased Random Walk Algorithm
-# Author: CaptainFlint
-# https://artofproblemsolving.com/community/c3090h2221709_wilsons_maze_generator_implementation
 import os
 import sys
 current = os.path.dirname(os.path.realpath(__file__))
@@ -17,27 +13,16 @@ import numpy as np
 from time import time, sleep
 from random import sample, randint, choice, shuffle
 import traceback
+import importlib
 from queue import Queue
 from Mazelib.mazelib import Maze
-from Mazelib.mazelib.generate.MazeGenAlgo import MazeGenAlgo
-from Mazelib.mazelib.generate.AldousBroder import AldousBroder
-from Mazelib.mazelib.generate.BacktrackingGenerator import BacktrackingGenerator
-from Mazelib.mazelib.generate.BinaryTree import BinaryTree
-from Mazelib.mazelib.generate.CellularAutomaton import CellularAutomaton
-from Mazelib.mazelib.generate.Division import Division
-from Mazelib.mazelib.generate.DungeonRooms import DungeonRooms
-from Mazelib.mazelib.generate.Ellers import Ellers
-from Mazelib.mazelib.generate.GrowingTree import GrowingTree
-from Mazelib.mazelib.generate.HuntAndKill import HuntAndKill
-from Mazelib.mazelib.generate.Kruskal import Kruskal
-from Mazelib.mazelib.generate.Prims import Prims
-from Mazelib.mazelib.generate.Sidewinder import Sidewinder
-from Mazelib.mazelib.generate.TrivialMaze import TrivialMaze
-from Mazelib.mazelib.generate.Wilsons import Wilsons
 import matplotlib.pyplot as plt
 from matplotlib.path import Path
 from matplotlib.patches import PathPatch
-
+MAZE_GENERATORS = ['AldousBroder', 'BacktrackingGenerator',
+                   'CellularAutomaton', 'DungeonRooms',
+                   'GrowingTree', 'HuntAndKill', 'Kruskal',
+                   'Prims', 'Sidewinder', 'Wilsons']
 NORTH = 0
 EAST = 1     
                                     
@@ -45,7 +30,8 @@ EAST = 1
 class SelectableMaze():
   
   def __init__(self, height, width, mazetype=None):
-    """ initialises maze
+    """ initialises maze with one of MAZE_GENERATORS
+    if mazetype is None, choose a random type
     self.grid has format n x m x 2,
     where axis 2 is not North border, not East border 
     """
@@ -62,22 +48,19 @@ class SelectableMaze():
                         self.east, self.west]
     self.start = (self.height - 1, 0)
     self.end = (0, self.width - 1)
-        
+    
     self.maze = Maze()
-    self.mazetypes = [AldousBroder, BacktrackingGenerator,
-                      CellularAutomaton, DungeonRooms,
-                      GrowingTree,
-                      HuntAndKill, Kruskal,
-                      Prims, Sidewinder,
-                      Wilsons]
+ 
     if mazetype is None:
-        self.maze_fn = choice(self.mazetypes)                 
+        self.mazetype = choice(MAZE_GENERATORS)
     else:
-        try:
-          # convert from string to class
-          self.maze_fn = globals()[mazetype]
-        except (KeyError):
-          raise KeyError(f'Maze type {mazetype} not known')
+    	  self.mazetype = mazetype                         
+    try:
+        # convert from string to class
+        module = importlib.import_module('Mazelib.mazelib.generate.' + self.mazetype)
+        self.maze_fn = getattr(module, self.mazetype)    
+    except (ModuleNotFoundError, KeyError):
+          raise KeyError(f'Maze type {self.mazetype} not known, must be one of {MAZE_GENERATORS}')
     self.maze.generator = self.maze_fn(height, width)
    
   def north(self, cell):
@@ -148,8 +131,7 @@ class SelectableMaze():
       plt.show()
 
   def check_in_grid(self, new_cell):
-       return   0 <= new_cell[1] < self.width and  0 <= new_cell[0] < self.height
-               
+       return   0 <= new_cell[1] < self.width and  0 <= new_cell[0] < self.height               
         
   def adjacency(self):
       """construct adjacency matrix
@@ -168,8 +150,7 @@ class SelectableMaze():
               shuffle(neighbours)
               adjdict[(r, c)]= neighbours
       return adjdict
-  
-    
+     
   def dfs(self, node, graph, visited, path, stop=None):
       """ depth first search """
       if node == stop:
@@ -185,8 +166,7 @@ class SelectableMaze():
               path[coord] = node
               finished =self.dfs(coord, graph, visited, path, stop)  # Call the dfs recursively  
               if finished:
-                return True
-        
+                return True       
   
   def bfs(self, node, graph, visited, path,stop=None): #function for BFS
       """ This will return a dictionary, path,  child node of starting node
@@ -253,7 +233,6 @@ class SelectableMaze():
               if 'E' in dirgrid[(r, c)]:
                   self.display_grid[2 * r : 2*r+3, 2*c +2] = 1    
       return self.display_grid, dirgrid
-
      
   def generate_maze(self):
       """ generate a maze and return a block grid and 3d grid """
@@ -286,18 +265,13 @@ class SelectableMaze():
       plt.imshow(grid, cmap=plt.cm.binary, interpolation='nearest')
       plt.xticks([]), plt.yticks([])
       plt.show() 
-    
-  if __name__ == '__main__':
+
+        
+if __name__ == '__main__':
     """ test all suitable generators """
     width, height = 50, 50
     
-    for fn in [AldousBroder, BacktrackingGenerator,
-               CellularAutomaton, DungeonRooms,
-               GrowingTree, HuntAndKill, Kruskal,
-               Prims, Sidewinder, Wilsons]:
-        # convert classname into simple string
-        fn_string = str(fn).split('.')[-1][:-2]
-        
+    for fn_string in MAZE_GENERATORS:        
         g = SelectableMaze(height, width, fn_string)
         
         t = time()
@@ -309,12 +283,8 @@ class SelectableMaze():
         #g.showPNG(display_grid)
         g.draw_maze()
         print(fn_string, elapsed)
-       
+        plt.close()
         path = g.solve_maze()
         #print(path)
-
-
-
-
-
+    #plt.close('all')
 
