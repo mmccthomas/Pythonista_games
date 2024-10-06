@@ -143,7 +143,7 @@ class MazeTrial():
       self.gui.add_numbers([Squares(coord, text, color, z_position=30, sqsize=rel_size * sqsize,
                              alpha=0.5, font=('Avenir Next', sqsize),
                              offset=((1.0 - rel_size) / 2, -(1.0 - rel_size) / 2),
-                             text_anchor_point=(-0.75, 1.35)) for coord in coords],
+                             text_anchor_point=(-1, 1.35)) for coord in coords],
                            clear_previous=False)
         
     def rle(self, inarray):
@@ -196,9 +196,8 @@ class MazeTrial():
     
     def initial_board(self):
         """ Display board and generate maze"""
-    
-        self.highlight([self.start], 'S', 'red')
-        self.highlight([self.end], 'E', 'green')
+        icons = {'right': u'\u25b7', 'left': u'\u25c1', 'up': u'\u25b3', 'down': u'\u25bd'}
+        
         maze = SelectableMaze(self.size, self.size, mazetype=self.generator)
         maze.endpoints(self.start, self.end)
         t = time()
@@ -211,7 +210,11 @@ class MazeTrial():
         t = time()
         self.path = maze.solve_maze()
         # print('solve time', time() -t)
-        self.create_line_borders(maze.grid)        
+        self.create_line_borders(maze.grid)
+        s = maze.grid[self.start]
+        dir = 'up' if s[0] else 'right'
+        self.highlight([self.start], icons[dir], 'red', )
+        self.highlight([self.end], u'\u2605', 'green')
         self.gui.set_top(f'Maze: {maze.mazetype}     Size: {self.size}')               
                                     
     def initialize(self):
