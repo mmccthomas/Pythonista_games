@@ -25,10 +25,10 @@ from gui.gui_interface import Gui, Coord
 #from scrabble_ai_main.UI import scrabble_renderer
 import scrabble_ai_main.Game.scrabble_game as scrabble_game
 import scrabble_ai_main.Game.scrabble_objects as scrabble_objects
-wordlists =['scrabble.txt', # official scrabble dict
+wordlists =['wordlists/scrabble.txt', # official scrabble dict
             'scrabble_ai_main/Data/lang/en/3000_oxford_words.txt',
-            '5000-more-common.txt',
-            'words_10000.txt']
+            'wordlists/5000-more-common.txt',
+            'wordlists/words_10000.txt']
 # select wordlist by index
 wordlist = wordlists[2]
 

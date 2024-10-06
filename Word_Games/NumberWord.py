@@ -27,7 +27,7 @@ from crossword_create import CrossWord
 from gui.gui_scene import Tile, BoxedLabel
 from ui import Image, Path, LINE_JOIN_ROUND, LINE_JOIN_MITER
 from scene import Texture, Point
-WordleList = [ '5000-more-common.txt', 'words_20000.txt'] 
+WordleList = [ 'wordlists/5000-more-common.txt', 'wordlists/words_20000.txt'] 
 BLOCK = '#'
 SPACE = ' '
 file = 'https://gist.githubusercontent.com/eyturner/3d56f6a194f411af9f29df4c9d4a4e6e/raw/63b6dbaf2719392cb2c55eb07a6b1d4e758cc16d/20k.txt'

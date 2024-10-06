@@ -203,8 +203,8 @@ class Player():
 
                                                      
 SOUND = True
-#WORDLISTS = [ 'letters5.txt'] 
-WORDLISTS = ['5000-more-common.txt'] # 'letters3.txt', 'letters10.txt'] 
+#WORDLISTS = [ 'wordlists/letters5.txt'] 
+WORDLISTS = ['wordlists/5000-more-common.txt'] # 'wordlists/letters3.txt', 'wordlists/letters10.txt'] 
   
 
 class LetterGame():

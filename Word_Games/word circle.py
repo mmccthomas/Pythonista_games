@@ -22,7 +22,7 @@ import gui.gui_scene as gscene
 from gui.gui_interface import Gui, Squares
 BLOCK = '#'
 SPACE = ' '
-WORDLIST = ["letters3_common.txt", "5000-more-common.txt"]
+WORDLIST = ["wordlists/letters3_common.txt", "wordlists/5000-more-common.txt"]
 GRIDSIZE ='4,4'
 HINT = (-1, -1)    
 

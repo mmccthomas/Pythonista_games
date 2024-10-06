@@ -7,7 +7,7 @@ from queue import Queue
 from Letter_game import LetterGame, Player
 import gui.gui_scene as gscene
 from gui.gui_interface import Gui, Squares
-WordleList = ['5000-more-common.txt'] 
+WordleList = ['wordlists/5000-more-common.txt'] 
 
 
 class Wordle(LetterGame):

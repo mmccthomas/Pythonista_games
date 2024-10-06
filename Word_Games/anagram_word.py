@@ -24,7 +24,7 @@ from Letter_game import LetterGame, Player, Word
 import gui.gui_scene as gscene
 from gui.gui_interface import Gui, Squares
 from crossword_create import CrossWord
-WordleList = [ '5000-more-common.txt', 'words_20000.txt'] 
+WordleList = [ 'wordlists/5000-more-common.txt', 'wordlists/words_20000.txt'] 
 BLOCK = '#'
 SPACE = ' '
 FINISHED = (-10, -10)

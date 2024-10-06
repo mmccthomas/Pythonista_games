@@ -177,7 +177,7 @@ class Sudoko(LetterGame):
         text = self.totals[coord] if coord in self.totals else ''
         self.square_list.append(Squares(coord, text, color, z_position=30,
                                         alpha=0.5, font=('Avenir Next', 20),
-                                        text_anchor_point=(-1, 1)))
+                                        text_anchor_point=(-0.9, 0.9)))
     self.gui.add_numbers(self.square_list)
     
     self.delta_t('display cages')
