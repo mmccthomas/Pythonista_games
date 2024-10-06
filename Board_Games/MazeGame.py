@@ -148,11 +148,11 @@ class MazeTrial():
         
     def highlight(self, coords, text, color, rel_size=0.9):
       sqsize = self.gui.gs.SQ_SIZE
-      square_list = [Squares(coord, text, color, z_position=30, sqsize=rel_size * sqsize,
+      self.gui.add_numbers([Squares(coord, text, color, z_position=30, sqsize=rel_size * sqsize,
                              alpha=0.5, font=('Avenir Next', sqsize),
                              offset=((1.0 - rel_size) / 2, -(1.0 - rel_size) / 2),
-                             text_anchor_point=(-0.75, 1.35)) for coord in coords]
-      self.gui.add_numbers(square_list, clear_previous=False)
+                             text_anchor_point=(-0.75, 1.35)) for coord in coords],
+                           clear_previous=False)
         
     def rle(self, inarray):
         """ run length encoding. Partial credit to R rle function.
@@ -286,6 +286,8 @@ class MazeTrial():
           moves = move[0]
           moves.pop(-1)
           moves = uniquify(moves)
+          # remove any out of grid moves
+          moves = [move for move in moves if self.gui.gs.check_in_board(move)]
           # use sets to filter moves, most obvious and efficient
           # find moves in previous moves
           common = list(set(moves).intersection(set(self.moves)))
