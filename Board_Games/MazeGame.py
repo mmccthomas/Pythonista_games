@@ -3,6 +3,7 @@
 # sizes selectable are 10x10, 30x30 and 50x50
 # best played using a pencil or similar
 # solution uses  breadth-first search, depth-first search is optional at line 261
+
 import numpy as np
 import traceback
 import os
@@ -10,7 +11,7 @@ import sys
 import dialogs
 from ui import LINE_CAP_ROUND
 from queue import Queue
-from random import randint, seed, choice
+from random import randint
 from time import sleep, time
 current = os.path.dirname(os.path.realpath(__file__))
 parent = os.path.dirname(current)
@@ -37,7 +38,7 @@ class MazeTrial():
         """Create, initialize and draw an empty board."""
         self.debug = False
         self.generator = None
-        sizes = {'Small': 10, 'Medium': 30, 'Large': 50, 'SuperLarge': 80}
+        sizes = {'Small': 15, 'Medium': 30, 'Large': 50, 'SuperLarge': 80}
         select = dialogs.list_dialog('Maze size', ['Small', 'Medium', 'Large',  'SuperLarge'])
         self.size = sizes.get(select, 30)
           
@@ -64,16 +65,12 @@ class MazeTrial():
       
         self.gui.start_menu = {'New Game': self.restart,
                                'Quit': self.gui.gs.close}
-           
-        self.erase = True
-        self.edit_mode = False
-        self.identify_mode = False
-        self.save_enabled = False
-        self.letter = 'x'
-        self.gui.replace_labels('row', [''for n in range(self.size)][::-1], color='white', font=('Avenir', 15))
-        self.gui.replace_labels('col', ['' for n in range(self.size)], color='white', font=('Avenir', 15))
+                               
+        self.gui.replace_labels('row', ['' for n in range(self.size)][::-1])
+        self.gui.replace_labels('col', ['' for n in range(self.size)])
+        
         self.start = (self.size-1, 0)  # always bottom left
-        # top right quadrant
+        # random position in top right quadrant
         self.end = (randint(0, self.size // 2), randint(self.size//2, self.size-1))
         self.error = self.initialize()
     
@@ -89,15 +86,11 @@ class MazeTrial():
         sleep(0.001)
         if not self.q.empty():
           data = self.q.get(block=False)
-          
-          # self.delta_t('get')
-          # self.q.task_done()
           if isinstance(data, (tuple, list, int)):
             coord = data  # self.gui.ident(data)
             break
           else:
             try:
-              # print(f' trying to run {data}')
               data()
             except (Exception) as e:
               print(traceback.format_exc())
@@ -106,16 +99,14 @@ class MazeTrial():
         
     def _get_player_move(self):
       """Takes in the user's input and performs that move on the board, returns the coordinates of the move
-      Allows for movement over board"""
-      
+      Allows for movement over board"""      
       coord_list = []
-      
+            
       # sit here until piece place on board
       items = 0
       
       while items < 1000:  # stop lockup
         move = self.wait_for_gui()
-        # print('items',items, move)
         try:
           if self.log_moves:
             coord_list.append(move)
@@ -139,6 +130,7 @@ class MazeTrial():
         
         if move[0] == (-1, -1):
            return (None, None), 'Enter', None  # pressed enter button
+           
         # deal with buttons. each returns the button text
         elif move[0][0] < 0 and move[0][1] < 0:
           return (None, None), self.gui.gs.buttons[-move[0][0]].text, None
@@ -214,18 +206,13 @@ class MazeTrial():
         elapsed = time() - t
         # print('Maze time', elapsed)
         self.gui.set_prompt(f'Generated in {elapsed:.3f} secs')
-        display_grid, dirgrid = maze.convert_grid()
-        # maze.showPNG(maze.block_grid)
-        # maze.draw_maze()
+        # display_grid, dirgrid = maze.convert_grid()
         
         t = time()
         self.path = maze.solve_maze()
         # print('solve time', time() -t)
-        
-        fn_name = maze.mazetype
-        self.gui.set_top(f'Maze: Generator:  {fn_name} Size: {self.size}')
-        
-        self.create_line_borders(maze.grid)
+        self.create_line_borders(maze.grid)        
+        self.gui.set_top(f'Maze: {maze.mazetype}     Size: {self.size}')               
                                     
     def initialize(self):
         """This method should only be called once,
@@ -242,20 +229,7 @@ class MazeTrial():
         except ValueError as e:
             self.gui.set_prompt('')
             return e
-    
-    def run(self):
-        """
-        Main method that prompts the user for input
-        """
-        try:
-            while True:
-                move = self.get_player_move()
-                finished = self.process_turn(move)
-                if self.game_over(finished):
-                   self.reveal()
-        except (Exception):
-          print(traceback.format_exc())
-          
+             
     def reveal(self):
       """finish the game by revealing solution"""
       self.highlight(self.path[:-1], '', 'cyan', 0.8)
@@ -326,6 +300,8 @@ class MazeTrial():
         intersection = set(self.moves).intersection(set(self.path))
         correct = len(intersection)
         path_length = len(self.path)
+        if path_length - correct < 20:
+        	self.gui.set_message(f'{path_length - correct} moves left')
         if path_length - 5 <= correct <= path_length:
             return True
                     
@@ -333,7 +309,19 @@ class MazeTrial():
        self.gui.gs.close()
        g = MazeTrial()
        g.run()
-       
+    
+    def run(self):
+        """
+        Main method that prompts the user for input
+        """
+        try:
+            while True:
+                move = self.get_player_move()
+                finished = self.process_turn(move)
+                if self.game_over(finished):
+                   self.reveal()
+        except (Exception):
+          print(traceback.format_exc())   
     
 if __name__ == '__main__':
   game = MazeTrial()

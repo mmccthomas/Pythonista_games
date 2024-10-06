@@ -54,7 +54,7 @@ class SelectableMaze():
     if mazetype is None:
         self.mazetype = choice(MAZE_GENERATORS)
     else:
-    	  self.mazetype = mazetype                         
+        self.mazetype = mazetype                         
     try:
         # convert from string to class
         module = importlib.import_module('Mazelib.mazelib.generate.' + self.mazetype)
@@ -228,10 +228,11 @@ class SelectableMaze():
            
       for r in range(self.height):
           for c in range(self.width):
+              r2, c2 = r * 2, c * 2
               if 'N' in dirgrid[(r, c)]:
-                  self.display_grid[2*r, 2*c :2*c+3] = 1
+                  self.display_grid[r2, c2 : c2 + 3] = 1
               if 'E' in dirgrid[(r, c)]:
-                  self.display_grid[2 * r : 2*r+3, 2*c +2] = 1    
+                  self.display_grid[r2 : r2 + 3, c2 +2] = 1    
       return self.display_grid, dirgrid
      
   def generate_maze(self):
@@ -287,4 +288,5 @@ if __name__ == '__main__':
         path = g.solve_maze()
         #print(path)
     #plt.close('all')
+
 
