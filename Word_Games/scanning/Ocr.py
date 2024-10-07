@@ -41,12 +41,7 @@ class Player():
     self.PIECES.append(f'../gui/tileblocks/@.png')
     self.PIECES.append(f'../gui/tileblocks/_.png')
     self.PLAYERS = None
-
-
-
  
-
-
 
 class OcrCrossword(LetterGame):
     def __init__(self, all_text, board, board_size, img=None):
@@ -55,7 +50,6 @@ class OcrCrossword(LetterGame):
         self.q = Queue()
         self.log_moves = False
         self.gui = Gui(self.board, Player())
-
         self.gui.set_grid_colors(grid='clear') # background is classic board
         self.gui.gs.q = self.q 
         self.words = []
@@ -92,9 +86,10 @@ class OcrCrossword(LetterGame):
     
     def draw_rectangles(self):
         W, H = self.sizex, self.sizey
-        for rect in self.rectangles[:20]:
+        for rect in self.rectangles2:
           # bl, br, tl, tr
-          box = [self.gui.rc_to_pos((p.y * H - 1, p.x * W)) for p in rect]        
+          box = [self.gui.rc_to_pos((H - p[1] * H - 1, p[0] * W)) for p in rect]        
+          #box = [self.gui.rc_to_pos((p.y * H - 1, p.x * W)) for p in rect]        
           self.gui.draw_line(box)
           
     def add_indexes(self):
@@ -385,17 +380,20 @@ def main():
     asset = photos.pick_asset(assets=all_assets)
     if asset is not None:
        img = recognise.convert_to_png(asset)
-       rects = recognise.rectangles(asset)
-       all_text_dict= recognise.text_ocr(asset)
+       rects, rects2 = recognise.rectangles(asset)
+       all_text_dict= recognise.text_ocr(asset) #, rects2[9])
     else:
       all_text = []
       all_text_dict = {}
-    board, board_size = recognise.sort_by_position(all_text_dict)
-    
-    all_text = list(all_text_dict.values())
+    try:
+       board, board_size = recognise.sort_by_position(all_text_dict)    
+       all_text = list(all_text_dict.values())
+    except (AttributeError):
+    	all_text = []
     ocr = OcrCrossword(all_text, board, board_size)
     ocr.add_image(img)
     ocr.rectangles = rects
+    ocr.rectangles2 = rects2
     if all_text:
        ocr.filter(sort_alpha=False, max_length=None, min_length=None, sort_length=False, remove_numbers=False)
     ocr.run()

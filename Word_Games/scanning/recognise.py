@@ -14,7 +14,7 @@ VNDetectRectanglesRequest = objc_util.ObjCClass('VNDetectRectanglesRequest')
 VNRectangleObservation = objc_util.ObjCClass('VNRectangleObservation')
 
 def convert_to_png(asset):
-	  
+    
     img = Image.open(asset.get_image_data())    
     #img.save('temp.png', format="png")   
     # Write PIL Image to in-memory PNG
@@ -34,10 +34,10 @@ def rectangles(asset):
     print(width, height)
     with objc_util.autoreleasepool():
       req = VNDetectRectanglesRequest.alloc().init().autorelease()
-      req.maximumObservations = 0 
+      req.maximumObservations = 0
       req.minimumAspectRatio = 0
       req.maximumAspectRatio = 1
-      req.minimumSize = 0.0
+      req.minimumSize = 0.015
       req.quadratureTolerance = 45.0
       req.minimumConfidence = 0
       
@@ -45,22 +45,30 @@ def rectangles(asset):
       success = handler.performRequests_error_([req], None)    
       if success:
           boxes = []
+          boxes2 = []
           print(f'no boxes {len(req.results())}')
+          
           for result in req.results():
             rect_box = result #result.VNRectangleObservation()
             bl = rect_box.bottomLeft()
             br = rect_box.bottomRight()
             tl = rect_box.topLeft()
-            tr = rect_box.topRight()
+            tr = rect_box.topRight()            
+            cg_box = result.boundingBox()
+            x, y = cg_box.origin.x, cg_box.origin.y
+            w, h = cg_box.size.width, cg_box.size.height
             print([f'{p.x:.3f}, {p.y:.3f}' for p in [bl, br, tr, tl]])
+            print('w,h=', w,h)
+            boxes2.append(((x,y), (x+w,y), (x+w, y+h), (x, y+h), (x,y)))
             boxes.append((bl, br, tr, tl, bl))
             
-          return boxes     
+          return boxes , boxes2    
     
-def text_ocr(asset):
+def text_ocr(asset, aoi=None):
   """Image recognition of text
   works best with full words or numbers
   individual letters not so great
+  VNDetectTextRectanglesRequest.regionOfInterest
   """
   
   img_data = objc_util.ns(asset.get_image_data().getvalue()) 
@@ -68,6 +76,9 @@ def text_ocr(asset):
     req = VNRecognizeTextRequest.alloc().init().autorelease()
     req.setRecognitionLanguages_(['zh-Hant', 'en-US'])
     req.setRecognitionLevel_(0) # accurate
+    if aoi:
+      bl, br, tr, tl, _ = aoi
+      req.regionOfInterest = (bl, tr)
     req.setCustomWords_([x for x in list('ABCDEFGHIJKLMNOPQRSTUVWXYZ')]) # individual letters
     handler = VNImageRequestHandler.alloc().initWithData_options_(img_data, None).autorelease()
     success = handler.performRequests_error_([req], None)    
@@ -130,3 +141,4 @@ def sort_by_position(all_text_dict):
     except (Exception) as e:
         print(traceback.format_exc())
         return None, None
+
