@@ -248,14 +248,19 @@ class Gui():
          
   def set_grid_colors(self, grid=None, highlight=None, z_position=10, grid_stroke_color=None):
     if grid is not None:
-      try:          
-          image = ui.Image.named(grid)
+      try:
+          image = ui.Image.from_data(grid)
           self.gs.grid_fill = 'clear'
           self.gs.background_image = image
       except (Exception) as e:
-          print('error in set_grid_colors', e)
-          if grid.startswith('#') or ui.parse_color(grid)!=(0.0,0.0,0.0,0.0):
-            self.gs.grid_fill = grid
+        try:          
+            image = ui.Image.named(grid)
+            self.gs.grid_fill = 'clear'
+            self.gs.background_image = image
+        except (Exception) as e:
+            print('error in set_grid_colors', e)
+            if grid.startswith('#') or ui.parse_color(grid)!=(0.0,0.0,0.0,0.0):
+              self.gs.grid_fill = grid
     self.gs.grid_stroke_color = grid_stroke_color       
     self.gs.grid_z_position = z_position   
     if highlight is not None:
@@ -612,6 +617,8 @@ class dotdict(dict):
     __getattr__ = dict.get
     __setattr__ = dict.__setitem__
     __delattr__ = dict.__delitem__      
+
+
 
 
 
