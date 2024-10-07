@@ -37,9 +37,9 @@ class Player():
     self.PLAYER_2 = '@'
     self.EMPTY = ' '
     self.PIECE_NAMES  ='abcdefghijklmnopqrstuvwxyz0123456789. '
-    self.PIECES = [f'../gui/tileblocks/{k}.png' for k in self.PIECE_NAMES[:-2]]
-    self.PIECES.append(f'../gui/tileblocks/@.png')
-    self.PIECES.append(f'../gui/tileblocks/_.png')
+    self.PIECES = [f'../../gui/tileblocks/{k}.png' for k in self.PIECE_NAMES[:-2]]
+    self.PIECES.append(f'../../gui/tileblocks/@.png')
+    self.PIECES.append(f'../../gui/tileblocks/_.png')
     self.PLAYERS = None
  
 
@@ -50,7 +50,7 @@ class OcrCrossword(LetterGame):
         self.q = Queue()
         self.log_moves = False
         self.gui = Gui(self.board, Player())
-        self.gui.set_grid_colors(grid='clear') # background is classic board
+        self.gui.set_grid_colors(grid='black') # background is classic board
         self.gui.gs.q = self.q 
         self.words = []
         self.letters_mode = False
@@ -60,7 +60,7 @@ class OcrCrossword(LetterGame):
         self.gui.allow_any_move(True)
         self.gui.setup_gui()
         self.board = np.array(self.board)
-        self.board[self.board == '-'] = '-' # replace '-' by ' '
+        self.board[self.board == '-'] = ' ' # replace '-' by ' '
         self.COLUMN_LABELS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'[:self.sizex]
         self.gui.build_extra_grid(self.sizex, self.sizey, 
                                   grid_width_x=1, grid_width_y=1,
@@ -368,7 +368,7 @@ class OcrCrossword(LetterGame):
       self.words = words 
         
     def add_image(self, img):
-      background = SpriteNode(Texture(ui.Image.from_data(img)))
+      background = SpriteNode(Texture(ui.Image.named(img)))
       background.size = (self.gui.gs.SQ_SIZE * self.gui.gs.DIMENSION_X,
                          self.gui.gs.SQ_SIZE * self.gui.gs.DIMENSION_Y)
       background.position = (0, 0)
@@ -379,8 +379,8 @@ def main():
     all_assets = photos.get_assets()
     asset = photos.pick_asset(assets=all_assets)
     if asset is not None:
-       img = recognise.convert_to_png(asset)
-       rects, rects2 = recognise.rectangles(asset)
+       recognise.convert_to_png(asset)
+       #rects, rects2 = recognise.rectangles(asset)
        all_text_dict= recognise.text_ocr(asset) #, rects2[9])
     else:
       all_text = []
@@ -391,9 +391,9 @@ def main():
     except (AttributeError):
     	all_text = []
     ocr = OcrCrossword(all_text, board, board_size)
-    ocr.add_image(img)
-    ocr.rectangles = rects
-    ocr.rectangles2 = rects2
+    #ocr.add_image('temp.png')
+    #ocr.rectangles = rects
+    #ocr.rectangles2 = rects2
     if all_text:
        ocr.filter(sort_alpha=False, max_length=None, min_length=None, sort_length=False, remove_numbers=False)
     ocr.run()

@@ -7,6 +7,7 @@ import traceback
 import pandas as pd
 from matplotlib import pyplot
 import straighten_image
+DEBUG=False
 
 VNImageRequestHandler = objc_util.ObjCClass('VNImageRequestHandler')
 VNRecognizeTextRequest = objc_util.ObjCClass('VNRecognizeTextRequest')
@@ -16,11 +17,11 @@ VNRectangleObservation = objc_util.ObjCClass('VNRectangleObservation')
 def convert_to_png(asset):
     
     img = Image.open(asset.get_image_data())    
-    #img.save('temp.png', format="png")   
+    img.save('temp.png', format="png")   
     # Write PIL Image to in-memory PNG
-    membuf = BytesIO()
-    img.save(membuf, format="png")  
-    return membuf.getvalue()
+    #membuf = BytesIO()
+    #img.save(membuf, format="png")  
+    #return membuf.getvalue()
     
 
 def rectangles(asset):
@@ -57,8 +58,9 @@ def rectangles(asset):
             cg_box = result.boundingBox()
             x, y = cg_box.origin.x, cg_box.origin.y
             w, h = cg_box.size.width, cg_box.size.height
-            print([f'{p.x:.3f}, {p.y:.3f}' for p in [bl, br, tr, tl]])
-            print('w,h=', w,h)
+            if DEBUG:
+                print([f'{p.x:.3f}, {p.y:.3f}' for p in [bl, br, tr, tl]])
+                print('w,h=', w,h)
             boxes2.append(((x,y), (x+w,y), (x+w, y+h), (x, y+h), (x,y)))
             boxes.append((bl, br, tr, tl, bl))
             
@@ -120,9 +122,9 @@ def sort_by_position(all_text_dict):
           
         #sort by y then x
         sorted_df = df.sort_values(by=['y', 'x'], ascending=[False, True])
-        
-        # print all of the dataframe
-        print(sorted_df.to_string())
+        if DEBUG:
+            # print all of the dataframe
+            print(sorted_df.to_string())
         
         # prepare board
         board = np.empty((df['y'].max()+1, df['x'].max()+1), dtype='U1')
@@ -135,8 +137,9 @@ def sort_by_position(all_text_dict):
     
         # turn upside down
         board = np.flipud(board)
-        # print it
-        [print(''.join(row)) for row in board]
+        if DEBUG:
+            # print it
+            [print(''.join(row)) for row in board]
         return board, board.shape
     except (Exception) as e:
         print(traceback.format_exc())
