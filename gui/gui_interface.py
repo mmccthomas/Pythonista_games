@@ -530,7 +530,19 @@ class Gui():
         for k, v in kwargs.items():
           for label in labels:
             setattr(label, k, v)
-                   
+            
+  def add_image(self, img, **kwargs):
+      """ display an image on the grid. This is included so that the image
+      can be diplayed after the gui and grid are initiated """
+      
+      background = SpriteNode(Texture(ui.Image.named(img)))
+      background.size = (self.gs.SQ_SIZE * self.gs.DIMENSION_X,
+                         self.gs.SQ_SIZE * self.gs.DIMENSION_Y)
+      background.position = (0, 0)
+      background.anchor_point = (0, 0)
+      for k, v in kwargs.items():
+          setattr(background, k, v)
+      self.grid.add_child(background)                
   
 class Coord(tuple):
     """ a simple class to allow addition and slicing
@@ -617,6 +629,7 @@ class dotdict(dict):
     __getattr__ = dict.get
     __setattr__ = dict.__setitem__
     __delattr__ = dict.__delitem__      
+
 
 
 

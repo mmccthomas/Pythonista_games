@@ -20,6 +20,7 @@ sys.path.append(grandparent)
 from types import SimpleNamespace
 from gui.gui_interface import Gui, Coord, Squares
 from Word_Games.Letter_game import LetterGame
+from ui import LINE_CAP_ROUND
 from scene import *
 import gui.gui_scene as gs
 import numpy as np
@@ -44,9 +45,10 @@ class Player():
  
 
 class OcrCrossword(LetterGame):
-    def __init__(self, all_text, board, board_size, img=None):
+    def __init__(self, all_text, board=None, board_size=None, asset=None):
         self.load() # attempt to load temp file
-        self.SIZE = self.get_size(board, board_size)        
+        self.SIZE = self.get_size(board=board, board_size=board_size)     
+        self.asset = asset   
         self.q = Queue()
         self.log_moves = False
         self.gui = Gui(self.board, Player())
@@ -56,6 +58,8 @@ class OcrCrossword(LetterGame):
         self.letters_mode = False
         self.direction_mode = False
         self.index_mode = False
+        self.image_mode = False
+        self.defined_area = None
         self.gui.require_touch_move(False)
         self.gui.allow_any_move(True)
         self.gui.setup_gui()
@@ -82,7 +86,7 @@ class OcrCrossword(LetterGame):
             self.board = np.char.lower(board)            
           except (Exception) as e:
             print(e)      
-      super().get_size()
+      super().get_size(board_size)
     
     def draw_rectangles(self):
         W, H = self.sizex, self.sizey
@@ -110,15 +114,16 @@ class OcrCrossword(LetterGame):
         x, y, w, h = self.gui.grid.bbox    
         position_dict = {
         'ipad13_landscape': {'rackscale': 0.9,
-        'button1': (w+20, 0), 'button2': (w+20, h/21), 'button3': (w+150, h/21),
-        'button4': (w+20, 3 *h/21), 'button5': (w+150, 3*h/21),
-        'button6': (w+20, 4 *h/21), 'button7': (w+150, 0), 'button8': (w+20, 5*h/21),
-        'button9': (w+150, 5*h/21),   'button10': (w+250, 5*h/21),
+        'button1': (w+20, 0), 'button2': (w+20, h/21), 'button3': (w+130, h/21),
+        'button4': (w+20, 3 *h/21), 'button5': (w+110, 3*h/21),
+        'button6': (w+20, 4 *h/21), 'button7': (w+130, 0), 'button8': (w+20, 5*h/21),
+        'button9': (w+150, 5*h/21),   'button10': (w+250, 5*h/21), 'button11': (w+250, 4*h/21),
+        'button12': (w+250, 3*h/21),
         'box1': (w+5, 2*h/3-6), 'box2': (w+5, 6*h/21), 'font': ('Avenir Next', 15)},                                         
 
         'ipad_landscape': {'rackscale': 0.9,
         'button1': (w+20, 0), 'button2': (w+20, h/21), 'button3': (w+150, h/21),
-        'button4': (w+20, 3*h/21), 'button5': (w+150, 3*h/21),
+        'button4': (w+20, 3*h/21), 'button5': (w+100, 3*h/21),
         'button6': (w+20, 4*h/21), 'button7': (w+150, 0), 'button8': (w+20, 5*h/21),
         'button9': (w+150, 5*h/21),   'button10': (w+250, 5*h/21),
         'box1': (w+5, 2*h/3-6), 'box2': (w+5, 6*h/21), 'font': ('Avenir Next', 15)}
@@ -146,46 +151,50 @@ class OcrCrossword(LetterGame):
     def set_buttons(self):
       """ install set of active buttons """ 
       x, y, w, h = self.gui.grid.bbox       
+      params = {'stroke_color': 'black', 'font': self.posn.font, 'reg_touch': True, 'color': 'black'}
       button = self.gui.set_enter('Quit', position=self.posn.button7,
-                                  stroke_color='black', fill_color='pink',
-                                  color='black', font=self.posn.font)   
+                                  fill_color='pink',
+                                  **params)   
       
       button = self.gui.add_button(text='Fill bottom', title='', position=self.posn.button2,
-                                   min_size=(100, 32), reg_touch=True,
-                                   stroke_color='black', fill_color='yellow',
-                                   color='black', font=self.posn.font)
+                                   min_size=(100, 32), fill_color='yellow', **params)
       button = self.gui.add_button(text='Fill right', title='', position=self.posn.button3,
-                                   min_size=(100, 32), reg_touch=True,
-                                   stroke_color='black', fill_color='yellow',
-                                   color='black', font=self.posn.font)
+                                   min_size=(100, 32), fill_color='yellow', **params)
+                                   
+                                
       button = self.gui.add_button(text='Copy Text', title='', position=self.posn.button4, 
-                                   min_size=(80, 32), reg_touch=True,
-                                   stroke_color='black', fill_color='orange',
-                                   color='black', font=self.posn.font) 
+                                   min_size=(80, 32), fill_color='orange', **params)
+                                   
+                                  
       button = self.gui.add_button(text='Copy grid', title='', position=self.posn.button5,
-                                   min_size=(100, 32), reg_touch=True,
-                                   stroke_color='black', fill_color='orange',
-                                   color='black', font=self.posn.font)
+                                   min_size=(80, 32), fill_color='orange', **params)
       button = self.gui.add_button(text='Copy both', title='', position=self.posn.button6,
-                                   min_size=(230, 32), reg_touch=True,
-                                   stroke_color='black', fill_color='orange',
-                                   color='black', font=self.posn.font)                 
+                                   min_size=(170, 32), fill_color='orange', **params
+              )                 
       button = self.gui.add_button(text='Clear', title='', position=self.posn.button1,
-                                   min_size=(100, 32), reg_touch=True,
-                                   stroke_color='black', fill_color='pink',
-                                   color='black', font=self.posn.font)                 
+                                   min_size=(100, 32), **params,
+                                   fill_color='pink',
+                                   )                 
       self.letters = self.gui.add_button(text='Add letters', title='', position=self.posn.button8,
-                                   min_size=(100, 32), reg_touch=True,
-                                   stroke_color='black', fill_color='cyan',
-                                   color='black', font=self.posn.font)
+                                   min_size=(100, 32), **params,
+                                   fill_color='cyan',
+                                   )
       self.direction = self.gui.add_button(text='Across', title='', position=self.posn.button9,
-                                   min_size=(100, 32), reg_touch=True,
-                                   stroke_color='black', fill_color='cyan',
-                                   color='black', font=self.posn.font)      
+                                   min_size=(100, 32), **params,
+                                   fill_color='cyan',
+                                   )      
       self.multi_character = self.gui.add_button(text='Indexes', title='', position=self.posn.button10,
-                                   min_size=(100, 32), reg_touch=True,
-                                   stroke_color='black', fill_color='cyan',
-                                   color='black', font=self.posn.font)                                          
+                                   min_size=(100, 32), **params,
+                                   fill_color='cyan',
+                                   )           
+      self.images = self.gui.add_button(text='Image Mode', title='', position=self.posn.button11,
+                                   min_size=(100, 32), **params,
+                                   fill_color='cyan',
+                                   )     
+      button = self.gui.add_button(text='Recognise Area', title='', position=self.posn.button12,
+                                   min_size=(100, 32), **params,
+                                   fill_color='cyan',
+                                   )                                                                           
 
     def create_grid(self):
       """ create string represention of board
@@ -288,12 +297,47 @@ class OcrCrossword(LetterGame):
         elif letter == 'Add letters':
            self.letters_mode = not self.letters_mode
            self.gui.set_props(self.letters, fill_color = 'red' if self.letters_mode else 'cyan')       
+           if self.image_mode:
+               self.enter_image_mode()
+               
+        elif letter == 'Image Mode':
+           self.image_mode = not self.image_mode
+           self.gui.set_props(self.images, fill_color = 'red' if self.image_mode else 'cyan')    
+           self.enter_image_mode()   
            
+        elif letter == 'Recognise Area':
+           if self.image_mode:
+             self.recognise_area()   
+              
         elif letter != '':  # valid selection
           try:
               cell = self.get_board_rc(origin, self.board)
-              if not self.letters_mode and not self.gui.long_touch:
-                  self.board_rc(origin, self.board, '#' if cell == ' ' else ' ')  
+              if self.image_mode:
+                  """select defined area"""
+                  st_y, st_x = origin # / self.sizex
+                  #st_y = 1.0 - st_y
+                  end_y, end_x = coord # / self.sizex
+                  #end_y = 1.0 - end_y
+                  box = [self.gui.gs.rc_to_pos(st_y, st_x), 
+                         self.gui.gs.rc_to_pos(end_y, st_x), 
+                         self.gui.gs.rc_to_pos(end_y, end_x), 
+                         self.gui.gs.rc_to_pos(st_y, end_x), 
+                         self.gui.gs.rc_to_pos(st_y, st_x)]                      
+                  params = {'line_width': 4, 'line_cap_style': LINE_CAP_ROUND, 'stroke_color': 'blue'}
+                  self.gui.draw_line(box, **params)        
+                  
+                  x, y = min(st_x, end_x), self.sizex- 1-max(st_y, end_y)      
+                  x1, y1 = max(st_x, end_x), self.sizex-1 -min(st_y, end_y)
+                  # this is for square image
+                  # need to adjust for scale h/w
+                  if self.scale > 1.0:
+                  	self.defined_area = ( (x/self.sizex, y/(self.sizey*self.scale)), (x1/self.sizex, y1/(self.sizey*self.scale)))
+                  else:
+                    self.defined_area = ( (y/self.sizey, self.scale*x/self.sizex), (y1/self.sizey, self.scale*x1/self.sizex))
+                  self.gui.set_message(f'{self.defined_area}')
+                  
+              elif not self.letters_mode and not self.gui.long_touch:
+                  self.board_rc(origin, self.board, '#' if cell == ' ' else ' ')                
               else:
                 try:
                    letter = dialogs.input_alert('Enter 1 or more letters')  
@@ -367,39 +411,52 @@ class OcrCrossword(LetterGame):
         print(traceback.format_exc())
       self.words = words 
         
-    def add_image(self, img):
-      background = SpriteNode(Texture(ui.Image.named(img)))
-      background.size = (self.gui.gs.SQ_SIZE * self.gui.gs.DIMENSION_X,
-                         self.gui.gs.SQ_SIZE * self.gui.gs.DIMENSION_Y)
-      background.position = (0, 0)
-      background.anchor_point = (0, 0)
-      self.gui.grid.add_child(background)
+    def enter_image_mode(self):
+        if self.asset is not None:
+            filename, self.scale = recognise.convert_to_png(self.asset)
+            self.gui.add_image(filename)
+            self.rectangles, self.rectangles2  = recognise.rectangles(self.asset)
+            self.draw_rectangles()
+            self.board[self.board == ' '] = '-'
+            self.gui.update(self.board)  
+            all_text_dict= recognise.text_ocr(self.asset) #, rects2[9])
+            try:
+                board, board_size = recognise.sort_by_position(all_text_dict)    
+                all_text = list(all_text_dict.values())
+            except (AttributeError):
+                all_text = []
                 
+    def recognise_area(self):
+        '''recognise text in defined area'''
+        if self.defined_area:
+          all_text_dict = recognise.text_ocr(self.asset, self.defined_area)
+          try:
+             self.all_text = list(all_text_dict.values())
+             self.filter(sort_alpha=False, max_length=None, min_length=None, sort_length=False, remove_numbers=False)
+          except (AttributeError):
+          	self.gui.set_message(f'No text found in {self.defined_area}')
+          	
+          	
 def main():
+    
     all_assets = photos.get_assets()
     asset = photos.pick_asset(assets=all_assets)
     if asset is not None:
-       recognise.convert_to_png(asset)
-       #rects, rects2 = recognise.rectangles(asset)
        all_text_dict= recognise.text_ocr(asset) #, rects2[9])
+       all_text = list(all_text_dict.values())
     else:
       all_text = []
       all_text_dict = {}
-    try:
-       board, board_size = recognise.sort_by_position(all_text_dict)    
-       all_text = list(all_text_dict.values())
-    except (AttributeError):
-    	all_text = []
-    ocr = OcrCrossword(all_text, board, board_size)
-    #ocr.add_image('temp.png')
-    #ocr.rectangles = rects
-    #ocr.rectangles2 = rects2
+    
+    ocr = OcrCrossword(all_text, asset=asset, board_size='25 25')
     if all_text:
        ocr.filter(sort_alpha=False, max_length=None, min_length=None, sort_length=False, remove_numbers=False)
     ocr.run()
     
 if __name__ == '__main__':
     main()
+
+
 
 
 

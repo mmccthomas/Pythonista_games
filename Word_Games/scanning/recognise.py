@@ -15,13 +15,22 @@ VNDetectRectanglesRequest = objc_util.ObjCClass('VNDetectRectanglesRequest')
 VNRectangleObservation = objc_util.ObjCClass('VNRectangleObservation')
 
 def convert_to_png(asset):
-    
-    img = Image.open(asset.get_image_data())    
-    img.save('temp.png', format="png")   
+    """ conver tand make smaller
+    TODO not sure abour rotation, why do some rotate? """
+    filename = 'temp.png'
+    img = Image.open(asset.get_image_data()) 
+    w, h = img.size
+    scale = h/w
+    img = img.resize((500, int(scale*500))) 
+    if w > h:
+      scale = 1 / scale
+      img = img.transpose(Image.ROTATE_270) 
+    img.save(filename, format="png")   
     # Write PIL Image to in-memory PNG
     #membuf = BytesIO()
     #img.save(membuf, format="png")  
     #return membuf.getvalue()
+    return filename, scale
     
 
 def rectangles(asset):
@@ -79,7 +88,7 @@ def text_ocr(asset, aoi=None):
     req.setRecognitionLanguages_(['zh-Hant', 'en-US'])
     req.setRecognitionLevel_(0) # accurate
     if aoi:
-      bl, br, tr, tl, _ = aoi
+      bl, tr = aoi
       req.regionOfInterest = (bl, tr)
     req.setCustomWords_([x for x in list('ABCDEFGHIJKLMNOPQRSTUVWXYZ')]) # individual letters
     handler = VNImageRequestHandler.alloc().initWithData_options_(img_data, None).autorelease()
@@ -144,4 +153,6 @@ def sort_by_position(all_text_dict):
     except (Exception) as e:
         print(traceback.format_exc())
         return None, None
+
+
 
