@@ -47,6 +47,23 @@ class Gui():
     self.gs.start_menu = {'New Game': self.gs.dismiss_modal_scene,  
                            'Quit': self.gs.close}
                            
+  def scroll_text_box(self, text='', **kwargs):                         
+    """ create a scroll view"""
+    scrollview = ui.TextView(bg_color='black')
+    scrollview.border_color='white'
+    scrollview.corner_radius=10
+    scrollview.border_width=2
+    scrollview.name='chris'
+    scrollview.text=text
+    scrollview.color='white'
+    scrollview.bg_color='black'
+    scrollview.text_color='white'
+    scrollview.shows_vertical_scroll_indicator=True
+    for k, v in kwargs.items():
+      setattr(scrollview, k, v)
+    self.v.add_subview(scrollview)
+    return scrollview
+    
   def input_text_list(self, prompt='', position=None,items=None,**kwargs):
     ''' show a single line text box with an ok and a cancel button
     try to adapt size to number of list items'''
