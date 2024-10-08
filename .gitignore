@@ -1,4 +1,6 @@
 *.pkl
 *.json
 Kye/*.json
-Word_Games/*.npy
+Word_Games/scanning/*.npy
+Word_Games/scanning/*.png
+Word_Games/scanning/*.jpg
