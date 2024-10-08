@@ -11,7 +11,7 @@ sys.path.append(current + '/Mazelib')
 import random
 import numpy as np
 from time import time, sleep
-from random import sample, randint, choice, shuffle
+from random import sample, randint, choice, shuffle, choices
 import traceback
 import importlib
 from queue import Queue
@@ -19,10 +19,12 @@ from Mazelib.mazelib import Maze
 import matplotlib.pyplot as plt
 from matplotlib.path import Path
 from matplotlib.patches import PathPatch
-MAZE_GENERATORS = ['AldousBroder', 'BacktrackingGenerator',
-                   'CellularAutomaton', 'DungeonRooms',
-                   'GrowingTree', 'HuntAndKill', 'Kruskal',
-                   'Prims', 'Sidewinder', 'Wilsons']
+# maze types with relative weights
+# my judgement on which are nicer
+MAZE_GENERATORS = {'AldousBroder': 40, 'BacktrackingGenerator':120,
+                   'CellularAutomaton':80, 'DungeonRooms':70,
+                   'GrowingTree':90, 'HuntAndKill':100, 'Kruskal':30,
+                   'Prims': 20, 'Sidewinder':60, 'Wilsons':60}
 NORTH = 0
 EAST = 1     
                                     
@@ -51,8 +53,8 @@ class SelectableMaze():
     
     self.maze = Maze()
  
-    if mazetype is None:
-        self.mazetype = choice(MAZE_GENERATORS)
+    if mazetype is None:        
+        self.mazetype = choices(list(MAZE_GENERATORS), weights=list(MAZE_GENERATORS.values()), k=1)[0]
     else:
         self.mazetype = mazetype                         
     try:
@@ -272,6 +274,9 @@ if __name__ == '__main__':
     """ test all suitable generators """
     width, height = 50, 50
     
+    for i in range(50):
+      print(choices(list(MAZE_GENERATORS), weights=list(MAZE_GENERATORS.values()), k=1)[0])
+      
     for fn_string in MAZE_GENERATORS:        
         g = SelectableMaze(height, width, fn_string)
         
