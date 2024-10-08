@@ -212,7 +212,7 @@ This is used to read text from an image, and also used to create crossword frame
 Uses Apple UiKit for Ocr. Attempts made to read single letters from crossword grid, but not very successful.
 experiences crashes sometimes, hence each move is stored in numpy array for instant recovery.
 
-Entry point : Word_Games/Ocr.py
+Entry point : Word_Games/scanning/Ocr.py
 
 
 Notes
