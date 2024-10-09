@@ -21,7 +21,7 @@ def convert_to_png(asset):
     img = Image.open(asset.get_image_data()) 
     w, h = img.size
     scale = h/w
-    img = img.resize((500, int(scale*500))) 
+    img = img.resize((500, 500)) 
     if w > h:
       scale = 1 / scale
       img = img.transpose(Image.ROTATE_270) 
@@ -33,7 +33,7 @@ def convert_to_png(asset):
     return filename, scale
     
 
-def rectangles(asset):
+def rectangles(asset, aoi=None):
     """Image recognition of rectangles
     to use as subframes
     """
@@ -47,10 +47,12 @@ def rectangles(asset):
       req.maximumObservations = 0
       req.minimumAspectRatio = 0
       req.maximumAspectRatio = 1
-      req.minimumSize = 0.015
+      req.minimumSize = 0.05
       req.quadratureTolerance = 45.0
       req.minimumConfidence = 0
-      
+      if aoi:
+	      bl, tr = aoi
+	      req.regionOfInterest = (bl, tr)
       handler = VNImageRequestHandler.alloc().initWithData_options_(img_data, None).autorelease()
       success = handler.performRequests_error_([req], None)    
       if success:

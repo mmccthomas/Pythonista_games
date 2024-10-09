@@ -44,7 +44,7 @@ def straighten(img_data):
     return straightened
     
 if __name__ == "__main__":
-    img_path = 'Pieceword7.jpg'
+    img_path = 'temp.png'
     image_corners = find_corners(img_path)
     #[tl=[0,0], bl=[h, 0], br=[h, w], tr=[0, w]]
     #reorder
