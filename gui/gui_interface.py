@@ -265,16 +265,16 @@ class Gui():
          
   def set_grid_colors(self, grid=None, highlight=None, z_position=10, grid_stroke_color=None):
     if grid is not None:
-      try:
-          image = ui.Image.from_data(grid)
-          self.gs.grid_fill = 'clear'
-          self.gs.background_image = image
-      except (Exception) as e:
-        try:          
+      #try:
+      #    image = ui.Image.from_data(grid)
+      #    self.gs.grid_fill = 'clear'
+      #    self.gs.background_image = image
+      #except (Exception) as e:
+      try:          
             image = ui.Image.named(grid)
             self.gs.grid_fill = 'clear'
             self.gs.background_image = image
-        except (Exception) as e:
+      except (Exception) as e:
             print('error in set_grid_colors', e)
             if grid.startswith('#') or ui.parse_color(grid)!=(0.0,0.0,0.0,0.0):
               self.gs.grid_fill = grid

@@ -89,9 +89,9 @@ class OcrCrossword(LetterGame):
             print(e)      
       super().get_size(board_size)
     
-    def draw_rectangles(self):
+    def draw_rectangles(self, rectangles):
         W, H = self.sizex, self.sizey
-        for rect in self.rectangles2:
+        for rect in rectangles:
           # bl, br, tl, tr
           box = [self.gui.rc_to_pos((H - p[1] * H - 1, p[0] * W)) for p in rect]        
           #box = [self.gui.rc_to_pos((p.y * H - 1, p.x * W)) for p in rect]        
@@ -119,7 +119,7 @@ class OcrCrossword(LetterGame):
         'button4': (w+20, 3 *h/21), 'button5': (w+110, 3*h/21),
         'button6': (w+20, 4 *h/21), 'button7': (w+130, 0), 'button8': (w+20, 5*h/21),
         'button9': (w+150, 5*h/21),   'button10': (w+250, 5*h/21), 'button11': (w+250, 4*h/21),
-        'button12': (w+250, 3*h/21),
+        'button12': (w+250, 3*h/21),   'button13': (w+250, 2*h/21),
         'box1': (w+5, 2*h/3-6), 'box2': (w+5, 6*h/21),  'box3': (w+105, 75),'font': ('Avenir Next', 15)},                                         
 
         'ipad_landscape': {'rackscale': 0.9,
@@ -184,7 +184,8 @@ class OcrCrossword(LetterGame):
                                         fill_color='cyan', **params)     
       self.gui.add_button(text='Recognise Area', position=self.posn.button12,
                           fill_color='cyan', **params)   
-                                                                         
+      self.gui.add_button(text='Recognise Pieceword', position=self.posn.button13,
+                          fill_color='cyan', **params)                                                                     
 
     def create_grid(self):
       """ create string represention of board
@@ -298,6 +299,10 @@ class OcrCrossword(LetterGame):
         elif letter == 'Recognise Area':
            if self.image_mode:
              self.recognise_area()   
+             
+        elif letter == 'Recognise Pieceword':
+           if self.image_mode:
+             self.recognise_pieceword() 
               
         elif letter != '':  # valid selection
           try:
@@ -305,9 +310,9 @@ class OcrCrossword(LetterGame):
               if self.image_mode:
                   """select defined area"""
                   def r2(x):
-                  	""" round and scale"""
-                  	return round(x, 2)/self.sizex
-                  	
+                    """ round and scale"""
+                    return round(x, 2)/self.sizex
+                    
                   st_y, st_x = origin # / self.sizex
                   #st_y = 1.0 - st_y
                   end_y, end_x = coord # / self.sizex
@@ -333,7 +338,7 @@ class OcrCrossword(LetterGame):
                   w = abs(x1-x)
                   h = abs(y-y1)
                   if self.scale >= 1.0:
-                  	self.defined_area = ((x, y), (w, h))
+                    self.defined_area = ((x, y), (w, h))
                   else:
                     self.defined_area = ((y, x), (y, x))
                   
@@ -418,8 +423,8 @@ class OcrCrossword(LetterGame):
         if self.asset is not None:
             filename, self.scale = recognise.convert_to_png(self.asset)
             self.gui.add_image(filename)
-            self.rectangles, self.rectangles2  = recognise.rectangles(self.asset)
-            self.draw_rectangles()
+            self.rects, self.bboxes  = recognise.rectangles(self.asset)
+            self.draw_rectangles(self.bboxes)
             self.board[self.board == ' '] = '-'
             self.gui.update(self.board)  
             all_text_dict = recognise.text_ocr(self.asset)
@@ -433,15 +438,27 @@ class OcrCrossword(LetterGame):
         '''recognise text in defined area'''
         if self.defined_area:
           all_text_dict = recognise.text_ocr(self.asset, self.defined_area)
-          self.rectangles, self.rectangles2  = recognise.rectangles(self.asset, self.defined_area)
-          self.draw_rectangles()
+          self.rects, self.bboxes  = recognise.rectangles(self.asset, self.defined_area)
+          self.draw_rectangles(self.rects)
           try:
              self.all_text = list(all_text_dict.values())
              self.filter(sort_alpha=False, max_length=None, min_length=None, sort_length=False, remove_numbers=False)
           except (AttributeError):
-          	self.gui.set_message(f'No text found in {self.defined_area}')
-          	
-          	
+            self.gui.set_message(f'No text found in {self.defined_area}')
+            
+    def recognise_pieceword(self):            
+        '''recognise pieceword grid in defined area'''
+        if self.defined_area:  
+          self.rects, self.bboxes  = recognise.rectangles(self.asset, self.defined_area)
+          self.draw_rectangles(self.rects)
+          try:
+             board = recognise.pieceword_sort(self.asset, None, self.rects)
+             self.wordsbox.font = ('Courier', 30)
+             self.wordsbox.text=board
+             return board            
+          except (AttributeError):
+            self.gui.set_message(f'No text found in {self.defined_area}')
+               
 def main():
     
     all_assets = photos.get_assets()
@@ -460,6 +477,7 @@ def main():
     
 if __name__ == '__main__':
     main()
+
 
 
 

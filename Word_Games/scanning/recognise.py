@@ -47,35 +47,37 @@ def rectangles(asset, aoi=None):
       req.maximumObservations = 0
       req.minimumAspectRatio = 0
       req.maximumAspectRatio = 1
-      req.minimumSize = 0.05
+      req.minimumSize = 0.08
       req.quadratureTolerance = 45.0
       req.minimumConfidence = 0
       if aoi:
-	      bl, tr = aoi
-	      req.regionOfInterest = (bl, tr)
+        bl, tr = aoi
+        req.regionOfInterest = (bl, tr)
       handler = VNImageRequestHandler.alloc().initWithData_options_(img_data, None).autorelease()
       success = handler.performRequests_error_([req], None)    
       if success:
-          boxes = []
-          boxes2 = []
+          rect_boxes = []
+          bounding_boxes = []
           print(f'no boxes {len(req.results())}')
           
           for result in req.results():
-            rect_box = result #result.VNRectangleObservation()
+            # bounding box is bigger than rectangle box
+            rect_box = result #.VNRectangleObservation()
             bl = rect_box.bottomLeft()
             br = rect_box.bottomRight()
             tl = rect_box.topLeft()
-            tr = rect_box.topRight()            
+            tr = rect_box.topRight()  
+                      
             cg_box = result.boundingBox()
             x, y = cg_box.origin.x, cg_box.origin.y
             w, h = cg_box.size.width, cg_box.size.height
             if DEBUG:
                 print([f'{p.x:.3f}, {p.y:.3f}' for p in [bl, br, tr, tl]])
                 print('w,h=', w,h)
-            boxes2.append(((x,y), (x+w,y), (x+w, y+h), (x, y+h), (x,y)))
-            boxes.append((bl, br, tr, tl, bl))
+            bounding_boxes.append(((x,y), (x+w,y), (x+w, y+h), (x, y+h), (x,y)))
+            rect_boxes.append(((bl.x, bl.y), (br.x, br.y), (tr.x, tr.y), (tl.x, tl.y), (bl.x, bl.y)))
             
-          return boxes , boxes2    
+          return rect_boxes , bounding_boxes
     
 def text_ocr(asset, aoi=None):
   """Image recognition of text
@@ -87,12 +89,12 @@ def text_ocr(asset, aoi=None):
   img_data = objc_util.ns(asset.get_image_data().getvalue()) 
   with objc_util.autoreleasepool():
     req = VNRecognizeTextRequest.alloc().init().autorelease()
-    req.setRecognitionLanguages_(['zh-Hant', 'en-US'])
+    req.setRecognitionLanguages_(['zh-Hant','en-US'])
     req.setRecognitionLevel_(0) # accurate
     if aoi:
       bl, tr = aoi
       req.regionOfInterest = (bl, tr)
-    req.setCustomWords_([x for x in list('ABCDEFGHIJKLMNOPQRSTUVWXYZ')]) # individual letters
+    req.setCustomWords_([x for x in list('ABCDEFGHIJKLMNOPQRSTUVWXYZ01')]) # individual letters
     handler = VNImageRequestHandler.alloc().initWithData_options_(img_data, None).autorelease()
     success = handler.performRequests_error_([req], None)    
     if success:
@@ -106,8 +108,32 @@ def text_ocr(asset, aoi=None):
         results =  [result.text() for result in req.results()]
          
         return all_text #[str(result.text()) for result in req.results()]       
-        
-def sort_by_position(all_text_dict):
+
+def pieceword_sort(asset, page_text_dict, rectangles):
+    """ from a series of rectangles, perform a text recognition inside each"""
+    def r2(x):
+        """ round"""
+        return round(x, 3)
+    all_dict ={}   
+    for index, text_rect in enumerate(rectangles):
+       
+       #try to split rectangles into 9
+       w = (text_rect[2][0] - text_rect[0][0])
+       h = (text_rect[2][1] - text_rect[0][1])
+       x, y = text_rect[0]
+       #for i in range(9):
+          #box = ((x + (i % 3) * w, y + 2*h - (i//3) * h), (w,h))
+       aoi = ((x, y), (w, h))
+       all_text_dict = text_ocr(asset, aoi=aoi)
+       if DEBUG:
+             print(f'{index} {x:.2f}, {y:.2f}, {list(all_text_dict.values())}')
+       b, bs = sort_by_position(all_text_dict, max_y=3)
+       all_dict.update({(r2(x),r2(y),r2(w),r2(h)): b})
+       
+    board, shape = sort_by_position(all_dict, max_y=-3)
+    return   '\n'.join([''.join(row) for row in board])
+    
+def sort_by_position(all_text_dict, max_y=None):
     # use the box data to reorder text
     # attempts to reconstruct crossword letters
     
@@ -118,15 +144,24 @@ def sort_by_position(all_text_dict):
         # all_text_dict has form (x, y, w, h): text
         #x, y, w, h are scaled 0-1.0        
         df = pd.DataFrame(np.array(list(all_text_dict.keys())), columns=('x', 'y', 'w', 'h'))
-        # scale 0-1000 and round to nearest 5
-        df = df.multiply(1000).astype(int)    
-        df = df.divide(5.0).round().multiply(5).astype(int)
-        # find  spacing of rows
-        df_diff = df.diff()
-        df_med = df_diff.median()['y']
-        # scale to spacing
-        df = df.divide(-df_med).round().astype(int)
         
+        if max_y is None:
+            # scale 0-1000 and round to nearest 5
+            df = df.multiply(1000).astype(int)    
+            df = df.divide(5.0).round().multiply(5).astype(int)
+            # TODO convert x and y to row and col
+            p = np.polyfit(np.arange(df.shape[0]), np.sort(df['y']),1)
+            # scale to spacing
+            if DEBUG:
+                print(df.to_string(), p)
+            df = df.subtract(p[1]).divide(p[0]).astype(int)
+        elif max_y>0:           
+           df = np.rint(df.multiply(max_y)).astype(int)
+        elif max_y < 0:
+           df = np.rint(df.divide(np.max(df['h']))).astype(int)
+           if DEBUG:
+                print(df.to_string())
+           
         #stitch text as new column
         text_df = pd.DataFrame(np.array(list(all_text_dict.values())), columns =['text'])
         df = df.join(text_df) 
@@ -136,25 +171,42 @@ def sort_by_position(all_text_dict):
         if DEBUG:
             # print all of the dataframe
             print(sorted_df.to_string())
+        if max_y < 0:
+            board = np.empty((-max_y*(df['y'].max()+1), -max_y*(df['x'].max()+1)), dtype='U1')
+            board[:, :] = '#'
+            
+            for _, row in sorted_df.iterrows():
+              if row['text'] is not None:
+                board[-max_y*row['y']: -max_y*row['y']+row['text'].shape[0], -max_y*row['x']: -max_y*row['x']+row['text'].shape[1]] = np.flipud(row['text'])
+        else: 
+            # prepare board
+            board = np.empty((df['y'].max()+1, df['x'].max()+1), dtype='U1')
+            board[:, :] = '#'
+    
+            #attempt to fill board given by row and col
         
-        # prepare board
-        board = np.empty((df['y'].max()+1, df['x'].max()+1), dtype='U1')
-        board[:, :] = ' '
-    
-        #attempt to fill board given by row and col
-    
-        for _, row in sorted_df.iterrows():
-            board[row['y'], row['x']: row['x']+len(row['text'])] = list(row['text'])
+            for _, row in sorted_df.iterrows():
+                board[row['y'], row['x']: row['x']+len(row['text'])] = list(row['text'])
     
         # turn upside down
         board = np.flipud(board)
-        if DEBUG:
+        if True:
+            print()
             # print it
             [print(''.join(row)) for row in board]
+           
         return board, board.shape
     except (Exception) as e:
         print(traceback.format_exc())
         return None, None
+
+
+
+
+
+
+
+
 
 
 
