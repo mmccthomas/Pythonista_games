@@ -27,6 +27,7 @@ import numpy as np
 from PIL import Image
 from io import BytesIO
 import recognise
+from time import sleep
 savefile= 'Ocr_save'
 
 
@@ -89,13 +90,17 @@ class OcrCrossword(LetterGame):
             print(e)      
       super().get_size(board_size)
     
-    def draw_rectangles(self, rectangles):
+    def draw_rectangles(self, rectangles, **kwargs):
         W, H = self.sizex, self.sizey
         for rect in rectangles:
-          # bl, br, tl, tr
-          box = [self.gui.rc_to_pos((H - p[1] * H - 1, p[0] * W)) for p in rect]        
-          #box = [self.gui.rc_to_pos((p.y * H - 1, p.x * W)) for p in rect]        
-          self.gui.draw_line(box)
+          x, y, w, h = rect
+          x1, y1 = x+w, y+h                 
+          box = [self.gui.gs.rc_to_pos(H-y*H-1, x*W), 
+                 self.gui.gs.rc_to_pos(H-y1*H-1, x*W), 
+                 self.gui.gs.rc_to_pos(H-y1*H-1, x1*W+1), 
+                 self.gui.gs.rc_to_pos(H-y*H-1, x1*W+1), 
+                 self.gui.gs.rc_to_pos(H-y*H-1, x*W)]                                                  
+          self.gui.draw_line(box, **kwargs)
           
     def add_indexes(self):
       if hasattr(self, 'indexes'):
@@ -119,7 +124,7 @@ class OcrCrossword(LetterGame):
         'button4': (w+20, 3 *h/21), 'button5': (w+110, 3*h/21),
         'button6': (w+20, 4 *h/21), 'button7': (w+130, 0), 'button8': (w+20, 5*h/21),
         'button9': (w+150, 5*h/21),   'button10': (w+250, 5*h/21), 'button11': (w+250, 4*h/21),
-        'button12': (w+250, 3*h/21),   'button13': (w+250, 2*h/21),
+        'button12': (w+250, 3*h/21),   'button13': (w+250, 2*h/21),  'button14': (w+250, 1*h/21),
         'box1': (w+5, 2*h/3-6), 'box2': (w+5, 6*h/21),  'box3': (w+105, 75),'font': ('Avenir Next', 15)},                                         
 
         'ipad_landscape': {'rackscale': 0.9,
@@ -127,7 +132,7 @@ class OcrCrossword(LetterGame):
         'button4': (w+20, 3*h/21), 'button5': (w+100, 3*h/21),
         'button6': (w+20, 4*h/21), 'button7': (w+150, 0), 'button8': (w+20, 5*h/21),
         'button9': (w+150, 5*h/21),   'button10': (w+250, 5*h/21), 'button11': (w+250, 4*h/21),
-        'button12': (w+250, 3*h/21),
+        'button12': (w+250, 3*h/21),   'button13': (w+250, 2*h/21),  'button14': (w+250, 1*h/21),
         'box1': (w+5, 2*h/3-6), 'box2': (w+5, 6*h/21), 'box3': (w+50, 75), 'font': ('Avenir Next', 12)}
         }        
         try:
@@ -185,7 +190,9 @@ class OcrCrossword(LetterGame):
       self.gui.add_button(text='Recognise Area', position=self.posn.button12,
                           fill_color='cyan', **params)   
       self.gui.add_button(text='Recognise Pieceword', position=self.posn.button13,
-                          fill_color='cyan', **params)                                                                     
+                          fill_color='cyan', **params)     
+      self.gui.add_button(text='Recognise Crossword', position=self.posn.button14,
+                          fill_color='cyan', **params)                                                                  
 
     def create_grid(self):
       """ create string represention of board
@@ -303,6 +310,10 @@ class OcrCrossword(LetterGame):
         elif letter == 'Recognise Pieceword':
            if self.image_mode:
              self.recognise_pieceword() 
+             
+        elif letter == 'Recognise Crossword':
+           if self.image_mode:
+             self.recognise_crossword() 
               
         elif letter != '':  # valid selection
           try:
@@ -337,10 +348,10 @@ class OcrCrossword(LetterGame):
                   # this is for square image
                   w = abs(x1-x)
                   h = abs(y-y1)
-                  if self.scale >= 1.0:
-                    self.defined_area = ((x, y), (w, h))
-                  else:
-                    self.defined_area = ((y, x), (y, x))
+                  #if self.scale >= 1.0:
+                  self.defined_area = (x, y, w, h)
+                  #else:
+                  #  self.defined_area = ((y, x), (w, h)
                   
                   
               elif not self.letters_mode and not self.gui.long_touch:
@@ -421,7 +432,8 @@ class OcrCrossword(LetterGame):
         
     def enter_image_mode(self):
         if self.asset is not None:
-            filename, self.scale = recognise.convert_to_png(self.asset)
+            filename, self.scale, props = recognise.convert_to_png(self.asset)
+            self.gui.set_message(f'{props}')
             self.gui.add_image(filename)
             self.rects, self.bboxes  = recognise.rectangles(self.asset)
             self.draw_rectangles(self.bboxes)
@@ -441,7 +453,9 @@ class OcrCrossword(LetterGame):
           self.rects, self.bboxes  = recognise.rectangles(self.asset, self.defined_area)
           self.draw_rectangles(self.rects)
           try:
+             #recognise.sort_by_position(all_text_dict, max_y=None)
              self.all_text = list(all_text_dict.values())
+             self.draw_rectangles(list(self.all_word_dict))
              self.filter(sort_alpha=False, max_length=None, min_length=None, sort_length=False, remove_numbers=False)
           except (AttributeError):
             self.gui.set_message(f'No text found in {self.defined_area}')
@@ -458,7 +472,54 @@ class OcrCrossword(LetterGame):
              return board            
           except (AttributeError):
             self.gui.set_message(f'No text found in {self.defined_area}')
-               
+            
+    def recognise_crossword(self):
+      """ process crossword grid """
+      if self.defined_area:
+          # split defined area into 4 overlapping areas
+          W, H = self.sizex, self.sizey
+          x, y, w, h= self.defined_area
+          n = 3
+          d = w / (n + 3)
+          dx, dy = w / n + d, h / n + d
+          subrects = []
+          for i in range(n * n):
+          	subrects.append((x + i % n * w/n -d * (i%n !=0), y + (i // n) * h / n - d * (i//n != 0), dx, dy))
+          	
+          subrects2 = [
+          (x, y, dx, dy), (x+w/n-d, y, dx, dy),
+          (x, y+h/n-d, dx, dy), (x+w/n-d, y+h/n-d, dx, dy)]
+          for subrect in subrects:
+            self.rects, self.bboxes  = recognise.rectangles(self.asset, subrect)
+            params = {'line_width': 2, 'line_cap_style': LINE_CAP_ROUND, 'stroke_color': 'red', 'z_position':500}
+            self.gui.remove_lines(z_position=500)
+            self.draw_rectangles(self.rects, **params)
+            sleep(3)
+            #get areas and aspect of each rectangle
+            areas = np.array([round(w * h, 3) for x, y, w, h in self.rects])
+            aspects = np.array([round(h / w, 2) for x, y, w, h in self.rects])
+            hist_area = np.histogram(areas, bins=10)
+            hist_aspect = np.histogram(aspects, bins=10)
+            area_span = np.linspace(min(areas), max(areas), num=10)
+            d = np.digitize(areas, area_span, right=True)
+            aspect_span = np.linspace(min(aspects), max(aspects), num=10)
+            d1 = np.digitize(aspects, aspect_span, right=True)
+            #find greatest number of items  in d
+            print(d)
+            unique, counts = np.unique(d, return_counts=True)
+            print(unique, counts)
+            best = np.argmax(counts)
+            a = unique[best]
+            b = np.array(self.rects)
+            print(b.shape)
+            c = [r for idx, r in enumerate(self.rects) if d[idx] == a ]
+            #c= b[d==a]
+            print(len(c))
+            params = {'line_width': 4, 'line_cap_style': LINE_CAP_ROUND, 'stroke_color': 'green', 'z_position':1000}
+            self.gui.remove_lines(z_position=500)
+            self.draw_rectangles(c, **params)
+            sleep(2)
+              
 def main():
     
     all_assets = photos.get_assets()
@@ -477,6 +538,9 @@ def main():
     
 if __name__ == '__main__':
     main()
+
+
+
 
 
 

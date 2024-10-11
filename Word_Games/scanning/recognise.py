@@ -14,25 +14,74 @@ VNRecognizeTextRequest = objc_util.ObjCClass('VNRecognizeTextRequest')
 VNDetectRectanglesRequest = objc_util.ObjCClass('VNDetectRectanglesRequest')
 VNRectangleObservation = objc_util.ObjCClass('VNRectangleObservation')
 
+import appex
+from PIL import Image
+from PIL.ExifTags import TAGS
+import clipboard
+exif_rotations = {
+1: '0 degrees: the correct orientation, no adjustment is required.',
+2: '0 degrees, mirrored: image has been flipped back-to-front.',
+3: '180 degrees: image is upside down.',
+4: '180 degrees, mirrored: image has been flipped back-to-front and is upside down.',
+5: '90 degrees: image has been flipped back-to-front and is on its side.',
+6: '90 degrees, mirrored: image is on its side.',
+7: '270 degrees: image has been flipped back-to-front and is on its far side.'
+}
+def get_exif(i):
+  ret = {}
+  # i = Image.open(fn)
+  info = i._getexif()
+  for tag, value in info.items():
+    decoded = TAGS.get(tag, tag)
+    ret[decoded] = value
+  return ret
+
+
 def convert_to_png(asset):
-    """ conver tand make smaller
-    TODO not sure abour rotation, why do some rotate? """
+    """ convert and  make smaller
+    get rotation from exif data """
     filename = 'temp.png'
     img = Image.open(asset.get_image_data()) 
-    w, h = img.size
+    exif = get_exif(img)
+    w = h = r = None
+    try:
+       w = exif['ExifImageWidth']
+       h = exif['ExifImageHeight']
+       r = exif['Orientation']
+    except (KeyError):
+        pass
+    props = (w, h, r, exif_rotations.get(r, None))
     scale = h/w
-    img = img.resize((500, 500)) 
-    if w > h:
-      scale = 1 / scale
-      img = img.transpose(Image.ROTATE_270) 
+    img = img.resize((1000,1000)) 
+    match r:
+      case 6:
+        img = img.transpose(Image.ROTATE_270) 
+      case _:
+        pass
+
     img.save(filename, format="png")   
     # Write PIL Image to in-memory PNG
     #membuf = BytesIO()
     #img.save(membuf, format="png")  
     #return membuf.getvalue()
-    return filename, scale
+    return filename, scale, props
     
-
+def scan_xword(image_name, crossword_file):                
+    im = np.array(Image.open(image_name).convert('L'),dtype=np.uint8)
+    im = im /255
+    dec = 3
+    im_small = im[:-dec:dec,:-dec:dec]
+    sizex, sizey = im_small.shape
+    # do rle encoding on array to find size of squares
+    lens = []
+    for i in range(sizey):
+      z,_,_ = rle(im_small[i,:])
+      z= z[z>1]
+      z=z[z<sizey - 1]
+      lens.extend(z)
+    mode_ = mode(lens)
+    no_squares = int(sizey / mode_)  
+    
 def rectangles(asset, aoi=None):
     """Image recognition of rectangles
     to use as subframes
@@ -51,8 +100,8 @@ def rectangles(asset, aoi=None):
       req.quadratureTolerance = 45.0
       req.minimumConfidence = 0
       if aoi:
-        bl, tr = aoi
-        req.regionOfInterest = (bl, tr)
+        x, y, w, h = aoi
+        req.regionOfInterest = ((x, y), (w, h))
       handler = VNImageRequestHandler.alloc().initWithData_options_(img_data, None).autorelease()
       success = handler.performRequests_error_([req], None)    
       if success:
@@ -74,9 +123,10 @@ def rectangles(asset, aoi=None):
             if DEBUG:
                 print([f'{p.x:.3f}, {p.y:.3f}' for p in [bl, br, tr, tl]])
                 print('w,h=', w,h)
-            bounding_boxes.append(((x,y), (x+w,y), (x+w, y+h), (x, y+h), (x,y)))
-            rect_boxes.append(((bl.x, bl.y), (br.x, br.y), (tr.x, tr.y), (tl.x, tl.y), (bl.x, bl.y)))
-            
+            #bounding_boxes.append(((x,y), (x+w,y), (x+w, y+h), (x, y+h), (x,y)))
+            #rect_boxes.append(((bl.x, bl.y), (br.x, br.y), (tr.x, tr.y), (tl.x, tl.y), (bl.x, bl.y)))
+            bounding_boxes.append((x, y, w, h))
+            rect_boxes.append((bl.x, bl.y, tr.x - bl.x, tr.y-bl.y))
           return rect_boxes , bounding_boxes
     
 def text_ocr(asset, aoi=None):
@@ -89,12 +139,14 @@ def text_ocr(asset, aoi=None):
   img_data = objc_util.ns(asset.get_image_data().getvalue()) 
   with objc_util.autoreleasepool():
     req = VNRecognizeTextRequest.alloc().init().autorelease()
-    req.setRecognitionLanguages_(['zh-Hant','en-US'])
+    req.setRecognitionLanguages_(['en-US'])
     req.setRecognitionLevel_(0) # accurate
     if aoi:
-      bl, tr = aoi
-      req.regionOfInterest = (bl, tr)
-    req.setCustomWords_([x for x in list('ABCDEFGHIJKLMNOPQRSTUVWXYZ01')]) # individual letters
+      x, y, w, h = aoi
+      req.regionOfInterest = ((x, y), (w, h))
+    
+    # req.reportCharacterBoxes = True
+    # req.setCustomWords_([x for x in list('ABCDEFGHIJKLMNOPQRSTUVWXYZ01')]) # individual letters
     handler = VNImageRequestHandler.alloc().initWithData_options_(img_data, None).autorelease()
     success = handler.performRequests_error_([req], None)    
     if success:
@@ -151,6 +203,10 @@ def sort_by_position(all_text_dict, max_y=None):
             df = df.divide(5.0).round().multiply(5).astype(int)
             # TODO convert x and y to row and col
             p = np.polyfit(np.arange(df.shape[0]), np.sort(df['y']),1)
+            ys = np.sort(df['y'])
+            #spacing = np.sort(np.abs(np.diff(ys)))
+            unique = np.unique(df['y'])
+            #spacing_mean = np.mean(spacing)
             # scale to spacing
             if DEBUG:
                 print(df.to_string(), p)
@@ -171,7 +227,7 @@ def sort_by_position(all_text_dict, max_y=None):
         if DEBUG:
             # print all of the dataframe
             print(sorted_df.to_string())
-        if max_y < 0:
+        if max_y is not None and max_y < 0:
             board = np.empty((-max_y*(df['y'].max()+1), -max_y*(df['x'].max()+1)), dtype='U1')
             board[:, :] = '#'
             
@@ -199,6 +255,8 @@ def sort_by_position(all_text_dict, max_y=None):
     except (Exception) as e:
         print(traceback.format_exc())
         return None, None
+
+
 
 
 
