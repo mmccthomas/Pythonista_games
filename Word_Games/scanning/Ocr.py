@@ -97,8 +97,8 @@ class OcrCrossword(LetterGame):
           x1, y1 = x+w, y+h                 
           box = [self.gui.gs.rc_to_pos(H-y*H-1, x*W), 
                  self.gui.gs.rc_to_pos(H-y1*H-1, x*W), 
-                 self.gui.gs.rc_to_pos(H-y1*H-1, x1*W+1), 
-                 self.gui.gs.rc_to_pos(H-y*H-1, x1*W+1), 
+                 self.gui.gs.rc_to_pos(H-y1*H-1, x1*W), 
+                 self.gui.gs.rc_to_pos(H-y*H-1, x1*W), 
                  self.gui.gs.rc_to_pos(H-y*H-1, x*W)]                                                  
           self.gui.draw_line(box, **kwargs)
           
@@ -473,52 +473,90 @@ class OcrCrossword(LetterGame):
           except (AttributeError):
             self.gui.set_message(f'No text found in {self.defined_area}')
             
+    def split_defined_area(self, N=5):
+      # split defined area into N x N overlapping areas
+      # d defines amount of overlap
+     
+          x, y, w, h = self.defined_area         
+          d = w / (N + 4) # overlap          
+          subrects = []
+          for i in range(N * N):
+            div, mod = divmod(i, N)
+            subrects.append((x + mod * (w / N) - d * (mod != 0), 
+                             y + div * (h / N) - d * (div != 0), 
+                             w / N + d,
+                             h / N + d))
+          return subrects
+          
+    def find_rects_in_area(self, subrect):
+            """ find all rectangles in smaller area 
+            then filter thos rectangles to remove outsize or undersize items
+            """
+            
+            rects, bboxes  = recognise.rectangles(self.asset, subrect)
+            
+            #get areas and aspect of each rectangle
+            areas = np.array([round(w * h, 3) for x, y, w, h in rects])
+            aspects = np.array([round(h / w, 2) for x, y, w, h in rects])
+            
+            hist_area = np.histogram(areas, bins=10)
+            hist_aspect = np.histogram(aspects, bins=10)
+            
+            area_span = np.linspace(min(areas), max(areas), num=10)
+            d_area= np.digitize(areas, area_span, right=True)
+            
+            aspect_span = np.linspace(min(aspects), max(aspects), num=10)
+            d_apect = np.digitize(aspects, aspect_span, right=True)
+            
+            #find greatest number of items  in area
+            # TODO should we also use aspect?
+            print('digitized', d_area)
+            unique, counts = np.unique(d_area, return_counts=True)
+            print('unique, counts', unique, counts)
+            most = unique[np.argmax(counts)]
+
+            filtered = [r for idx, r in enumerate(rects) if d_area[idx] == most ]
+            print('filtered', len(filtered))
+            
+            params = {'line_width': 2, 'stroke_color': 'red', 'z_position':1000}
+            self.draw_rectangles(filtered, **params)
+            return filtered
+            
+    def filter_total(self, total_rects):
+          total_rects = np.round(np.array(total_rects), decimals=2)
+          print(len(total_rects))
+          total_rects = np.unique(total_rects, axis=0)
+          print(len(total_rects))
+          inds = np.lexsort((total_rects[:,3],total_rects[:,2],total_rects[:,1],total_rects[:,0]))  
+          total_rects = total_rects[inds]
+          # now remove duplicate x,ys remove smaller of the duplicates
+          diffs = np.diff(total_rects, axis=0)
+          zero = np.zeros_like(diffs[:,0])   
+          bigger = np.logical_or(diffs[:,2] > 0, 
+                                 diffs[:,3] > 0)
+          duplicates = ~np.logical_or(np.isclose(diffs[:,1], zero, atol=.01), 
+                                      np.isclose(diffs[:,0], zero, atol=.01))
+          idx = np.where(duplicates)
+          is_bigger = bigger[idx]
+          [print(diff) for diff in diffs]
+          print(idx, is_bigger)
+          total_rects = [tuple(item) for item in total_rects]
+          return total_rects
+      
     def recognise_crossword(self):
       """ process crossword grid """
       if self.defined_area:
-          # split defined area into 4 overlapping areas
-          W, H = self.sizex, self.sizey
-          x, y, w, h= self.defined_area
-          n = 3
-          d = w / (n + 3)
-          dx, dy = w / n + d, h / n + d
-          subrects = []
-          for i in range(n * n):
-          	subrects.append((x + i % n * w/n -d * (i%n !=0), y + (i // n) * h / n - d * (i//n != 0), dx, dy))
-          	
-          subrects2 = [
-          (x, y, dx, dy), (x+w/n-d, y, dx, dy),
-          (x, y+h/n-d, dx, dy), (x+w/n-d, y+h/n-d, dx, dy)]
-          for subrect in subrects:
-            self.rects, self.bboxes  = recognise.rectangles(self.asset, subrect)
-            params = {'line_width': 2, 'line_cap_style': LINE_CAP_ROUND, 'stroke_color': 'red', 'z_position':500}
-            self.gui.remove_lines(z_position=500)
-            self.draw_rectangles(self.rects, **params)
-            sleep(3)
-            #get areas and aspect of each rectangle
-            areas = np.array([round(w * h, 3) for x, y, w, h in self.rects])
-            aspects = np.array([round(h / w, 2) for x, y, w, h in self.rects])
-            hist_area = np.histogram(areas, bins=10)
-            hist_aspect = np.histogram(aspects, bins=10)
-            area_span = np.linspace(min(areas), max(areas), num=10)
-            d = np.digitize(areas, area_span, right=True)
-            aspect_span = np.linspace(min(aspects), max(aspects), num=10)
-            d1 = np.digitize(aspects, aspect_span, right=True)
-            #find greatest number of items  in d
-            print(d)
-            unique, counts = np.unique(d, return_counts=True)
-            print(unique, counts)
-            best = np.argmax(counts)
-            a = unique[best]
-            b = np.array(self.rects)
-            print(b.shape)
-            c = [r for idx, r in enumerate(self.rects) if d[idx] == a ]
-            #c= b[d==a]
-            print(len(c))
-            params = {'line_width': 4, 'line_cap_style': LINE_CAP_ROUND, 'stroke_color': 'green', 'z_position':1000}
-            self.gui.remove_lines(z_position=500)
-            self.draw_rectangles(c, **params)
-            sleep(2)
+          #subdivide selected area and find rectangles 
+          total_rects = []
+          for subrect in self.split_defined_area(N=5):
+              total_rects.extend(self.find_rects_in_area(subrect))           
+            
+          total_rects = self.filter_total(total_rects)
+          
+          self.gui.remove_lines(z_position=1000)
+          params = {'line_width': 5, 'stroke_color': 'red', 'z_position':1000}
+          self.draw_rectangles(total_rects, **params)
+          [print(x,y,w*h) for x,y,w,h in total_rects]
               
 def main():
     
@@ -538,6 +576,8 @@ def main():
     
 if __name__ == '__main__':
     main()
+
+
 
 
 
