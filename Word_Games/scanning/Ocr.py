@@ -94,8 +94,8 @@ class OcrCrossword(LetterGame):
         W, H = self.sizex, self.sizey
         
         if isinstance(rectangles, pd.DataFrame):
-        	rectangles = list(rectangles[['x','y','w','h']].itertuples(index=False, name=None))
-        	
+          rectangles = list(rectangles[['x','y','w','h']].itertuples(index=False, name=None))
+          
         for rect in rectangles:
           x, y, w, h = rect
           x1, y1 = x+w, y+h                 
@@ -572,15 +572,31 @@ class OcrCrossword(LetterGame):
        total_rects['c'] = c
        total_rects.pop('centrex')
        total_rects.pop('centrey')
-       return total_rect
+       return total_rects
        
     def add_missing(self, total_rects):
-    	""" find which rc coordinates are not in total_rects, add them in"""
-    	for r in range(total_rects.max(axis=0)['r'])):
-    		pass
-      return total_rects
-    	
-    	
+      """ find which rc coordinates are not in total_rects, add them in"""
+      R, C = int(total_rects.max(axis=0)['r'])+1, int(total_rects.max(axis=0)['c'])+1
+      board = np.full((R,C), True)
+      locs = np.array(total_rects[['r', 'c']])
+      for loc in locs:
+        board[tuple(loc)] = False
+      missing = np.argwhere(board==True)
+      df = pd.DataFrame(missing, columns=['r', 'c'])
+      w = total_rects.mean(axis=0)['w']
+      h = total_rects.mean(axis=0)['h']
+      x0 = total_rects.min(axis=0)['x']
+      y0 = total_rects.min(axis=0)['y']
+      # fill x, y, w, h and size columns
+      df['x'] = np.round(x0 + df.c * w*1.1, 2)
+      df['y'] = np.round(y0 + df.r * h*1.1, 2)
+      df['w'] = w*.9
+      df['h'] = h*.9
+      df['area'] = df.w * df.h * 1000
+  
+      return df
+      
+      
     def recognise_crossword(self):
       """ process crossword grid """
       if self.defined_area:
@@ -598,8 +614,11 @@ class OcrCrossword(LetterGame):
           print(total_rects.to_string())
           total_rects =self.convert_to_rc(total_rects)
           self.wordsbox.text = total_rects.to_string()
-          self.add_missing(total_rects)
-              
+          df = self.add_missing(total_rects)
+          params = {'line_width': 5, 'stroke_color': 'green', 'z_position':1000}
+          self.draw_rectangles(df, **params)
+          total_rects = pd.concat([total_rects, df], ignore_index=False) 
+            
 def main():
     
     all_assets = photos.get_assets()
@@ -618,6 +637,7 @@ def main():
     
 if __name__ == '__main__':
     main()
+
 
 
 
