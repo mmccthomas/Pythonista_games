@@ -92,6 +92,10 @@ class OcrCrossword(LetterGame):
     
     def draw_rectangles(self, rectangles, **kwargs):
         W, H = self.sizex, self.sizey
+        
+        if isinstance(rectangles, pd.DataFrame):
+        	rectangles = list(rectangles[['x','y','w','h']].itertuples(index=False, name=None))
+        	
         for rect in rectangles:
           x, y, w, h = rect
           x1, y1 = x+w, y+h                 
@@ -491,13 +495,20 @@ class OcrCrossword(LetterGame):
     def find_rects_in_area(self, subrect):
             """ find all rectangles in smaller area 
             then filter thos rectangles to remove outsize or undersize items
+            returns pandas dataframe
             """
             
             rects, bboxes  = recognise.rectangles(self.asset, subrect)
+            df = pd.DataFrame(np.array(rects), columns=('x', 'y', 'w', 'h'))
+            df = np.round(df, decimals=3)
+            df['area']= df.w * df.h * 1000
+            print(len(df))
+            df.sort_values(by=['x','y','area'], inplace=True, ignore_index=True)
+            df.drop_duplicates(['x', 'y'], keep='last', inplace=True, ignore_index=True)
             
             #get areas and aspect of each rectangle
-            areas = np.array([round(w * h, 3) for x, y, w, h in rects])
-            aspects = np.array([round(h / w, 2) for x, y, w, h in rects])
+            areas = np.round(df.area, 3)
+            aspects = np.round(df.h / df.w, 2)
             
             hist_area = np.histogram(areas, bins=10)
             hist_aspect = np.histogram(aspects, bins=10)
@@ -506,57 +517,88 @@ class OcrCrossword(LetterGame):
             d_area= np.digitize(areas, area_span, right=True)
             
             aspect_span = np.linspace(min(aspects), max(aspects), num=10)
-            d_apect = np.digitize(aspects, aspect_span, right=True)
+            d_aspect = np.digitize(aspects, aspect_span, right=True)
             
             #find greatest number of items  in area
             # TODO should we also use aspect?
             print('digitized', d_area)
+            print('areas', areas)
+            print('digitized', d_aspect)
+            print('aspects', aspects)
             unique, counts = np.unique(d_area, return_counts=True)
             print('unique, counts', unique, counts)
             most = unique[np.argmax(counts)]
-
-            filtered = [r for idx, r in enumerate(rects) if d_area[idx] == most ]
+            filtered = df[d_area[df.index] == most]
+            
             print('filtered', len(filtered))
             
             params = {'line_width': 2, 'stroke_color': 'red', 'z_position':1000}
+            #convert to list of tuples for drawing
             self.draw_rectangles(filtered, **params)
             return filtered
             
     def filter_total(self, total_rects):
-          total_rects = np.round(np.array(total_rects), decimals=2)
+          """ total rects is pandas Dataframe '"""
+          total_rects = np.round(total_rects, decimals=2)
+          total_rects['area']= total_rects.w * total_rects.h * 1000
           print(len(total_rects))
-          total_rects = np.unique(total_rects, axis=0)
-          print(len(total_rects))
-          inds = np.lexsort((total_rects[:,3],total_rects[:,2],total_rects[:,1],total_rects[:,0]))  
-          total_rects = total_rects[inds]
-          # now remove duplicate x,ys remove smaller of the duplicates
-          diffs = np.diff(total_rects, axis=0)
-          zero = np.zeros_like(diffs[:,0])   
-          bigger = np.logical_or(diffs[:,2] > 0, 
-                                 diffs[:,3] > 0)
-          duplicates = ~np.logical_or(np.isclose(diffs[:,1], zero, atol=.01), 
-                                      np.isclose(diffs[:,0], zero, atol=.01))
-          idx = np.where(duplicates)
-          is_bigger = bigger[idx]
-          [print(diff) for diff in diffs]
-          print(idx, is_bigger)
-          total_rects = [tuple(item) for item in total_rects]
+          total_rects.sort_values(by=['x','y','area'], inplace=True, ignore_index=True)
+          total_rects.drop_duplicates(['x', 'y'], keep='last', inplace=True, ignore_index=True)
+          area_span = np.linspace(total_rects.min(axis=0)['area'], total_rects.max(axis=0)['area'], num=10)
+          d_area= np.digitize(np.array(total_rects.area), area_span, right=True)
+          unique, counts = np.unique(d_area, return_counts=True)
+          most = unique[np.argmax(counts)]
+          idx = d_area[np.array(total_rects.index)] == most
+          total_rects = total_rects[idx]
+          
+          total_rects.pop('area')
           return total_rects
-      
+          
+    def convert_to_rc(self, total_rects):
+       '''convert x y to r c'''
+       total_rects['centrex']= total_rects.x + total_rects.w /2
+       total_rects['centrey']= total_rects.y + total_rects.h /2
+       dx = total_rects.mean(axis=0)['w'] * 1.1
+       
+       dy = total_rects.mean(axis=0)['h'] * 1.1
+       
+       min_x = total_rects.min(axis=0)['centrex']
+       min_y = total_rects.min(axis=0)['centrey']
+       max_x = total_rects.max(axis=0)['centrex']
+       max_y = total_rects.max(axis=0)['centrey']
+       c = np.rint((total_rects.centrex - min_x) / dx).astype(int)
+       r = np.rint((total_rects.centrey - min_y) / dy).astype(int)
+       total_rects['r'] =r
+       total_rects['c'] = c
+       total_rects.pop('centrex')
+       total_rects.pop('centrey')
+       return total_rect
+       
+    def add_missing(self, total_rects):
+    	""" find which rc coordinates are not in total_rects, add them in"""
+    	for r in range(total_rects.max(axis=0)['r'])):
+    		pass
+      return total_rects
+    	
+    	
     def recognise_crossword(self):
       """ process crossword grid """
       if self.defined_area:
           #subdivide selected area and find rectangles 
-          total_rects = []
+          total_rects = pd.DataFrame(columns=('x', 'y', 'w', 'h'))
           for subrect in self.split_defined_area(N=5):
-              total_rects.extend(self.find_rects_in_area(subrect))           
+              total_rects = pd.concat([total_rects, self.find_rects_in_area(subrect)], ignore_index=False)     
+              #sleep(2)      
             
           total_rects = self.filter_total(total_rects)
           
           self.gui.remove_lines(z_position=1000)
           params = {'line_width': 5, 'stroke_color': 'red', 'z_position':1000}
           self.draw_rectangles(total_rects, **params)
-          [print(x,y,w*h) for x,y,w,h in total_rects]
+          print(total_rects.to_string())
+          total_rects =self.convert_to_rc(total_rects)
+          self.wordsbox.text = total_rects.to_string()
+          self.add_missing(total_rects)
               
 def main():
     
@@ -576,6 +618,8 @@ def main():
     
 if __name__ == '__main__':
     main()
+
+
 
 
 
