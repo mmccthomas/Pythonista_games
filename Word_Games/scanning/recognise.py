@@ -1,4 +1,5 @@
 # text and rectangles recognition
+# contains Vision class rectanges and text, and CoreML function
 import objc_util
 from objc_util import ObjCClass, nsurl, ns, autoreleasepool
 import numpy as np
@@ -13,7 +14,10 @@ from matplotlib import pyplot
 import straighten_image
 import clipboard
 import appex
+import math
 from PIL.ExifTags import TAGS
+import dialogs
+import photos
 
 DEBUG=False
 
@@ -159,7 +163,7 @@ class Recognise():
       """
       
       img_data = objc_util.ns(asset.get_image_data().getvalue()) 
-      with objc_util.autoreleasepool():
+      with autoreleasepool():
         req = VNRecognizeTextRequest.alloc().init().autorelease()
         req.setRecognitionLanguages_(['en-US'])
         req.setRecognitionLevel_(0) # accurate
@@ -167,7 +171,7 @@ class Recognise():
           x, y, w, h = aoi
           req.regionOfInterest = ((x, y), (w, h))
         
-        # req.reportCharacterBoxes = True
+        req.reportCharacterBoxes = True
         # req.setCustomWords_([x for x in list('ABCDEFGHIJKLMNOPQRSTUVWXYZ01')]) # individual letters
         handler = VNImageRequestHandler.alloc().initWithData_options_(img_data, None).autorelease()
         success = handler.performRequests_error_([req], None)    
@@ -213,20 +217,21 @@ class Recognise():
           self.vn_model = self.load_model()
       
       # Create and perform the recognition request:
-      req = VNCoreMLRequest.alloc().initWithModel_(self.vn_model).autorelease()
-      if aoi:
-          x, y, w, h = aoi
-          req.regionOfInterest = ((x, y), (w, h))
-      handler = VNImageRequestHandler.alloc().initWithData_options_(img_data, None).autorelease()
-      success = handler.performRequests_error_([req], None)
-      
-      if success:
-        best_result = req.results()[0]
-        label = str(best_result.identifier())
-        confidence = best_result.confidence()
-        return {'label': label, 'confidence': confidence}
-      else:
-        return None
+      with autoreleasepool():
+          req = VNCoreMLRequest.alloc().initWithModel_(self.vn_model).autorelease()
+          if aoi:
+              x, y, w, h = aoi
+              req.regionOfInterest = ((x, y), (w, h))
+          handler = VNImageRequestHandler.alloc().initWithData_options_(img_data, None).autorelease()
+          success = handler.performRequests_error_([req], None)
+          
+          if success:
+            best_result = req.results()[0]
+            label = str(best_result.identifier())
+            confidence = best_result.confidence()
+            return {'label': label, 'confidence': confidence}
+          else:
+            return None
     
     
     def classify_image(self, img):
@@ -236,8 +241,10 @@ class Recognise():
       return self._classify_img_data(img_data)
     
     def corel_ml_text_recognition(self, asset, aoi):
-      
-      x,y,w,h = aoi   
+      if aoi is None:
+        x, y, w, h = 0,0,1.0,1.0 
+      else:
+          x,y,w,h = aoi   
       if asset is not self.asset or w != self.w or h != self.w: 
         MAX_SIZE = 28
         img = asset.get_image()
@@ -356,11 +363,7 @@ class Recognise():
             return board, board.shape
         except (Exception) as e:
             print(traceback.format_exc())
-            return None, None
-    
-    
-    import math
-        
+            return None, None            
         
     def hough_line(self,img, angle_step=1, lines_are_white=True, value_threshold=5):
             """
@@ -407,8 +410,7 @@ class Recognise():
                     rho = diag_len + int(round(x * cos_t[t_idx] + y * sin_t[t_idx]))
                     accumulator[rho, t_idx] += 1
         
-            return accumulator, thetas, rhos
-        
+            return accumulator, thetas, rhos        
         
     def show_hough_line(self,img, accumulator, thetas, rhos, save_path=None):
             import matplotlib.pyplot as plt
@@ -431,10 +433,7 @@ class Recognise():
             # plt.axis('off')
             if save_path is not None:
                 plt.savefig(save_path, bbox_inches='tight')
-            plt.show()
-        
-        
-        
+            plt.show()                      
             
             accumulator, thetas, rhos = self.hough_line(img)
             self. gshow_hough_line(img, accumulator, thetas, rhos, save_path='imgs/output.png')
@@ -467,12 +466,27 @@ class Recognise():
           threshold = bin_centers[idx]
           return threshold
               
-
-
-
-
-
-
-
-
+def main():
+  g = Recognise()
+  r = dialogs.alert('Classify Image', '', 'Camera', 'Photo Library')
+  if r == 1:
+    img = photos.capture_image()
+    if img is None:
+      return
+    g.scale_image(img, 224).show()
+    result = classify_image(img)
+  else:
+    asset = photos.pick_asset()
+    if asset is None:
+      return
+    result = g.corel_ml_text_recognition(asset, aoi=None)
+    asset.get_ui_image((255, 255)).show()
+  if result:
+    print(result)
+  else:
+    print('Image classification failed')
+                            
+if __name__ == '__main__':
+  main()
+  
 
