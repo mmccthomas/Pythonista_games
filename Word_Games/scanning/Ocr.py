@@ -645,7 +645,8 @@ class OcrCrossword(LetterGame):
           x, y = data.T
           plt.scatter(x,y, color='red' )          
           plt.show()
-          board = np.empty((self.Ny, self.Nx), dtype='U1')
+          board = np.full((self.Ny, self.Nx), ' ', dtype='U1')
+          conf_board = np.zeros((self.Ny, self.Nx), dtype=int)
           # try to recognise character
           self.gui.set_props(self.gridbox, font=('Courier New', 16))
           self.gui.remove_lines()
@@ -660,11 +661,12 @@ class OcrCrossword(LetterGame):
               print(f'{result["label"]}, conf={result["confidence"]:0.3f} time= {elapsed:.4f}')
               if result['confidence'] < 0.3:
                  board[int(selection["r"]), int(selection["c"])] = '#'
+                 
               else:
                board[int(selection["r"]), int(selection["c"])] = result['label']
-              
-              self.gui.set_text(self.gridbox, 
-                            '\n'.join(['/'.join(list(row)) for row in np.flipud(board)]))    
+              conf_board[int(selection["r"]), int(selection["c"])] = int(result['confidence']*10)
+              self.gui.set_text(self.gridbox,  '\n'.join(['/'.join(list(row)) for row in np.flipud(board)]))    
+              self.wordsbox.text =  f'{np.flipud(conf_board)}'
           
 def main():
     
