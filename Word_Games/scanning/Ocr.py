@@ -8,6 +8,7 @@ import sys
 import clipboard
 import dialogs
 import traceback
+from time import time
 from queue import Queue
 import pandas as pd
 from matplotlib import pyplot as plt
@@ -132,7 +133,7 @@ class OcrCrossword(LetterGame):
         'button12': (w+250, 3*h/21),   'button13': (w+250, 2*h/21),  'button14': (w+250, 1*h/21),
         'box1': (w+5, 2*h/3-6), 'box2': (w+5, 6*h/21),  'box3': (w+105, 75),'font': ('Avenir Next', 15)},                                         
 
-        'ipad_landscape': {'rackscale': 0.9,
+        'ipad_landscape': {'rackscale': 1.5,
         'button1': (w+20, 0), 'button2': (w+20, h/21), 'button3': (w+150, h/21),
         'button4': (w+20, 3*h/21), 'button5': (w+100, 3*h/21),
         'button6': (w+20, 4*h/21), 'button7': (w+150, 0), 'button8': (w+20, 5*h/21),
@@ -156,9 +157,9 @@ class OcrCrossword(LetterGame):
       #self.gui.set_props(self.wordsbox, font=('Courier New', 12))
       self.gridbox = self.gui.add_button(text='', title='Grid', 
                           position=self.posn.box2, 
-                          min_size=(2* tsize+10, tsize+10), 
+                          min_size=(300, 200), #min_size=(2* tsize+10, tsize+10), 
                           fill_color='black')
-      self.gui.set_props(self.gridbox, font=('Courier New', 8))
+      self.gui.set_props(self.gridbox, font=('Courier New', 10))
       self.wordsbox = self.gui.scroll_text_box(x=self.posn.box3[0], 
                                                y=self.posn.box3[1],
                                                width=300, height=200,
@@ -512,7 +513,7 @@ class OcrCrossword(LetterGame):
             aspects = np.round(df.h / df.w, 2)
             
             hist_area = np.histogram(areas, bins=10)
-            hist_aspect = np.histogram(aspects, bins=10)
+            #hist_aspect = np.histogram(aspects, bins=10)
             
             area_span = np.linspace(min(areas), max(areas), num=10)
             d_area= np.digitize(areas, area_span, right=True)
@@ -644,17 +645,36 @@ class OcrCrossword(LetterGame):
           x, y = data.T
           plt.scatter(x,y, color='red' )          
           plt.show()
-
-          
+          board = np.empty((self.Ny, self.Nx), dtype='U1')
+          # try to recognise character
+          self.gui.set_props(self.gridbox, font=('Courier New', 16))
+          self.gui.remove_lines()
+          for index, selection in total_rects.iterrows():
+            aoi = tuple(selection[['x', 'y', 'w', 'h']])
+            t = time()
+            result = buffer = self.recognise.corel_ml_text_recognition(self.asset, aoi)
+            
+            print(f'{int(selection["r"])}, {int(selection["c"])}')
+            if result:
+              elapsed = time() - t
+              print(f'{result["label"]}, conf={result["confidence"]:0.3f} time= {elapsed:.4f}')
+              if result['confidence'] < 0.3:
+                 board[int(selection["r"]), int(selection["c"])] = '#'
+              else:
+               board[int(selection["r"]), int(selection["c"])] = result['label']
+              
+              self.gui.set_text(self.gridbox, 
+                            '\n'.join(['/'.join(list(row)) for row in np.flipud(board)]))    
           
 def main():
     
     all_assets = photos.get_assets()
     asset = photos.pick_asset(assets=all_assets)
-    if asset is not None:
+    try:
        all_text_dict= Recognise().text_ocr(asset) #, rects2[9])
+       
        all_text = list(all_text_dict.values())
-    else:
+    except:
       all_text = []
       all_text_dict = {}
     
@@ -665,4 +685,5 @@ def main():
     
 if __name__ == '__main__':
     main()
+
 
