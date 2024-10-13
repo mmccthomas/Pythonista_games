@@ -10,7 +10,7 @@ import dialogs
 import traceback
 from queue import Queue
 import pandas as pd
-from matplotlib import pyplot
+from matplotlib import pyplot as plt
 
 current = os.path.dirname(os.path.realpath(__file__))
 parent = os.path.dirname(current)
@@ -26,7 +26,7 @@ import gui.gui_scene as gs
 import numpy as np
 from PIL import Image
 from io import BytesIO
-import recognise
+from  recognise import Recognise
 from time import sleep
 savefile= 'Ocr_save'
 
@@ -78,6 +78,7 @@ class OcrCrossword(LetterGame):
         self.set_buttons()
         self.add_boxes()
         self.add_indexes()
+        self.recognise = Recognise()
         
         
     def get_size(self, board, board_size):
@@ -436,14 +437,14 @@ class OcrCrossword(LetterGame):
         
     def enter_image_mode(self):
         if self.asset is not None:
-            filename, self.scale, props = recognise.convert_to_png(self.asset)
+            filename, self.scale, props = self.recognise.convert_to_png(self.asset)
             self.gui.set_message(f'{props}')
             self.gui.add_image(filename)
-            self.rects, self.bboxes  = recognise.rectangles(self.asset)
+            self.rects, self.bboxes  = self.recognise.rectangles(self.asset)
             self.draw_rectangles(self.bboxes)
             self.board[self.board == ' '] = '-'
             self.gui.update(self.board)  
-            all_text_dict = recognise.text_ocr(self.asset)
+            all_text_dict = self.recognise.text_ocr(self.asset)
             try:
                 #board, board_size = recognise.sort_by_position(all_text_dict)    
                 all_text = list(all_text_dict.values())
@@ -453,8 +454,8 @@ class OcrCrossword(LetterGame):
     def recognise_area(self):
         '''recognise text in defined area'''
         if self.defined_area:
-          all_text_dict = recognise.text_ocr(self.asset, self.defined_area)
-          self.rects, self.bboxes  = recognise.rectangles(self.asset, self.defined_area)
+          all_text_dict = self.recognise.text_ocr(self.asset, self.defined_area)
+          self.rects, self.bboxes  = self.recognise.rectangles(self.asset, self.defined_area)
           self.draw_rectangles(self.rects)
           try:
              #recognise.sort_by_position(all_text_dict, max_y=None)
@@ -467,10 +468,10 @@ class OcrCrossword(LetterGame):
     def recognise_pieceword(self):            
         '''recognise pieceword grid in defined area'''
         if self.defined_area:  
-          self.rects, self.bboxes  = recognise.rectangles(self.asset, self.defined_area)
+          self.rects, self.bboxes  = self.recognise.rectangles(self.asset, self.defined_area)
           self.draw_rectangles(self.rects)
           try:
-             board = recognise.pieceword_sort(self.asset, None, self.rects)
+             board = self.recognise.pieceword_sort(self.asset, None, self.rects)
              self.wordsbox.font = ('Courier', 30)
              self.wordsbox.text=board
              return board            
@@ -498,11 +499,11 @@ class OcrCrossword(LetterGame):
             returns pandas dataframe
             """
             
-            rects, bboxes  = recognise.rectangles(self.asset, subrect)
+            rects, bboxes  = self.recognise.rectangles(self.asset, subrect)
             df = pd.DataFrame(np.array(rects), columns=('x', 'y', 'w', 'h'))
             df = np.round(df, decimals=3)
             df['area']= df.w * df.h * 1000
-            print(len(df))
+            #print(len(df))
             df.sort_values(by=['x','y','area'], inplace=True, ignore_index=True)
             df.drop_duplicates(['x', 'y'], keep='last', inplace=True, ignore_index=True)
             
@@ -521,16 +522,16 @@ class OcrCrossword(LetterGame):
             
             #find greatest number of items  in area
             # TODO should we also use aspect?
-            print('digitized', d_area)
-            print('areas', areas)
-            print('digitized', d_aspect)
-            print('aspects', aspects)
+            # print('digitized', d_area)
+            # print('areas', areas)
+            # print('digitized', d_aspect)
+            # print('aspects', aspects)
             unique, counts = np.unique(d_area, return_counts=True)
-            print('unique, counts', unique, counts)
+            # print('unique, counts', unique, counts)
             most = unique[np.argmax(counts)]
             filtered = df[d_area[df.index] == most]
             
-            print('filtered', len(filtered))
+            # print('filtered', len(filtered))
             
             params = {'line_width': 2, 'stroke_color': 'red', 'z_position':1000}
             #convert to list of tuples for drawing
@@ -556,47 +557,63 @@ class OcrCrossword(LetterGame):
           
     def convert_to_rc(self, total_rects):
        '''convert x y to r c'''
-       total_rects['centrex']= total_rects.x + total_rects.w /2
-       total_rects['centrey']= total_rects.y + total_rects.h /2
-       dx = total_rects.mean(axis=0)['w'] * 1.1
+       def process(column, ratio=None):
+           """calculate size of axis, then values and hence delta           
+           ratio = 0.5 # fraction of counts to accept
+           """
+           
+           values = np.array(total_rects[column])
+           u, count = np.unique(values, return_counts=True)
+           
+           avg_ = np.mean(count)
+           
+           if ratio is None:
+              stdev_ = np.std(count)
+              ratio = 1 - stdev_ / avg_
+              
+           filtered = u[count > avg_ * ratio]
+           filt_count = count[count > avg_ * ratio] 
+           plt.stem(u, count, linefmt='red') 
+           plt.stem(filtered, filt_count, linefmt='blue')    
+           plt.show()
+           N = len(filtered)            
+           diff_ = np.mean(np.diff(filtered))
+           return N, diff_, filtered
+         
+       print('x red=original, blue = filtered') 
+       self.Nx, self.diffx, self.xs = process('x', ratio=None)
+       print('y red=original, blue = filtered') 
+       self.Ny, self.diffy, self.ys = process('y', ratio=None)
+       print(f'{self.Nx=}, {self.diffx=:.3f}, {self.xs=}')
+       print(f'{self.Ny=}, {self.diffy=}:.3f, {self.ys=}')
+       total_rects['c'] = np.rint((total_rects.x - min(self.xs)) / self.diffx).astype(int)
+       total_rects['r'] = np.rint((total_rects.y - min(self.ys)) / self.diffy).astype(int)
        
-       dy = total_rects.mean(axis=0)['h'] * 1.1
-       
-       min_x = total_rects.min(axis=0)['centrex']
-       min_y = total_rects.min(axis=0)['centrey']
-       max_x = total_rects.max(axis=0)['centrex']
-       max_y = total_rects.max(axis=0)['centrey']
-       c = np.rint((total_rects.centrex - min_x) / dx).astype(int)
-       r = np.rint((total_rects.centrey - min_y) / dy).astype(int)
-       total_rects['r'] =r
-       total_rects['c'] = c
-       total_rects.pop('centrex')
-       total_rects.pop('centrey')
        return total_rects
        
     def add_missing(self, total_rects):
       """ find which rc coordinates are not in total_rects, add them in"""
-      R, C = int(total_rects.max(axis=0)['r'])+1, int(total_rects.max(axis=0)['c'])+1
-      board = np.full((R,C), True)
+      #fill a board of computed size with logic True
+      board = np.full((self.Ny, self.Nx), True)
+      #fill board with logic False if r,c in totsl_rects
       locs = np.array(total_rects[['r', 'c']])
       for loc in locs:
         board[tuple(loc)] = False
+      # missing is  whats left
       missing = np.argwhere(board==True)
-      df = pd.DataFrame(missing, columns=['r', 'c'])
-      w = total_rects.mean(axis=0)['w']
-      h = total_rects.mean(axis=0)['h']
-      x0 = total_rects.min(axis=0)['x']
-      y0 = total_rects.min(axis=0)['y']
+      # make a new datafram from missing r,c
+      missing_df = pd.DataFrame(missing, columns=['r', 'c'])
+      w, h = tuple(total_rects.mean(axis=0)[['w', 'h']])
+
       # fill x, y, w, h and size columns
-      df['x'] = np.round(x0 + df.c * w*1.1, 2)
-      df['y'] = np.round(y0 + df.r * h*1.1, 2)
-      df['w'] = w*.9
-      df['h'] = h*.9
-      df['area'] = df.w * df.h * 1000
+      missing_df['x'] = np.array([self.xs[c] for c in missing_df.c])
+      missing_df['y'] = np.array([self.ys[r] for r in missing_df.r])
+      missing_df['w'] = w
+      missing_df['h'] = h
+      missing_df['area'] = w * h * 1000
   
-      return df
-      
-      
+      return missing_df
+        
     def recognise_crossword(self):
       """ process crossword grid """
       if self.defined_area:
@@ -611,20 +628,31 @@ class OcrCrossword(LetterGame):
           self.gui.remove_lines(z_position=1000)
           params = {'line_width': 5, 'stroke_color': 'red', 'z_position':1000}
           self.draw_rectangles(total_rects, **params)
-          print(total_rects.to_string())
+          # print(total_rects.to_string())
           total_rects =self.convert_to_rc(total_rects)
           self.wordsbox.text = total_rects.to_string()
+          
           df = self.add_missing(total_rects)
           params = {'line_width': 5, 'stroke_color': 'green', 'z_position':1000}
           self.draw_rectangles(df, **params)
+          data = np.array(total_rects[['x','y']])
+          plt.close()
+          x, y = data.T
+          plt.scatter(x,y, color='green' )          
           total_rects = pd.concat([total_rects, df], ignore_index=False) 
-            
+          data = np.array(df[['x','y']])
+          x, y = data.T
+          plt.scatter(x,y, color='red' )          
+          plt.show()
+
+          
+          
 def main():
     
     all_assets = photos.get_assets()
     asset = photos.pick_asset(assets=all_assets)
     if asset is not None:
-       all_text_dict= recognise.text_ocr(asset) #, rects2[9])
+       all_text_dict= Recognise().text_ocr(asset) #, rects2[9])
        all_text = list(all_text_dict.values())
     else:
       all_text = []
@@ -637,39 +665,4 @@ def main():
     
 if __name__ == '__main__':
     main()
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
