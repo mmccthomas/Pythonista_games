@@ -20,7 +20,7 @@ import dialogs
 import photos
 import resource
 
-DEBUG=True
+DEBUG = False
 
 VNImageRequestHandler = ObjCClass('VNImageRequestHandler')
 VNRecognizeTextRequest = ObjCClass('VNRecognizeTextRequest')
@@ -258,7 +258,7 @@ class Recognise():
           x,y,w,h = aoi   
       if asset is not self.asset or not math.isclose(w, self.w, abs_tol=0.005) or not math.isclose(h, self.h, abs_tol=0.005):
         MAX_SIZE = 28
-        img = asset.get_image().convert('L')
+        img = asset.get_image().convert('1')
         width = asset.pixel_width
         height = asset.pixel_height                 
         sq_x, sq_y = (w*width, h*height)
@@ -266,7 +266,7 @@ class Recognise():
         img.resize((int(width*ratio_x), int(width*ratio_y)), Image.ANTIALIAS)
         buffer = io.BytesIO()
         img.save(buffer, 'JPEG')      
-        img_data = ns(buffer.getvalue())
+        img_data = ns(buffer.getvalue()) 
         self.w, self.h, self.asset = w, h, asset
         self.img_data = img_data     
       
@@ -293,44 +293,29 @@ class Recognise():
         
     def pieceword_sort(self, asset, page_text_dict, rectangles):
         """ from a series of rectangles, perform a text recognition inside each"""
-        def r2(x):
-            """ round"""
-            return round(x, 3)
-            
+     
         def get_chars(rectangles):
             params = {'line_width': 5, 'stroke_color': 'red', 'z_position':1000}
             all_dict = []   
             self.gui.remove_lines()    
-            for index, text_rect in enumerate(rectangles):           
-               #try to split rectangles into 9
-               x, y, w,h  = text_rect
-               
-               self.draw_box(text_rect, **{**params, 'z_position':500})
-               for i in range(9):
-                  memused1= self.memused()
-                  # bottom left to top right
-                  box = (x + (i % 3) * w/3, y + (i//3) * h/3, w/3 , h/3)                      
-                  char_ =  self.character_ocr(asset, aoi=box)  
-                  
-                  print('mem used', self.memused() - memused1, 'MB')
-                     
-                  self.draw_box(box, **{**params,'stroke_color': 'green'})
-                  if char_:
+            for index, text_rect in rectangles.iterrows():      
+                try:     
+                    box  = tuple(text_rect)                  
+                    char_ =  self.character_ocr(asset, aoi=box)                    
+                    
+                    self.draw_box(box, **{**params,'stroke_color': 'green'})
                     self.gui.set_message(f'{index} {box[0]:.2f}, {box[1]:.2f}, {char_["label"]}  {char_["confidence"]:.2f}')
                     all_dict.append(char_)
                     if DEBUG:
-                      print(f'{index} {box[0]:.2f}, {box[1]:.2f}, {char_["label"]}  {char_["confidence"]:.2f}')
-                  memused = self.memused()
-                  print(memused)
+                        print(f'{index} {box[0]:.2f}, {box[1]:.2f}, {char_["label"]}  {char_["confidence"]:.2f}')
+                    print('mem used', self.memused(), 'MB')
+                except (Exception) as e:
+                   print(e)
             self.gui.remove_lines()    
-            return all_dict
-            #b, bs = self.sort_by_position(all_dict, max_y=3)
-            #all_dict.update({(r2(x),r2(y),r2(w),r2(h)): b})
-             
+            return all_dict             
              
         all_dict = get_chars(rectangles)  
-        board, shape = self.sort_by_position(all_dict, max_y=-3)
-        return   '\n'.join([''.join(row) for row in np.flipud(board)])
+        return all_dict
         
     def sort_by_position(self, all_text_dict, max_y=None):
         # use the box data to reorder text
@@ -361,62 +346,7 @@ class Recognise():
                  else:
                       board[int(selection["r"]), int(selection["c"])] = '#'
             return board, board.shape
-            """
-            if max_y is None:
-                # scale 0-1000 and round to nearest 5
-                df = df.multiply(1000).astype(int)    
-                df = df.divide(5.0).round().multiply(5).astype(int)
-                # TODO convert x and y to row and col
-                p = np.polyfit(np.arange(df.shape[0]), np.sort(df['y']),1)
-                ys = np.sort(df['y'])
-                #spacing = np.sort(np.abs(np.diff(ys)))
-                unique = np.unique(df['y'])
-                #spacing_mean = np.mean(spacing)
-                # scale to spacing
-                if DEBUG:
-                    print(df.to_string(), p)
-                df = df.subtract(p[1]).divide(p[0]).astype(int)
-            elif max_y>0:           
-               df = np.rint(df.multiply(max_y)).astype(int)
-            elif max_y < 0:
-               df = np.rint(df.divide(np.max(df['h']))).astype(int)
-               if DEBUG:
-                    print(df.to_string())
-               
-            #stitch text as new column
-            text_df = pd.DataFrame(np.array(list(all_text_dict.values())), columns =['text'])
-            df = df.join(text_df) 
-              
-            #sort by y then x
-            sorted_df = df.sort_values(by=['y', 'x'], ascending=[False, True])
-            if DEBUG:
-                # print all of the dataframe
-                print(sorted_df.to_string())
-            if max_y is not None and max_y < 0:
-                board = np.empty((-max_y*(df['y'].max()+1), -max_y*(df['x'].max()+1)), dtype='U1')
-                board[:, :] = '#'
-                
-                for _, row in sorted_df.iterrows():
-                  if row['text'] is not None:
-                    board[-max_y*row['y']: -max_y*row['y']+row['text'].shape[0], -max_y*row['x']: -max_y*row['x']+row['text'].shape[1]] = np.flipud(row['text'])
-            else: 
-                # prepare board
-                board = np.empty((df['y'].max()+1, df['x'].max()+1), dtype='U1')
-                board[:, :] = '#'
-        
-                #attempt to fill board given by row and col
             
-                for _, row in sorted_df.iterrows():
-                    board[row['y'], row['x']: row['x']+len(row['text'])] = list(row['text'])
-        
-            # turn upside down
-            board = np.flipud(board)
-            if True:
-                print()
-                # print it
-                [print(''.join(row)) for row in board]
-               
-            return board, board.shape"""
         except (Exception) as e:
             print(traceback.format_exc())
             return None, None            
@@ -436,15 +366,15 @@ class Recognise():
               stdev_ = np.std(count)
               ratio = 1 - stdev_ / avg_
               
-           plt.stem(u, count, linefmt='red') 
+           #plt.stem(u, count, linefmt='red') 
            if ratio < 1.0:  
                filtered = u[count >= avg_ * ratio]
                filt_count = count[count >= avg_ * ratio]               
-               plt.stem(filtered, filt_count, linefmt='blue')    
+               #plt.stem(filtered, filt_count, linefmt='blue')    
            else:
               filtered = u
                            
-           plt.show()
+           #plt.show()
            N = len(filtered)            
            diff_ = np.mean(np.diff(filtered))
            return N, diff_, filtered
@@ -457,8 +387,10 @@ class Recognise():
        print(f'{self.Ny=}, {diffy=}:.3f, {self.ys=}')
        # TODO does not account for non uniform spacing
        # better to index u values?
-       df['c'] = np.rint((df.x - min(self.xs)) / diffx).astype(int)
-       df['r'] = np.rint((df.y - min(self.ys)) / diffy).astype(int)
+       c = np.digitize(df.x, self.xs, right=True)
+       r = np.digitize(df.y, self.ys, right=True)
+       df['c'] = c #np.rint((df.x - min(self.xs)) / diffx).astype(int)
+       df['r'] = r #np.rint((df.y - min(self.ys)) / diffy).astype(int)
        
        return df
            
@@ -586,6 +518,7 @@ def main():
 if __name__ == '__main__':
   main()
   
+
 
 
 

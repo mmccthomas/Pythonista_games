@@ -415,6 +415,8 @@ class OcrCrossword(LetterGame):
           break
       
     def filter(self, sort_alpha=True, max_length=None, min_length=None, sort_length=True, remove_numbers=False):
+      """ filter all detected text and sort according to length
+      """
       
       words = self.all_text
       if max_length:
@@ -469,13 +471,26 @@ class OcrCrossword(LetterGame):
             
     def recognise_pieceword(self):            
         '''recognise pieceword grid in defined area'''
+        # find all boxes first
         if self.defined_area:  
-          self.rects, self.bboxes  = self.recognise.rectangles(self.asset, self.defined_area)
-          self.draw_rectangles(self.rects)
+          total_rects = pd.DataFrame(columns=('x', 'y', 'w', 'h'))
+          rects, bboxes  = self.recognise.rectangles(self.asset, self.defined_area)
+          self.draw_rectangles(rects)
+          print('found', len(rects))
+          for subrect in rects:              
+              df =  self.find_rects_in_area(subrect)
+              total_rects = pd.concat([total_rects, df], ignore_index=False)          
+          self.draw_rectangles(total_rects)
+          total_rects = self.filter_total(total_rects)
+          self.gui.remove_lines()
+          self.draw_rectangles(total_rects)
+          print(len(total_rects))
           try:
-             board = self.recognise.pieceword_sort(self.asset, None, self.rects)
-             self.wordsbox.font = ('Courier', 30)
-             self.wordsbox.text=board
+             all_dict = self.recognise.pieceword_sort(self.asset, None, total_rects)
+             board_, shape = self.recognise.sort_by_position(all_dict, max_y=-3)
+             board = '\n'.join([''.join(row) for row in np.flipud(board_)])
+             self.wordsbox.font = ('Courier', 24)
+             self.wordsbox.text = board
              return board            
           except (AttributeError):
             self.gui.set_message(f'No text found in {self.defined_area}')
@@ -531,30 +546,27 @@ class OcrCrossword(LetterGame):
             unique, counts = np.unique(d_area, return_counts=True)
             # print('unique, counts', unique, counts)
             most = unique[np.argmax(counts)]
-            filtered = df[d_area[df.index] == most]
-            
+            filtered = df[d_area[df.index] == most]           
             # print('filtered', len(filtered))
-            
-            params = {'line_width': 2, 'stroke_color': 'red', 'z_position':1000}
-            #convert to list of tuples for drawing
-            self.draw_rectangles(filtered, **params)
             return filtered
             
     def filter_total(self, total_rects):
-          """ total rects is pandas Dataframe '"""
-          total_rects = np.round(total_rects, decimals=2)
-          total_rects['area']= total_rects.w * total_rects.h * 1000
+          """ total rects is pandas Dataframe 
+          add reduced resolution column for sorting and filtering
+          remove them at the end """
+          total_rects[['xr', 'yr', 'wr', 'hr']] = np.round(total_rects[['x', 'y', 'w', 'h']], 2)
+          
+          total_rects['area']= total_rects.wr * total_rects.hr * 1000
           print(len(total_rects))
-          total_rects.sort_values(by=['x','y','area'], inplace=True, ignore_index=True)
-          total_rects.drop_duplicates(['x', 'y'], keep='last', inplace=True, ignore_index=True)
+          total_rects.sort_values(by=['xr','yr','area'], inplace=True, ignore_index=True)
+          total_rects.drop_duplicates(['xr', 'yr'], keep='last', inplace=True, ignore_index=True)
           area_span = np.linspace(total_rects.min(axis=0)['area'], total_rects.max(axis=0)['area'], num=10)
           d_area= np.digitize(np.array(total_rects.area), area_span, right=True)
           unique, counts = np.unique(d_area, return_counts=True)
           most = unique[np.argmax(counts)]
           idx = d_area[np.array(total_rects.index)] == most
-          total_rects = total_rects[idx]
-          
-          total_rects.pop('area')
+          total_rects = total_rects[idx]          
+          [total_rects.pop(col) for col in ['area', 'xr', 'yr', 'wr', 'hr']]
           return total_rects
           
     
@@ -603,14 +615,14 @@ class OcrCrossword(LetterGame):
           params = {'line_width': 5, 'stroke_color': 'green', 'z_position':1000}
           self.draw_rectangles(df, **params)
           data = np.array(total_rects[['x','y']])
-          plt.close()
+          #plt.close()
           x, y = data.T
-          plt.scatter(x,y, color='green' )          
+          #plt.scatter(x,y, color='green' )          
           total_rects = pd.concat([total_rects, df], ignore_index=False) 
           data = np.array(df[['x','y']])
           x, y = data.T
-          plt.scatter(x,y, color='red' )          
-          plt.show()
+          #plt.scatter(x,y, color='red' )          
+          #plt.show()
           board = np.full((self.recognise.Ny, self.recognise.Nx), ' ', dtype='U1')
           conf_board = np.zeros((self.recognise.Ny, self.recognise.Nx), dtype=int)
           # try to recognise character
@@ -653,5 +665,8 @@ def main():
     
 if __name__ == '__main__':
     main()
+
+
+
 
 
