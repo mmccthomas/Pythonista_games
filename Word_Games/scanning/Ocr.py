@@ -12,6 +12,7 @@ from time import time
 from queue import Queue
 import pandas as pd
 from matplotlib import pyplot as plt
+import resource
 
 current = os.path.dirname(os.path.realpath(__file__))
 parent = os.path.dirname(current)
@@ -79,7 +80,7 @@ class OcrCrossword(LetterGame):
         self.set_buttons()
         self.add_boxes()
         self.add_indexes()
-        self.recognise = Recognise()
+        self.recognise = Recognise(self.gui)
         
         
     def get_size(self, board, board_size):
@@ -556,46 +557,11 @@ class OcrCrossword(LetterGame):
           total_rects.pop('area')
           return total_rects
           
-    def convert_to_rc(self, total_rects):
-       '''convert x y to r c'''
-       def process(column, ratio=None):
-           """calculate size of axis, then values and hence delta           
-           ratio = 0.5 # fraction of counts to accept
-           """
-           
-           values = np.array(total_rects[column])
-           u, count = np.unique(values, return_counts=True)
-           
-           avg_ = np.mean(count)
-           
-           if ratio is None:
-              stdev_ = np.std(count)
-              ratio = 1 - stdev_ / avg_
-              
-           filtered = u[count > avg_ * ratio]
-           filt_count = count[count > avg_ * ratio] 
-           plt.stem(u, count, linefmt='red') 
-           plt.stem(filtered, filt_count, linefmt='blue')    
-           plt.show()
-           N = len(filtered)            
-           diff_ = np.mean(np.diff(filtered))
-           return N, diff_, filtered
-         
-       print('x red=original, blue = filtered') 
-       self.Nx, self.diffx, self.xs = process('x', ratio=None)
-       print('y red=original, blue = filtered') 
-       self.Ny, self.diffy, self.ys = process('y', ratio=None)
-       print(f'{self.Nx=}, {self.diffx=:.3f}, {self.xs=}')
-       print(f'{self.Ny=}, {self.diffy=}:.3f, {self.ys=}')
-       total_rects['c'] = np.rint((total_rects.x - min(self.xs)) / self.diffx).astype(int)
-       total_rects['r'] = np.rint((total_rects.y - min(self.ys)) / self.diffy).astype(int)
-       
-       return total_rects
-       
+    
     def add_missing(self, total_rects):
       """ find which rc coordinates are not in total_rects, add them in"""
       #fill a board of computed size with logic True
-      board = np.full((self.Ny, self.Nx), True)
+      board = np.full((self.recognise.Ny, self.recognise.Nx), True)
       #fill board with logic False if r,c in totsl_rects
       locs = np.array(total_rects[['r', 'c']])
       for loc in locs:
@@ -607,8 +573,8 @@ class OcrCrossword(LetterGame):
       w, h = tuple(total_rects.mean(axis=0)[['w', 'h']])
 
       # fill x, y, w, h and size columns
-      missing_df['x'] = np.array([self.xs[c] for c in missing_df.c])
-      missing_df['y'] = np.array([self.ys[r] for r in missing_df.r])
+      missing_df['x'] = np.array([self.recognise.xs[c] for c in missing_df.c])
+      missing_df['y'] = np.array([self.recognise.ys[r] for r in missing_df.r])
       missing_df['w'] = w
       missing_df['h'] = h
       missing_df['area'] = w * h * 1000
@@ -630,7 +596,7 @@ class OcrCrossword(LetterGame):
           params = {'line_width': 5, 'stroke_color': 'red', 'z_position':1000}
           self.draw_rectangles(total_rects, **params)
           # print(total_rects.to_string())
-          total_rects =self.convert_to_rc(total_rects)
+          total_rects =self.recognise.convert_to_rc(total_rects)
           self.wordsbox.text = total_rects.to_string()
           
           df = self.add_missing(total_rects)
@@ -645,15 +611,15 @@ class OcrCrossword(LetterGame):
           x, y = data.T
           plt.scatter(x,y, color='red' )          
           plt.show()
-          board = np.full((self.Ny, self.Nx), ' ', dtype='U1')
-          conf_board = np.zeros((self.Ny, self.Nx), dtype=int)
+          board = np.full((self.recognise.Ny, self.recognise.Nx), ' ', dtype='U1')
+          conf_board = np.zeros((self.recognise.Ny, self.recognise.Nx), dtype=int)
           # try to recognise character
           self.gui.set_props(self.gridbox, font=('Courier New', 16))
           self.gui.remove_lines()
           for index, selection in total_rects.iterrows():
             aoi = tuple(selection[['x', 'y', 'w', 'h']])
             t = time()
-            result = buffer = self.recognise.corel_ml_text_recognition(self.asset, aoi)
+            result = buffer = self.recognise.character_ocr(self.asset, aoi)
             
             print(f'{int(selection["r"])}, {int(selection["c"])}')
             if result:

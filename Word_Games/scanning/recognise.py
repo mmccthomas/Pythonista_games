@@ -10,7 +10,7 @@ import os
 import io
 from time import time
 import pandas as pd
-from matplotlib import pyplot
+from matplotlib import pyplot as plt
 import straighten_image
 import clipboard
 import appex
@@ -18,8 +18,9 @@ import math
 from PIL.ExifTags import TAGS
 import dialogs
 import photos
+import resource
 
-DEBUG=False
+DEBUG=True
 
 VNImageRequestHandler = ObjCClass('VNImageRequestHandler')
 VNRecognizeTextRequest = ObjCClass('VNRecognizeTextRequest')
@@ -47,12 +48,19 @@ exif_rotations = {
 7: '270 degrees: image has been flipped back-to-front and is on its far side.'
 }
 
+  
+  
 class Recognise():
-    def __init__(self):
+    def __init__(self, gui):
       self.w =0
       self.h = 0
       self.asset = None
+      self.gui = gui
       
+    @staticmethod 
+    def memused():
+        return resource.getrusage(resource.RUSAGE_SELF).ru_maxrss// (2**20) 
+        
     def get_exif(self, i):
       ret = {}
       # i = Image.open(fn)
@@ -177,6 +185,7 @@ class Recognise():
         success = handler.performRequests_error_([req], None)    
         if success:
             all_text = {}
+            
             for result in req.results():
               cg_box = result.boundingBox()
               x, y = cg_box.origin.x, cg_box.origin.y
@@ -188,7 +197,7 @@ class Recognise():
             return all_text #[str(result.text()) for result in req.results()]       
     
     
-    def load_model(self):
+    def load_model(self, modelname):
       '''Helper method for downloading/caching the mlmodel file'''
       if not os.path.exists(MODEL_PATH):
         print(f'Downloading model: {MODEL_FILENAME}...')
@@ -211,10 +220,10 @@ class Recognise():
       return vn_model
     
     
-    def _classify_img_data(self, img_data, aoi):
+    def _classify_img_data(self, modelname, img_data, aoi):
       '''The main image classification method, used by `classify_image` (for camera images) and `classify_asset` (for photo library assets).'''
       if not hasattr(self, 'vnmodel'):
-          self.vn_model = self.load_model()
+          self.vn_model = self.load_model(modelname)
       
       # Create and perform the recognition request:
       with autoreleasepool():
@@ -229,10 +238,9 @@ class Recognise():
             best_result = req.results()[0]
             label = str(best_result.identifier())
             confidence = best_result.confidence()
-            return {'label': label, 'confidence': confidence}
+            return {'label': label, 'confidence': confidence, 'cg_box': aoi}
           else:
-            return None
-    
+            return None    
     
     def classify_image(self, img):
       buffer = io.BytesIO()
@@ -240,14 +248,17 @@ class Recognise():
       img_data = ns(buffer.getvalue())
       return self._classify_img_data(img_data)
     
-    def corel_ml_text_recognition(self, asset, aoi):
+    def character_ocr(self, asset, aoi):
+      """ read a single 28 x 28 pixel character
+      scale the image so that aoi size is 28 x 28 pixels
+      """
       if aoi is None:
         x, y, w, h = 0,0,1.0,1.0 
       else:
           x,y,w,h = aoi   
-      if asset is not self.asset or w != self.w or h != self.w: 
+      if asset is not self.asset or not math.isclose(w, self.w, abs_tol=0.005) or not math.isclose(h, self.h, abs_tol=0.005):
         MAX_SIZE = 28
-        img = asset.get_image()
+        img = asset.get_image().convert('L')
         width = asset.pixel_width
         height = asset.pixel_height                 
         sq_x, sq_y = (w*width, h*height)
@@ -257,9 +268,9 @@ class Recognise():
         img.save(buffer, 'JPEG')      
         img_data = ns(buffer.getvalue())
         self.w, self.h, self.asset = w, h, asset
-        self.img_data = img_data
+        self.img_data = img_data     
       
-      return self._classify_img_data(self.img_data, aoi)
+      return self._classify_img_data('Alphanum_28x28.mlmodel', self.img_data, aoi)
     
     
     def scale_image(self, img, max_dim):
@@ -268,31 +279,58 @@ class Recognise():
       w = int(img.size[0] * scale)
       h = int(img.size[1] * scale)
       return img.resize((w, h), Image.ANTIALIAS)
-            
+    
+    def draw_box(self,rect_, **kwargs):
+          W, H = self.gui.gs.DIMENSION_X, self.gui.gs.DIMENSION_Y
+          x, y, w, h = rect_
+          x1, y1 = x+w, y+h                 
+          box = [self.gui.gs.rc_to_pos(H-y*H-1, x*W), 
+                 self.gui.gs.rc_to_pos(H-y1*H-1, x*W), 
+                 self.gui.gs.rc_to_pos(H-y1*H-1, x1*W), 
+                 self.gui.gs.rc_to_pos(H-y*H-1, x1*W), 
+                 self.gui.gs.rc_to_pos(H-y*H-1, x*W)]                                                  
+          self.gui.draw_line(box, **kwargs)      
         
     def pieceword_sort(self, asset, page_text_dict, rectangles):
         """ from a series of rectangles, perform a text recognition inside each"""
         def r2(x):
             """ round"""
             return round(x, 3)
-        all_dict ={}   
-        for index, text_rect in enumerate(rectangles):
-           
-           #try to split rectangles into 9
-           w = (text_rect[2][0] - text_rect[0][0])
-           h = (text_rect[2][1] - text_rect[0][1])
-           x, y = text_rect[0]
-           #for i in range(9):
-              #box = ((x + (i % 3) * w, y + 2*h - (i//3) * h), (w,h))
-           aoi = ((x, y), (w, h))
-           all_text_dict = text_ocr(asset, aoi=aoi)
-           if DEBUG:
-                 print(f'{index} {x:.2f}, {y:.2f}, {list(all_text_dict.values())}')
-           b, bs = self.sort_by_position(all_text_dict, max_y=3)
-           all_dict.update({(r2(x),r2(y),r2(w),r2(h)): b})
-           
+            
+        def get_chars(rectangles):
+            params = {'line_width': 5, 'stroke_color': 'red', 'z_position':1000}
+            all_dict = []   
+            self.gui.remove_lines()    
+            for index, text_rect in enumerate(rectangles):           
+               #try to split rectangles into 9
+               x, y, w,h  = text_rect
+               
+               self.draw_box(text_rect, **{**params, 'z_position':500})
+               for i in range(9):
+                  memused1= self.memused()
+                  # bottom left to top right
+                  box = (x + (i % 3) * w/3, y + (i//3) * h/3, w/3 , h/3)                      
+                  char_ =  self.character_ocr(asset, aoi=box)  
+                  
+                  print('mem used', self.memused() - memused1, 'MB')
+                     
+                  self.draw_box(box, **{**params,'stroke_color': 'green'})
+                  if char_:
+                    self.gui.set_message(f'{index} {box[0]:.2f}, {box[1]:.2f}, {char_["label"]}  {char_["confidence"]:.2f}')
+                    all_dict.append(char_)
+                    if DEBUG:
+                      print(f'{index} {box[0]:.2f}, {box[1]:.2f}, {char_["label"]}  {char_["confidence"]:.2f}')
+                  memused = self.memused()
+                  print(memused)
+            self.gui.remove_lines()    
+            return all_dict
+            #b, bs = self.sort_by_position(all_dict, max_y=3)
+            #all_dict.update({(r2(x),r2(y),r2(w),r2(h)): b})
+             
+             
+        all_dict = get_chars(rectangles)  
         board, shape = self.sort_by_position(all_dict, max_y=-3)
-        return   '\n'.join([''.join(row) for row in board])
+        return   '\n'.join([''.join(row) for row in np.flipud(board)])
         
     def sort_by_position(self, all_text_dict, max_y=None):
         # use the box data to reorder text
@@ -304,8 +342,26 @@ class Recognise():
             #attempt to put dictionary into regular grid
             # all_text_dict has form (x, y, w, h): text
             #x, y, w, h are scaled 0-1.0        
-            df = pd.DataFrame(np.array(list(all_text_dict.keys())), columns=('x', 'y', 'w', 'h'))
-            
+            df = pd.DataFrame([t['cg_box'] for t in all_text_dict], columns=('x', 'y', 'w', 'h'))
+            df = np.round(df, 2)
+            df['text'] = [t['label'] for t in all_text_dict]
+            df['conf'] = [round(t['confidence'], 2) for t in all_text_dict]
+            df['area']= df.w * df.h * 1000
+            df.sort_values(by=['x','y','area'], inplace=True, ignore_index=True)
+            df.drop_duplicates(['x', 'y'], keep='last', inplace=True, ignore_index=True)
+            df = self.convert_to_rc(df)
+            data = np.array(df[['x','y']])
+            x, y = data.T
+            #plt.scatter(x,y, color='red' )          
+            #plt.show()
+            board = np.full((self.Ny, self.Nx), ' ', dtype='U1')
+            for index, selection in df.iterrows():
+                 if selection['conf']> 0.3:
+                      board[int(selection["r"]), int(selection["c"])] = selection['text']
+                 else:
+                      board[int(selection["r"]), int(selection["c"])] = '#'
+            return board, board.shape
+            """
             if max_y is None:
                 # scale 0-1000 and round to nearest 5
                 df = df.multiply(1000).astype(int)    
@@ -360,11 +416,52 @@ class Recognise():
                 # print it
                 [print(''.join(row)) for row in board]
                
-            return board, board.shape
+            return board, board.shape"""
         except (Exception) as e:
             print(traceback.format_exc())
             return None, None            
-        
+            
+    def convert_to_rc(self, df):
+       '''add r, c columns to  a dataframe with x y values'''
+       def process(column, ratio=None):
+           """calculate size of axis, then values and hence delta           
+           ratio = 0.5 # fraction of counts to accept
+           """           
+           values = np.array(df[column])
+           u, count = np.unique(values, return_counts=True)
+           
+           avg_ = np.mean(count)
+           
+           if ratio is None:
+              stdev_ = np.std(count)
+              ratio = 1 - stdev_ / avg_
+              
+           plt.stem(u, count, linefmt='red') 
+           if ratio < 1.0:  
+               filtered = u[count >= avg_ * ratio]
+               filt_count = count[count >= avg_ * ratio]               
+               plt.stem(filtered, filt_count, linefmt='blue')    
+           else:
+              filtered = u
+                           
+           plt.show()
+           N = len(filtered)            
+           diff_ = np.mean(np.diff(filtered))
+           return N, diff_, filtered
+         
+       print('x red=original, blue = filtered') 
+       self.Nx, diffx, self.xs = process('x', ratio=None)
+       print('y red=original, blue = filtered') 
+       self.Ny, diffy, self.ys = process('y', ratio=None)
+       print(f'{self.Nx=}, {diffx=:.3f}, {self.xs=}')
+       print(f'{self.Ny=}, {diffy=}:.3f, {self.ys=}')
+       # TODO does not account for non uniform spacing
+       # better to index u values?
+       df['c'] = np.rint((df.x - min(self.xs)) / diffx).astype(int)
+       df['r'] = np.rint((df.y - min(self.ys)) / diffy).astype(int)
+       
+       return df
+           
     def hough_line(self,img, angle_step=1, lines_are_white=True, value_threshold=5):
             """
             Hough transform for lines
@@ -467,7 +564,7 @@ class Recognise():
           return threshold
               
 def main():
-  g = Recognise()
+  g = Recognise(None)
   r = dialogs.alert('Classify Image', '', 'Camera', 'Photo Library')
   if r == 1:
     img = photos.capture_image()
@@ -489,4 +586,13 @@ def main():
 if __name__ == '__main__':
   main()
   
+
+
+
+
+
+
+
+
+
 
