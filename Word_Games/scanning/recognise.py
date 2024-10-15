@@ -354,6 +354,7 @@ class Recognise():
            ratio = 0.5 # fraction of counts to accept
            """           
            values = np.round(np.array(df[column]), 2)
+           
            u, count = np.unique(values, return_counts=True)
            
            avg_ = np.mean(count)
@@ -374,7 +375,10 @@ class Recognise():
            N = len(filtered)            
            diff_ = np.mean(np.diff(filtered))
            return N, diff_, filtered
-         
+       print(list(df.x))
+       print(list(df.y))
+       print(list(df.w))
+       print(list(df.h))
        print('x red=original, blue = filtered') 
        self.Nx, diffx, self.xs = process('x', ratio=None)
        print('y red=original, blue = filtered') 
