@@ -492,21 +492,23 @@ class OcrCrossword(LetterGame):
           print('found', len(boxes))
           for _, subrect in boxes.iterrows():              
               df =  self.find_rects_in_area(subrect)
+              self.draw_rectangles(df)
               total_rects = pd.concat([total_rects, df], ignore_index=False)          
           self.draw_rectangles(total_rects)
           total_rects = self.filter_total(total_rects)
           self.gui.remove_lines()
           self.draw_rectangles(total_rects)
           print(len(total_rects))
+          self.recognise.convert_to_rc(total_rects)
           try:
-             all_dict = self.recognise.pieceword_sort(self.asset, None, total_rects)
+             all_dict = self.recognise.read_characters(self.asset, None, total_rects)
              board_, shape = self.recognise.sort_by_position(all_dict, max_y=-3)
              board = '\n'.join([''.join(row) for row in np.flipud(board_)])
              self.wordsbox.font = ('Courier', 24)
              self.wordsbox.text = board
              return board            
-          except (AttributeError):
-            self.gui.set_message(f'No text found in {self.defined_area}')
+          except ((ValueError,AttributeError)):
+            self.gui.set_message(f'Text reading error  in {self.defined_area}')
             
     def split_defined_area(self, N=5):
       # split defined area into N x N overlapping areas
@@ -542,13 +544,14 @@ class OcrCrossword(LetterGame):
             df.drop_duplicates(['x', 'y'], keep='last', inplace=True, ignore_index=True)
             
             #get areas and aspect of each rectangle
-            areas = np.round(df.area, 3)
+            areas = np.round(df.area, 1)
             aspects = np.round(df.h / df.w, 2)
             
             hist_area = np.histogram(areas, bins=10)
             #hist_aspect = np.histogram(aspects, bins=10)
             
             area_span = np.linspace(min(areas), max(areas), num=10)
+            #area_span = np.unique(areas)
             d_area= np.digitize(areas, area_span, right=True)
             
             aspect_span = np.linspace(min(aspects), max(aspects), num=10)
@@ -582,8 +585,10 @@ class OcrCrossword(LetterGame):
           unique, counts = np.unique(d_area, return_counts=True)
           most = unique[np.argmax(counts)]
           idx = d_area[np.array(total_rects.index)] == most
-          total_rects = total_rects[idx]          
-          [total_rects.pop(col) for col in ['area', 'xr', 'yr', 'wr', 'hr']]
+          total_rects = total_rects[idx]  
+          total_rects.drop(['area', 'xr', 'yr', 'wr', 'hr'], axis='columns', inplace=True)      
+          #[total_rects.pop(col) for col in ['area', 'xr', 'yr', 'wr', 'hr']]
+          total_rects.reset_index(drop=True, inplace=True)
           return total_rects
           
     

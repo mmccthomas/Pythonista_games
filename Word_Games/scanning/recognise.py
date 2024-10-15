@@ -287,7 +287,7 @@ class Recognise():
                  self.gui.gs.rc_to_pos(H-y*H-1, x*W)]                                                  
           self.gui.draw_line(box, **kwargs)      
         
-    def pieceword_sort(self, asset, page_text_dict, rectangles):
+    def read_characters(self, asset, page_text_dict, rectangles):
         """ from a series of rectangles, perform a text recognition inside each"""
      
         def get_chars(rectangles):
@@ -347,12 +347,13 @@ class Recognise():
             return None, None            
             
     def convert_to_rc(self, df):
-       '''add r, c columns to  a dataframe with x y values'''
+       '''add r, c columns to  a dataframe with x y values
+       TODO need to process this better'''
        def process(column, ratio=None):
            """calculate size of axis, then values and hence delta           
            ratio = 0.5 # fraction of counts to accept
            """           
-           values = np.array(df[column])
+           values = np.round(np.array(df[column]), 2)
            u, count = np.unique(values, return_counts=True)
            
            avg_ = np.mean(count)
