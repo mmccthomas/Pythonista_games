@@ -4,7 +4,6 @@ import objc_util
 from objc_util import ObjCClass, nsurl, ns, autoreleasepool
 import numpy as np
 from PIL import Image
-from io import BytesIO
 import traceback
 import os
 import io
@@ -12,9 +11,9 @@ from time import time
 import pandas as pd
 from matplotlib import pyplot as plt
 import straighten_image
-import clipboard
 import appex
 import math
+import requests
 from PIL.ExifTags import TAGS
 import dialogs
 import photos
@@ -49,7 +48,6 @@ exif_rotations = {
 }
 
   
-  
 class Recognise():
     def __init__(self, gui):
       self.w =0
@@ -69,8 +67,7 @@ class Recognise():
         decoded = TAGS.get(tag, tag)
         ret[decoded] = value
       return ret
-    
-    
+        
     def convert_to_png(self, asset):
         """ convert and  make smaller
         get rotation from exif data """
@@ -127,12 +124,12 @@ class Recognise():
         # print(width, height)
         with autoreleasepool():
           req = VNDetectRectanglesRequest.alloc().init().autorelease()
+          req.minimumSize = 0.08 
           req.maximumObservations = 0
           req.minimumAspectRatio = 0
           req.maximumAspectRatio = 1
-          req.minimumSize = 0.08
           req.quadratureTolerance = 45.0
-          req.minimumConfidence = 0
+          req.minimumConfidence = 0         
           if aoi:
             x, y, w, h = aoi
             req.regionOfInterest = ((x, y), (w, h))
@@ -155,10 +152,9 @@ class Recognise():
                 x, y = cg_box.origin.x, cg_box.origin.y
                 w, h = cg_box.size.width, cg_box.size.height
                 if DEBUG:
-                    print([f'{p.x:.3f}, {p.y:.3f}' for p in [bl, br, tr, tl]])
+                    print(f'{x:.3f}, {y:.3f}')
                     print('w,h=', w,h)
-                #bounding_boxes.append(((x,y), (x+w,y), (x+w, y+h), (x, y+h), (x,y)))
-                #rect_boxes.append(((bl.x, bl.y), (br.x, br.y), (tr.x, tr.y), (tl.x, tl.y), (bl.x, bl.y)))
+
                 bounding_boxes.append((x, y, w, h))
                 rect_boxes.append((bl.x, bl.y, tr.x - bl.x, tr.y-bl.y))
               return rect_boxes , bounding_boxes
@@ -168,8 +164,7 @@ class Recognise():
       works best with full words or numbers
       individual letters not so great
       VNDetectTextRectanglesRequest.regionOfInterest
-      """
-      
+      """      
       img_data = objc_util.ns(asset.get_image_data().getvalue()) 
       with autoreleasepool():
         req = VNRecognizeTextRequest.alloc().init().autorelease()
@@ -177,25 +172,19 @@ class Recognise():
         req.setRecognitionLevel_(0) # accurate
         if aoi:
           x, y, w, h = aoi
-          req.regionOfInterest = ((x, y), (w, h))
-        
+          req.regionOfInterest = ((x, y), (w, h))        
         req.reportCharacterBoxes = True
         # req.setCustomWords_([x for x in list('ABCDEFGHIJKLMNOPQRSTUVWXYZ01')]) # individual letters
         handler = VNImageRequestHandler.alloc().initWithData_options_(img_data, None).autorelease()
         success = handler.performRequests_error_([req], None)    
         if success:
-            all_text = {}
-            
+            all_text = {}            
             for result in req.results():
               cg_box = result.boundingBox()
               x, y = cg_box.origin.x, cg_box.origin.y
               w, h = cg_box.size.width, cg_box.size.height
-              all_text[x, y, w, h] = str(result.text())
-            
-            results =  [result.text() for result in req.results()]
-             
-            return all_text #[str(result.text()) for result in req.results()]       
-    
+              all_text[x, y, w, h] = str(result.text())             
+            return all_text         
     
     def load_model(self, modelname):
       '''Helper method for downloading/caching the mlmodel file'''
@@ -242,36 +231,35 @@ class Recognise():
           else:
             return None    
     
-    def classify_image(self, img):
+    def classify_image(self, img, aoi):
       buffer = io.BytesIO()
       img.save(buffer, 'JPEG')
       img_data = ns(buffer.getvalue())
-      return self._classify_img_data(img_data)
+      return self._classify_img_data(img_data, aoi)
     
     def character_ocr(self, asset, aoi):
       """ read a single 28 x 28 pixel character
       scale the image so that aoi size is 28 x 28 pixels
       """
       if aoi is None:
-        x, y, w, h = 0,0,1.0,1.0 
+          x, y, w, h = 0.0, 0.0, 1.0, 1.0 
       else:
-          x,y,w,h = aoi   
+          x, y, w, h = aoi   
       if asset is not self.asset or not math.isclose(w, self.w, abs_tol=0.005) or not math.isclose(h, self.h, abs_tol=0.005):
         MAX_SIZE = 28
         img = asset.get_image().convert('1')
         width = asset.pixel_width
         height = asset.pixel_height                 
-        sq_x, sq_y = (w*width, h*height)
+        sq_x, sq_y = (w * width, h * height)
         ratio_x, ratio_y = MAX_SIZE / sq_x, MAX_SIZE / sq_y
-        img.resize((int(width*ratio_x), int(width*ratio_y)), Image.ANTIALIAS)
+        img.resize((int(width * ratio_x), int(width * ratio_y)), Image.ANTIALIAS)
         buffer = io.BytesIO()
         img.save(buffer, 'JPEG')      
         img_data = ns(buffer.getvalue()) 
         self.w, self.h, self.asset = w, h, asset
         self.img_data = img_data     
       
-      return self._classify_img_data('Alphanum_28x28.mlmodel', self.img_data, aoi)
-    
+      return self._classify_img_data('Alphanum_28x28.mlmodel', self.img_data, aoi)    
     
     def scale_image(self, img, max_dim):
       '''Helper function to downscale an image for showing in the console'''
@@ -307,8 +295,7 @@ class Recognise():
                     self.gui.set_message(f'{index} {box[0]:.2f}, {box[1]:.2f}, {char_["label"]}  {char_["confidence"]:.2f}')
                     all_dict.append(char_)
                     if DEBUG:
-                        print(f'{index} {box[0]:.2f}, {box[1]:.2f}, {char_["label"]}  {char_["confidence"]:.2f}')
-                    print('mem used', self.memused(), 'MB')
+                        print(f'{index} {box[0]:.2f}, {box[1]:.2f}, {char_["label"]}  {char_["confidence"]:.2f}')                    
                 except (Exception) as e:
                    print(e)
             self.gui.remove_lines()    
@@ -517,15 +504,3 @@ def main():
                             
 if __name__ == '__main__':
   main()
-  
-
-
-
-
-
-
-
-
-
-
-
