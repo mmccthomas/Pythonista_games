@@ -500,6 +500,10 @@ class OcrCrossword(LetterGame):
           self.draw_rectangles(total_rects)
           print(len(total_rects))
           self.recognise.convert_to_rc(total_rects)
+          df = self.add_missing(total_rects)
+          total_rects = pd.concat([total_rects, df], ignore_index=False)   
+          self.draw_rectangles(total_rects, stroke_color='green')
+          print(total_rects.to_string())
           try:
              all_dict = self.recognise.read_characters(self.asset, None, total_rects)
              board_, shape = self.recognise.sort_by_position(all_dict, max_y=-3)
@@ -595,9 +599,11 @@ class OcrCrossword(LetterGame):
     def add_missing(self, total_rects):
       """ find which rc coordinates are not in total_rects, add them in"""
       #fill a board of computed size with logic True
-      board = np.full((self.recognise.Ny, self.recognise.Nx), True)
+      Ny, Nx = self.recognise.Ny, self.recognise.Nx
+      board = np.full((Ny, Nx), True)
       #fill board with logic False if r,c in totsl_rects
       locs = np.array(total_rects[['r', 'c']])
+      print(total_rects.to_string())
       for loc in locs:
         board[tuple(loc)] = False
       # missing is  whats left
@@ -605,8 +611,10 @@ class OcrCrossword(LetterGame):
       # make a new datafram from missing r,c
       missing_df = pd.DataFrame(missing, columns=['r', 'c'])
       w, h = tuple(total_rects.mean(axis=0)[['w', 'h']])
-
+      assert ( np.max(missing_df.c) < Nx)
+      assert ( np.max(missing_df.r) < Ny)
       # fill x, y, w, h and size columns
+      
       missing_df['x'] = np.array([self.recognise.xs[c] for c in missing_df.c])
       missing_df['y'] = np.array([self.recognise.ys[r] for r in missing_df.r])
       missing_df['w'] = w

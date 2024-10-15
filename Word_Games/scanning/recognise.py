@@ -348,49 +348,33 @@ class Recognise():
             
     def convert_to_rc(self, df):
        '''add r, c columns to  a dataframe with x y values
-       TODO need to process this better'''
+       '''
        def process(column, ratio=None):
-           """calculate size of axis, then values and hence delta           
-           ratio = 0.5 # fraction of counts to accept
+           """sort the axis, perform a diff to get major steps
+           the find the position of peaks to use as array for digitise
            """           
-           values = np.round(np.array(df[column]), 2)
+           values = np.round(np.array(df[column]), 3)
+           sorted = np.sort(values)
+           diff_ = np.diff(sorted)*100           
+           # array value of peaks
+           sorted_d = sorted[np.argwhere(diff_>1.5)[:,0]]
+           delta = np.mean(np.diff(sorted_d))/2
            
-           u, count = np.unique(values, return_counts=True)
-           
-           avg_ = np.mean(count)
-           
-           if ratio is None:
-              stdev_ = np.std(count)
-              ratio = 1 - stdev_ / avg_
-              
-           #plt.stem(u, count, linefmt='red') 
-           if ratio < 1.0:  
-               filtered = u[count >= avg_ * ratio]
-               filt_count = count[count >= avg_ * ratio]               
-               #plt.stem(filtered, filt_count, linefmt='blue')    
-           else:
-              filtered = u
-                           
-           #plt.show()
-           N = len(filtered)            
-           diff_ = np.mean(np.diff(filtered))
-           return N, diff_, filtered
-       print(list(df.x))
-       print(list(df.y))
-       print(list(df.w))
-       print(list(df.h))
+           sorted_d = np.insert(sorted_d, 0, [sorted[0]])
+           # add 1 since first value does not have a peak
+           N = len(sorted_d)   
+           return N, sorted_d, delta
+     
        print('x red=original, blue = filtered') 
-       self.Nx, diffx, self.xs = process('x', ratio=None)
+       self.Nx, self.xs, self.dx = process('x', ratio=None)
        print('y red=original, blue = filtered') 
-       self.Ny, diffy, self.ys = process('y', ratio=None)
-       print(f'{self.Nx=}, {diffx=:.3f}, {self.xs=}')
-       print(f'{self.Ny=}, {diffy=}:.3f, {self.ys=}')
-       # TODO does not account for non uniform spacing
-       # better to index u values?
-       c = np.digitize(df.x, self.xs, right=True)
-       r = np.digitize(df.y, self.ys, right=True)
-       df['c'] = np.rint((df.x - min(self.xs)) / diffx).astype(int)
-       df['r'] = np.rint((df.y - min(self.ys)) / diffy).astype(int)
+       self.Ny,  self.ys, self.dy = process('y', ratio=None)
+       print(f'{self.Nx=}, {self.xs=}')
+       print(f'{self.Ny=}, {self.ys=}')
+       c = np.digitize(df.x-self.dx, self.xs, right=True)
+       r = np.digitize(df.y-self.dy, self.ys, right=True)
+       df['c'] = c #np.rint((df.x - min(self.xs)) / diffx).astype(int)
+       df['r'] = r # np.rint((df.y - min(self.ys)) / diffy).astype(int)
        
        return df
            
