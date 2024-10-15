@@ -157,7 +157,15 @@ class Recognise():
 
                 bounding_boxes.append((x, y, w, h))
                 rect_boxes.append((bl.x, bl.y, tr.x - bl.x, tr.y-bl.y))
-              return rect_boxes , bounding_boxes
+                
+              #rects = np.round(pd.DataFrame(rect_boxes, columns=('x', 'y', 'w', 'h')), 3)
+              #rects['area'] = rects.w * rects.h *1000
+              #bounding = np.round(pd.DataFrame(bounding_boxes, columns=('x', 'y', 'w', 'h')), 3)
+              #bounding['area'] = bounding.w * bounding.h *1000
+              #rects = rects.sort_values(by=['x','y','area'], inplace=True, ignore_index=True)
+              #rect_boxes = rect_boxes.sort_values(by=['x','y','area'], inplace=True, ignore_index=True)
+              
+              return rect_boxes, bounding_boxes
         
     def text_ocr(self, asset, aoi=None):
       """Image recognition of text
@@ -376,8 +384,8 @@ class Recognise():
        # better to index u values?
        c = np.digitize(df.x, self.xs, right=True)
        r = np.digitize(df.y, self.ys, right=True)
-       df['c'] = c #np.rint((df.x - min(self.xs)) / diffx).astype(int)
-       df['r'] = r #np.rint((df.y - min(self.ys)) / diffy).astype(int)
+       df['c'] = np.rint((df.x - min(self.xs)) / diffx).astype(int)
+       df['r'] = np.rint((df.y - min(self.ys)) / diffy).astype(int)
        
        return df
            

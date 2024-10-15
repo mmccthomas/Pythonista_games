@@ -13,6 +13,18 @@ from queue import Queue
 import pandas as pd
 from matplotlib import pyplot as plt
 import resource
+import tempfile
+import shutil
+import glob
+try:
+    # find size of temp directory
+    f = glob.glob(tempfile.tempdir + '/*')
+    l =len(f)
+    print('tmp has ', l, 'objects')
+    #clear tmp directory
+    shutil.rmtree(tempfile.tempdir)
+except ((TypeError, FileNotFoundError)) as e:
+  print(e)
 
 current = os.path.dirname(os.path.realpath(__file__))
 parent = os.path.dirname(current)
@@ -474,10 +486,11 @@ class OcrCrossword(LetterGame):
         # find all boxes first
         if self.defined_area:  
           total_rects = pd.DataFrame(columns=('x', 'y', 'w', 'h'))
-          rects, bboxes  = self.recognise.rectangles(self.asset, self.defined_area)
-          self.draw_rectangles(rects)
-          print('found', len(rects))
-          for subrect in rects:              
+          boxes =  self.find_rects_in_area(self.defined_area, use_bboxes=True)
+          # rects, bboxes  = self.recognise.rectangles(self.asset, self.defined_area)
+          self.draw_rectangles(boxes)
+          print('found', len(boxes))
+          for _, subrect in boxes.iterrows():              
               df =  self.find_rects_in_area(subrect)
               total_rects = pd.concat([total_rects, df], ignore_index=False)          
           self.draw_rectangles(total_rects)
@@ -510,18 +523,22 @@ class OcrCrossword(LetterGame):
                              h / N + d))
           return subrects
           
-    def find_rects_in_area(self, subrect):
+    def find_rects_in_area(self, subrect , use_bboxes=False):
             """ find all rectangles in smaller area 
             then filter thos rectangles to remove outsize or undersize items
             returns pandas dataframe
             """
-            
-            rects, bboxes  = self.recognise.rectangles(self.asset, subrect)
-            df = pd.DataFrame(np.array(rects), columns=('x', 'y', 'w', 'h'))
+            if isinstance(subrect, pd.Series):
+              aoi = tuple(subrect[['x','y','w','h']])
+            else:
+              aoi = subrect
+            rects, bboxes  = self.recognise.rectangles(self.asset, aoi)
+            select = bboxes if use_bboxes else rects
+            df = pd.DataFrame(np.array(select), columns=('x', 'y', 'w', 'h'))
             df = np.round(df, decimals=3)
             df['area']= df.w * df.h * 1000
             #print(len(df))
-            df.sort_values(by=['x','y','area'], inplace=True, ignore_index=True)
+            df.sort_values(by=['y','x','area'], inplace=True, ignore_index=True)
             df.drop_duplicates(['x', 'y'], keep='last', inplace=True, ignore_index=True)
             
             #get areas and aspect of each rectangle
@@ -558,7 +575,7 @@ class OcrCrossword(LetterGame):
           
           total_rects['area']= total_rects.wr * total_rects.hr * 1000
           print(len(total_rects))
-          total_rects.sort_values(by=['xr','yr','area'], inplace=True, ignore_index=True)
+          total_rects.sort_values(by=['yr','xr','area'], inplace=True, ignore_index=True)
           total_rects.drop_duplicates(['xr', 'yr'], keep='last', inplace=True, ignore_index=True)
           area_span = np.linspace(total_rects.min(axis=0)['area'], total_rects.max(axis=0)['area'], num=10)
           d_area= np.digitize(np.array(total_rects.area), area_span, right=True)
