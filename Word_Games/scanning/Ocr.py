@@ -13,18 +13,7 @@ from queue import Queue
 import pandas as pd
 from matplotlib import pyplot as plt
 import resource
-import tempfile
-import shutil
-import glob
-try:
-    # find size of temp directory
-    f = glob.glob(tempfile.tempdir + '/*')
-    l =len(f)
-    print('tmp has ', l, 'objects')
-    #clear tmp directory
-    shutil.rmtree(tempfile.tempdir)
-except ((TypeError, FileNotFoundError)) as e:
-  print(e)
+
 
 current = os.path.dirname(os.path.realpath(__file__))
 parent = os.path.dirname(current)
@@ -43,9 +32,7 @@ from io import BytesIO
 from  recognise import Recognise
 from time import sleep
 savefile= 'Ocr_save'
-
-
-
+tmp_directory = '///private/var/mobile/Containers/Data/Application/BF0000C4-73CE-4920-B411-8C8662899F1B/tmp'
 
 class Player():
   def __init__(self):
@@ -502,17 +489,20 @@ class OcrCrossword(LetterGame):
           self.recognise.convert_to_rc(total_rects)
           df = self.add_missing(total_rects)
           total_rects = pd.concat([total_rects, df], ignore_index=False)   
+          total_rects.sort_values(by=['r','c','area'], inplace=True, ignore_index=True)
           self.draw_rectangles(total_rects, stroke_color='green')
           print(total_rects.to_string())
+          # at this point we have all the valid rectangles
           try:
-             all_dict = self.recognise.read_characters(self.asset, None, total_rects)
-             board_, shape = self.recognise.sort_by_position(all_dict, max_y=-3)
+             total_rects = self.recognise.read_characters(self.asset, None, total_rects)
+             print(total_rects.to_string())
+             board_, shape = self.recognise.fill_board(total_rects)
              board = '\n'.join([''.join(row) for row in np.flipud(board_)])
              self.wordsbox.font = ('Courier', 24)
              self.wordsbox.text = board
              return board            
-          except ((ValueError,AttributeError)):
-            self.gui.set_message(f'Text reading error  in {self.defined_area}')
+          except ((ValueError,AttributeError))as e:
+            self.gui.set_message(f'Text reading error  in {self.defined_area} {e}')
             
     def split_defined_area(self, N=5):
       # split defined area into N x N overlapping areas
@@ -590,8 +580,7 @@ class OcrCrossword(LetterGame):
           most = unique[np.argmax(counts)]
           idx = d_area[np.array(total_rects.index)] == most
           total_rects = total_rects[idx]  
-          total_rects.drop(['area', 'xr', 'yr', 'wr', 'hr'], axis='columns', inplace=True)      
-          #[total_rects.pop(col) for col in ['area', 'xr', 'yr', 'wr', 'hr']]
+          total_rects.drop(['xr', 'yr', 'wr', 'hr'], axis='columns', inplace=True)      
           total_rects.reset_index(drop=True, inplace=True)
           return total_rects
           

@@ -28,7 +28,7 @@ VNRectangleObservation = ObjCClass('VNRectangleObservation')
 MLModel = ObjCClass('MLModel')
 VNCoreMLModel = ObjCClass('VNCoreMLModel')
 VNCoreMLRequest = ObjCClass('VNCoreMLRequest')
-
+NSFileManager = ObjCClass('NSFileManager')
 
 # Configuration (change URL and filename if you want to use a different model):
 MODEL_URL = 'https://docs-assets.developer.apple.com/coreml/models/MobileNet.mlmodel'
@@ -121,7 +121,6 @@ class Recognise():
         #img_data = straighten_image.straighten(convert_to_png(asset))
         width = asset.pixel_width
         height = asset.pixel_height
-        # print(width, height)
         with autoreleasepool():
           req = VNDetectRectanglesRequest.alloc().init().autorelease()
           req.minimumSize = 0.08 
@@ -138,8 +137,8 @@ class Recognise():
           if success:
               rect_boxes = []
               bounding_boxes = []
-              #print(f'no boxes {len(req.results())}')
-              
+              if DEBUG:
+                  print(f'no boxes {len(req.results())}')              
               for result in req.results():
                 # bounding box is bigger than rectangle box
                 rect_box = result #.VNRectangleObservation()
@@ -152,20 +151,13 @@ class Recognise():
                 x, y = cg_box.origin.x, cg_box.origin.y
                 w, h = cg_box.size.width, cg_box.size.height
                 if DEBUG:
-                    print(f'{x:.3f}, {y:.3f}')
-                    print('w,h=', w,h)
+                    print(f'{x:.3f}, {y:.3f}, {w:.3f}, {h:.3f}')
 
                 bounding_boxes.append((x, y, w, h))
                 rect_boxes.append((bl.x, bl.y, tr.x - bl.x, tr.y-bl.y))
                 
-              #rects = np.round(pd.DataFrame(rect_boxes, columns=('x', 'y', 'w', 'h')), 3)
-              #rects['area'] = rects.w * rects.h *1000
-              #bounding = np.round(pd.DataFrame(bounding_boxes, columns=('x', 'y', 'w', 'h')), 3)
-              #bounding['area'] = bounding.w * bounding.h *1000
-              #rects = rects.sort_values(by=['x','y','area'], inplace=True, ignore_index=True)
-              #rect_boxes = rect_boxes.sort_values(by=['x','y','area'], inplace=True, ignore_index=True)
-              
               return rect_boxes, bounding_boxes
+        return None, None
         
     def text_ocr(self, asset, aoi=None):
       """Image recognition of text
@@ -192,7 +184,8 @@ class Recognise():
               x, y = cg_box.origin.x, cg_box.origin.y
               w, h = cg_box.size.width, cg_box.size.height
               all_text[x, y, w, h] = str(result.text())             
-            return all_text         
+            return all_text
+        return None   
     
     def load_model(self, modelname):
       '''Helper method for downloading/caching the mlmodel file'''
@@ -210,16 +203,18 @@ class Recognise():
       ml_model_url = nsurl(MODEL_PATH)
       # Compile the model:
       c_model_url = MLModel.compileModelAtURL_error_(ml_model_url, None)
+      print('Created temp file', c_model_url)
       # Load model from the compiled model file:
       ml_model = MLModel.modelWithContentsOfURL_error_(c_model_url, None)
       # Create a VNCoreMLModel from the MLModel for use with the Vision framework:
       vn_model = VNCoreMLModel.modelForMLModel_error_(ml_model, None)
+      # NSFileManager.removeItemAtURL(c_model_url)
       return vn_model
     
     
     def _classify_img_data(self, modelname, img_data, aoi):
       '''The main image classification method, used by `classify_image` (for camera images) and `classify_asset` (for photo library assets).'''
-      if not hasattr(self, 'vnmodel'):
+      if not hasattr(self, 'vn_model'):
           self.vn_model = self.load_model(modelname)
       
       # Create and perform the recognition request:
@@ -294,50 +289,41 @@ class Recognise():
             params = {'line_width': 5, 'stroke_color': 'red', 'z_position':1000}
             all_dict = []   
             self.gui.remove_lines()    
-            for index, text_rect in rectangles.iterrows():      
+            for index, text_rect in rectangles.iterrows():    
+                mem = self.memused()  
                 try:     
-                    box  = tuple(text_rect)                  
+                    box  = tuple(np.array(text_rect[['x', 'y', 'w', 'h']]))        
                     char_ =  self.character_ocr(asset, aoi=box)                    
                     
                     self.draw_box(box, **{**params,'stroke_color': 'green'})
                     self.gui.set_message(f'{index} {box[0]:.2f}, {box[1]:.2f}, {char_["label"]}  {char_["confidence"]:.2f}')
                     all_dict.append(char_)
                     if DEBUG:
-                        print(f'{index} {box[0]:.2f}, {box[1]:.2f}, {char_["label"]}  {char_["confidence"]:.2f}')                    
+                        print(f'{index} {box[0]:.2f}, {box[1]:.2f}, {char_["label"]}  {char_["confidence"]:.2f}')      
+                        print('mem used', self.memused())              
                 except (Exception) as e:
                    print(e)
             self.gui.remove_lines()    
             return all_dict             
-             
-        all_dict = get_chars(rectangles)  
-        return all_dict
+         
+        all_dict = get_chars(rectangles) 
+        df_dictionary = pd.DataFrame(all_dict)
+        df_dictionary.pop('cg_box')
+        return pd.concat([rectangles, df_dictionary], axis='columns')
         
-    def sort_by_position(self, all_text_dict, max_y=None):
-        # use the box data to reorder text
+    def fill_board(self, total_rects):
+        # use the rectangle data to fill board
         # attempts to reconstruct crossword letters
         
-        if not all_text_dict:
-          return None, None
-        try:  
-            #attempt to put dictionary into regular grid
-            # all_text_dict has form (x, y, w, h): text
-            #x, y, w, h are scaled 0-1.0        
-            df = pd.DataFrame([t['cg_box'] for t in all_text_dict], columns=('x', 'y', 'w', 'h'))
-            df = np.round(df, 2)
-            df['text'] = [t['label'] for t in all_text_dict]
-            df['conf'] = [round(t['confidence'], 2) for t in all_text_dict]
-            df['area']= df.w * df.h * 1000
-            df.sort_values(by=['x','y','area'], inplace=True, ignore_index=True)
-            df.drop_duplicates(['x', 'y'], keep='last', inplace=True, ignore_index=True)
-            df = self.convert_to_rc(df)
-            data = np.array(df[['x','y']])
-            x, y = data.T
+        try:             
+            data = np.array(total_rects[['c','r']])
+            c, r = data.T
             #plt.scatter(x,y, color='red' )          
             #plt.show()
             board = np.full((self.Ny, self.Nx), ' ', dtype='U1')
-            for index, selection in df.iterrows():
-                 if selection['conf']> 0.3:
-                      board[int(selection["r"]), int(selection["c"])] = selection['text']
+            for index, selection in total_rects.iterrows():
+                 if selection['confidence']> 0.3:
+                      board[int(selection["r"]), int(selection["c"])] = selection['label']
                  else:
                       board[int(selection["r"]), int(selection["c"])] = '#'
             return board, board.shape
@@ -349,30 +335,30 @@ class Recognise():
     def convert_to_rc(self, df):
        '''add r, c columns to  a dataframe with x y values
        '''
-       def process(column, ratio=None):
+       def process(column, span='w'):
            """sort the axis, perform a diff to get major steps
            the find the position of peaks to use as array for digitise
            """           
            values = np.round(np.array(df[column]), 3)
-           sorted = np.sort(values)
-           diff_ = np.diff(sorted)*100           
-           # array value of peaks
-           sorted_d = sorted[np.argwhere(diff_>1.5)[:,0]]
-           delta = np.mean(np.diff(sorted_d))/2
+           mean_span = np.mean(np.array(df[span]))        
            
-           sorted_d = np.insert(sorted_d, 0, [sorted[0]])
-           # add 1 since first value does not have a peak
+           sorted = np.sort(values)
+           diff_ = np.diff(sorted)           
+           # array value of peaks
+           sorted_d = sorted[np.argwhere(diff_>mean_span/2)[:,0]]
+           sorted_d = np.append(sorted_d, values[-1])
+           delta = np.mean(np.diff(sorted_d))          
            N = len(sorted_d)   
-           return N, sorted_d, delta
+           return N, sorted_d, mean_span
      
        print('x red=original, blue = filtered') 
-       self.Nx, self.xs, self.dx = process('x', ratio=None)
+       self.Nx, self.xs, self.dx = process('x', span='w')
        print('y red=original, blue = filtered') 
-       self.Ny,  self.ys, self.dy = process('y', ratio=None)
+       self.Ny,  self.ys, self.dy = process('y', span='h')
        print(f'{self.Nx=}, {self.xs=}')
        print(f'{self.Ny=}, {self.ys=}')
-       c = np.digitize(df.x-self.dx, self.xs, right=True)
-       r = np.digitize(df.y-self.dy, self.ys, right=True)
+       c = np.searchsorted(self.xs[1:]-self.dx/2,  df.x,side='right')
+       r = np.searchsorted(self.ys[1:]-self.dy/2, df.y, side='right')
        df['c'] = c #np.rint((df.x - min(self.xs)) / diffx).astype(int)
        df['r'] = r # np.rint((df.y - min(self.ys)) / diffy).astype(int)
        
