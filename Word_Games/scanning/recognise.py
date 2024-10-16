@@ -7,6 +7,7 @@ from PIL import Image
 import traceback
 import os
 import io
+from glob import glob
 from time import time
 import pandas as pd
 from matplotlib import pyplot as plt
@@ -201,6 +202,11 @@ class Recognise():
             bytes_written += len(chunk)
         print('Download finished')
       ml_model_url = nsurl(MODEL_PATH)
+      #files = glob(str(ml_model_url)[6:] + '/*')
+      #if (modelname + '.mlmodelc') in files:
+      #    c_model_url = files.index(modelname + '.mlmodelc')
+      #    print('Used existing file', c_model_url)
+      #else: 
       # Compile the model:
       c_model_url = MLModel.compileModelAtURL_error_(ml_model_url, None)
       print('Created temp file', c_model_url)
@@ -226,10 +232,10 @@ class Recognise():
           handler = VNImageRequestHandler.alloc().initWithData_options_(img_data, None).autorelease()
           success = handler.performRequests_error_([req], None)
           
-          if success:
+          if success:            
             best_result = req.results()[0]
             label = str(best_result.identifier())
-            confidence = best_result.confidence()
+            confidence = round(best_result.confidence(), 2)
             return {'label': label, 'confidence': confidence, 'cg_box': aoi}
           else:
             return None    
@@ -296,10 +302,10 @@ class Recognise():
                     char_ =  self.character_ocr(asset, aoi=box)                    
                     
                     self.draw_box(box, **{**params,'stroke_color': 'green'})
-                    self.gui.set_message(f'{index} {box[0]:.2f}, {box[1]:.2f}, {char_["label"]}  {char_["confidence"]:.2f}')
+                    self.gui.set_message(f'{index} {box[0]:.2f}, {box[1]:.2f}, {char_["label"]}  {char_["confidence"]}')
                     all_dict.append(char_)
                     if DEBUG:
-                        print(f'{index} {box[0]:.2f}, {box[1]:.2f}, {char_["label"]}  {char_["confidence"]:.2f}')      
+                        print(f'{index} {box[0]:.2f}, {box[1]:.2f}, {char_["label"]}  {char_["confidence"]}')      
                         print('mem used', self.memused())              
                 except (Exception) as e:
                    print(e)
@@ -311,7 +317,7 @@ class Recognise():
         df_dictionary.pop('cg_box')
         return pd.concat([rectangles, df_dictionary], axis='columns')
         
-    def fill_board(self, total_rects):
+    def fill_board(self, total_rects, min_confidence=0.3):
         # use the rectangle data to fill board
         # attempts to reconstruct crossword letters
         
@@ -322,7 +328,7 @@ class Recognise():
             #plt.show()
             board = np.full((self.Ny, self.Nx), ' ', dtype='U1')
             for index, selection in total_rects.iterrows():
-                 if selection['confidence']> 0.3:
+                 if selection['confidence']> min_confidence:
                       board[int(selection["r"]), int(selection["c"])] = selection['label']
                  else:
                       board[int(selection["r"]), int(selection["c"])] = '#'
@@ -478,7 +484,7 @@ def main():
     asset = photos.pick_asset()
     if asset is None:
       return
-    result = g.corel_ml_text_recognition(asset, aoi=None)
+    result = g.character_ocr(asset, aoi=None)
     asset.get_ui_image((255, 255)).show()
   if result:
     print(result)

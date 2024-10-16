@@ -496,7 +496,7 @@ class OcrCrossword(LetterGame):
           try:
              total_rects = self.recognise.read_characters(self.asset, None, total_rects)
              print(total_rects.to_string())
-             board_, shape = self.recognise.fill_board(total_rects)
+             board_, shape = self.recognise.fill_board(total_rects, 0.5)
              board = '\n'.join([''.join(row) for row in np.flipud(board_)])
              self.wordsbox.font = ('Courier', 24)
              self.wordsbox.text = board
