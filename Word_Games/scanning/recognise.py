@@ -179,12 +179,15 @@ class Recognise():
         handler = VNImageRequestHandler.alloc().initWithData_options_(img_data, None).autorelease()
         success = handler.performRequests_error_([req], None)    
         if success:
-            all_text = {}            
+            all_text = []            
             for result in req.results():
               cg_box = result.boundingBox()
               x, y = cg_box.origin.x, cg_box.origin.y
               w, h = cg_box.size.width, cg_box.size.height
-              all_text[x, y, w, h] = str(result.text())             
+              all_text.append( {'x': x, 'y': y, 'w': w, 'h': h, 
+                                'areax1000': w*h*1000, 'confidence': result.confidence(), 
+                                'label': str(result.text())})
+              #all_text[x, y, w, h] = str(result.text())             
             return all_text
         return None   
     
@@ -327,12 +330,14 @@ class Recognise():
             #plt.scatter(x,y, color='red' )          
             #plt.show()
             board = np.full((self.Ny, self.Nx), ' ', dtype='U1')
+            conf_board = np.zeros((self.Ny, self.Nx), dtype=int)
             for index, selection in total_rects.iterrows():
+                 conf_board[int(selection["r"]), int(selection["c"])] = int(selection['confidence']*10)
                  if selection['confidence']> min_confidence:
                       board[int(selection["r"]), int(selection["c"])] = selection['label']
                  else:
                       board[int(selection["r"]), int(selection["c"])] = '#'
-            return board, board.shape
+            return board, board.shape, conf_board
             
         except (Exception) as e:
             print(traceback.format_exc())
@@ -443,6 +448,80 @@ class Recognise():
             accumulator, thetas, rhos = self.hough_line(img)
             self. gshow_hough_line(img, accumulator, thetas, rhos, save_path='imgs/output.png')
     
+ 
+        
+    @staticmethod
+    def partition(items, threshold):
+        """https://stackoverflow.com/questions/67368951/opencv-matchtemplate-and-np-where-keep-only-unique-values/67370239#67370239
+        and https://en.wikipedia.org/wiki/Disjoint-set_data_structure 
+        """
+        def predicate(pt1, pt2):
+            #threshold = .1
+            return (abs(pt1[0] - pt2[0]) < threshold) and (abs(pt1[1] - pt2[1]) < threshold)   
+        
+        N = len(items)
+        np_items = np.array(items) # - 2d array
+            
+        # // The first O(N) pass: create N single-vertex trees
+        parents = np.full(N, -1, dtype=int)
+        ranks = np.full(N, 0, dtype=int)
+        parents = [-1] * N
+        ranks = [0] * N
+        
+        def _find_root(i):
+            _root = i
+            while parents[_root] >= 0:
+                _root = parents[_root]
+            return _root
+            
+        def _compress_path(i, target):
+            _k = i
+            while True:
+                parent = parents[_k]
+                if parent < 0:
+                    break
+                parents[_k] = target
+                _k = parent
+    
+        # The main O(N^2) pass: merge connected components
+        for i in range(N):
+            # Find root
+            root = _find_root(i)
+                
+            for j in range(N):
+                if i == j or not predicate(items[i], items[j]):
+                    continue
+                
+                root2 = _find_root(j)
+                    
+                if root != root2:
+                    # Unite both trees
+                    rank, rank2 = ranks[root], ranks[root2]
+                    if rank > rank2:
+                        parents[root2] = root
+                    else:
+                        parents[root] = root2
+                        ranks[root2] += 1 if rank == rank2 else 0
+                        root = root2
+                    assert parents[root] < 0
+    
+                    _compress_path(j, root)
+                    _compress_path(i, root)
+                        
+        # Final O(N) pass: enumerate classes
+        labels = [0] * N
+        nclasses = 0
+    
+        for i in range(N):
+            root = _find_root(i)
+            # re-use the rank as the class label
+            if ranks[root] >= 0:
+                ranks[root] = ~nclasses
+                nclasses += 1
+            labels[i] = ~ranks[root]
+    
+        return nclasses, labels
+        
     def threshold_otsu(self, x, *args, **kwargs):
           """Find the threshold value for a bimodal histogram using the Otsu method.
       
@@ -493,3 +572,5 @@ def main():
                             
 if __name__ == '__main__':
   main()
+
+
