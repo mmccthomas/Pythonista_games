@@ -1,6 +1,8 @@
 # Use VisionKit text recognition to read an image
 # containing text.
 # Provide a grid to generate crossword frame as text
+#cthomas
+# Oct 2024
 import photos
 import objc_util
 import os
@@ -12,7 +14,10 @@ from time import time
 from queue import Queue
 import pandas as pd
 from matplotlib import pyplot as plt
+import matplotlib.cm as cm
 import resource
+#cthomas
+#oct2024
 
 
 current = os.path.dirname(os.path.realpath(__file__))
@@ -33,6 +38,7 @@ from  recognise import Recognise
 from time import sleep
 savefile= 'Ocr_save'
 tmp_directory = '///private/var/mobile/Containers/Data/Application/BF0000C4-73CE-4920-B411-8C8662899F1B/tmp'
+MSG = ('','')
 
 class Player():
   def __init__(self):
@@ -147,6 +153,7 @@ class OcrCrossword(LetterGame):
            raise KeyError('Portrait mode  or iphone not supported')
            
     def add_boxes(self):
+      global MSG
       """ add non responsive decoration boxes"""
       x, y, w, h = self.gui.grid.bbox 
       tsize = self.posn.rackscale * self.gui.gs.SQ_SIZE
@@ -164,6 +171,8 @@ class OcrCrossword(LetterGame):
                                                y=self.posn.box3[1],
                                                width=300, height=200,
                                                font=('Courier New', 12))
+      msg = self.format_cols(MSG[0], columns=4, width=12)
+      self.wordsbox.text=msg      
       
     def set_buttons(self):
       """ install set of active buttons
@@ -209,7 +218,7 @@ class OcrCrossword(LetterGame):
         line = "'"
         for c in range(self.sizex):
           i = self.indexes[r, c]
-          char = self.board[r, c]
+          char = self.board[r][c]
           if i != 0 and char != ' ':
              item = str(i) + char
           elif i != 0:
@@ -256,7 +265,7 @@ class OcrCrossword(LetterGame):
             
         if letter == 'Quit':
           self.gui.gs.close()
-          sys.exit() 
+          #sys.exit() 
           return 0
           
         elif letter == 'Clear':
@@ -315,7 +324,7 @@ class OcrCrossword(LetterGame):
              
         elif letter == 'Recognise Pieceword':
            if self.image_mode:
-             self.recognise_pieceword() 
+             self.recognise_crossword(pieceword=True) 
              
         elif letter == 'Recognise Crossword':
            if self.image_mode:
@@ -402,7 +411,9 @@ class OcrCrossword(LetterGame):
           print(e)    
         
     def run(self):
-      self.create_grid()   
+      self.create_grid() 
+      if MSG[0] != '':
+      	self.words = MSG[0]
       if hasattr(self, 'rectangles'):
         self.draw_rectangles()
       self.gui.update(self.board)      
@@ -439,7 +450,9 @@ class OcrCrossword(LetterGame):
       self.words = words 
         
     def enter_image_mode(self):
+        global MSG
         if self.asset is not None:
+          if self.image_mode:
             filename, self.scale, props = self.recognise.convert_to_png(self.asset)
             self.gui.set_message(f'{props}')
             self.gui.add_image(filename)
@@ -453,57 +466,106 @@ class OcrCrossword(LetterGame):
                 all_text = list(all_text_dict.values())
             except (AttributeError):
                 all_text = []
+          else:
+            # clear image and rectangles
+            # TODO would really like to reset grid size here, without clearing text boxes
+            #self.gui.remove_lines()
+            #self.gui.add_image(f'../../gui/tileblocks/_.png')
+            
+            MSG = (self.words, self.lines)
+            # force quit 
+            self.q.put([-1,-1])
                 
+    def convert_text_to_dataframe(self, text_dict):
+       """ take text_dict with form [{label, confidence, cg_box}]         
+       to form Dataframe x, y, w, h, areax1000, label
+       """   
+       df = pd.DataFrame(text_dict)
+       df = np.round(df, 3)
+       return df
+       
+
+       
     def recognise_area(self):
         '''recognise text in defined area'''
         if self.defined_area:
           all_text_dict = self.recognise.text_ocr(self.asset, self.defined_area)
-          self.rects, self.bboxes  = self.recognise.rectangles(self.asset, self.defined_area)
-          self.draw_rectangles(self.rects)
+          df = self.convert_text_to_dataframe(all_text_dict)
+          df.sort_values(by=['y','x'], ascending=False, inplace=True, ignore_index=True)
+          points = list(df[['x','y']].itertuples(index=False, name=None))
+          #how to get best threshold?
+          cluster_count, labels = self.recognise.partition(points, threshold=0.1)
+          df['group'] = np.array(labels)
+          data = np.array(df[['x','y']])
+          plt.close()
+          x, y = data.T
+          colorset = plt.cm.rainbow(np.linspace(0, 1, cluster_count))
+          #colorset = ['red','green', 'blue', 'yellow', 'purple']
+          c = [colorset[col] for col in labels]
+          plt.scatter(x,y, color=c )  
+          plt.show()        
+          df.sort_values(by=['group','y','x'], ascending=[False,False,True], inplace=True, ignore_index=True)
+          print(df.to_string())
           try:
-             #recognise.sort_by_position(all_text_dict, max_y=None)
-             self.all_text = list(all_text_dict.values())
-             self.draw_rectangles(list(self.all_word_dict))
+             self.all_text = list(df.label)
+             self.draw_rectangles(df)
              self.filter(sort_alpha=False, max_length=None, min_length=None, sort_length=False, remove_numbers=False)
           except (AttributeError):
             self.gui.set_message(f'No text found in {self.defined_area}')
-            
-    def recognise_pieceword(self):            
-        '''recognise pieceword grid in defined area'''
-        # find all boxes first
-        if self.defined_area:  
+    
+    def recognise_crossword(self, pieceword=False):
+      """ process crossword grid,
+      either regular grid or pieceword
+      pieceword is displayed as groups of 9 tiles """
+      if self.defined_area:
           total_rects = pd.DataFrame(columns=('x', 'y', 'w', 'h'))
-          boxes =  self.find_rects_in_area(self.defined_area, use_bboxes=True)
-          # rects, bboxes  = self.recognise.rectangles(self.asset, self.defined_area)
-          self.draw_rectangles(boxes)
-          print('found', len(boxes))
-          for _, subrect in boxes.iterrows():              
-              df =  self.find_rects_in_area(subrect)
-              self.draw_rectangles(df)
-              total_rects = pd.concat([total_rects, df], ignore_index=False)          
-          self.draw_rectangles(total_rects)
+          #subdivide selected area and find rectangles 
+          if not pieceword:
+              grid_font = 20
+              for subrect in self.split_defined_area(N=5):
+                  df = self.find_rects_in_area(subrect)
+                  total_rects = pd.concat([total_rects, df], ignore_index=False)     
+          else:
+              grid_font = 12
+              # find groups of pieces
+              boxes = self.find_rects_in_area(self.defined_area, use_bboxes=True)          
+              self.draw_rectangles(boxes)
+              print(f'found {len(boxes)} boxes')
+              for _, subrect in boxes.iterrows():              
+                  df =  self.find_rects_in_area(subrect)
+                  self.draw_rectangles(df)
+                  total_rects = pd.concat([total_rects, df], ignore_index=False)     
+                      
+          self.draw_rectangles(total_rects)  
           total_rects = self.filter_total(total_rects)
           self.gui.remove_lines()
           self.draw_rectangles(total_rects)
-          print(len(total_rects))
-          self.recognise.convert_to_rc(total_rects)
+          print(f' Total rectangles {len(total_rects)}')
+          total_rects =self.recognise.convert_to_rc(total_rects)                       
           df = self.add_missing(total_rects)
-          total_rects = pd.concat([total_rects, df], ignore_index=False)   
-          total_rects.sort_values(by=['r','c','area'], inplace=True, ignore_index=True)
-          self.draw_rectangles(total_rects, stroke_color='green')
+          total_rects = pd.concat([total_rects, df], ignore_index=False) 
+          total_rects.sort_values(by=['r','c','areax1000'], inplace=True, ignore_index=True)
+          params = {'line_width': 5, 'stroke_color': 'green', 'z_position':1000}
+          self.draw_rectangles(df, **params)
           print(total_rects.to_string())
           # at this point we have all the valid rectangles
           try:
-             total_rects = self.recognise.read_characters(self.asset, None, total_rects)
-             print(total_rects.to_string())
-             board_, shape = self.recognise.fill_board(total_rects, 0.5)
-             board = '\n'.join([''.join(row) for row in np.flipud(board_)])
-             self.wordsbox.font = ('Courier', 24)
-             self.wordsbox.text = board
-             return board            
+            data = np.array(total_rects[['x','y']])
+            #plt.close()
+            x, y = data.T
+            #plt.scatter(x,y, color='green' )  
+            #plt.show()        
+            total_rects = self.recognise.read_characters(self.asset, None, total_rects)
+            board_, shape, conf_board = self.recognise.fill_board(total_rects, min_confidence=0.5)
+            board = '\n'.join(['/'.join(row) for row in np.flipud(board_)])
+            self.gui.set_props(self.gridbox, font=('Courier New', grid_font))
+            self.gui.set_text(self.gridbox, board)    
+            self.wordsbox.text =  f'{np.flipud(conf_board)}'
+            return board   
+                     
           except ((ValueError,AttributeError))as e:
             self.gui.set_message(f'Text reading error  in {self.defined_area} {e}')
-            
+                          
     def split_defined_area(self, N=5):
       # split defined area into N x N overlapping areas
       # d defines amount of overlap
@@ -532,13 +594,13 @@ class OcrCrossword(LetterGame):
             select = bboxes if use_bboxes else rects
             df = pd.DataFrame(np.array(select), columns=('x', 'y', 'w', 'h'))
             df = np.round(df, decimals=3)
-            df['area']= df.w * df.h * 1000
+            df['areax1000']= np.round(df.w * df.h * 1000, 3)
             #print(len(df))
-            df.sort_values(by=['y','x','area'], inplace=True, ignore_index=True)
+            df.sort_values(by=['y','x','areax1000'], inplace=True, ignore_index=True)
             df.drop_duplicates(['x', 'y'], keep='last', inplace=True, ignore_index=True)
             
             #get areas and aspect of each rectangle
-            areas = np.round(df.area, 1)
+            areas = np.round(df.areax1000, 1)
             aspects = np.round(df.h / df.w, 2)
             
             hist_area = np.histogram(areas, bins=10)
@@ -570,12 +632,12 @@ class OcrCrossword(LetterGame):
           remove them at the end """
           total_rects[['xr', 'yr', 'wr', 'hr']] = np.round(total_rects[['x', 'y', 'w', 'h']], 2)
           
-          total_rects['area']= total_rects.wr * total_rects.hr * 1000
+          total_rects['areax1000']= round(total_rects.wr * total_rects.hr * 1000, 3)
           print(len(total_rects))
-          total_rects.sort_values(by=['yr','xr','area'], inplace=True, ignore_index=True)
+          total_rects.sort_values(by=['yr','xr','areax1000'], inplace=True, ignore_index=True)
           total_rects.drop_duplicates(['xr', 'yr'], keep='last', inplace=True, ignore_index=True)
-          area_span = np.linspace(total_rects.min(axis=0)['area'], total_rects.max(axis=0)['area'], num=10)
-          d_area= np.digitize(np.array(total_rects.area), area_span, right=True)
+          area_span = np.linspace(total_rects.min(axis=0)['areax1000'], total_rects.max(axis=0)['areax1000'], num=10)
+          d_area= np.digitize(np.array(total_rects.areax1000), area_span, right=True)
           unique, counts = np.unique(d_area, return_counts=True)
           most = unique[np.argmax(counts)]
           idx = d_area[np.array(total_rects.index)] == most
@@ -592,7 +654,7 @@ class OcrCrossword(LetterGame):
       board = np.full((Ny, Nx), True)
       #fill board with logic False if r,c in totsl_rects
       locs = np.array(total_rects[['r', 'c']])
-      print(total_rects.to_string())
+      #print(total_rects.to_string())
       for loc in locs:
         board[tuple(loc)] = False
       # missing is  whats left
@@ -606,84 +668,45 @@ class OcrCrossword(LetterGame):
       
       missing_df['x'] = np.array([self.recognise.xs[c] for c in missing_df.c])
       missing_df['y'] = np.array([self.recognise.ys[r] for r in missing_df.r])
-      missing_df['w'] = w
-      missing_df['h'] = h
-      missing_df['area'] = w * h * 1000
-  
+      missing_df['w'] = np.round(w, 3)
+      missing_df['h'] = np.round(h, 3)
+      missing_df['areax1000'] = np.round(w * h * 1000, 3)
+      print(f'added {len(missing_df)} missing items')
       return missing_df
         
-    def recognise_crossword(self):
-      """ process crossword grid """
-      if self.defined_area:
-          #subdivide selected area and find rectangles 
-          total_rects = pd.DataFrame(columns=('x', 'y', 'w', 'h'))
-          for subrect in self.split_defined_area(N=5):
-              total_rects = pd.concat([total_rects, self.find_rects_in_area(subrect)], ignore_index=False)     
-              #sleep(2)      
-            
-          total_rects = self.filter_total(total_rects)
-          
-          self.gui.remove_lines(z_position=1000)
-          params = {'line_width': 5, 'stroke_color': 'red', 'z_position':1000}
-          self.draw_rectangles(total_rects, **params)
-          # print(total_rects.to_string())
-          total_rects =self.recognise.convert_to_rc(total_rects)
-          self.wordsbox.text = total_rects.to_string()
-          
-          df = self.add_missing(total_rects)
-          params = {'line_width': 5, 'stroke_color': 'green', 'z_position':1000}
-          self.draw_rectangles(df, **params)
-          data = np.array(total_rects[['x','y']])
-          #plt.close()
-          x, y = data.T
-          #plt.scatter(x,y, color='green' )          
-          total_rects = pd.concat([total_rects, df], ignore_index=False) 
-          data = np.array(df[['x','y']])
-          x, y = data.T
-          #plt.scatter(x,y, color='red' )          
-          #plt.show()
-          board = np.full((self.recognise.Ny, self.recognise.Nx), ' ', dtype='U1')
-          conf_board = np.zeros((self.recognise.Ny, self.recognise.Nx), dtype=int)
-          # try to recognise character
-          self.gui.set_props(self.gridbox, font=('Courier New', 16))
-          self.gui.remove_lines()
-          for index, selection in total_rects.iterrows():
-            aoi = tuple(selection[['x', 'y', 'w', 'h']])
-            t = time()
-            result = buffer = self.recognise.character_ocr(self.asset, aoi)
-            
-            print(f'{int(selection["r"])}, {int(selection["c"])}')
-            if result:
-              elapsed = time() - t
-              print(f'{result["label"]}, conf={result["confidence"]:0.3f} time= {elapsed:.4f}')
-              if result['confidence'] < 0.3:
-                 board[int(selection["r"]), int(selection["c"])] = '#'
-                 
-              else:
-               board[int(selection["r"]), int(selection["c"])] = result['label']
-              conf_board[int(selection["r"]), int(selection["c"])] = int(result['confidence']*10)
-              self.gui.set_text(self.gridbox,  '\n'.join(['/'.join(list(row)) for row in np.flipud(board)]))    
-              self.wordsbox.text =  f'{np.flipud(conf_board)}'
-          
+    
 def main():
     
     all_assets = photos.get_assets()
     asset = photos.pick_asset(assets=all_assets)
-    try:
-       all_text_dict= Recognise().text_ocr(asset) #, rects2[9])
-       
-       all_text = list(all_text_dict.values())
-    except:
-      all_text = []
-      all_text_dict = {}
+    #try:     
+    #   all_text_dict= Recognise().text_ocr(asset) #, rects2[9])       
+    #   all_text = list(all_text_dict.values())
+    #except:
+    #  all_text = []
+    #  all_text_dict = {}
     
-    ocr = OcrCrossword(all_text, asset=asset, board_size='25 25')
-    if all_text:
-       ocr.filter(sort_alpha=False, max_length=None, min_length=None, sort_length=False, remove_numbers=False)
+    ocr = OcrCrossword([], asset=asset, board_size='25 25')
+    ocr.defined_area =[0,0,1,1]
+    ocr.recognise_area()
+    ocr.image_mode = not ocr.image_mode
+    ocr.gui.set_props(ocr.images, fill_color = 'red' if ocr.image_mode else 'cyan')    
+    ocr.enter_image_mode()   
+    #if all_text:
+    #   ocr.filter(sort_alpha=False, max_length=None, min_length=None, sort_length=False, remove_numbers=False)
     ocr.run()
+    # if closed with MSG set then restart with new grid
+    while MSG:
+       ocr = OcrCrossword([], asset=asset)
+       ocr.words = MSG[0]
+       ocr.lines = MSG[1]
+       ocr.run()
     
 if __name__ == '__main__':
     main()
+
+
+
 
 
 
