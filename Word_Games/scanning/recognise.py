@@ -31,6 +31,7 @@ VNCoreMLModel = ObjCClass('VNCoreMLModel')
 VNCoreMLRequest = ObjCClass('VNCoreMLRequest')
 NSFileManager = ObjCClass('NSFileManager')
 
+
 # Configuration (change URL and filename if you want to use a different model):
 MODEL_URL = 'https://docs-assets.developer.apple.com/coreml/models/MobileNet.mlmodel'
 
@@ -204,8 +205,7 @@ class Recognise():
                   else:
                   	  all_text.append( {'x': x, 'y': y, 'w': w, 'h': h, 
                                         'areax1000': w*h*1000, 'confidence': result.confidence(), 
-                                        'label': str(result.text())})
-                  #all_text[x, y, w, h] = str(result.text())             
+                                        'label': str(result.text())})         
       return all_text   
     
     def load_model(self, modelname):
@@ -228,6 +228,8 @@ class Recognise():
       #    print('Used existing file', c_model_url)
       #else: 
       # Compile the model:
+      f = 	NSFileManager.defaultManager().temporaryDirectory()
+      print('temp dir is ' , str(f.absoluteString()))
       c_model_url = MLModel.compileModelAtURL_error_(ml_model_url, None)
       print('Created temp file', c_model_url)
       td = str(c_model_url.absoluteString()).split('/')

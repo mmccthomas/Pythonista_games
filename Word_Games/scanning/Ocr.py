@@ -137,6 +137,7 @@ class OcrCrossword(LetterGame):
         'button6': (w+20, 4 *h/21), 'button7': (w+130, 0), 'button8': (w+20, 5*h/21),
         'button9': (w+150, 5*h/21),   'button10': (w+250, 5*h/21), 'button11': (w+250, 4*h/21),
         'button12': (w+250, 3*h/21),   'button13': (w+250, 2*h/21),  'button14': (w+250, 1*h/21),
+        'button15': (w+250, 0),
         'box1': (w+5, 2*h/3-6), 'box2': (w+5, 6*h/21),  'box3': (w+105, 75),'font': ('Avenir Next', 15)},                                         
 
         'ipad_landscape': {'rackscale': 1.5,
@@ -207,7 +208,9 @@ class OcrCrossword(LetterGame):
       self.gui.add_button(text='Recognise Pieceword', position=self.posn.button13,
                           fill_color='cyan', **params)     
       self.gui.add_button(text='Recognise Crossword', position=self.posn.button14,
-                          fill_color='cyan', **params)                                                                  
+                          fill_color='cyan', **params)        
+      self.gui.add_button(text='Recognise NumberGrid', position=self.posn.button15,
+                          fill_color='cyan', **params)                                                           
 
     def create_grid(self):
       """ create string represention of board
@@ -332,9 +335,11 @@ class OcrCrossword(LetterGame):
              self.recognise_crossword(pieceword=True) 
              
         elif letter == 'Recognise Crossword':
-           if self.image_mode:
-             self.recognise_crossword() 
-              
+           if self.image_mode:  
+               self.recognise_crossword(pieceword=False, allow_numbers=False)
+        elif letter == 'Recognise NumberGrid':
+           if self.image_mode:  
+               self.recognise_crossword(pieceword=False, allow_numbers=True)     
         elif letter != '':  # valid selection
           try:
               cell = self.get_board_rc(origin, self.board)
@@ -547,10 +552,12 @@ class OcrCrossword(LetterGame):
           except (AttributeError):
             self.gui.set_message(f'No text found in {self.defined_area}')
     
-    def recognise_crossword(self, pieceword=False, allow_numbers=True):
+    def recognise_crossword(self, pieceword=False, allow_numbers=False):
       """ process crossword grid,
       either regular grid or pieceword
-      pieceword is displayed as groups of 9 tiles """
+      pieceword is displayed as groups of 9 tiles
+      if allow_numbers is True, use text_ocr instead of char_ocr """
+      
       if self.defined_area:
           total_rects = pd.DataFrame(columns=('x', 'y', 'w', 'h'))
           #subdivide selected area and find rectangles 
@@ -746,6 +753,8 @@ def main():
     
 if __name__ == '__main__':
     main()
+
+
 
 
 
