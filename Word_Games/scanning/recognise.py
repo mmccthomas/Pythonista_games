@@ -177,8 +177,8 @@ class Recognise():
       else:
         aoi_list = [aoi]
         save_aoi = False
-      all_text = []  
-           
+        
+      all_text = []             
       for aoi in aoi_list:  
           with autoreleasepool():
             req = VNRecognizeTextRequest.alloc().init().autorelease()
@@ -196,11 +196,11 @@ class Recognise():
                   cg_box = result.boundingBox()
                   x, y = cg_box.origin.x, cg_box.origin.y
                   w, h = cg_box.size.width, cg_box.size.height
-                  if aoi:
-                     all_text.append( {'x': x, 'y': y, 'w': w, 'h': h, 
+                  if save_aoi:
+                     all_text.append( {'x': X, 'y': Y, 'w': W, 'h': H, 
                                        'areax1000': w*h*1000, 'confidence': result.confidence(), 
                                        'label': str(result.text()), 
-                                       'aoi_x':X, 'aoi_y': Y, 'aoi_w': W, 'aoi_h': H})
+                                       'cg_x':x, 'cg_y': y, 'cg_w': w, 'cg_h': h})
                   else:
                   	  all_text.append( {'x': x, 'y': y, 'w': w, 'h': h, 
                                         'areax1000': w*h*1000, 'confidence': result.confidence(), 
@@ -349,7 +349,10 @@ class Recognise():
         # use the rectangle data to fill board
         # attempts to reconstruct crossword letters
         # find max length of labels
-        text = total_rects['label']
+        # text might be type string or dobject
+        # may contain NaN, convert these to space
+        text = np.array(total_rects['label']).astype(str)
+        text[text=='nan'] = ' '        
         max_text = len(max(text, key=len))
         try:             
             data = np.array(total_rects[['c','r']])

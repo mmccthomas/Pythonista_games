@@ -403,15 +403,20 @@ class OcrCrossword(LetterGame):
             pass 
                         
     def save(self):
-      np.save(savefile, self.board) 
-      np.save(savefile + '_indexes', self.indexes)
+      
+      np.savez(savefile, board=self.board, indexes=self.indexes)
           
     def load(self):
       response = dialogs.alert('Load temporary file?', '', 'YES', 'NO', hide_cancel_button=True)
       if response == 1:
         try:
-          self.board = np.load(savefile + '.npy')      
-          self.indexes = np.load(savefile + '_indexes.npy')
+          data = np.load(savefile + '.npz')
+          self.board = data['board']
+          self.indexes = data['indexes']
+          board = '\n'.join(['/'.join(row) for row in np.flipud(self.board)])
+          self.gui.set_props(self.gridbox, font=('Courier New', grid_font))
+          #self.create_grid()
+          self.gui.set_text(self.gridbox, board)    
         except (Exception) as e:
           print(e)    
         
@@ -483,27 +488,32 @@ class OcrCrossword(LetterGame):
                 
     def convert_text_to_dataframe(self, text_dict, existing_df=None):
        """ take text_dict with form [{label, confidence, cg_box}]         
-       to form Dataframe x, y, w, h, areax1000, label
+       to form Dataframe x, y, w, h, areax1000, c, r, confidence, label
        if existing_df then merge the dataframes
+       need confidence and label from text_dict
        """   
        df = pd.DataFrame(text_dict)       
        df = np.round(df, 3)
+           
        if existing_df is not None:
-           df.sort_values(by=['aoi_y', 'aoi_y'], ascending=True, inplace=True, ignore_index=True)
-       print(df.to_string())
-       #need to merge df into existing df
-       # if multiple boxes in df with same aoi xy join them to
-       #df2 =pd.merge(existing, df,how='outer', on=None, left_on=None, right_on=None, left_index=False, right_index=False, sort=False, suffixes=('_x', '_y'), copy=None, indicator=False, validate=None)
-       
-
-
-       df2 =df.groupby(['aoi_y', 'aoi_x']).apply(lambda x: ''.join(x.label)).apply(pd.Series)
-       #df2.sort_values(by=['aoi_y', 'aoi_y'], ascending=True, inplace=True, ignore_index=True)
-       print(df2.to_string())
-       #df2 = df.groupby(by=['aoi_x', 'aoi_y'])
+           #need to merge df into existing df
+           # if multiple boxes in df with same aoi xy join them to    
+           # sort by y then x
+           df.sort_values(by=['y', 'x'], ascending=True, inplace=True, ignore_index=True)
+           # group same x,y values together.
+           # concatenate label strings, average confidence
+           df2 = df.groupby(['y', 'x'])[['label', 'confidence']].agg({'label':lambda x: ''.join(x), 'confidence': lambda x: np.mean(x)}).reset_index()
+           # now merge this dataframe with rectangle dataframe to align x,y and r,c
+           df3 = pd.merge(existing_df, df2, 
+                          how='outer', on=['y', 'x'],left_on=None, right_on=None, 
+                          left_index=False, right_index=False, sort=False)
+           print(df3.to_string())
+           # change NaN values to space for label, and 0 for confidence
+           df3['confidence'] = df3['confidence'].fillna(0.0)
+           df3['label'] = df3['label'].fillna(' ')
+           return df3
        return df
        
-
        
     def recognise_area(self):
         '''recognise text in defined area'''
@@ -512,17 +522,22 @@ class OcrCrossword(LetterGame):
           df = self.convert_text_to_dataframe(all_text_dict)
           df.sort_values(by=['y','x'], ascending=False, inplace=True, ignore_index=True)
           points = list(df[['x','y']].itertuples(index=False, name=None))
+          
+          # Group areas tigether to better order text
           #how to get best threshold?
-          cluster_count, labels = self.recognise.partition(points, threshold=0.1)
+          # This algorithm is empirical to group large and smaller areas
+          threshold = 0.05 / min(self.defined_area[2], self.defined_area[3])
+          cluster_count, labels = self.recognise.partition(points, threshold=threshold)
+          
           df['group'] = np.array(labels)
           data = np.array(df[['x','y']])
           plt.close()
           x, y = data.T
           colorset = plt.cm.rainbow(np.linspace(0, 1, cluster_count))
-          #colorset = ['red','green', 'blue', 'yellow', 'purple']
           c = [colorset[col] for col in labels]
           plt.scatter(x,y, color=c )  
-          plt.show()        
+          plt.show()
+                  
           df.sort_values(by=['group','y','x'], ascending=[False,False,True], inplace=True, ignore_index=True)
           print(df.to_string())
           try:
@@ -572,8 +587,8 @@ class OcrCrossword(LetterGame):
             data = np.array(total_rects[['x','y']])
             #plt.close()
             x, y = data.T
-            #plt.scatter(x,y, color='green' )  
-            #plt.show()    
+            plt.scatter(x,y, color='green' )  
+            plt.show()    
             if allow_numbers:
                # text ocr allows numbers    
                all_text_dict = self.recognise.text_ocr(self.asset, total_rects)
@@ -731,6 +746,8 @@ def main():
     
 if __name__ == '__main__':
     main()
+
+
 
 
 
