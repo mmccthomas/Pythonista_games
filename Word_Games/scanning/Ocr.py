@@ -214,17 +214,22 @@ class OcrCrossword(LetterGame):
           slashes separate each character
       """
       self.lines = []
-      for r in range(self.sizey):
+      use_indexes =  np.any(self.indexes)
+      for r in range(self.board.shape[0]):
         line = "'"
-        for c in range(self.sizex):
-          i = self.indexes[r, c]
+        for c in range(self.board.shape[1]):
+          if use_indexes:
+            i = self.indexes[r, c]
           char = self.board[r][c]
-          if i != 0 and char != ' ':
-             item = str(i) + char
-          elif i != 0:
-             item = str(i)
+          if use_indexes:
+            if i != 0 and char != ' ':
+               item = str(i) + char
+            elif i != 0:
+               item = str(i)
+            else:
+               item = char       
           else:
-             item = char       
+               item = char
           line = line + item + '/'
           
         line = line[:-1] + "'\n" 
@@ -413,7 +418,7 @@ class OcrCrossword(LetterGame):
     def run(self):
       self.create_grid() 
       if MSG[0] != '':
-      	self.words = MSG[0]
+        self.words = MSG[0]
       if hasattr(self, 'rectangles'):
         self.draw_rectangles()
       self.gui.update(self.board)      
@@ -476,12 +481,26 @@ class OcrCrossword(LetterGame):
             # force quit 
             self.q.put([-1,-1])
                 
-    def convert_text_to_dataframe(self, text_dict):
+    def convert_text_to_dataframe(self, text_dict, existing_df=None):
        """ take text_dict with form [{label, confidence, cg_box}]         
        to form Dataframe x, y, w, h, areax1000, label
+       if existing_df then merge the dataframes
        """   
-       df = pd.DataFrame(text_dict)
+       df = pd.DataFrame(text_dict)       
        df = np.round(df, 3)
+       if existing_df is not None:
+           df.sort_values(by=['aoi_y', 'aoi_y'], ascending=True, inplace=True, ignore_index=True)
+       print(df.to_string())
+       #need to merge df into existing df
+       # if multiple boxes in df with same aoi xy join them to
+       #df2 =pd.merge(existing, df,how='outer', on=None, left_on=None, right_on=None, left_index=False, right_index=False, sort=False, suffixes=('_x', '_y'), copy=None, indicator=False, validate=None)
+       
+
+
+       df2 =df.groupby(['aoi_y', 'aoi_x']).apply(lambda x: ''.join(x.label)).apply(pd.Series)
+       #df2.sort_values(by=['aoi_y', 'aoi_y'], ascending=True, inplace=True, ignore_index=True)
+       print(df2.to_string())
+       #df2 = df.groupby(by=['aoi_x', 'aoi_y'])
        return df
        
 
@@ -513,7 +532,7 @@ class OcrCrossword(LetterGame):
           except (AttributeError):
             self.gui.set_message(f'No text found in {self.defined_area}')
     
-    def recognise_crossword(self, pieceword=False):
+    def recognise_crossword(self, pieceword=False, allow_numbers=True):
       """ process crossword grid,
       either regular grid or pieceword
       pieceword is displayed as groups of 9 tiles """
@@ -554,14 +573,23 @@ class OcrCrossword(LetterGame):
             #plt.close()
             x, y = data.T
             #plt.scatter(x,y, color='green' )  
-            #plt.show()        
-            total_rects = self.recognise.read_characters(self.asset, None, total_rects)
-            board_, shape, conf_board = self.recognise.fill_board(total_rects, min_confidence=0.5)
-            board = '\n'.join(['/'.join(row) for row in np.flipud(board_)])
+            #plt.show()    
+            if allow_numbers:
+               # text ocr allows numbers    
+               all_text_dict = self.recognise.text_ocr(self.asset, total_rects)
+               total_rects = self.convert_text_to_dataframe(all_text_dict, total_rects)
+                  
+            else:
+                total_rects = self.recognise.read_characters(self.asset, total_rects)
+            self.board, shape, conf_board = self.recognise.fill_board(total_rects, min_confidence=0.5)
+            
+            board = '\n'.join(['/'.join(row) for row in np.flipud(self.board)])
             self.gui.set_props(self.gridbox, font=('Courier New', grid_font))
+            #self.create_grid()
             self.gui.set_text(self.gridbox, board)    
+            self.lines = board
             self.wordsbox.text =  f'{np.flipud(conf_board)}'
-            return board   
+            return self.board   
                      
           except ((ValueError,AttributeError))as e:
             self.gui.set_message(f'Text reading error  in {self.defined_area} {e}')
@@ -655,8 +683,7 @@ class OcrCrossword(LetterGame):
       #fill board with logic False if r,c in totsl_rects
       locs = np.array(total_rects[['r', 'c']])
       #print(total_rects.to_string())
-      for loc in locs:
-        board[tuple(loc)] = False
+      [self.board_rc(tuple(loc), board, False) for loc in locs]
       # missing is  whats left
       missing = np.argwhere(board==True)
       # make a new datafram from missing r,c
@@ -704,6 +731,7 @@ def main():
     
 if __name__ == '__main__':
     main()
+
 
 
 

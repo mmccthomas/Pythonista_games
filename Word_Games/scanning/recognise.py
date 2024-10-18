@@ -88,6 +88,8 @@ class Recognise():
         match r:
           case 6:
             img = img.transpose(Image.ROTATE_270) 
+          case 3:
+            img = img.transpose(Image.ROTATE_180) 
           case _:
             pass
     
@@ -165,31 +167,46 @@ class Recognise():
       works best with full words or numbers
       individual letters not so great
       VNDetectTextRectanglesRequest.regionOfInterest
-      """      
+      """             
       img_data = objc_util.ns(asset.get_image_data().getvalue()) 
-      with autoreleasepool():
-        req = VNRecognizeTextRequest.alloc().init().autorelease()
-        req.setRecognitionLanguages_(['en-US'])
-        req.setRecognitionLevel_(0) # accurate
-        if aoi:
-          x, y, w, h = aoi
-          req.regionOfInterest = ((x, y), (w, h))        
-        req.reportCharacterBoxes = True
-        # req.setCustomWords_([x for x in list('ABCDEFGHIJKLMNOPQRSTUVWXYZ01')]) # individual letters
-        handler = VNImageRequestHandler.alloc().initWithData_options_(img_data, None).autorelease()
-        success = handler.performRequests_error_([req], None)    
-        if success:
-            all_text = []            
-            for result in req.results():
-              cg_box = result.boundingBox()
-              x, y = cg_box.origin.x, cg_box.origin.y
-              w, h = cg_box.size.width, cg_box.size.height
-              all_text.append( {'x': x, 'y': y, 'w': w, 'h': h, 
-                                'areax1000': w*h*1000, 'confidence': result.confidence(), 
-                                'label': str(result.text())})
-              #all_text[x, y, w, h] = str(result.text())             
-            return all_text
-        return None   
+      
+      if isinstance(aoi, pd.DataFrame):
+        subset = aoi[['x','y','w','h']]
+        aoi_list = [tuple(x) for x in subset.to_numpy()]
+        save_aoi = True
+      else:
+        aoi_list = [aoi]
+        save_aoi = False
+      all_text = []  
+           
+      for aoi in aoi_list:  
+          with autoreleasepool():
+            req = VNRecognizeTextRequest.alloc().init().autorelease()
+            req.setRecognitionLanguages_(['en-US'])
+            req.setRecognitionLevel_(0) # accurate
+            if aoi:
+              X, Y, W, H = aoi
+              req.regionOfInterest = ((X, Y), (W, H))        
+            req.reportCharacterBoxes = True
+            # req.setCustomWords_([x for x in list('ABCDEFGHIJKLMNOPQRSTUVWXYZ01')]) # individual letters
+            handler = VNImageRequestHandler.alloc().initWithData_options_(img_data, None).autorelease()
+            success = handler.performRequests_error_([req], None)    
+            if success:                    
+                for result in req.results():
+                  cg_box = result.boundingBox()
+                  x, y = cg_box.origin.x, cg_box.origin.y
+                  w, h = cg_box.size.width, cg_box.size.height
+                  if aoi:
+                     all_text.append( {'x': x, 'y': y, 'w': w, 'h': h, 
+                                       'areax1000': w*h*1000, 'confidence': result.confidence(), 
+                                       'label': str(result.text()), 
+                                       'aoi_x':X, 'aoi_y': Y, 'aoi_w': W, 'aoi_h': H})
+                  else:
+                  	  all_text.append( {'x': x, 'y': y, 'w': w, 'h': h, 
+                                        'areax1000': w*h*1000, 'confidence': result.confidence(), 
+                                        'label': str(result.text())})
+                  #all_text[x, y, w, h] = str(result.text())             
+      return all_text   
     
     def load_model(self, modelname):
       '''Helper method for downloading/caching the mlmodel file'''
@@ -213,6 +230,14 @@ class Recognise():
       # Compile the model:
       c_model_url = MLModel.compileModelAtURL_error_(ml_model_url, None)
       print('Created temp file', c_model_url)
+      td = str(c_model_url.absoluteString()).split('/')
+      tdir = '/'.join(td[1:-1]) + '/'
+      print('Temp directory ', tdir)
+      f = glob(tdir +'*')     
+      size = sum([os.path.getsize(fp) for fp in f])
+      print(f'{len(f)} items,  {size} bytes')
+      # use shutil.rmtree(fp) to delete /tmp
+      # then os.mkdir(fp) to regenerate
       # Load model from the compiled model file:
       ml_model = MLModel.modelWithContentsOfURL_error_(c_model_url, None)
       # Create a VNCoreMLModel from the MLModel for use with the Vision framework:
@@ -291,7 +316,7 @@ class Recognise():
                  self.gui.gs.rc_to_pos(H-y*H-1, x*W)]                                                  
           self.gui.draw_line(box, **kwargs)      
         
-    def read_characters(self, asset, page_text_dict, rectangles):
+    def read_characters(self, asset, rectangles):
         """ from a series of rectangles, perform a text recognition inside each"""
      
         def get_chars(rectangles):
@@ -323,13 +348,15 @@ class Recognise():
     def fill_board(self, total_rects, min_confidence=0.3):
         # use the rectangle data to fill board
         # attempts to reconstruct crossword letters
-        
+        # find max length of labels
+        text = total_rects['label']
+        max_text = len(max(text, key=len))
         try:             
             data = np.array(total_rects[['c','r']])
             c, r = data.T
             #plt.scatter(x,y, color='red' )          
             #plt.show()
-            board = np.full((self.Ny, self.Nx), ' ', dtype='U1')
+            board = np.full((self.Ny, self.Nx), ' ', dtype=f'U{max_text}')
             conf_board = np.zeros((self.Ny, self.Nx), dtype=int)
             for index, selection in total_rects.iterrows():
                  conf_board[int(selection["r"]), int(selection["c"])] = int(selection['confidence']*10)
@@ -572,5 +599,8 @@ def main():
                             
 if __name__ == '__main__':
   main()
+
+
+
 
 
