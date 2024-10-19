@@ -1,3 +1,10 @@
+# A set of utilities to read a puzzle image from the photo library
+#  Read blocks of text
+#  create crossword grid manually
+#  Read a crossword gridwith letters only
+#  Read Pieceword grid with froups of 3x3 squares
+#  Read numerical crossword grid
+
 # Use VisionKit text recognition to read an image
 # containing text.
 # Provide a grid to generate crossword frame as text
@@ -16,8 +23,6 @@ import pandas as pd
 from matplotlib import pyplot as plt
 import matplotlib.cm as cm
 import resource
-#cthomas
-#oct2024
 
 
 current = os.path.dirname(os.path.realpath(__file__))
@@ -54,8 +59,10 @@ class Player():
 
 class OcrCrossword(LetterGame):
     def __init__(self, all_text, board=None, board_size=None, asset=None):
+        self.debug = False
+        self.board = board
         self.load() # attempt to load temp file
-        self.SIZE = self.get_size(board=board, board_size=board_size)     
+        self.SIZE = self.get_size(board=self.board, board_size=board_size)     
         self.asset = asset   
         self.q = Queue()
         self.log_moves = False
@@ -85,17 +92,24 @@ class OcrCrossword(LetterGame):
         self.set_buttons()
         self.add_boxes()
         self.add_indexes()
+        self.create_grid()
         self.recognise = Recognise(self.gui)
-        
+            
         
     def get_size(self, board, board_size):
+      """ get board size
+      if loaded board, board is an np array
+      board_size is a default 25x25
+      """
       if board is not None:
-        response = dialogs.alert('Use decoded board?', '', 'YES', 'NO', hide_cancel_button=True)
-        if response == 1:
-          try:
-            self.board = np.char.lower(board)            
-          except (Exception) as e:
-            print(e)      
+        #response = dialogs.alert('Use decoded board?', '', 'YES', 'NO', hide_cancel_button=True)
+        #if response == 1:
+        #  try:
+        #    self.board = np.char.lower(board)            
+        #  except (Exception) as e:
+        #    print(e)      
+        super().get_size()
+        return
       super().get_size(board_size)
     
     def draw_rectangles(self, rectangles, **kwargs):
@@ -241,7 +255,38 @@ class OcrCrossword(LetterGame):
       # remove last \n
       self.lines[-1] = self.lines[-1].rstrip()
       self.gui.set_text(self.gridbox, ''.join(self.lines))
-                       
+      
+    def select_defined_area(self, origin, coord):
+      """select defined area"""
+      def r2(x):
+          """ round and scale"""
+          return round(x, 2)/self.sizex
+                    
+      st_y, st_x = origin # / self.sizex
+      #st_y = 1.0 - st_y
+      end_y, end_x = coord # / self.sizex
+      # find which way we drew the box
+      x, y = min(st_x, end_x), max(st_y, end_y)
+      x1, y1 = max(st_x, end_x), min(st_y, end_y)
+                  
+      box = [self.gui.gs.rc_to_pos(y, x), 
+             self.gui.gs.rc_to_pos(y1-1, x), 
+             self.gui.gs.rc_to_pos(y1-1, x1+1), 
+             self.gui.gs.rc_to_pos(y, x1+1), 
+             self.gui.gs.rc_to_pos(y, x)]                      
+      params = {'line_width': 4, 'line_cap_style': LINE_CAP_ROUND, 
+                'stroke_color': 'blue', 'z_position':1000}
+      self.gui.remove_lines(z_position=1000)
+      self.gui.draw_line(box, **params)        
+      # calculate region of interest
+      # need x, y relative to original asset
+      # 0,0 is lower left, 1,1 is upper right
+      x, y = r2(x), r2(self.sizey - 1 - y)
+      x1, y1 = r2(x1+1), r2(self.sizey - y1)                  
+      w = abs(x1-x)
+      h = abs(y-y1)
+      self.defined_area = (x, y, w, h)
+                                   
     def get_player_move(self, board=None):
       """Takes in the user's input and performs that move on the board,
       returns the coordinates of the move
@@ -344,41 +389,8 @@ class OcrCrossword(LetterGame):
           try:
               cell = self.get_board_rc(origin, self.board)
               if self.image_mode:
-                  """select defined area"""
-                  def r2(x):
-                    """ round and scale"""
-                    return round(x, 2)/self.sizex
-                    
-                  st_y, st_x = origin # / self.sizex
-                  #st_y = 1.0 - st_y
-                  end_y, end_x = coord # / self.sizex
-                  # find which way we drew the box
-                  x, y = min(st_x, end_x), max(st_y, end_y)
-                  x1, y1 = max(st_x, end_x), min(st_y, end_y)
-                  
-                  #end_y = 1.0 - end_y
-                  box = [self.gui.gs.rc_to_pos(y, x), 
-                         self.gui.gs.rc_to_pos(y1-1, x), 
-                         self.gui.gs.rc_to_pos(y1-1, x1+1), 
-                         self.gui.gs.rc_to_pos(y, x1+1), 
-                         self.gui.gs.rc_to_pos(y, x)]                      
-                  params = {'line_width': 4, 'line_cap_style': LINE_CAP_ROUND, 'stroke_color': 'blue', 'z_position':1000}
-                  self.gui.remove_lines(z_position=1000)
-                  self.gui.draw_line(box, **params)        
-                  # calculate region of interest
-                  # need x, y relative to original asset
-                  # 0,0 is lower left, 1,1 is upper right
-                  x, y = r2(x), r2(self.sizey - 1 - y)
-                  x1, y1 = r2(x1+1), r2(self.sizey - y1)                  
-                  # this is for square image
-                  w = abs(x1-x)
-                  h = abs(y-y1)
-                  #if self.scale >= 1.0:
-                  self.defined_area = (x, y, w, h)
-                  #else:
-                  #  self.defined_area = ((y, x), (w, h)
-                  
-                  
+                 self.select_defined_area(origin, coord) 
+                                                     
               elif not self.letters_mode and not self.gui.long_touch:
                   self.board_rc(origin, self.board, '#' if cell == ' ' else ' ')                
               else:
@@ -389,9 +401,12 @@ class OcrCrossword(LetterGame):
                 if letter:     
                   if self.index_mode and letter.isnumeric():
                     self.indexes[origin] = int(letter)
-                    self.gui.add_numbers([Squares(origin, str(letter), 'yellow', z_position=30,
-                                        alpha=0.5, font=('Avenir Next', 18),
-                                        text_anchor_point=(-1.1, 1.2))], clear_previous=False)
+                    if letter == 0:
+                      self.gui.clear_numbers(origin)                                          
+                    else:
+                        self.gui.replace_numbers([Squares(origin, str(letter), 'yellow', z_position=30,
+                                                  alpha=0.5, font=('Avenir Next', 18),
+                                                  text_anchor_point=(-1.1, 1.2))])
                   elif len(letter) == 1:
                       self.board_rc(origin, self.board, letter)
                   else:             
@@ -403,13 +418,13 @@ class OcrCrossword(LetterGame):
                         self.board_rc(origin + (0, index), self.board, l.lower() )
                       
               self.create_grid()   
-              self.gui.update(self.board)       
+              self.gui.update(np.char.lower(self.board))       
           except (IndexError):
             pass 
                         
     def save(self):
       
-      np.savez(savefile, board=self.board, indexes=self.indexes)
+      np.savez(savefile, board=self.board, indexes=self.indexes, words=self.words)
           
     def load(self):
       response = dialogs.alert('Load temporary file?', '', 'YES', 'NO', hide_cancel_button=True)
@@ -418,10 +433,8 @@ class OcrCrossword(LetterGame):
           data = np.load(savefile + '.npz')
           self.board = data['board']
           self.indexes = data['indexes']
-          board = '\n'.join(['/'.join(row) for row in np.flipud(self.board)])
-          self.gui.set_props(self.gridbox, font=('Courier New', grid_font))
-          #self.create_grid()
-          self.gui.set_text(self.gridbox, board)    
+          self.words = data['words']
+          
         except (Exception) as e:
           print(e)    
         
@@ -431,7 +444,7 @@ class OcrCrossword(LetterGame):
         self.words = MSG[0]
       if hasattr(self, 'rectangles'):
         self.draw_rectangles()
-      self.gui.update(self.board)      
+      self.gui.update(np.char.lower(self.board))      
       while True:
         move = self.get_player_move()
         end = self.process_turn(move, self.board)
@@ -474,7 +487,7 @@ class OcrCrossword(LetterGame):
             self.rects, self.bboxes  = self.recognise.rectangles(self.asset)
             self.draw_rectangles(self.bboxes)
             self.board[self.board == ' '] = '-'
-            self.gui.update(self.board)  
+            self.gui.update(np.char.lower(self.board))  
             all_text_dict = self.recognise.text_ocr(self.asset)
             try:
                 #board, board_size = recognise.sort_by_position(all_text_dict)    
@@ -484,10 +497,8 @@ class OcrCrossword(LetterGame):
           else:
             # clear image and rectangles
             # TODO would really like to reset grid size here, without clearing text boxes
-            #self.gui.remove_lines()
-            #self.gui.add_image(f'../../gui/tileblocks/_.png')
-            
-            MSG = (self.words, self.lines)
+        
+            MSG = (self.words, self.lines, self.indexes)
             # force quit 
             self.q.put([-1,-1])
                 
@@ -512,7 +523,8 @@ class OcrCrossword(LetterGame):
            df3 = pd.merge(existing_df, df2, 
                           how='outer', on=['y', 'x'],left_on=None, right_on=None, 
                           left_index=False, right_index=False, sort=False)
-           print(df3.to_string())
+           if self.debug:
+               print(df3.to_string())
            # change NaN values to space for label, and 0 for confidence
            df3['confidence'] = df3['confidence'].fillna(0.0)
            df3['label'] = df3['label'].fillna(' ')
@@ -544,7 +556,8 @@ class OcrCrossword(LetterGame):
           plt.show()
                   
           df.sort_values(by=['group','y','x'], ascending=[False,False,True], inplace=True, ignore_index=True)
-          print(df.to_string())
+          if self.debug:
+              print(df.to_string())
           try:
              self.all_text = list(df.label)
              self.draw_rectangles(df)
@@ -588,14 +601,16 @@ class OcrCrossword(LetterGame):
           total_rects.sort_values(by=['r','c','areax1000'], inplace=True, ignore_index=True)
           params = {'line_width': 5, 'stroke_color': 'green', 'z_position':1000}
           self.draw_rectangles(df, **params)
-          print(total_rects.to_string())
+          if self.debug:
+              print(total_rects.to_string())
           # at this point we have all the valid rectangles
           try:
-            data = np.array(total_rects[['x','y']])
-            #plt.close()
-            x, y = data.T
-            plt.scatter(x,y, color='green' )  
-            plt.show()    
+            if self.debug:
+                data = np.array(total_rects[['x','y']])
+                #plt.close()
+                x, y = data.T
+                plt.scatter(x,y, color='green' )  
+                plt.show()    
             if allow_numbers:
                # text ocr allows numbers    
                all_text_dict = self.recognise.text_ocr(self.asset, total_rects)
@@ -603,13 +618,13 @@ class OcrCrossword(LetterGame):
                   
             else:
                 total_rects = self.recognise.read_characters(self.asset, total_rects)
-            self.board, shape, conf_board = self.recognise.fill_board(total_rects, min_confidence=0.5)
-            
-            board = '\n'.join(['/'.join(row) for row in np.flipud(self.board)])
-            self.gui.set_props(self.gridbox, font=('Courier New', grid_font))
+            self.board, shape, conf_board, self.indexes =  self.recognise.fill_board(total_rects, min_confidence=0.5)
+            self.create_grid()
+            #board = '\n'.join(['/'.join(row) for row in np.flipud(self.board)])
+            #self.gui.set_props(self.gridbox, font=('Courier New', grid_font))
             #self.create_grid()
-            self.gui.set_text(self.gridbox, board)    
-            self.lines = board
+            #self.gui.set_text(self.gridbox, board)    
+            #self.lines = board
             self.wordsbox.text =  f'{np.flipud(conf_board)}'
             return self.board   
                      
@@ -664,16 +679,19 @@ class OcrCrossword(LetterGame):
             d_aspect = np.digitize(aspects, aspect_span, right=True)
             
             #find greatest number of items  in area
-            # TODO should we also use aspect?
-            # print('digitized', d_area)
-            # print('areas', areas)
-            # print('digitized', d_aspect)
-            # print('aspects', aspects)
+            if self.debug:
+                # TODO should we also use aspect?
+                print('digitized', d_area)
+                print('areas', areas)
+                print('digitized', d_aspect)
+                print('aspects', aspects)
             unique, counts = np.unique(d_area, return_counts=True)
-            # print('unique, counts', unique, counts)
+            
             most = unique[np.argmax(counts)]
-            filtered = df[d_area[df.index] == most]           
-            # print('filtered', len(filtered))
+            filtered = df[d_area[df.index] == most] 
+            if self.debug: 
+                print('unique, counts', unique, counts)         
+                print('filtered', len(filtered))
             return filtered
             
     def filter_total(self, total_rects):
@@ -692,7 +710,7 @@ class OcrCrossword(LetterGame):
           most = unique[np.argmax(counts)]
           idx = d_area[np.array(total_rects.index)] == most
           total_rects = total_rects[idx]  
-          total_rects.drop(['xr', 'yr', 'wr', 'hr'], axis='columns', inplace=True)      
+          total_rects = total_rects.drop(['xr', 'yr', 'wr', 'hr'], axis='columns')      
           total_rects.reset_index(drop=True, inplace=True)
           return total_rects
           
@@ -728,31 +746,28 @@ def main():
     
     all_assets = photos.get_assets()
     asset = photos.pick_asset(assets=all_assets)
-    #try:     
-    #   all_text_dict= Recognise().text_ocr(asset) #, rects2[9])       
-    #   all_text = list(all_text_dict.values())
-    #except:
-    #  all_text = []
-    #  all_text_dict = {}
-    
     ocr = OcrCrossword([], asset=asset, board_size='25 25')
     ocr.defined_area =[0,0,1,1]
     ocr.recognise_area()
     ocr.image_mode = not ocr.image_mode
     ocr.gui.set_props(ocr.images, fill_color = 'red' if ocr.image_mode else 'cyan')    
     ocr.enter_image_mode()   
-    #if all_text:
-    #   ocr.filter(sort_alpha=False, max_length=None, min_length=None, sort_length=False, remove_numbers=False)
     ocr.run()
+    
     # if closed with MSG set then restart with new grid
     while MSG:
        ocr = OcrCrossword([], asset=asset)
        ocr.words = MSG[0]
        ocr.lines = MSG[1]
+       ocr.indexes = MSG[2]
        ocr.run()
     
 if __name__ == '__main__':
     main()
+
+
+
+
 
 
 

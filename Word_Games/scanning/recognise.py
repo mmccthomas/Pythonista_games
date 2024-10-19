@@ -362,14 +362,18 @@ class Recognise():
             #plt.scatter(x,y, color='red' )          
             #plt.show()
             board = np.full((self.Ny, self.Nx), ' ', dtype=f'U{max_text}')
+            indexes = np.zeros((self.Ny, self.Nx), dtype=int)
             conf_board = np.zeros((self.Ny, self.Nx), dtype=int)
             for index, selection in total_rects.iterrows():
                  conf_board[int(selection["r"]), int(selection["c"])] = int(selection['confidence']*10)
-                 if selection['confidence']> min_confidence:
-                      board[int(selection["r"]), int(selection["c"])] = selection['label']
+                 if selection['confidence'] >= min_confidence:                      
+                      if selection['label'].isnumeric():
+                      	indexes[int(selection["r"]), int(selection["c"])] = selection['label']
+                      else:
+                      	board[int(selection["r"]), int(selection["c"])] = selection['label']
                  else:
                       board[int(selection["r"]), int(selection["c"])] = '#'
-            return board, board.shape, conf_board
+            return np.flipud(board), board.shape, np.flipud(conf_board), np.flipud(indexes)
             
         except (Exception) as e:
             print(traceback.format_exc())
