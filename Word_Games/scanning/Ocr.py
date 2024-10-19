@@ -23,7 +23,7 @@ import pandas as pd
 from matplotlib import pyplot as plt
 import matplotlib.cm as cm
 import resource
-
+from scene import Rect
 
 current = os.path.dirname(os.path.realpath(__file__))
 parent = os.path.dirname(current)
@@ -58,10 +58,10 @@ class Player():
  
 
 class OcrCrossword(LetterGame):
-    def __init__(self, all_text, board=None, board_size=None, asset=None):
+    def __init__(self, all_text, board=None, board_size=None, asset=None, autoload=False):
         self.debug = False
         self.board = board
-        self.load() # attempt to load temp file
+        self.load(autoload=autoload) # attempt to load temp file
         self.SIZE = self.get_size(board=self.board, board_size=board_size)     
         self.asset = asset   
         self.q = Queue()
@@ -100,16 +100,23 @@ class OcrCrossword(LetterGame):
       """ get board size
       if loaded board, board is an np array
       board_size is a default 25x25
+      for Lettergame.set_size()
+        if board_size is spefied use it
+        else if self.board is specified, use that
+        else prompt for size
       """
       if board is not None:
-        #response = dialogs.alert('Use decoded board?', '', 'YES', 'NO', hide_cancel_button=True)
-        #if response == 1:
-        #  try:
-        #    self.board = np.char.lower(board)            
-        #  except (Exception) as e:
-        #    print(e)      
-        super().get_size()
-        return
+        response = dialogs.alert('Use previously decoded board?', '', 'YES', 'NO', hide_cancel_button=True)
+        if response == 1:
+          try:
+              self.board = np.char.lower(board)     
+              super().get_size() 
+              return       
+          except (Exception) as e:
+             print(e) 
+        else:
+        	self.board = None            
+        
       super().get_size(board_size)
     
     def draw_rectangles(self, rectangles, **kwargs):
@@ -117,7 +124,8 @@ class OcrCrossword(LetterGame):
         
         if isinstance(rectangles, pd.DataFrame):
           rectangles = list(rectangles[['x','y','w','h']].itertuples(index=False, name=None))
-          
+        elif rectangles is None:
+        	return  
         for rect in rectangles:
           x, y, w, h = rect
           x1, y1 = x+w, y+h                 
@@ -254,6 +262,8 @@ class OcrCrossword(LetterGame):
       
       # remove last \n
       self.lines[-1] = self.lines[-1].rstrip()
+      grid_font = 24*13/len(self.lines)
+      self.gui.set_props(self.gridbox, font=('Courier New', grid_font))
       self.gui.set_text(self.gridbox, ''.join(self.lines))
       
     def select_defined_area(self, origin, coord):
@@ -426,8 +436,12 @@ class OcrCrossword(LetterGame):
       
       np.savez(savefile, board=self.board, indexes=self.indexes, words=self.words)
           
-    def load(self):
-      response = dialogs.alert('Load temporary file?', '', 'YES', 'NO', hide_cancel_button=True)
+    def load(self, autoload=False):
+      if autoload:
+        response = 1
+      else:
+         response = dialogs.alert('Load temporary file?', '', 'YES', 'NO', hide_cancel_button=True)
+         
       if response == 1:
         try:
           data = np.load(savefile + '.npz')
@@ -575,15 +589,17 @@ class OcrCrossword(LetterGame):
           total_rects = pd.DataFrame(columns=('x', 'y', 'w', 'h'))
           #subdivide selected area and find rectangles 
           if not pieceword:
-              grid_font = 20
               for subrect in self.split_defined_area(N=5):
                   df = self.find_rects_in_area(subrect)
-                  total_rects = pd.concat([total_rects, df], ignore_index=False)     
+                  if df is not None:
+                     total_rects = pd.concat([total_rects, df], ignore_index=False)     
           else:
-              grid_font = 12
               # find groups of pieces
-              boxes = self.find_rects_in_area(self.defined_area, use_bboxes=True)          
-              self.draw_rectangles(boxes)
+              boxes = self.find_rects_in_area(self.defined_area, use_bboxes=True, min_size=0.08) 
+              if boxes is not None:        
+                 self.draw_rectangles(boxes)
+                 print('no boxes', len(boxes))
+                 sleep(3)
               print(f'found {len(boxes)} boxes')
               for _, subrect in boxes.iterrows():              
                   df =  self.find_rects_in_area(subrect)
@@ -601,6 +617,7 @@ class OcrCrossword(LetterGame):
           total_rects.sort_values(by=['r','c','areax1000'], inplace=True, ignore_index=True)
           params = {'line_width': 5, 'stroke_color': 'green', 'z_position':1000}
           self.draw_rectangles(df, **params)
+          self.gui.set_message2(f'Grid x={self.recognise.Nx}, y={self.recognise.Ny}, {len(total_rects)} squares found')
           if self.debug:
               print(total_rects.to_string())
           # at this point we have all the valid rectangles
@@ -619,13 +636,13 @@ class OcrCrossword(LetterGame):
             else:
                 total_rects = self.recognise.read_characters(self.asset, total_rects)
             self.board, shape, conf_board, self.indexes =  self.recognise.fill_board(total_rects, min_confidence=0.5)
-            self.create_grid()
+            
             #board = '\n'.join(['/'.join(row) for row in np.flipud(self.board)])
-            #self.gui.set_props(self.gridbox, font=('Courier New', grid_font))
-            #self.create_grid()
+            self.create_grid()
             #self.gui.set_text(self.gridbox, board)    
             #self.lines = board
-            self.wordsbox.text =  f'{np.flipud(conf_board)}'
+            self.wordsbox.text =  f'{np.flipud(conf_board)}' 
+            self.gui.set_message(f'OCR complete {len(np.where(conf_board>=5)[0])} items recognised')
             return self.board   
                      
           except ((ValueError,AttributeError))as e:
@@ -646,53 +663,60 @@ class OcrCrossword(LetterGame):
                              h / N + d))
           return subrects
           
-    def find_rects_in_area(self, subrect , use_bboxes=False):
+    def find_rects_in_area(self, subrect , use_bboxes=False, min_size=0.08):
             """ find all rectangles in smaller area 
-            then filter thos rectangles to remove outsize or undersize items
+            then filter those rectangles to remove outsize or undersize items
             returns pandas dataframe
             """
+            full = Rect(0.0, 0.0, 1.0, 1.0)
             if isinstance(subrect, pd.Series):
               aoi = tuple(subrect[['x','y','w','h']])
             else:
               aoi = subrect
-            rects, bboxes  = self.recognise.rectangles(self.asset, aoi)
+            if not full.contains_rect(Rect(*aoi)):
+              aoi = (0,0,1.0,1.0)
+            rects, bboxes  = self.recognise.rectangles(self.asset, aoi, min_size=min_size)
             select = bboxes if use_bboxes else rects
-            df = pd.DataFrame(np.array(select), columns=('x', 'y', 'w', 'h'))
-            df = np.round(df, decimals=3)
-            df['areax1000']= np.round(df.w * df.h * 1000, 3)
-            #print(len(df))
-            df.sort_values(by=['y','x','areax1000'], inplace=True, ignore_index=True)
-            df.drop_duplicates(['x', 'y'], keep='last', inplace=True, ignore_index=True)
-            
-            #get areas and aspect of each rectangle
-            areas = np.round(df.areax1000, 1)
-            aspects = np.round(df.h / df.w, 2)
-            
-            hist_area = np.histogram(areas, bins=10)
-            #hist_aspect = np.histogram(aspects, bins=10)
-            
-            area_span = np.linspace(min(areas), max(areas), num=10)
-            #area_span = np.unique(areas)
-            d_area= np.digitize(areas, area_span, right=True)
-            
-            aspect_span = np.linspace(min(aspects), max(aspects), num=10)
-            d_aspect = np.digitize(aspects, aspect_span, right=True)
-            
-            #find greatest number of items  in area
-            if self.debug:
-                # TODO should we also use aspect?
-                print('digitized', d_area)
-                print('areas', areas)
-                print('digitized', d_aspect)
-                print('aspects', aspects)
-            unique, counts = np.unique(d_area, return_counts=True)
-            
-            most = unique[np.argmax(counts)]
-            filtered = df[d_area[df.index] == most] 
-            if self.debug: 
-                print('unique, counts', unique, counts)         
-                print('filtered', len(filtered))
-            return filtered
+            if select:
+	            df = pd.DataFrame(np.array(select), columns=('x', 'y', 'w', 'h'))
+	            df = np.round(df, decimals=3)
+	            df['areax1000']= np.round(df.w * df.h * 1000, 3)
+	            #print(len(df))
+	            df.sort_values(by=['y','x','areax1000'], inplace=True, ignore_index=True)
+	            df.drop_duplicates(['x', 'y'], keep='last', inplace=True, ignore_index=True)
+	            
+	            #get areas and aspect of each rectangle
+	            areas = np.round(df.areax1000, 1)
+	            aspects = np.round(df.h / df.w, 2)
+	            
+	            hist_area = np.histogram(areas, bins=10)
+	            #hist_aspect = np.histogram(aspects, bins=10)
+	            
+	            area_span = np.linspace(min(areas), max(areas), num=10)
+	            #area_span = np.unique(areas)
+	            d_area= np.digitize(areas, area_span, right=True)
+	            
+	            aspect_span = np.linspace(min(aspects), max(aspects), num=10)
+	            d_aspect = np.digitize(aspects, aspect_span, right=True)
+	            
+	            #find greatest number of items  in area
+	            if self.debug:
+	                # TODO should we also use aspect?
+	                print('digitized', d_area)
+	                print('areas', areas)
+	                print('digitized', d_aspect)
+	                print('aspects', aspects)
+	            unique, counts = np.unique(d_area, return_counts=True)
+	            
+	            most = unique[np.argmax(counts)]
+	            self.draw_rectangles(df)
+	            #filtered = df
+	            filtered = df[d_area[df.index] == most] 
+	            if self.debug: 
+	                print('unique, counts', unique, counts)         
+	                print('filtered', len(filtered))
+	            return filtered
+            return None
             
     def filter_total(self, total_rects):
           """ total rects is pandas Dataframe 
@@ -755,8 +779,9 @@ def main():
     ocr.run()
     
     # if closed with MSG set then restart with new grid
+    # if autoload then used previous data
     while MSG:
-       ocr = OcrCrossword([], asset=asset)
+       ocr = OcrCrossword([], asset=asset, autoload=True)
        ocr.words = MSG[0]
        ocr.lines = MSG[1]
        ocr.indexes = MSG[2]
@@ -764,6 +789,8 @@ def main():
     
 if __name__ == '__main__':
     main()
+
+
 
 
 

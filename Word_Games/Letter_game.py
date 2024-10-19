@@ -619,7 +619,7 @@ class LetterGame():
        selection = f'{size}'     
     elif isinstance(size, str):
          selection = size
-    elif hasattr(self, 'board'):
+    elif hasattr(self, 'board') and self.board is not None:
         selection = f'{len(self.board[0])},{len(self.board)}'
         self.sizey, self.sizex = len(self.board), len(self.board[0])
         #self.gui.gs.DIMENSION_Y, self.gui.gs.DIMENSION_X = self.sizey, self.sizex

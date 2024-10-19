@@ -117,7 +117,7 @@ class Recognise():
         mode_ = mode(lens)
         no_squares = int(sizey / mode_)  
         
-    def rectangles(self, asset, aoi=None):
+    def rectangles(self, asset, aoi=None, min_size=0.2):
         """Image recognition of rectangles
         to use as subframes
         """
@@ -127,7 +127,7 @@ class Recognise():
         height = asset.pixel_height
         with autoreleasepool():
           req = VNDetectRectanglesRequest.alloc().init().autorelease()
-          req.minimumSize = 0.08 
+          req.minimumSize = min_size 
           req.maximumObservations = 0
           req.minimumAspectRatio = 0
           req.maximumAspectRatio = 1
@@ -189,7 +189,7 @@ class Recognise():
               X, Y, W, H = aoi
               req.regionOfInterest = ((X, Y), (W, H))        
             req.reportCharacterBoxes = True
-            # req.setCustomWords_([x for x in list('ABCDEFGHIJKLMNOPQRSTUVWXYZ01')]) # individual letters
+            req.setCustomWords_([x for x in list('ABCDEFGHIJKLMNOPQRSTUVWXYZ01')]) # individual letters
             handler = VNImageRequestHandler.alloc().initWithData_options_(img_data, None).autorelease()
             success = handler.performRequests_error_([req], None)    
             if success:                    
@@ -370,7 +370,7 @@ class Recognise():
                       if selection['label'].isnumeric():
                       	indexes[int(selection["r"]), int(selection["c"])] = selection['label']
                       else:
-                      	board[int(selection["r"]), int(selection["c"])] = selection['label']
+                      	board[int(selection["r"]), int(selection["c"])] = selection['label'].lower()
                  else:
                       board[int(selection["r"]), int(selection["c"])] = '#'
             return np.flipud(board), board.shape, np.flipud(conf_board), np.flipud(indexes)
