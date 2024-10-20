@@ -14,6 +14,7 @@ import os
 from queue import Queue
 import logging
 import traceback
+from types import SimpleNamespace as ns
 current = os.path.dirname(os.path.realpath(__file__))
 parent = os.path.dirname(current)
 sys.path.append(parent)
@@ -221,7 +222,7 @@ class GameBoard(Scene):
     self.IMAGES = {}
     self.highlights = [[]]
     self.squares = {}
-    self.numbers = []
+    self.numbers = {} # (coords): {shape:shapeNode, label:LabelNode}
     self.touch_indicator = None
     self.line_timer = 0.5
     self.start_touch = None
@@ -565,35 +566,32 @@ class GameBoard(Scene):
         self.hl.append(t)
         
   def get_numbers(self, coords):
-    """ get color and text of number square objects for temporary storage"""
+    """ get color and text of number square objects for temporary storage
+    (coords): {shape:shapeNode, label:LabelNode}"""
     if isinstance(coords, list):
       items = {}
       for coord in coords:
         # remove existing
-        for t in self.numbers:
-          tpos = self.grid_to_rc(t.position)
-          if tpos == coord:
-            if isinstance(t, ShapeNode):
-              color = t.color
-              alpha = t.alpha
-            elif isinstance(t, LabelNode):
-              text = t.text
-              text_color = t.color
+        for k, v in self.numbers.items():
+          #tpos = self.grid_to_rc(t.position)
+          if k == coord:
+              color = v.shape.color
+              alpha = v.shape.alpha
+              text = v.label.text
+              text_color = v.label.color
               
         items[coord] = {'color': color, 'text': text,
                         'text_color': text_color, 'alpha': alpha}
       return items
     elif isinstance(coords, tuple):
       items = {}
-      for t in self.numbers:
-          tpos = self.grid_to_rc(t.position)
-          if tpos == coords:
-            if isinstance(t, ShapeNode):
-              color = t.color
-              alpha = t.alpha
-            elif isinstance(t, LabelNode):
-              text = t.text
-              text_color = t.color
+      for k, v in self.numbers.items():
+          if k == coords:
+                color = v.shape.color
+                alpha = label.alpha            
+                text = v.label.text
+                text_color = v.label.color
+                
       items[coords] = {'color': color, 'text': text,
                        'text_color': text_color, 'alpha': alpha}
       return items
@@ -603,6 +601,7 @@ class GameBoard(Scene):
   def put_numbers(self, items, **kwargs):
     """ put temporary items back again items are dictionary of coord:
     (color, text, text_color)
+    (coords): {shape:shapeNode, label:LabelNode}
     """
     for k, v in kwargs.items():
       setattr(self, k, v)
@@ -610,15 +609,14 @@ class GameBoard(Scene):
     if isinstance(items, dict):
       for coord, data in items.items():
         # remove existing
-        for t in self.numbers:
-          tpos = self.grid_to_rc(t.position)
-          if tpos == coord:
-            if isinstance(t, ShapeNode):
-              t.color = data['color']
-              t.alpha = data['alpha']
-            elif isinstance(t, LabelNode):
-              t.text = data['text']
-              t.color = data['text_color']
+        try:
+          v = self.numbers[coord]           
+          v.shape.color = data['color']
+          v.shape.alpha = data['alpha']            
+          v.label.text = data['text']
+          v.label.color = data['text_color']
+        except (KeyError):
+          pass
     
   def replace_numbers(self, items, **kwargs):
     """ replace the properties of specified number squares """
@@ -633,17 +631,20 @@ class GameBoard(Scene):
     if isinstance(items, list):
       for item in items:
         # remove existing
-        for t in self.numbers:
-          tpos = self.grid_to_rc(t.position)
-          if tpos == items:
-            t.remove_from_parent()
-            self.numbers.remove(t)
+        try:
+           v = self.numbers[item]            
+           v.shape.remove_from_parent()           
+           v.label.remove_from_parent()
+           self.numbers[item] = {}
+        except (KeyError):
+          pass
       # now add new
       self.add_numbers(items, clear_previous=False, **kwargs)
         
   def add_numbers(self, items, clear_previous=True, **kwargs):
     # items is a list of Squares objects
     # items are each a dictionary of (row,col), text, color
+    # (coords): {shape:shapeNode, label:LabelNode}
     for k, v in kwargs.items():
       setattr(self, k, v)
     if clear_previous:
@@ -670,7 +671,7 @@ class GameBoard(Scene):
             t.anchor_point = item.anchor_point
         else:
             t.anchor_point = (0, 0)
-        self.numbers.append(t)
+        
         #  unmodified text point is centre of cell
         # text anchor point will be -1 to +1
         tposx, tposy = item.text_anchor_point
@@ -683,35 +684,41 @@ class GameBoard(Scene):
                        z_position=item.z_position + 5,
                        parent=self.game_field)
         t1.anchor_point = (0, 1.0)
-  
-        self.numbers.append(t1)
+        self.numbers[tuple(item.position)] = ns(**{'shape': t, 'label': t1})
+      
   
   def clear_numbers(self, number_list=None):
     """ clear some or all numbers
     if number_list is specified, it is [(r,c)] 
     Need to remove both shape and labelnode
     they have different position but same grid position
+    (coords): {shape:shapeNode, label:LabelNode}
     """
     if number_list is None:
-      for t in self.numbers:
-        t.remove_from_parent()
-      self.numbers = []
+      for v in self.numbers.values():
+           v.shape.remove_from_parent()
+           v.label.remove_from_parent()
+      self.numbers = {}
+      
     elif isinstance(number_list, list):
       for pos in number_list:
-        for t in self.numbers[:]:
-          tpos = self.grid_to_rc(t.position)
-          if tpos == pos:
-            t.remove_from_parent()
-            self.numbers.remove(t)
+        try:
+          v = self.numbers[pos]           
+          v.shape.remove_from_parent()            
+          v.label.remove_from_parent()            
+          self.numbers[pos] = {}
+        except (KeyError):
+          pass   
     elif isinstance(number_list, tuple):
       # slicing ( self.numbers[:] ) is important to avoid skipping
-      for t in self.numbers[:]:
-          tpos = self.grid_to_rc(t.position)
-          if tpos == number_list:
-            t.remove_from_parent()
-            self.numbers.remove(t)
-    else:
-      pass  # do nothing
+      try:
+          v = self.numbers[number_list] 
+          v.shape.remove_from_parent()            
+          v.label.remove_from_parent()            
+          self.numbers[number_list] = {}
+      except (KeyError):
+          pass   
+    
         
   def clear_highlights(self):
     if hasattr(self, 'hl'):
