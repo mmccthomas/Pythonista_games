@@ -117,7 +117,7 @@ class Recognise():
         mode_ = mode(lens)
         no_squares = int(sizey / mode_)  
         
-    def rectangles(self, asset, aoi=None, min_size=0.2):
+    def rectangles(self, asset, aoi=None, min_size=0.2, min_aspect=0):
         """Image recognition of rectangles
         to use as subframes
         """
@@ -129,9 +129,9 @@ class Recognise():
           req = VNDetectRectanglesRequest.alloc().init().autorelease()
           req.minimumSize = min_size 
           req.maximumObservations = 0
-          req.minimumAspectRatio = 0
+          req.minimumAspectRatio = min_aspect
           req.maximumAspectRatio = 1
-          req.quadratureTolerance = 45.0
+          req.quadratureTolerance = 20
           req.minimumConfidence = 0         
           if aoi:
             x, y, w, h = aoi
@@ -203,7 +203,7 @@ class Recognise():
                                        'label': str(result.text()), 
                                        'cg_x':x, 'cg_y': y, 'cg_w': w, 'cg_h': h})
                   else:
-                  	  all_text.append( {'x': x, 'y': y, 'w': w, 'h': h, 
+                      all_text.append( {'x': x, 'y': y, 'w': w, 'h': h, 
                                         'areax1000': w*h*1000, 'confidence': result.confidence(), 
                                         'label': str(result.text())})         
       return all_text   
@@ -228,7 +228,7 @@ class Recognise():
       #    print('Used existing file', c_model_url)
       #else: 
       # Compile the model:
-      f = 	NSFileManager.defaultManager().temporaryDirectory()
+      f =   NSFileManager.defaultManager().temporaryDirectory()
       print('temp dir is ' , str(f.absoluteString()))
       c_model_url = MLModel.compileModelAtURL_error_(ml_model_url, None)
       print('Created temp file', c_model_url)
@@ -368,9 +368,9 @@ class Recognise():
                  conf_board[int(selection["r"]), int(selection["c"])] = int(selection['confidence']*10)
                  if selection['confidence'] >= min_confidence:                      
                       if selection['label'].isnumeric():
-                      	indexes[int(selection["r"]), int(selection["c"])] = selection['label']
+                        indexes[int(selection["r"]), int(selection["c"])] = selection['label']
                       else:
-                      	board[int(selection["r"]), int(selection["c"])] = selection['label'].lower()
+                        board[int(selection["r"]), int(selection["c"])] = selection['label'].lower()
                  else:
                       board[int(selection["r"]), int(selection["c"])] = '#'
             return np.flipud(board), board.shape, np.flipud(conf_board), np.flipud(indexes)
@@ -608,6 +608,7 @@ def main():
                             
 if __name__ == '__main__':
   main()
+
 
 
 
