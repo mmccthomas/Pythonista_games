@@ -572,31 +572,32 @@ class GameBoard(Scene):
       items = {}
       for coord in coords:
         # remove existing
-        for k, v in self.numbers.items():
-          #tpos = self.grid_to_rc(t.position)
-          if k == coord:
-              color = v.shape.color
-              alpha = v.shape.alpha
-              text = v.label.text
-              text_color = v.label.color
+        try:
+           v = self.numbers[coord]
+           color = v.shape.color
+           alpha = v.shape.alpha
+           text = v.label.text
+           text_color = v.label.color
               
-        items[coord] = {'color': color, 'text': text,
+           items[coord] = {'color': color, 'text': text,
                         'text_color': text_color, 'alpha': alpha}
+        except (KeyError):
+          pass
       return items
     elif isinstance(coords, tuple):
       items = {}
-      for k, v in self.numbers.items():
-          if k == coords:
-                color = v.shape.color
-                alpha = label.alpha            
-                text = v.label.text
-                text_color = v.label.color
+      try:
+          v = self.numbers[coord]
+          color = v.shape.color
+          alpha = label.alpha            
+          text = v.label.text
+          text_color = v.label.color
                 
-      items[coords] = {'color': color, 'text': text,
+          items[coords] = {'color': color, 'text': text,
                        'text_color': text_color, 'alpha': alpha}
+      except (KeyError):
+          pass
       return items
-    else:
-       pass
       
   def put_numbers(self, items, **kwargs):
     """ put temporary items back again items are dictionary of coord:
@@ -696,8 +697,8 @@ class GameBoard(Scene):
     """
     if number_list is None:
       for v in self.numbers.values():
-           v.shape.remove_from_parent()
-           v.label.remove_from_parent()
+         v.shape.remove_from_parent()
+         v.label.remove_from_parent()
       self.numbers = {}
       
     elif isinstance(number_list, list):
@@ -718,8 +719,7 @@ class GameBoard(Scene):
           self.numbers[number_list] = {}
       except (KeyError):
           pass   
-    
-        
+            
   def clear_highlights(self):
     if hasattr(self, 'hl'):
       for t in self.hl:
