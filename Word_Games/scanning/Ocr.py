@@ -153,7 +153,7 @@ class OcrCrossword(LetterGame):
       # positions of all objects for all devices
         x, y, w, h = self.gui.grid.bbox    
         position_dict = {
-        'ipad13_landscape': {'rackscale': 0.9,
+        'ipad13_landscape': {'rackscale': 0.9, 'gridbox': (300, 200),
         'button1': (w+20, 0), 'button2': (w+20, h/21), 'button3': (w+130, h/21),
         'button4': (w+20, 3 *h/21), 'button5': (w+110, 3*h/21),
         'button6': (w+20, 4 *h/21), 'button7': (w+130, 0), 'button8': (w+20, 5*h/21),
@@ -162,12 +162,13 @@ class OcrCrossword(LetterGame):
         'button15': (w+250, 0),
         'box1': (w+5, 2*h/3-6), 'box2': (w+5, 6*h/21),  'box3': (w+105, 75),'font': ('Avenir Next', 15)},                                         
 
-        'ipad_landscape': {'rackscale': 1.5,
+        'ipad_landscape': {'rackscale': 1.5,  'gridbox': (300, 150),
         'button1': (w+20, 0), 'button2': (w+20, h/21), 'button3': (w+150, h/21),
         'button4': (w+20, 3*h/21), 'button5': (w+100, 3*h/21),
         'button6': (w+20, 4*h/21), 'button7': (w+150, 0), 'button8': (w+20, 5*h/21),
         'button9': (w+150, 5*h/21),   'button10': (w+250, 5*h/21), 'button11': (w+250, 4*h/21),
         'button12': (w+250, 3*h/21),   'button13': (w+250, 2*h/21),  'button14': (w+250, 1*h/21),
+        'button15': (w+250, 0),
         'box1': (w+5, 2*h/3-6), 'box2': (w+5, 6*h/21), 'box3': (w+50, 75), 'font': ('Avenir Next', 12)}
         }        
         try:
@@ -187,7 +188,7 @@ class OcrCrossword(LetterGame):
       #self.gui.set_props(self.wordsbox, font=('Courier New', 12))
       self.gridbox = self.gui.add_button(text='', title='Grid', 
                           position=self.posn.box2, 
-                          min_size=(300, 200), #min_size=(2* tsize+10, tsize+10), 
+                          min_size=self.posn.gridbox, #min_size=(2* tsize+10, tsize+10), 
                           fill_color='black')
       self.gui.set_props(self.gridbox, font=('Courier New', 10))
       self.wordsbox = self.gui.scroll_text_box(x=self.posn.box3[0], 
@@ -237,13 +238,22 @@ class OcrCrossword(LetterGame):
     def create_grid(self):
       """ create string represention of board
           slashes separate each character
+          check shape if board and indexes as board can resize
       """
+      r_board_shape, c_board_shape = self.board.shape
+      r_index_shape, c_index_shape = self.indexes.shape
+      if r_index_shape < r_board_shape or c_index_shape < c_board_shape :
+        new_indexes = np.zeros((self.board.shape), dtype=int)
+        new_indexes[:r_index_shape, :c_index_shape] = self.indexes
+        self.indexes = new_indexes
+      
       self.lines = []
       use_indexes =  np.any(self.indexes)
       for r in range(self.board.shape[0]):
         line = "'"
         for c in range(self.board.shape[1]):
           if use_indexes:
+            
             i = self.indexes[r, c]
           char = self.board[r][c]
           if use_indexes:
@@ -262,7 +272,8 @@ class OcrCrossword(LetterGame):
       
       # remove last \n
       self.lines[-1] = self.lines[-1].rstrip()
-      grid_font = 24*13/len(self.lines)
+      fontsize = 24 if self.gui.device == 'ipad13_landscape' else 18
+      grid_font = fontsize * 13/len(self.lines)
       self.gui.set_props(self.gridbox, font=('Courier New', grid_font))
       self.gui.set_text(self.gridbox, ''.join(self.lines))
       
@@ -411,7 +422,7 @@ class OcrCrossword(LetterGame):
                 if letter:     
                   if self.index_mode and letter.isnumeric():
                     self.indexes[origin] = int(letter)
-                    if letter == 0:
+                    if letter == '0':
                       self.gui.clear_numbers(origin)                                          
                     else:
                         self.gui.replace_numbers([Squares(origin, str(letter), 'yellow', z_position=30,
@@ -718,6 +729,7 @@ class OcrCrossword(LetterGame):
             """ find all rectangles in smaller area 
             then filter those rectangles to remove outsize or undersize items
             returns pandas dataframe
+            #TODO. this deletes some rectangles that it shouldnt. investigate
             """
             full = Rect(0.0, 0.0, 1.0, 1.0)
             if isinstance(subrect, pd.Series):
@@ -761,7 +773,7 @@ class OcrCrossword(LetterGame):
               
               most = unique[np.argmax(counts)]
               self.draw_rectangles(df)
-              #filtered = df
+              filtered = df
               filtered = df[d_area[df.index] == most] 
               if self.debug: 
                   print('unique, counts', unique, counts)         
@@ -772,7 +784,8 @@ class OcrCrossword(LetterGame):
     def filter_total(self, total_rects):
           """ total rects is pandas Dataframe 
           add reduced resolution column for sorting and filtering
-          remove them at the end """
+          remove them at the end 
+          TODO this does not filter very well"""
           total_rects[['xr', 'yr', 'wr', 'hr']] = np.round(total_rects[['x', 'y', 'w', 'h']], 2)
           
           total_rects['areax1000']= round(total_rects.wr * total_rects.hr * 1000, 3)
@@ -784,7 +797,7 @@ class OcrCrossword(LetterGame):
           unique, counts = np.unique(d_area, return_counts=True)
           most = unique[np.argmax(counts)]
           idx = d_area[np.array(total_rects.index)] == most
-          total_rects = total_rects[idx]  
+          #total_rects = total_rects[idx]  
           total_rects = total_rects.drop(['xr', 'yr', 'wr', 'hr'], axis='columns')      
           total_rects.reset_index(drop=True, inplace=True)
           return total_rects
