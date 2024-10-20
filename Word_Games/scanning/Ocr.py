@@ -115,7 +115,7 @@ class OcrCrossword(LetterGame):
           except (Exception) as e:
              print(e) 
         else:
-        	self.board = None            
+          self.board = None            
         
       super().get_size(board_size)
     
@@ -125,7 +125,7 @@ class OcrCrossword(LetterGame):
         if isinstance(rectangles, pd.DataFrame):
           rectangles = list(rectangles[['x','y','w','h']].itertuples(index=False, name=None))
         elif rectangles is None:
-        	return  
+          return  
         for rect in rectangles:
           x, y, w, h = rect
           x1, y1 = x+w, y+h                 
@@ -595,16 +595,13 @@ class OcrCrossword(LetterGame):
                      total_rects = pd.concat([total_rects, df], ignore_index=False)     
           else:
               # find groups of pieces
-              boxes = self.find_rects_in_area(self.defined_area, use_bboxes=True, min_size=0.08) 
+              boxes = self.find_pieceword()
               if boxes is not None:        
                  self.draw_rectangles(boxes)
                  print('no boxes', len(boxes))
                  sleep(3)
               print(f'found {len(boxes)} boxes')
-              for _, subrect in boxes.iterrows():              
-                  df =  self.find_rects_in_area(subrect)
-                  self.draw_rectangles(df)
-                  total_rects = pd.concat([total_rects, df], ignore_index=False)     
+              total_rects = boxes
                       
           self.draw_rectangles(total_rects)  
           total_rects = self.filter_total(total_rects)
@@ -620,6 +617,7 @@ class OcrCrossword(LetterGame):
           self.gui.set_message2(f'Grid x={self.recognise.Nx}, y={self.recognise.Ny}, {len(total_rects)} squares found')
           if self.debug:
               print(total_rects.to_string())
+              
           # at this point we have all the valid rectangles
           try:
             if self.debug:
@@ -663,6 +661,59 @@ class OcrCrossword(LetterGame):
                              h / N + d))
           return subrects
           
+    def find_pieceword(self):
+        """ pieceword grids are arranged as 9x4 or 7x5  rectangles of 3x3 squares
+        this gives grid size of 27, 12 or 21, 15 
+        try both arrangements to see which is used. 
+        First find the bounding rectangle to divide more accurately
+        """
+        if self.defined_area:
+            aoi = self.defined_area
+            rects, bboxes  = self.recognise.rectangles(self.asset, aoi, min_size=0.2)
+            areas = np.array(rects)
+            xmin, ymin = np.min(areas[:,0]), np.min(areas[:,1])
+            xmax, ymax = np.max(areas[:,0] + areas[:,2]), np.max(areas[:,1] + areas[:,3])
+            bounding_rect = (xmin, ymin, xmax-xmin, ymax-ymin)
+            #self.draw_rectangles(bboxes)
+            self.draw_rectangles([bounding_rect], line_width=10, stroke_color='cyan')
+            #try to divide into rectangles
+            # if most found boxes are same size, then use that arrangement
+            bx, by, bw, bh = bounding_rect
+            bound_area = bw * bh
+            # these are printed grids
+            for Y, X in [(9,4), (7,5)]:           
+               print(f'Trying {Y},{X}')
+               subrects = [(bx + x * bw/X, by + y * bh/Y, bw/X, bh/Y) for x in range(X) for y in range(Y)]
+               self.gui.remove_lines()              
+               df_all = pd.DataFrame(columns=('x', 'y', 'w', 'h', 'index', 'areax1000'))
+               
+               for index, aoi in enumerate(subrects):
+                  rects, bboxes  = self.recognise.rectangles(self.asset, aoi, min_size=0.3, min_aspect=0.3)
+                  #find biggest box. is it close to aoi?
+                  if rects:
+                    df = pd.DataFrame(np.array(rects), columns=('x', 'y', 'w', 'h'))
+                    df['index']= index
+                    df['areax1000'] = df.w * df.h * 1000
+                    df_all = pd.concat([df_all, df], ignore_index=False)
+               
+               # find max of each column grouped by index
+               df2 = df_all.groupby(['index']).max()               
+               max_area = np.array(df2.areax1000)
+               print('Max area {max_area}')
+               box_area = 1000 * bound_area / X / Y
+               area_close_to_aoi = abs(max_area - box_area) < box_area / 4
+               most_close = sum(area_close_to_aoi)/ X /Y
+               if most_close > 0.8:  # allow some latitude
+                   break               
+            print(f'Shape selected {Y},{X} score={most_close}')
+            df_all = np.round(df_all, 4).reset_index(drop=True)
+            # remove the large boxes
+            df_all.drop(df_all[df_all.areax1000 > box_area/8].index, inplace=True)
+            print(df_all.to_string())
+            # now we know X and Y
+            # we have subrects
+            return df_all
+            
     def find_rects_in_area(self, subrect , use_bboxes=False, min_size=0.08):
             """ find all rectangles in smaller area 
             then filter those rectangles to remove outsize or undersize items
@@ -678,44 +729,44 @@ class OcrCrossword(LetterGame):
             rects, bboxes  = self.recognise.rectangles(self.asset, aoi, min_size=min_size)
             select = bboxes if use_bboxes else rects
             if select:
-	            df = pd.DataFrame(np.array(select), columns=('x', 'y', 'w', 'h'))
-	            df = np.round(df, decimals=3)
-	            df['areax1000']= np.round(df.w * df.h * 1000, 3)
-	            #print(len(df))
-	            df.sort_values(by=['y','x','areax1000'], inplace=True, ignore_index=True)
-	            df.drop_duplicates(['x', 'y'], keep='last', inplace=True, ignore_index=True)
-	            
-	            #get areas and aspect of each rectangle
-	            areas = np.round(df.areax1000, 1)
-	            aspects = np.round(df.h / df.w, 2)
-	            
-	            hist_area = np.histogram(areas, bins=10)
-	            #hist_aspect = np.histogram(aspects, bins=10)
-	            
-	            area_span = np.linspace(min(areas), max(areas), num=10)
-	            #area_span = np.unique(areas)
-	            d_area= np.digitize(areas, area_span, right=True)
-	            
-	            aspect_span = np.linspace(min(aspects), max(aspects), num=10)
-	            d_aspect = np.digitize(aspects, aspect_span, right=True)
-	            
-	            #find greatest number of items  in area
-	            if self.debug:
-	                # TODO should we also use aspect?
-	                print('digitized', d_area)
-	                print('areas', areas)
-	                print('digitized', d_aspect)
-	                print('aspects', aspects)
-	            unique, counts = np.unique(d_area, return_counts=True)
-	            
-	            most = unique[np.argmax(counts)]
-	            self.draw_rectangles(df)
-	            #filtered = df
-	            filtered = df[d_area[df.index] == most] 
-	            if self.debug: 
-	                print('unique, counts', unique, counts)         
-	                print('filtered', len(filtered))
-	            return filtered
+              df = pd.DataFrame(np.array(select), columns=('x', 'y', 'w', 'h'))
+              df = np.round(df, decimals=3)
+              df['areax1000']= np.round(df.w * df.h * 1000, 3)
+              #print(len(df))
+              df.sort_values(by=['y','x','areax1000'], inplace=True, ignore_index=True)
+              df.drop_duplicates(['x', 'y'], keep='last', inplace=True, ignore_index=True)
+              
+              #get areas and aspect of each rectangle
+              areas = np.round(df.areax1000, 1)
+              aspects = np.round(df.h / df.w, 2)
+              
+              hist_area = np.histogram(areas, bins=10)
+              #hist_aspect = np.histogram(aspects, bins=10)
+              
+              area_span = np.linspace(min(areas), max(areas), num=10)
+              #area_span = np.unique(areas)
+              d_area= np.digitize(areas, area_span, right=True)
+              
+              aspect_span = np.linspace(min(aspects), max(aspects), num=10)
+              d_aspect = np.digitize(aspects, aspect_span, right=True)
+              
+              #find greatest number of items  in area
+              if self.debug:
+                  # TODO should we also use aspect?
+                  print('digitized', d_area)
+                  print('areas', areas)
+                  print('digitized', d_aspect)
+                  print('aspects', aspects)
+              unique, counts = np.unique(d_area, return_counts=True)
+              
+              most = unique[np.argmax(counts)]
+              self.draw_rectangles(df)
+              #filtered = df
+              filtered = df[d_area[df.index] == most] 
+              if self.debug: 
+                  print('unique, counts', unique, counts)         
+                  print('filtered', len(filtered))
+              return filtered
             return None
             
     def filter_total(self, total_rects):
@@ -789,6 +840,8 @@ def main():
     
 if __name__ == '__main__':
     main()
+
+
 
 
 
