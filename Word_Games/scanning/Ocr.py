@@ -54,12 +54,13 @@ class Player():
     self.PIECES = [f'../../gui/tileblocks/{k}.png' for k in self.PIECE_NAMES[:-2]]
     self.PIECES.append(f'../../gui/tileblocks/@.png')
     self.PIECES.append(f'../../gui/tileblocks/_.png')
+    
     self.PLAYERS = None
  
 
 class OcrCrossword(LetterGame):
     def __init__(self, all_text, board=None, board_size=None, asset=None, autoload=False):
-        self.debug = False
+        self.debug = True
         self.board = board
         self.load(autoload=autoload) # attempt to load temp file
         self.SIZE = self.get_size(board=self.board, board_size=board_size)     
@@ -92,7 +93,7 @@ class OcrCrossword(LetterGame):
         self.set_buttons()
         self.add_boxes()
         self.add_indexes()
-        self.create_grid()
+        self.create_grid(self.board)
         self.recognise = Recognise(self.gui)
             
         
@@ -144,7 +145,7 @@ class OcrCrossword(LetterGame):
             i = self.indexes[tuple(index)]
             squares_list.append(Squares(index, str(i), 'yellow', z_position=30,
                                             alpha=0.5, font=('Avenir Next', 18),
-                                            text_anchor_point=(-1.1, 1.2)))
+                                            text_anchor_point=(-1.0, 1.0)))
           self.gui.add_numbers(squares_list) 
       else:
          self.indexes = np.zeros(self.board.shape, dtype=int)
@@ -235,27 +236,27 @@ class OcrCrossword(LetterGame):
       self.gui.add_button(text='Recognise NumberGrid', position=self.posn.button15,
                           fill_color='cyan', **params)                                                           
 
-    def create_grid(self):
+    def create_grid(self, board):
       """ create string represention of board
           slashes separate each character
           check shape if board and indexes as board can resize
       """
-      r_board_shape, c_board_shape = self.board.shape
+      r_board_shape, c_board_shape = board.shape
       r_index_shape, c_index_shape = self.indexes.shape
       if r_index_shape < r_board_shape or c_index_shape < c_board_shape :
-        new_indexes = np.zeros((self.board.shape), dtype=int)
+        new_indexes = np.zeros((board.shape), dtype=int)
         new_indexes[:r_index_shape, :c_index_shape] = self.indexes
         self.indexes = new_indexes
       
       self.lines = []
       use_indexes =  np.any(self.indexes)
-      for r in range(self.board.shape[0]):
+      for r in range(board.shape[0]):
         line = "'"
-        for c in range(self.board.shape[1]):
+        for c in range(board.shape[1]):
           if use_indexes:
             
             i = self.indexes[r, c]
-          char = self.board[r][c]
+          char = board[r][c]
           if use_indexes:
             if i != 0 and char != ' ':
                item = str(i) + char
@@ -344,7 +345,7 @@ class OcrCrossword(LetterGame):
           
         elif letter == 'Clear':
            self.board = np.full((self.sizey, self.sizex), ' ')
-           self.create_grid()
+           self.create_grid(self.board)
            self.gui.update(self.board)
            
         elif letter == 'Copy Text':
@@ -354,20 +355,20 @@ class OcrCrossword(LetterGame):
         elif letter == 'Fill bottom':
           self.board[np.fliplr(np.flipud(self.board.copy()))=='#'] = '#'
           self.gui.update(self.board)
-          self.create_grid()
+          self.create_grid(self.board)
         
         elif letter == 'Fill right':
            self.board[np.fliplr(self.board.copy())=='#'] = '#'     
            self.gui.update(self.board)
-           self.create_grid()
+           self.create_grid(self.board)
            
         elif letter == 'Copy grid':
-           self.create_grid()
+           self.create_grid(self.board)
            clipboard.set('Puzzle_frame:\n' + ''.join(self.lines))
            self.gui.set_message('Data copied')   
                    
         elif letter == 'Copy both':
-           self.create_grid()
+           self.create_grid(self.board)
            msg = 'Puzzle:\n' + '\n'.join(self.words) + '\nPuzzle_frame:\n' + ''.join(self.lines)
            clipboard.set(msg)
            self.gui.set_message('Data copied') 
@@ -404,8 +405,13 @@ class OcrCrossword(LetterGame):
            if self.image_mode:  
                self.recognise_crossword(pieceword=False, allow_numbers=False)
         elif letter == 'Recognise NumberGrid':
-           if self.image_mode:  
-               self.recognise_crossword(pieceword=False, allow_numbers=True)     
+           if self.image_mode: 
+               df = self.recognise_area()
+               self.board, shape, conf_board, self.indexes =  self.recognise.fill_board(df, min_confidence=0.5)
+               self.create_grid(self.board)
+               # make blocks black
+               self.board[self.indexes==0] = '#'
+               #self.recognise_crossword(pieceword=False, allow_numbers=True)     
         elif letter != '':  # valid selection
           try:
               cell = self.get_board_rc(origin, self.board)
@@ -438,7 +444,7 @@ class OcrCrossword(LetterGame):
                       else:
                         self.board_rc(origin + (0, index), self.board, l.lower() )
                       
-              self.create_grid()   
+              self.create_grid(self.board)   
               self.gui.update(np.char.lower(self.board))       
           except (IndexError):
             pass 
@@ -464,11 +470,12 @@ class OcrCrossword(LetterGame):
           print(e)    
         
     def run(self):
-      self.create_grid() 
+      self.create_grid(self.board) 
       if MSG[0] != '':
         self.words = MSG[0]
       if hasattr(self, 'rectangles'):
         self.draw_rectangles()
+      #if not self.image_mode:
       self.gui.update(np.char.lower(self.board))      
       while True:
         move = self.get_player_move()
@@ -511,7 +518,7 @@ class OcrCrossword(LetterGame):
             self.gui.add_image(filename)
             self.rects, self.bboxes  = self.recognise.rectangles(self.asset)
             self.draw_rectangles(self.bboxes)
-            self.board[self.board == ' '] = '-'
+            self.board[self.board == ' '] = '-' # this ensures transparent grid
             self.gui.update(np.char.lower(self.board))  
             all_text_dict = self.recognise.text_ocr(self.asset)
             try:
@@ -521,7 +528,6 @@ class OcrCrossword(LetterGame):
                 all_text = []
           else:
             # clear image and rectangles
-            # TODO would really like to reset grid size here, without clearing text boxes
         
             MSG = (self.words, self.lines, self.indexes)
             # force quit 
@@ -557,10 +563,11 @@ class OcrCrossword(LetterGame):
        return df
        
        
-    def recognise_area(self):
-        '''recognise text in defined area'''
-        if self.defined_area:
-          all_text_dict = self.recognise.text_ocr(self.asset, self.defined_area)
+    def recognise_area(self, defined_area=(0,0,1,1)):
+          '''recognise text in defined area'''
+          if self.defined_area is not None:
+             defined_area =  self.defined_area
+          all_text_dict = self.recognise.text_ocr(self.asset, defined_area)
           df = self.convert_text_to_dataframe(all_text_dict)
           df.sort_values(by=['y','x'], ascending=False, inplace=True, ignore_index=True)
           points = list(df[['x','y']].itertuples(index=False, name=None))
@@ -568,7 +575,7 @@ class OcrCrossword(LetterGame):
           # Group areas tigether to better order text
           #how to get best threshold?
           # This algorithm is empirical to group large and smaller areas
-          threshold = 0.05 / min(self.defined_area[2], self.defined_area[3])
+          threshold = 0.05 / min(defined_area[2], defined_area[3])
           cluster_count, labels = self.recognise.partition(points, threshold=threshold)
           
           df['group'] = np.array(labels)
@@ -581,6 +588,12 @@ class OcrCrossword(LetterGame):
           plt.show()
                   
           df.sort_values(by=['group','y','x'], ascending=[False,False,True], inplace=True, ignore_index=True)
+          df = self.recognise.convert_to_rc(df)      
+          
+          # These 2 lines work very well to fill number grid, but overwrites part of display
+          #self.board, shape, conf_board, self.indexes =  self.recognise.fill_board(df, min_confidence=0.5)
+          #self.create_grid(self.board)
+          
           if self.debug:
               print(df.to_string())
           try:
@@ -589,6 +602,7 @@ class OcrCrossword(LetterGame):
              self.filter(sort_alpha=False, max_length=None, min_length=None, sort_length=False, remove_numbers=False)
           except (AttributeError):
             self.gui.set_message(f'No text found in {self.defined_area}')
+          return df
     
     def recognise_crossword(self, pieceword=False, allow_numbers=False):
       """ process crossword grid,
@@ -647,7 +661,7 @@ class OcrCrossword(LetterGame):
             self.board, shape, conf_board, self.indexes =  self.recognise.fill_board(total_rects, min_confidence=0.5)
             
             #board = '\n'.join(['/'.join(row) for row in np.flipud(self.board)])
-            self.create_grid()
+            self.create_grid(self.board)
             #self.gui.set_text(self.gridbox, board)    
             #self.lines = board
             self.wordsbox.text =  f'{np.flipud(conf_board)}' 
@@ -680,7 +694,7 @@ class OcrCrossword(LetterGame):
         """
         if self.defined_area:
             aoi = self.defined_area
-            rects, bboxes  = self.recognise.rectangles(self.asset, aoi, min_size=0.2)
+            rects, bboxes  = self.recognise.rectangles(self.asset, aoi, min_size=0.1)
             areas = np.array(rects)
             xmin, ymin = np.min(areas[:,0]), np.min(areas[:,1])
             xmax, ymax = np.max(areas[:,0] + areas[:,2]), np.max(areas[:,1] + areas[:,3])
@@ -853,6 +867,7 @@ def main():
     
 if __name__ == '__main__':
     main()
+
 
 
 

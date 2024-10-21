@@ -40,55 +40,55 @@ MODEL_FILENAME = 'Alphanum_28x28.mlmodel'
 MODEL_PATH = './' + MODEL_FILENAME
 
 exif_rotations = {
-1: '0 degrees: the correct orientation, no adjustment is required.',
-2: '0 degrees, mirrored: image has been flipped back-to-front.',
-3: '180 degrees: image is upside down.',
-4: '180 degrees, mirrored: image has been flipped back-to-front and is upside down.',
-5: '90 degrees: image has been flipped back-to-front and is on its side.',
-6: '90 degrees, mirrored: image is on its side.',
-7: '270 degrees: image has been flipped back-to-front and is on its far side.'
+    1: '0 degrees: the correct orientation, no adjustment is required.',
+    2: '0 degrees, mirrored: image has been flipped back-to-front.',
+    3: '180 degrees: image is upside down.',
+    4: '180 degrees, mirrored: image has been flipped back-to-front and is upside down.',
+    5: '90 degrees: image has been flipped back-to-front and is on its side.',
+    6: '90 degrees, mirrored: image is on its side.',
+    7: '270 degrees: image has been flipped back-to-front and is on its far side.'
 }
 
   
 class Recognise():
     def __init__(self, gui):
-      self.w =0
-      self.h = 0
-      self.asset = None
-      self.gui = gui
+        self.w = 0
+        self.h = 0
+        self.asset = None
+        self.gui = gui
       
-    @staticmethod 
+    @staticmethod
     def memused():
-        return resource.getrusage(resource.RUSAGE_SELF).ru_maxrss// (2**20) 
+        return resource.getrusage(resource.RUSAGE_SELF).ru_maxrss // (2 ** 20) 
         
     def get_exif(self, i):
-      ret = {}
-      # i = Image.open(fn)
-      info = i._getexif()
-      for tag, value in info.items():
-        decoded = TAGS.get(tag, tag)
-        ret[decoded] = value
-      return ret
+        ret = {}
+        # i = Image.open(fn)
+        info = i._getexif()
+        for tag, value in info.items():
+            decoded = TAGS.get(tag, tag)
+            ret[decoded] = value
+        return ret
         
     def convert_to_png(self, asset):
         """ convert and  make smaller
         get rotation from exif data """
         filename = 'temp.png'
-        img = Image.open(asset.get_image_data()) 
+        img = Image.open(asset.get_image_data())
         exif = self.get_exif(img)
         w = h = r = None
         try:
-           w = exif['ExifImageWidth']
-           h = exif['ExifImageHeight']
-           r = exif['Orientation']
+            w = exif['ExifImageWidth']
+            h = exif['ExifImageHeight']
+            r = exif['Orientation']
         except (KeyError):
             pass
         props = (w, h, r, exif_rotations.get(r, None))
         scale = h/w
-        img = img.resize((1000,1000)) 
+        img = img.resize((1000,1000))
         match r:
           case 6:
-            img = img.transpose(Image.ROTATE_270) 
+            img = img.transpose(Image.ROTATE_270)
           case 3:
             img = img.transpose(Image.ROTATE_180) 
           case _:
@@ -393,10 +393,10 @@ class Recognise():
            diff_ = np.diff(sorted)           
            # array value of peaks
            sorted_d = sorted[np.argwhere(diff_>mean_span/2)[:,0]]
-           sorted_d = np.append(sorted_d, values[-1])
+           sorted_d = np.append(sorted_d, sorted[-1])
            delta = np.mean(np.diff(sorted_d))          
            N = len(sorted_d)   
-           return N, sorted_d, mean_span
+           return N, sorted_d, delta
      
        print('x red=original, blue = filtered') 
        self.Nx, self.xs, self.dx = process('x', span='w')
@@ -406,8 +406,8 @@ class Recognise():
        print(f'{self.Ny=}, {self.ys=}')
        c = np.searchsorted(self.xs[1:]-self.dx/2,  df.x,side='right')
        r = np.searchsorted(self.ys[1:]-self.dy/2, df.y, side='right')
-       df['c'] = c #np.rint((df.x - min(self.xs)) / diffx).astype(int)
-       df['r'] = r # np.rint((df.y - min(self.ys)) / diffy).astype(int)
+       df['c'] = c
+       df['r'] = r
        
        return df
            

@@ -1738,3 +1738,261 @@ Puzzle20_frame:
 ' / /10/ / / / / / /11/ / / '
 ' / / / / / / / / / / / / '
 ' / / / / /12/ / / / / / / '
+
+Puzzle21:
+#485_57
+1
+GIN
+GLADE
+GLARE
+GOLDSMITH
+2
+CAMELLIA
+CODA
+COST
+CREEPER
+3
+NAIAD
+NEW
+NOUN
+4
+SCHOONER
+SIR
+SOURCE
+STUD
+5
+TIC
+TOTE
+TRACTION
+TRIED
+6
+BAN
+BEREFT
+BIB
+BROW
+BYRE
+7
+SADDEST
+SCARLET
+SLEEPIER
+SLEW
+SULTANA
+8
+RAY
+RIP
+ROW
+9
+FAX
+FLUX
+FRY
+FULLY
+10
+LABEL
+LAPWING
+LEAN
+LOT
+11
+EARN
+ELSE
+ERRATA
+EXULTANT
+12
+PEAR
+PERPLEX
+PIPE
+PLAY
+POET
+13
+MALE
+MANGANESE
+MAR
+MATURELY
+MISER
+14
+KAYAK
+KNEEL
+KNOLL
+
+Puzzle21_frame:
+' / / / / / / / /1/ / / / '
+' / / /2/ / / / / / / / / '
+' / / / / /3/ / / / / / / '
+' / / / /w/ / / / / / /4/ '
+' / / /e/ / / / / /5/ / / '
+' / /l/ / / / /6/ / / / / '
+' /7s/ / / / / / / / / / / '
+' / /u/ / / / / / / /8/ / '
+' / /9/l/ / / / / / / / /10'
+'11/ / / /t/ / / /12/ / / / '
+' / / / / /a/ / / / / / / '
+' / / / /13/ /n/ / / / / / '
+' / / / / / /14/a/ / / / / '
+
+Puzzle22:
+#485-106
+1
+BACON
+BARONET
+BENEFIT
+BERET
+BETA
+2
+PALM
+PREVIEW
+PUB
+3
+ABATTOIRS
+ACCLAIMED
+AIL
+AXE
+4
+ACER
+ALEE
+5
+OKRA
+ONE
+ONLY
+6
+DAIRY
+DEMURELY
+DRAIN
+DREAMT
+7
+PALLET
+PERSISTS
+PITIED
+POACH
+PRISONER
+8
+MANGO
+MELON
+MINI
+MIRACLE
+MORE
+MYSTERY
+9
+SAWMILL
+SCIENCE
+SCRABBLE
+SIEVED
+SUN
+10
+CALCITE
+CINDER
+CLOD
+11
+FAR
+FED
+FIELDER
+FIVE
+FLOUNCE
+FOE
+12
+SCENARIO
+SETTLER
+STRIKER
+13
+TALISMAN
+TEDDY
+TRIPTYCHS
+TRUSTY
+
+Puzzle22_frame:
+' /e/ / / / /1/ / / / / / '
+' /l/ /2/ / / / / / /3/ / '
+' /b/ / / / / / / / / / / '
+' /b/ / / / / /4/ / / / / '
+' /a/ / / /5/ / / / / / / '
+'6/r/ / / / / / / / / / /7'
+' /c/ / / / / / / /8/ / / '
+' /9s/a/w/m/i/l/l/ / / / / '
+' / / / / / / / / / / / / '
+' / / / / /10/ / / / / / / '
+' / / /11/ / / / / / / / / '
+' / / / / / / / / / / /12/ '
+' / / / /13/ / / / / / / / '
+
+Puzzle23:
+#485-140
+1
+COCKTAIL
+COFFEE
+COGNAC
+CORDIAL
+2
+PADRE
+PENCIL
+PRAISE
+PROOFS
+3
+SAVE
+SEC
+STEM
+4
+ADAPTABLE
+AIMLESSLY
+APACE
+5
+PEEL
+PLANK
+PRELUDE
+PRINTER
+6
+SCHOOL
+SEGMENT
+SEISMIC
+SHAMPOO
+7
+SEASIDE
+SEND
+SIRE
+SIZE
+SPEAR
+8
+CABBIE
+CEREAL
+CERISE
+CHARMER
+CIRCLE
+CIVIL
+CLUE
+CORTEX
+9
+ONION
+ORCHESTRA
+OTALGIA
+OXIDE
+OXONIAN
+10
+EAU
+ERST
+ETNA
+11
+WAX
+WIT
+WON
+12
+BAR
+BIT
+BUSY
+13
+MEASURE
+MELEE
+MICE
+MITRE
+MOSS
+
+Puzzle23_frame:
+' / / / / /1/ / / / / / / '
+' / / / / / / /2/ / / / / '
+' / / / / / / / / /3/ / / '
+' / / / /4a/d/a/p/t/a/b/l/e'
+' / / / / /i/ / / / / / /5'
+' / / / / / /m/ / / / / / '
+'6/ / / / / / /l/ /7/ / / '
+' / / / / / / /8/e/ / / / '
+' /9/ / / / / / / /s/ / / '
+' / / / / / / / /10/ /s/ / '
+' / / / / / / / / / / /l/ '
+' / /11/ / / / / / /12/ / /y'
+' / / / / / /13/ / / / / / '
