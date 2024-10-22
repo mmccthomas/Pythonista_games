@@ -190,7 +190,7 @@ class CrossWord():
       letter_pos = np.argwhere(np.char.isalpha(self.board))
       for pos in letter_pos:
           letter = self.board[tuple(pos)]
-          no = self.numbers[tuple(pos)]
+          no = self.number_board[tuple(pos)]
           # need to check if letter already in soln_dict
           if letter not in self.soln_dict.values():
               self.soln_dict[no] = letter
@@ -198,7 +198,7 @@ class CrossWord():
       # now fill the rest of board from soln_dict
       for r in range(len(self.board)):
           for c in range(len(self.board[0])):
-              no = self.numbers[(r,c)]
+              no = self.number_board[(r,c)]
               letter = self.soln_dict.get(no, None)
               if letter:
                   self.board[(r,c)] = letter
@@ -234,8 +234,9 @@ class CrossWord():
                  # arrive here when all existing hints exhausted                 
                  self.update_board_and_soln()
                  self.update_all_matches()
-                 print(index, self.populate_order, self.soln_dict)
-                 self.gui.print_board(self.board)
+                 if self.debug:
+                     print(index, self.populate_order, self.soln_dict)
+                     self.gui.print_board(self.board)
                  # now continue outer loop        
                  break
          
