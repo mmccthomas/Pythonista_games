@@ -2,5 +2,6 @@
 *.json
 Kye/*.json
 Word_Games/scanning/*.npy
+Word_Games/scanning/*.npz
 Word_Games/scanning/*.png
 Word_Games/scanning/*.jpg
