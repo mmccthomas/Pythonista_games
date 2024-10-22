@@ -168,6 +168,7 @@ class CrossNumbers(LetterGame):
   def update_board(self, hint=False, filter_placed=True, tile_color='yellow'):
     """ requires solution_dict from generate_word_number_pairs
                  solution_board from create_number_board 
+                 TODO needs to allow for incomplete dictionary
     """
     def key_from_value(dict_, val, pos=0):
       for k, v in dict_.items():
@@ -181,7 +182,8 @@ class CrossNumbers(LetterGame):
       for c, char_ in enumerate(row):
         if char_ != BLOCK:
           no = key_from_value(self.solution_dict, self.solution_board[r][c])
-          self.number_board[r][c] = no
+          if not self.filled_board:
+              self.number_board[r][c] = no
           # reveal known
           k = self.known_dict[no][0]
           if k != ' ':
@@ -194,7 +196,8 @@ class CrossNumbers(LetterGame):
           else:
             self.board[r][c] = ' '
             # number in top left corner
-            square_list.append(Squares((r,c), no, 'white' , z_position=30, alpha = .5,
+            if not self.filled_board:
+                square_list.append(Squares((r,c), no, 'white' , z_position=30, alpha = .5,
                                        font = ('Avenir Next', 15), text_anchor_point=(-1,1)))
                                        
     
@@ -309,33 +312,31 @@ class CrossNumbers(LetterGame):
     self.partition_word_list() 
     self.compute_intersections()
     if self.debug:
-        print(self.word_locations)        
+        print(self.word_locations)  
+              
     if self.filled_board:
         self.decode_filled_board()
     cx = CrossWord(self.gui, self.word_locations, self.all_words)
-    props = ['board', 'empty_board', 'all_word_dict', 'max_depth', 'debug']
-    cx.set_props(**transfer_props(props))
-    if self.filled_board:
-       props = ['soln_dict', 'numbers', 'copy_known']      
-       cx.set_props(**transfer_props(props))
+    cx.set_props(**transfer_props(['board', 'empty_board', 'all_word_dict', 
+                                   'max_depth', 'debug']))
+    if self.filled_board:  
+       cx.set_props(**transfer_props(['soln_dict', 'numbers', 'copy_known']))
        cx.number_words_solve(max_iterations=20, 
                              max_possibles=None)      
     else:       
         cx.populate_words_graph(max_iterations=200,
                                 length_first=False,
                                 max_possibles=100)  
-    self.copy_known()
     self.gui.update(self.board)
     # self.print_board()
     self.check_words()    
     self.create_number_board()
     self.generate_word_number_pairs()
     self.update_board()
-    if self.debug:
-      print(self.anagrams())
-      # [print(word, count) for word, count in self.word_counter.items() if count > 1]
+
     self.gui.set_message('')
     self.gui.set_enter('Hint')
+    
     while True:
       move = self.get_player_move(self.board)               
       finish = self.process_turn( move, self.number_board) 
