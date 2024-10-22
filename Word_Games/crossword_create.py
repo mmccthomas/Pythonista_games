@@ -7,6 +7,7 @@ from time import sleep, time
 import traceback
 import random
 import re
+import numpy as np
 import traceback
 from  collections import Counter
 import matplotlib.colors as mcolors
@@ -128,6 +129,7 @@ class CrossWord():
           # all match patterns except for full words
           patterned =  [word for word in self.word_locations if word.match_pattern and '.' in word.match_pattern]
           patterned_weights = [4 * match_size(match.match_pattern) for match in patterned]
+          
           # so pick a random choice of words with patterns, followed by all unplaced words, with
           # reference for longest word
           try:
@@ -173,7 +175,69 @@ class CrossWord():
                 return log_return(random.choice(self.word_locations))
              except(ValueError):
                 return None
- 
+                
+  def update_all_matches(self):
+      #need to update match for contained word
+      for word in self.word_locations:  
+          match = [self.board[coord] if self.board[coord].isalpha() else '.' 
+                   for coord in word.coords]
+          match = ''.join(match)
+          word.match_pattern = self.merge_matches(word.match_pattern, match) 
+              
+  def update_board_and_soln(self):
+      # update all occurences of letters on board in soln_dict
+      # if a letter is not in soln_dict, then add it in
+      letter_pos = np.argwhere(np.char.isalpha(self.board))
+      for pos in letter_pos:
+          letter = self.board[tuple(pos)]
+          no = self.numbers[tuple(pos)]
+          # need to check if letter already in soln_dict
+          if letter not in self.soln_dict.values():
+              self.soln_dict[no] = letter
+              
+      # now fill the rest of board from soln_dict
+      for r in range(len(self.board)):
+          for c in range(len(self.board[0])):
+              no = self.numbers[(r,c)]
+              letter = self.soln_dict.get(no, None)
+              if letter:
+                  self.board[(r,c)] = letter
+                                    
+  def number_words_solve(self, max_iterations=2000, max_possibles=None):
+      """ This is used to solve number words or cryptograms
+      Words are only fixed when they match completely
+      Every time a word is fixed, the solution dict is updated
+      and the board is updated with letters. Hence known is updated each time
+      """ 
+      index = 0 
+      self.populate_order = []
+      while any([not word.fixed for word in self.word_locations]):
+          index += 1
+          if index == max_iterations:
+            break
+          known = self.known() # populates word objects with match_pattern
+          self.hints = list(set([word for word in self.word_locations for k in known if word.intersects(k)]))         
+          while True: 
+            try:  # exits when used all hints                
+                word = self.hints.pop()   
+                length, possibles = self.get_possibles(word.match_pattern, max_possibles)
+                # simple solutions 
+                if word.fixed:
+                    continue
+                # only one word fits
+                elif  length == 1:
+                    # only word. use it                    
+                    self.fix_word(word, possibles.pop())                                        
+                    if self.debug:
+                        print('>>>>>>>>fix word', word)
+            except(ValueError, IndexError):  
+                 # arrive here when all existing hints exhausted                 
+                 self.update_board_and_soln()
+                 self.update_all_matches()
+                 print(index, self.populate_order, self.soln_dict)
+                 self.gui.print_board(self.board)
+                 # now continue outer loop        
+                 break
          
   def populate_words_graph(self, length_first=True, max_iterations=2000, max_possibles=None):
     # for all words attempt to fit in the grid, allowing for intersections
@@ -316,6 +380,7 @@ class CrossWord():
        for coord, child in word_obj.children.items(): 
          #print(child.match_pattern, type(child.match_pattern))
          child.update_grid('', self.board, child.match_pattern)
+       
          
   def merge_matches(self, a, b):
     ''' take two matches and combine them'''
@@ -624,3 +689,9 @@ class CrossWord():
             
     finally:       
         return options # unplaced option   
+
+
+
+
+
+

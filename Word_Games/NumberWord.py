@@ -2,7 +2,9 @@
 All the leters have been replaced by a random letter
 You have to guess the letter
 Chris Thomas May 2024
-
+# Modifications to allow predefined grid filled with numbers
+# in this case random crossword creation is not used and a solver is called instead
+Chris Thomas October 2024
 The games uses a 20k word dictionary
 """
 import os
@@ -16,7 +18,9 @@ import random
 import console
 import dialogs
 import re
+import numpy as np
 import traceback
+from itertools import groupby
 from time import sleep, time
 from queue import Queue
 from collections import defaultdict
@@ -27,7 +31,7 @@ from crossword_create import CrossWord
 from gui.gui_scene import Tile, BoxedLabel
 from ui import Image, Path, LINE_JOIN_ROUND, LINE_JOIN_MITER
 from scene import Texture, Point
-WordleList = [ 'wordlists/5000-more-common.txt', 'wordlists/words_20000.txt'] 
+WordleList = ['wordlists/5000-more-common.txt', 'wordlists/words_20000.txt'] #, 'wordlists/letters10.txt'] 
 BLOCK = '#'
 SPACE = ' '
 file = 'https://gist.githubusercontent.com/eyturner/3d56f6a194f411af9f29df4c9d4a4e6e/raw/63b6dbaf2719392cb2c55eb07a6b1d4e758cc16d/20k.txt'
@@ -50,7 +54,7 @@ def copy_board(board):
 class CrossNumbers(LetterGame):
   
   def __init__(self):
-    self.debug = False
+    self.debug = True
     # allows us to get a list of rc locations
     self.log_moves = True
     #self.word_locations = []
@@ -77,7 +81,7 @@ class CrossNumbers(LetterGame):
                               'Quit': self.quit})
     self.gui.set_start_menu({'New Game': self.restart, 'Quit': self.quit})
           
-    self.load_words(word_length=self.sizex)    
+    self.load_words(word_length=None) #self.sizex)    
     self.min_length = 2 # initial min word length
     self.max_length = 15 # initial  maximum word length
     self.max_depth = 1 # search depth for populate  
@@ -96,29 +100,43 @@ class CrossNumbers(LetterGame):
     """
     self.letters = [letter for letter in 'abcdefghijklmnopqrstuvwxyz']
     numbers = list(range(1,27))
-    shuffled = random.sample(self.letters, k=len(self.letters))
-    self.solution_dict = {number:[letter, True] for number, letter in zip(numbers, shuffled)}
-    self.solution_dict[' '] = [' ', False]
-    self.solution_dict['.'] = ['.', False]
-    choose_three = random.choices(numbers, k=3)
-    self.known_dict={number: [' ', False] for number in numbers}
-    for no in choose_three:
-      self.known_dict[no] =[self.solution_dict[no][0], True]
+    if not self.filled_board:
+        shuffled = random.sample(self.letters, k=len(self.letters))
+        self.solution_dict = {number:[letter, True] for number, letter in zip(numbers, shuffled)}
+        self.solution_dict[' '] = [' ', False]
+        self.solution_dict['.'] = ['.', False]
+        choose_three = random.choices(numbers, k=3)
+        self.known_dict={number: [' ', False] for number in numbers}
+        for no in choose_three:
+          self.known_dict[no] =[self.solution_dict[no][0], True]
+    else:
+        self.solution_dict = {number:[self.soln_dict.get(number, ' '), True] for number in numbers}
+        self.known_dict = {number: [' ', False] for number in numbers}
+        letter_pos = np.argwhere(np.char.isalpha(self.initial_board))
+        for loc in letter_pos:    
+            no =  self.numbers[tuple(loc)]  
+            letter = self.initial_board[loc[0]][loc[1]]
+            self.known_dict[no] = [letter, True]
     #self.known_dict[' '] = [' ', False]
     #self.known_dict['.'] = ['.', False]
     
   def create_number_board(self):
     """ redraws the board with numbered squares and blank tiles for unknowns
     and letters for known"""          
-    # start with empty board    
-    self.number_board = copy_board(self.empty_board)
+    # start with empty board
+    if self.filled_board:
+        self.number_board = copy_board(self.initial_board)    
+    else:
+        self.number_board = copy_board(self.empty_board)
     self.board = [[" " if _char == "." else _char for c, _char in enumerate(row)] for r, row in enumerate(self.board)]
     self.solution_board = copy_board(self.board)
-    self.board = copy_board(self.empty_board)
-    for r, row in enumerate(self.solution_board):
-      for c, _char in enumerate(row):
-        if _char == SPACE:
-          self.board_rc((r, c), self.board, BLOCK)
+    self.board = copy_board(self.number_board)
+    if not self.filled_board:
+        # fill any empty spaces
+        for r, row in enumerate(self.solution_board):
+          for c, _char in enumerate(row):
+            if _char == SPACE:
+              self.board_rc((r, c), self.board, BLOCK)
     #self.update_board()
     
   def display_numberpairs(self, tiles, off=0, max_items=13):
@@ -218,30 +236,96 @@ class CrossNumbers(LetterGame):
         self.display_numberpairs(list_of_known_letters, off=1, max_items=self.max_items)
     else:
         self.gui.set_moves(msg, font=('Avenir Next', 23))
-    
-       
+        
+  def decode_and_display_filled_board(self):
+    """ take a number filled board, display"""
+    def split_text(s):
+         for k, g in groupby(s, str.isalpha):
+             yield ''.join(g)
+             
+    self.board = np.array(self.board)
+    self.board[self.board=='-'] = ' '
+    # deal with number/alpha combo
+    number_letters = np.array([(r,c) for c in range(self.sizex) 
+                               for r in range(self.sizey) 
+                               if len(list(split_text(self.board[r][c])))>1])
+    numbers = np.argwhere(np.char.isnumeric(self.board))
+    #self.start_dict = {}
+    self.numbers = np.zeros(self.board.shape, dtype=int)
+    square_list = []
+    for number in np.append(numbers, number_letters, axis=0):
+      try:
+         no, letter = list(split_text(self.board[tuple(number)]))
+         self.board[tuple(number)] = letter      
+      except (ValueError) as e:
+         no = self.board[tuple(number)]
+      self.numbers[tuple(number)] = int(no)
+      #self.start_dict[tuple(number)] = no
+      square_list.append(Squares(number, no, 'white', z_position=30,
+                                        alpha=0.5, font=('Avenir Next', 18),
+                                        text_anchor_point=(-1.0, 1.0)))
+                        
+    self.gui.add_numbers(square_list)
+    self.board[np.char.isnumeric(self.board)] = ' '                                                            
+    self.gui.update(self.board)   
+    return self.board, self.numbers
+        
+  def copy_known(self):
+    # now fill the rest of board with these
+    for r in range(len(self.board)):
+      for c in range(len(self.board[0])):
+        no = self.numbers[(r,c)]
+        letter = self.soln_dict.get(no, None)
+        if letter:
+          self.board[(r,c)] = letter
+          
+  def decode_filled_board(self):
+    """ take a number filled board, display and attempt to solve """
+    self.decode_and_display_filled_board()
+    self.initial_board = copy_board(self.board)
+    self.soln_dict ={} 
+    # get starting known values
+    letter_pos = np.argwhere(np.char.isalpha(self.board))
+    for pos in letter_pos:
+       letter = self.board[tuple(pos)]
+       no = self.numbers[tuple(pos)]
+       self.soln_dict[no] = letter
+           
+    self.copy_known()
+    self.empty_board = copy_board(self.board)
+    self.gui.update(self.board)
+    return    
   
   def run(self):
     #LetterGame.run(self)
     """
     Main method that prompts the user for input
     """
-    cx = CrossWord(self.gui, self.word_locations, self.all_words)
-    self.gui.clear_messages()
-    
+    def transfer_props(props):
+       return  {k: getattr(self, k) for k in props}
+       
+    self.gui.clear_messages()    
     self.print_square(None) 
     self.partition_word_list() 
     self.compute_intersections()
     if self.debug:
-        print(self.word_locations)
-    cx.set_props(board=self.board,
-                 empty_board=self.empty_board, 
-                 all_word_dict=self.all_word_dict, 
-                 max_depth=self.max_depth,
-                 debug=self.debug)
-    cx.populate_words_graph(max_iterations=200,
-                            length_first=False,
-                            max_possibles=100)  
+        print(self.word_locations)        
+    if self.filled_board:
+        self.decode_filled_board()
+    cx = CrossWord(self.gui, self.word_locations, self.all_words)
+    props = ['board', 'empty_board', 'all_word_dict', 'max_depth', 'debug']
+    cx.set_props(**transfer_props(props))
+    if self.filled_board:
+       props = ['soln_dict', 'numbers', 'copy_known']      
+       cx.set_props(**transfer_props(props))
+       cx.number_words_solve(max_iterations=20, 
+                             max_possibles=None)      
+    else:       
+        cx.populate_words_graph(max_iterations=200,
+                                length_first=False,
+                                max_possibles=100)  
+    self.copy_known()
+    self.gui.update(self.board)
     # self.print_board()
     self.check_words()    
     self.create_number_board()
@@ -249,7 +333,7 @@ class CrossNumbers(LetterGame):
     self.update_board()
     if self.debug:
       print(self.anagrams())
-      [print(word, count) for word, count in self.word_counter.items() if count > 1]
+      # [print(word, count) for word, count in self.word_counter.items() if count > 1]
     self.gui.set_message('')
     self.gui.set_enter('Hint')
     while True:
@@ -283,6 +367,7 @@ class CrossNumbers(LetterGame):
     LetterGame.load_words(self, word_length, file_list=file_list)
     
   def initialise_board(self):
+    # detects if board has digits, indicating a prefilled board
     boards = {}
     if self.word_dict:
       # get words and puzzle frame from dict
@@ -296,11 +381,14 @@ class CrossNumbers(LetterGame):
   
     #if not hasattr(self, 'puzzle'):        
     self.puzzle = random.choice(list(boards))
-    #self.puzzle = 'Puzzle'
+    self.puzzle = 'Frame8'
     self.board = boards[self.puzzle]
     self.word_locations = []
-    self.length_matrix()                  
-    self.empty_board = copy_board(self.board)
+    self.length_matrix()      
+    print('frame lengths', [len(y) for y in self.board])
+    self.filled_board = np.any(np.char.isdigit(np.array(self.board, dtype='U3')))  
+    #self.empty_board = copy_board(self.board)
+    self.table = copy_board(self.board)
     print(len(self.word_locations), 'words', self.min_length, self.max_length) 
     
   def print_square(self, process, color=None):
@@ -421,5 +509,12 @@ if __name__ == '__main__':
     if quit:
       break
   
+
+
+
+
+
+
+
 
 
