@@ -215,7 +215,7 @@ class CrossWord():
           index += 1
           if index == max_iterations:
             break
-          known = self.known() # populates word objects with match_pattern
+          known = self.known(self.board) # populates word objects with match_pattern
           self.hints = list(set([word for word in self.word_locations for k in known if word.intersects(k)]))         
           while True: 
             try:  # exits when used all hints                
@@ -310,12 +310,14 @@ class CrossWord():
       # print(f'could find {match} for req_letters')
       return match, None 
       
-  def known(self):
+  def known(self, board=None):
     """ Find all known words and letters """
+    if board is None:
+    	board = self.empty_board
     known = []
     # get characters from empty board
     #written this wa to allow single step during debugging
-    [known.append((r,c)) if self.get_board_rc((r,c), self.empty_board) != SPACE and self.get_board_rc((r,c), self.empty_board) != BLOCK  else None for r, rows in enumerate(self.empty_board) for c, char_ in enumerate(rows) ]
+    [known.append((r,c)) if self.get_board_rc((r,c), board) != SPACE and self.get_board_rc((r,c), board) != BLOCK  else None for r, rows in enumerate(board) for c, char_ in enumerate(rows) ]
     #board = np.array(self.empty_board)
     #known = np.where(board!=BLOCK || board!#==SPACE)
     # now fill known items into word(s)
@@ -324,7 +326,7 @@ class CrossWord():
         for k in known:
           if word.intersects(k) : # found one
             if all([wc in known for wc in word.coords]): # full word known
-              word.set_word(''.join([self.get_board_rc(pos, self.empty_board) for pos in word.coords]))
+              word.set_word(''.join([self.get_board_rc(pos, board) for pos in word.coords]))
               if self.debug:
                   print(f'>>>>>>>>>Set word from known {word}')
               word.match_pattern = word.word
@@ -335,7 +337,7 @@ class CrossWord():
       for coord in known:
         for word in self.word_locations:
           if word.intersects(coord) : # found one
-            letter = self.get_board_rc(coord, self.empty_board)
+            letter = self.get_board_rc(coord, self.board)
             match = ''.join([letter if coord == c else '.' for c in word.coords])
             if word.match_pattern:
               word.match_pattern = self.merge_matches(word.match_pattern, match)
