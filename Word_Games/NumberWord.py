@@ -31,7 +31,7 @@ from crossword_create import CrossWord
 from gui.gui_scene import Tile, BoxedLabel
 from ui import Image, Path, LINE_JOIN_ROUND, LINE_JOIN_MITER
 from scene import Texture, Point
-WordleList = ['wordlists/5000-more-common.txt', 'wordlists/words_20000.txt'] #, 'wordlists/letters10.txt'] 
+WordleList = ['wordlists/letters10.txt'] #'wordlists/5000-more-common.txt', 'wordlists/words_20000.txt'] #, 'wordlists/letters10.txt'] 
 BLOCK = '#'
 SPACE = ' '
 file = 'https://gist.githubusercontent.com/eyturner/3d56f6a194f411af9f29df4c9d4a4e6e/raw/63b6dbaf2719392cb2c55eb07a6b1d4e758cc16d/20k.txt'
@@ -54,7 +54,7 @@ def copy_board(board):
 class CrossNumbers(LetterGame):
   
   def __init__(self):
-    self.debug = True
+    self.debug = False
     # allows us to get a list of rc locations
     self.log_moves = True
     #self.word_locations = []
@@ -328,6 +328,7 @@ class CrossNumbers(LetterGame):
        return  {k: getattr(self, k) for k in props}
        
     self.gui.clear_messages()    
+    self.gui.set_top(f'{self.puzzle}')
     self.print_square(None) 
     self.partition_word_list() 
     self.compute_intersections()
@@ -343,7 +344,7 @@ class CrossNumbers(LetterGame):
     if self.filled_board:  
        cx.set_props(**transfer_props(['soln_dict', 'number_board', 'copy_known']))
        
-       cx.number_words_solve(max_iterations=20, 
+       cx.number_words_solve(max_iterations=30, 
                              max_possibles=None)      
     else:       
         cx.populate_words_graph(max_iterations=200,
@@ -351,14 +352,12 @@ class CrossNumbers(LetterGame):
                                 max_possibles=100)  
     self.gui.update(self.board)
     # self.print_board()
-    self.check_words()    
     self.generate_word_number_pairs()
     self.create_number_board()    
     self.update_board()
 
     self.gui.set_message('')
     self.gui.set_enter('Hint')
-    
     while True:
       move = self.get_player_move(self.board)               
       finish = self.process_turn( move, self.number_board) 
@@ -374,6 +373,7 @@ class CrossNumbers(LetterGame):
     self.gui.set_prompt('')
     sleep(4)
     self.finished = True
+    self.check_words()
     self.gui.show_start_menu()
       
   def game_over(self):
@@ -403,12 +403,19 @@ class CrossNumbers(LetterGame):
          boards[name]  = board
   
     #if not hasattr(self, 'puzzle'):        
-    self.puzzle = random.choice(list(boards))
-    self.puzzle = 'Frame11'
+    #self.puzzle = random.choice(list(boards))
+    # self.puzzle = 'Frame7'
+    self.puzzle = self.select_list(boards)
+    if not self.puzzle:
+    	  self.puzzle = random.choice(list(boards))
     self.board = boards[self.puzzle]
+    
     self.word_locations = []
-    self.length_matrix()      
-    print('frame lengths', [len(y) for y in self.board])
+    self.length_matrix() 
+    print(len(self.board), len(self.board[0]))
+    for word in self.word_locations:
+      print(word.coords)     
+    print('frame ', [len(y) for y in self.board])
     self.filled_board = np.any(np.char.isdigit(np.array(self.board, dtype='U3')))  
     self.board = np.array(self.board)
     self.empty_board = self.board.copy()

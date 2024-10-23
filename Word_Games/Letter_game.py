@@ -21,6 +21,7 @@ from itertools import groupby, zip_longest
 from queue import Queue
 import console
 import sound
+import dialogs
 #from tiles import pil2ui, slice_image_into_tiles
 import matplotlib.colors as mcolors
 import numpy as np
@@ -377,7 +378,24 @@ class LetterGame():
     sleep(4)
     self.finished = True
     self.gui.gs.show_start_menu()
-    
+  
+  def select_list(self, word_lists):
+      '''Choose which category'''
+      items = [s.capitalize() for s in word_lists.keys()]
+      items = [item for item in items
+               if not  item.endswith('_frame')]
+      # return selection
+      selection = ''
+      prompt = ' Select puzzle'
+      selection = dialogs.list_dialog(prompt, items)
+      
+      if selection == 'cancelled_':
+        	return None 
+      if len(selection):
+          if self.debug:   
+            print(f'{selection=}')
+          return selection
+            
   def initialise_board(self):
     """ requires sizex, sizey fron get_size
                  letter_weights from load_words
