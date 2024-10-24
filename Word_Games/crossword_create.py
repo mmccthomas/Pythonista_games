@@ -207,47 +207,7 @@ class CrossWord():
               letter = self.soln_dict.get(no, None)
               if letter:
                   self.board[(r,c)] = letter
-                  
-  def number_words_solve2(self, length_first=True, max_iterations=2000, max_possibles=None):
-    # for all words attempt to fit in the grid, allowing for intersections
-    # some spaces may be known on empty board
-    self.start_time = time()
-    index = 0 
-    self.populate_order = []
-    while any([not word.fixed for word in self.word_locations]):
-        if index == max_iterations:
-              break
-        fixed =  [word for word in self.word_locations if word.fixed]
-        if self.debug:
-            self.gui.set_message(f' placed {len(fixed)} {index} iterations')
-        #word = self.get_next_cross_word(index, max_possibles,length_first)   
-        known = self.known(self.board) # populates word objects with match_pattern
-        self.hints = list(set([word for word in self.word_locations for k in known if word.intersects(k)]))  
-        while True: 
-          try:
-            word = self.hints.pop()               
-            options = self.look_ahead_3(word, max_possibles=max_possibles) # child, coord)   
-            if options is None:
-              break                   
-            index += 1
-          except (ValueError, IndexError):
-             self.copy_known(self.board)  
-             break
-             
-    fixed = [word for word in self.word_locations if word.fixed]   
-    
-    #self.update_board(filter_placed=False)
-    if self.debug:
-        self.gui.print_board(self.board)
-        print('Population order ', self.populate_order)
-    ptime = self.delta_t('time', do_print=False)
-    msg = f'Filled {len(fixed)}/ {len(self.word_locations)} words in {index} iterations, {ptime}secs'
-    words=len([w for w in self.word_locations if w.word])
-    print('no words', words)
-    # print(msg)   
-    self.gui.set_prompt(msg)
-    self.gui.update(self.board)
-                                     
+                                                       
   def number_words_solve(self, max_iterations=2000, max_possibles=None):
       """ This is used to solve number words or cryptograms
       Words are only fixed when they match completely
@@ -258,12 +218,15 @@ class CrossWord():
       self.populate_order = []
       while any([not word.fixed for word in self.word_locations]):
           index += 1
+          if self.debug:
+              print('Next Iteration >>>>>>>')
           if index == max_iterations:
             break
           known = self.known(self.board) # populates word objects with match_pattern
           self.hints = list(set([word for word in self.word_locations for k in known if word.intersects(k)])) 
-          print('no hints', len(self.hints))
+          
           if self.debug:
+            print('number hints', len(self.hints))
             try:
               #self.gui.gs.highlight_squares(word.coords)            
               self.gui.update(self.board)
@@ -274,15 +237,33 @@ class CrossWord():
             try:  # exits when used all hints                
                 word = self.hints.pop()   
                 length, possibles = self.get_possibles(word.match_pattern, max_possibles)
-                # simple solutions 
-                if word.fixed:
-                    continue
-                # only one word fits
-                elif  length == 1:
-                    # only word. use it                    
-                    self.fix_word(word, possibles.pop())                                        
-                    #if self.debug:
-                    print('>>>>>>>####>fix word', word)
+                if length:
+                  if self.debug: 
+                     print(f'{word=}, {word.match_pattern=}, {length=}')
+                  # simple solutions 
+                  if word.fixed:   
+                      continue
+                  if length < 10:
+                    for possible in possibles[::-1]:
+                      #test if all letters in soln dict
+                      # if so, drop this possibility
+                      res = set(possible).difference(set(self.soln_dict.values()))
+                      if not res:
+                        possibles.remove(possible)
+                        length -= 1
+                  if self.debug: 
+                    if length > 5:
+                         print(possibles[:5])
+                    else:
+                         print(possibles)                
+                  # only one word fits
+                  if  length == 1:
+                      # only word. use it      
+                      self.fix_word(word, possibles.pop()) 
+                      if self.debug:    
+                        print('>>>>>>>>fix word', word)                                           
+                      
+                    
             except(ValueError, IndexError):  
                  # arrive here when all existing hints exhausted                 
                  self.update_board_and_soln()
@@ -293,6 +274,8 @@ class CrossWord():
                  # now continue outer loop        
                  break
       print(self.populate_order)
+      print()
+      print()
          
   def populate_words_graph(self, length_first=True, max_iterations=2000, max_possibles=None):
     # for all words attempt to fit in the grid, allowing for intersections
@@ -371,7 +354,7 @@ class CrossWord():
     known = []
     # get characters from empty board
     #written this wa to allow single step during debugging
-    [known.append((r,c)) if self.get_board_rc((r,c), board) != SPACE and self.get_board_rc((r,c), board) != BLOCK  else None for r, rows in enumerate(board) for c, char_ in enumerate(rows) ]
+    [known.append((r,c)) if self.get_board_rc((r,c), board) != SPACE and self.get_board_rc((r,c), board) != BLOCK  and self.get_board_rc((r,c), board) !=  '.' else None for r, rows in enumerate(board) for c, char_ in enumerate(rows) ]
     #board = np.array(self.empty_board)
     #known = np.where(board!=BLOCK || board!#==SPACE)
     # now fill known items into word(s)
@@ -419,6 +402,7 @@ class CrossWord():
             # print(f'could find {match_pattern} for req_letters')
             return None, match_pattern
     except(KeyError):
+      
          print(match_pattern)
          print(traceback.format_exc())
          return None, match_pattern
@@ -746,6 +730,10 @@ class CrossWord():
             
     finally:       
         return options # unplaced option   
+
+
+
+
 
 
 

@@ -14,6 +14,9 @@ parent = os.path.dirname(current)
 sys.path.append(parent)
 grandparent = os.path.dirname(parent)
 sys.path.append(grandparent)
+import cv_codeword_solver_main.solver_tools as solver_tools
+#import cv_codeword_solver_main.call_solve
+from cv_codeword_solver_main.solver_tools import CodewordSolverDFS, WordDictionary
 import random
 import console
 import dialogs
@@ -31,7 +34,7 @@ from crossword_create import CrossWord
 from gui.gui_scene import Tile, BoxedLabel
 from ui import Image, Path, LINE_JOIN_ROUND, LINE_JOIN_MITER
 from scene import Texture, Point
-WordleList = ['wordlists/letters10.txt'] #'wordlists/5000-more-common.txt', 'wordlists/words_20000.txt'] #, 'wordlists/letters10.txt'] 
+WordleList = ['wordlists/words_alpha.txt'] # wordlists/letters10.txt'] #'wordlists/5000-more-common.txt', 'wordlists/words_20000.txt'] #, 'wordlists/letters10.txt'] 
 BLOCK = '#'
 SPACE = ' '
 file = 'https://gist.githubusercontent.com/eyturner/3d56f6a194f411af9f29df4c9d4a4e6e/raw/63b6dbaf2719392cb2c55eb07a6b1d4e758cc16d/20k.txt'
@@ -50,7 +53,7 @@ def  get_board_rc(rc, board):
 def copy_board(board):
   return list(map(list, board))
   
-
+	
 class CrossNumbers(LetterGame):
   
   def __init__(self):
@@ -269,7 +272,6 @@ class CrossNumbers(LetterGame):
                                for r in range(self.sizey) 
                                if len(list(split_text(self.board[r][c])))>1])
     numbers = np.argwhere(np.char.isnumeric(self.board))
-    #self.start_dict = {}
     self.number_board = np.zeros(self.board.shape, dtype=int)
     square_list = []
     if number_letters.size > 0:
@@ -281,17 +283,13 @@ class CrossNumbers(LetterGame):
       except (ValueError) as e:
          no = self.board[tuple(number)]
       self.number_board[tuple(number)] = int(no)
-      #self.start_dict[tuple(number)] = no
-      #square_list.append(Squares(number, no, 'white', z_position=30,
-      #                                  alpha=0.5, font=('Avenir Next', 18),
-      #                                  text_anchor_point=(-1.0, 1.0)))
-                        
-    # self.gui.add_numbers(square_list)
+                    
     self.board[np.char.isnumeric(self.board)] = ' '                                                            
     self.gui.update(self.board)   
     return self.board, self.number_board
         
   def copy_known(self, board=None):
+  	""" fill other copies of known letter """
     if board is None:
       board = self.board
     # now fill the rest of board with these
@@ -303,7 +301,7 @@ class CrossNumbers(LetterGame):
           board[(r,c)] = letter
           
   def decode_filled_board(self):
-    """ take a number filled board, display and attempt to solve """
+    """ take a number filled board, and display it"""
     self.decode_and_display_filled_board()
     self.empty_board = self.board.copy()
     self.soln_dict ={} 
@@ -315,12 +313,56 @@ class CrossNumbers(LetterGame):
        self.soln_dict[no] = letter
            
     self.copy_known()
-    #self.empty_board = copy_board(self.board)
     self.gui.update(self.board)
-    return    
-  
+    return
+    
+  def create_solve_dict(self):
+    """ create dict for solver
+    format is {name: {'given_letters': {4: 's', 20: 'r', 23: 'i'},
+                'encoded_words': [list of numbers for each word]}
+    """ 
+    numbers = [[self.number_board[coord] for coord in word.coords] 
+               for word in self.word_locations]
+    given_letters = self.soln_dict.copy()
+    #puzzle = {self.puzzle: {'given_letters': given_letters, 'encoded_words': numbers}}
+    code_dict = {i:"." for i in range(1, 27)}
+    code_dict.update(given_letters)
+            
+    # Load the list of words and construct the trie
+    print("Building trie word dictionary...\n")    
+    word_trie = WordDictionary()        
+    [word_trie.add_word(word) for word in self.all_words ]
+            
+    return code_dict, numbers, word_trie
+    
+  def solve(self):
+      # solver from  https://github.com/rg1990/cv-codeword-solver
+      def check_results(word_trie, decoded_words):
+          # Check if the solver failed and notify the user
+          result = True
+          if np.any(["." in word for word in decoded_words]):
+              print("Solving failed! Incomplete words remain in decoded_words. Check puzzle details are correct.")    
+              result = False      
+          # Catch the case where the words don't have wildcards, but are nonsense words
+          if not np.all([word_trie.search(word) for word in decoded_words]):
+              print(f"One or more decoded words are not valid:\n{decoded_words}")
+              #raise RuntimeError(f"One or more decoded words are not valid:\n{decoded_words}")
+              result = False
+          return result
+      code_dict, all_encoded_words, word_trie = self.create_solve_dict()
+      solver = CodewordSolverDFS(all_encoded_words, code_dict, word_trie, use_heuristics=True)
+      solver.solve()
+      decoded_words = solver.decode_words_in_list(all_encoded_words)
+      result = check_results(word_trie, decoded_words)
+      print(f"Decoded words:\n{decoded_words}")
+      solver.print_decoded_letters()
+      self.solution_dict = solver.code_dict.copy()
+      nonzero = np.argwhere(self.number_board > 0)
+      [board_rc(loc, self.board, self.solution_dict[self.number_board[tuple(loc)]]) 
+       for loc in nonzero]                
+      return result 
+      
   def run(self):
-    #LetterGame.run(self)
     """
     Main method that prompts the user for input
     """
@@ -337,15 +379,18 @@ class CrossNumbers(LetterGame):
               
     if self.filled_board:
         self.decode_filled_board()
+        
     #self.copy_board(self.empty_board)
     cx = CrossWord(self.gui, self.word_locations, self.all_words)
     cx.set_props(**transfer_props(['board', 'empty_board', 'all_word_dict', 
                                    'max_depth', 'debug']))
     if self.filled_board:  
-       cx.set_props(**transfer_props(['soln_dict', 'number_board', 'copy_known']))
-       
-       cx.number_words_solve(max_iterations=30, 
-                             max_possibles=None)      
+       success = self.solve()
+       self.gui.set_message2(f'Successful decode {success}')
+       if not success:
+         cx.set_props(**transfer_props(['soln_dict', 'number_board', 'copy_known']))
+         cx.number_words_solve(max_iterations=30, 
+                            max_possibles=None)      
     else:       
         cx.populate_words_graph(max_iterations=200,
                                 length_first=False,
@@ -358,6 +403,7 @@ class CrossNumbers(LetterGame):
 
     self.gui.set_message('')
     self.gui.set_enter('Hint')
+    
     while True:
       move = self.get_player_move(self.board)               
       finish = self.process_turn( move, self.number_board) 
@@ -378,13 +424,8 @@ class CrossNumbers(LetterGame):
       
   def game_over(self):
     """ check for finished game   
-    no more empty letters left in board"""
-    test = []
-    for r, row in enumerate(self.number_board):
-      for c, no in enumerate(row):
-        if no > 0:
-          test.append(self.board[(r,c)].isalpha())
-    return all(test)
+    all letters match solution or more empty letters left in board"""
+    return np.all(self.solution_board == self.board) or np.all(np.char.isalpha(self.board) & self.number_board > 0)
            
   def load_words(self, word_length, file_list=WordleList):
     LetterGame.load_words(self, word_length, file_list=file_list)
@@ -407,14 +448,14 @@ class CrossNumbers(LetterGame):
     # self.puzzle = 'Frame7'
     self.puzzle = self.select_list(boards)
     if not self.puzzle:
-    	  self.puzzle = random.choice(list(boards))
+        self.puzzle = random.choice(list(boards))
     self.board = boards[self.puzzle]
     
     self.word_locations = []
     self.length_matrix() 
     print(len(self.board), len(self.board[0]))
-    for word in self.word_locations:
-      print(word.coords)     
+    
+    # [print(word.coords) for word in self.word_locations]
     print('frame ', [len(y) for y in self.board])
     self.filled_board = np.any(np.char.isdigit(np.array(self.board, dtype='U3')))  
     self.board = np.array(self.board)
@@ -533,9 +574,13 @@ class CrossNumbers(LetterGame):
   def restart(self):
     self.gui.gs.close()
     self.finished = False
-    self.__init__()
-    self.run() 
-
+    g = CrossNumbers()
+    g.run() 
+    while(True):
+        quit = g.wait()
+        if quit:
+          break
+      
 if __name__ == '__main__':
   g = CrossNumbers()
   g.run()
@@ -545,6 +590,12 @@ if __name__ == '__main__':
     if quit:
       break
   
+
+
+
+
+
+
 
 
 
