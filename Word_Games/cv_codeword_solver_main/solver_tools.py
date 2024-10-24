@@ -2,7 +2,7 @@
 import time
 import string
 import numpy as np
-
+import re
 
 class TrieNode:
     def __init__(self):
@@ -40,7 +40,7 @@ class WordDictionary:
 
 class CodewordSolverDFS():
     
-    def __init__(self, encoded_words, code_dict, word_trie, use_heuristics=True):
+    def __init__(self, encoded_words, code_dict, word_trie, all_word_dict, use_heuristics=True):
         """
         Args:
             encoded_words (list[list[int]]): List with one sub-list per encoded word.
@@ -58,6 +58,7 @@ class CodewordSolverDFS():
         self.encoded_words = encoded_words
         self.code_dict = code_dict
         self._word_trie = word_trie
+        self.all_word_dict = all_word_dict
         
         # Create a list of letters sorted by most frequently occurring
         self._letter_frequency = [str(char) for char in "etaonihsrlducmwyfgpbvkjxqz"]
@@ -212,7 +213,25 @@ class CodewordSolverDFS():
         '''
         return all([self._word_trie.search(search_string) for search_string in word_list])
         
+    def all_words_are_valid2(self, word_list):
+        '''
+        For each word in word_list, including words containing wildcard characters ("."),
+        search the trie to find a match. Unless there is a match for every word in
+        word_list, return False.
         
+        Args:
+            word_list (list): List of decoded words, possibly containing
+                wildcard characters.
+                
+        Returns:
+            bool: True if there exists a match in the trie for every word in
+                word_list, else False.
+        '''       
+        possible = [len([word for word in self.all_word_dict[len(search_string)] if re.compile(search_string).search(word)])> 0
+                    for search_string in word_list]
+        return  all(possible)  
+        
+            
     def print_decoded_letters(self):
         '''
         Print the letters assigned to the numbers in self.code_dict, displaying

@@ -190,21 +190,21 @@ class CrossWord():
           print(self.board.shape)
               
   def update_board_and_soln(self):
-      # update all occurences of letters on board in soln_dict
-      # if a letter is not in soln_dict, then add it in
+      # update all occurences of letters on board in solution_dict
+      # if a letter is not in solution_dict, then add it in
       letter_pos = np.argwhere(np.char.isalpha(self.board))
       for pos in letter_pos:
           letter = self.board[tuple(pos)]
           no = self.number_board[tuple(pos)]
-          # need to check if letter already in soln_dict
-          if letter not in self.soln_dict.values():
-              self.soln_dict[no] = letter
+          # need to check if letter already in solution_dict
+          if letter not in self.solution_dict.values():
+              self.solution_dict[no] = letter
               
-      # now fill the rest of board from soln_dict
+      # now fill the rest of board from solution_dict
       for r in range(len(self.board)):
           for c in range(len(self.board[0])):
               no = self.number_board[(r,c)]
-              letter = self.soln_dict.get(no, None)
+              letter = self.solution_dict.get(no, None)
               if letter:
                   self.board[(r,c)] = letter
                                                        
@@ -245,9 +245,9 @@ class CrossWord():
                       continue
                   if length < 10:
                     for possible in possibles[::-1]:
-                      #test if all letters in soln dict
+                      #test if all letters in solution dict
                       # if so, drop this possibility
-                      res = set(possible).difference(set(self.soln_dict.values()))
+                      res = set(possible).difference(set(self.solution_dict.values()))
                       if not res:
                         possibles.remove(possible)
                         length -= 1
@@ -269,13 +269,12 @@ class CrossWord():
                  self.update_board_and_soln()
                  self.update_all_matches()
                  if self.debug:
-                     print(index, self.populate_order, self.soln_dict)
+                     print(index, self.populate_order, self.solution_dict)
                      self.gui.print_board(self.board)
                  # now continue outer loop        
                  break
-      print(self.populate_order)
-      print()
-      print()
+      if self.debug:
+        print(self.populate_order)
          
   def populate_words_graph(self, length_first=True, max_iterations=2000, max_possibles=None):
     # for all words attempt to fit in the grid, allowing for intersections
