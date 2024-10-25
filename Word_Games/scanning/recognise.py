@@ -381,18 +381,19 @@ class Recognise():
             
     def convert_to_rc(self, df):
        '''add r, c columns to  a dataframe with x y values
+          TODO this is not working well. we must establish Nx and Ny
        '''
        def process(column, span='w'):
            """sort the axis, perform a diff to get major steps
            the find the position of peaks to use as array for digitise
            """           
            values = np.round(np.array(df[column]), 3)
-           mean_span = np.mean(np.array(df[span]))        
+           #mean_span = np.mean(np.array(df[span]))        
            
            sorted = np.sort(values)
            diff_ = np.diff(sorted)           
            # array value of peaks
-           sorted_d = sorted[np.argwhere(diff_>mean_span/2)[:,0]]
+           sorted_d = sorted[np.argwhere(diff_>max(diff_/2))[:,0]]
            sorted_d = np.append(sorted_d, sorted[-1])
            delta = np.mean(np.diff(sorted_d))          
            N = len(sorted_d)   

@@ -364,6 +364,12 @@ class Gui():
     b.set_props(**kwargs)  
     b.set_text(msg)      
     
+  def get_text(self, button_str):
+    # get  existing text  from BoxedLabel object
+    b = getattr(self.gs, button_str) 
+    msg = b.get_text()
+    return msg      
+    
   def add_button(self, text='button', title='title', position=(100,100), min_size=(100, 50), reg_touch=False, **kwargs):
      # create a gui button that can invoke action if reg_touch is true
      box = BoxedLabel(text=text, title=title, position=position, min_size=min_size, parent=self.gs.game_field)

@@ -330,124 +330,161 @@ class OcrCrossword(LetterGame):
           return rc, self.get_board_rc(rc, self.board), rc_start
                              
       return (None, None), None, None
-       
+    
+    def change_letters(self, coord, origin):
+        # letters mode
+        try:
+            letter = dialogs.input_alert('Enter 1 or more letters')  
+        except (KeyboardInterrupt):
+            return
+        if letter:     
+            if self.index_mode and letter.isnumeric():
+                self.indexes[origin] = int(letter)
+                if letter == '0':
+                     self.gui.clear_numbers(origin)                                          
+                else:
+                     self.gui.replace_numbers([Squares(origin, str(letter), 'yellow', z_position=30,
+                                                        alpha=0.5, font=('Avenir Next', 18),
+                                                        text_anchor_point=(-1.0, 1.0))])
+            else:             
+              for index, l in enumerate(letter):            
+                  #.       down.                                 across                         
+                  delta = (index, 0) if self.direction_mode else (0, index)            
+                  self.board_rc(origin + delta, self.board, l.lower())
+                
+                            
     def process_turn(self, move, board):
       """ process the turn
       move is coord, new letter, selection_row
       """
+      def check_clipboard():
+          data = clipboard.get()
+          if data == '':
+              print('clipboard fail')
+          else:
+              print('clipboard', data)
+        
       if move:
         coord, letter, origin = move
-            
-        if letter == 'Quit':
-          self.gui.gs.close()
-          #sys.exit() 
-          return 0
+        match letter:
+          case 'Quit':
+              self.gui.gs.close()
+              #sys.exit() 
+              return 0
           
-        elif letter == 'Clear':
-           self.board = np.full((self.sizey, self.sizex), ' ')
-           self.create_grid(self.board)
-           self.gui.update(self.board)
+          case 'Clear':
+             self.board = np.full((self.sizey, self.sizex), ' ')
+             self.create_grid(self.board)
+             self.gui.update(self.board)
            
-        elif letter == 'Copy Text':
-           clipboard.set('Puzzle:\n' + '\n'.join(self.words))
-           self.gui.set_message('Data copied')   
+          case 'Copy Text':
+               clipboard.set('Puzzle:\n' + '\n'.join(self.words))
+               check_clipboard()
+               self.gui.set_message('Data copied')   
         
-        elif letter == 'Fill bottom':
-          self.board[np.fliplr(np.flipud(self.board.copy()))=='#'] = '#'
-          self.gui.update(self.board)
-          self.create_grid(self.board)
+          case 'Fill bottom':
+              self.board[np.fliplr(np.flipud(self.board.copy()))=='#'] = '#'
+              self.gui.update(self.board)
+              self.create_grid(self.board)
         
-        elif letter == 'Fill right':
-           self.board[np.fliplr(self.board.copy())=='#'] = '#'     
-           self.gui.update(self.board)
-           self.create_grid(self.board)
+          case 'Fill right':
+             self.board[np.fliplr(self.board.copy())=='#'] = '#'     
+             self.gui.update(self.board)
+             self.create_grid(self.board)
            
-        elif letter == 'Copy grid':
-           self.create_grid(self.board)
-           clipboard.set('Puzzle_frame:\n' + ''.join(self.lines))
-           self.gui.set_message('Data copied')   
+          case 'Copy grid':
+             if self.image_mode:
+                dialogs.hud_alert('Exit image mode first')
+                return
+             text = self.gui.get_text(self.gridbox)
+             #text = None
+             
+             if text:
+                clipboard.set('Puzzle_frame:\n' + text)
+             else:
+                 self.create_grid(self.board)
+                 clipboard.set('Puzzle_frame:\n' + ''.join(self.lines))
+         
+             check_clipboard()
+             self.gui.set_message('Data copied')   
                    
-        elif letter == 'Copy both':
-           self.create_grid(self.board)
-           msg = 'Puzzle:\n' + '\n'.join(self.words) + '\nPuzzle_frame:\n' + ''.join(self.lines)
-           clipboard.set(msg)
-           self.gui.set_message('Data copied') 
+          case 'Copy both':
+             if self.image_mode:
+                dialogs.hud_alert('Exit image mode first')
+                return 
+             text = self.gui.get_text(self.gridbox)
+             if text:
+                 clipboard.set( 'Puzzle:\n' + '\n'.join(self.words) + '\nPuzzle_frame:\n' + text)
+             else:               
+                 self.create_grid(self.board)
+                 msg = 'Puzzle:\n' + '\n'.join(self.words) + '\nPuzzle_frame:\n' + ''.join(self.lines)
+                 clipboard.set(msg)
+             check_clipboard()
+             self.gui.set_message('Data copied') 
            
-        elif letter == 'Across' or letter == 'Down':
-           self.direction_mode = not self.direction_mode
-           self.gui.set_text(self.direction, 'Down' if self.direction_mode else 'Across')     
-           self.gui.set_props(self.direction, fill_color='lightblue' if self.direction_mode else 'cyan')     
+          case 'Across' | 'Down':
+             self.direction_mode = not self.direction_mode
+             self.gui.set_text(self.direction, 'Down' if self.direction_mode else 'Across')     
+             self.gui.set_props(self.direction, fill_color='lightblue' if self.direction_mode else 'cyan')     
                             
-        elif letter == 'Indexes':
-           self.index_mode = not self.index_mode           
-           self.gui.set_props(self.multi_character, fill_color='lightblue' if self.index_mode else 'cyan')    
+          case 'Indexes':
+             self.index_mode = not self.index_mode           
+             self.gui.set_props(self.multi_character, fill_color='lightblue' if self.index_mode else 'cyan')    
             
-        elif letter == 'Add letters':
-           self.letters_mode = not self.letters_mode
-           self.gui.set_props(self.letters, fill_color = 'red' if self.letters_mode else 'cyan')       
-           if self.image_mode:
-               self.enter_image_mode()
+          case 'Add letters':
+             self.letters_mode = not self.letters_mode
+             self.gui.set_props(self.letters, fill_color = 'red' if self.letters_mode else 'cyan')       
+             if self.image_mode:
+                 self.enter_image_mode()
                
-        elif letter == 'Image Mode':
-           self.image_mode = not self.image_mode
-           self.gui.set_props(self.images, fill_color = 'red' if self.image_mode else 'cyan')    
-           self.enter_image_mode()   
+          case 'Image Mode':
+             self.image_mode = not self.image_mode
+             self.gui.set_props(self.images, fill_color = 'red' if self.image_mode else 'cyan')    
+             self.enter_image_mode()   
            
-        elif letter == 'Recognise Area':
-           if self.image_mode:
-             self.recognise_area()   
+          case 'Recognise Area':
+             if self.image_mode:
+               self.recognise_area()   
              
-        elif letter == 'Recognise Pieceword':
-           if self.image_mode:
-             self.recognise_crossword(pieceword=True) 
+          case 'Recognise Pieceword':
+             if self.image_mode:
+               self.recognise_crossword(pieceword=True) 
              
-        elif letter == 'Recognise Crossword':
-           if self.image_mode:  
-               self.recognise_crossword(pieceword=False, allow_numbers=False)
-        elif letter == 'Recognise NumberGrid':
-           if self.image_mode: 
-               df = self.recognise_area()
-               self.board, shape, conf_board, self.indexes =  self.recognise.fill_board(df, min_confidence=0.5)
-               self.create_grid(self.board)
-               # make blocks black
-               self.board[self.indexes==0] = '#'
-               #self.recognise_crossword(pieceword=False, allow_numbers=True)     
-        elif letter != '':  # valid selection
-          try:
-              cell = self.get_board_rc(origin, self.board)
-              if self.image_mode:
-                 self.select_defined_area(origin, coord) 
-                                                     
-              elif not self.letters_mode and not self.gui.long_touch:
-                  self.board_rc(origin, self.board, '#' if cell == ' ' else ' ')                
-              else:
-                try:
-                   letter = dialogs.input_alert('Enter 1 or more letters')  
-                except (KeyboardInterrupt):
-                  return
-                if letter:     
-                  if self.index_mode and letter.isnumeric():
-                    self.indexes[origin] = int(letter)
-                    if letter == '0':
-                      self.gui.clear_numbers(origin)                                          
-                    else:
-                        self.gui.replace_numbers([Squares(origin, str(letter), 'yellow', z_position=30,
-                                                  alpha=0.5, font=('Avenir Next', 18),
-                                                  text_anchor_point=(-1.1, 1.2))])
-                  elif len(letter) == 1:
-                      self.board_rc(origin, self.board, letter)
-                  else:             
-                    for index, l in enumerate(letter):
+          case  'Recognise Crossword':
+             if self.image_mode:  
+                 self.recognise_crossword(pieceword=False, allow_numbers=False)
+                 
+          case 'Recognise NumberGrid':
+             if self.image_mode: 
+                 df = self.recognise_area()
+                 self.board, shape, conf_board, self.indexes =  self.recognise.fill_board(df, min_confidence=0.5)
+                 self.create_grid(self.board)
+                 # make blocks black
+                 self.board[self.indexes==0] = '#'
+                 #self.recognise_crossword(pieceword=False, allow_numbers=True)     
+                 
+          case '':
+              pass  
+                   
+          case _:  # valid selection
+              # if single touch (origin=coord) then overrides image mode 
+              # to allow boxes to be updated while image on screen
+              try:
+                  if self.image_mode and (origin != coord):
+                      self.select_defined_area(origin, coord)
+                      return
                       
-                      if self.direction_mode:                 
-                        self.board_rc(origin + (index, 0), self.board, l.lower() )
-                      else:
-                        self.board_rc(origin + (0, index), self.board, l.lower() )
-                      
-              self.create_grid(self.board)   
-              self.gui.update(np.char.lower(self.board))       
-          except (IndexError):
-            pass 
+                  cell = self.get_board_rc(origin, self.board)                                                                                         
+                  if not self.letters_mode:
+                      # toggle square colour
+                      self.board_rc(origin, self.board, '#' if cell == ' ' else ' ')                
+                  else:
+                      self.change_letters(coord, origin)
+                        
+                  self.create_grid(self.board)   
+                  self.gui.update(np.char.lower(self.board))       
+              except (IndexError):
+                 pass 
                         
     def save(self):
       
@@ -593,7 +630,8 @@ class OcrCrossword(LetterGame):
           # These 2 lines work very well to fill number grid, but overwrites part of display
           #self.board, shape, conf_board, self.indexes =  self.recognise.fill_board(df, min_confidence=0.5)
           #self.create_grid(self.board)
-          
+          df = np.round(df, 2)
+          df.sort_values(by=['r','c'], ascending=[True,True], inplace=True, ignore_index=True)
           if self.debug:
               print(df.to_string())
           try:
@@ -867,6 +905,13 @@ def main():
     
 if __name__ == '__main__':
     main()
+
+
+
+
+
+
+
 
 
 

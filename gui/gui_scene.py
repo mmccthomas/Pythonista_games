@@ -514,12 +514,11 @@ class GameBoard(Scene):
 
     parent = self.game_field
     for r in range(self.DIMENSION_Y):
-      for c in range(self.DIMENSION_X):
-        piece = self.get_piece(r, c)
-        animation = False
-        
+      for c in range(self.DIMENSION_X):               
         # animation = False if piece == self.last_board[r][c] else True
         try:
+          piece = self.get_piece(r, c)
+          animation = False
           k = fn_piece(piece)
           if self.debug:
               print('fnpiece', k)
@@ -535,7 +534,7 @@ class GameBoard(Scene):
           t.name = str(fn_piece(piece)) + str(r * self.DIMENSION_Y + c)
           t.position = t.position + (self.smaller_tile / 2, self.smaller_tile / 2)
           parent.add_child(t)
-        except (AttributeError, KeyError, TypeError) as e:
+        except (AttributeError, KeyError, TypeError, IndexError) as e:
           if self.debug:
              print(k)
              print(traceback.format_exc())
@@ -1066,7 +1065,10 @@ class BoxedLabel():
       self.l_box_name.y_scale = y_scale
       
       self.update_text_positions()
-           
+      
+  def get_text(self): 
+  	  return self.text
+  	          
   def set_props(self, **kwargs):
     # pass kwargs to box, or box text
     # text can change box size
@@ -1122,6 +1124,7 @@ if __name__ == "__main__":
                       level=logging.WARNING)
   run(GameBoard(), LANDSCAPE, show_fps=True)
     
+
 
 
 
