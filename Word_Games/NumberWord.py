@@ -233,6 +233,7 @@ class CrossNumbers(LetterGame):
     # display the letters remaining to be placed
     known = [val[0] for val in self.known_dict.values() if val[0] != ' ']
     missing = set('abcdefghijklmnopqrstuvwxyz').difference(set(known))
+    missing = [letter.upper() for letter in missing]
     self.gui.set_message2(f'Missing letters {missing}')
                            
     # create text list for known dict
@@ -360,7 +361,7 @@ class CrossNumbers(LetterGame):
     code_dict.update(given_letters)
             
     # Load the list of words and construct the trie    
-    print('Building trie word dictionary ...\n')
+    #print('Building trie word dictionary ...\n')
     word_trie = WordDictionary()
     [word_trie.add_word(word) for word in self.all_words]
     
@@ -449,9 +450,10 @@ class CrossNumbers(LetterGame):
     # self.print_board()
     self.create_number_board()     
     self.update_board()
+    x,y,w,h = self.gui.grid.bbox
 
     self.gui.set_message('')
-    self.gui.set_enter('Hint')
+    self.gui.set_enter('Hint', position=(w,h+5), fill_color='red')
     
     while True:
       move = self.get_player_move(self.board)               
