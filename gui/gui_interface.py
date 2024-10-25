@@ -560,7 +560,22 @@ class Gui():
       for k, v in kwargs.items():
           setattr(background, k, v)
       self.grid.add_child(background)                
-  
+      
+  def set_waiting(self, message='Processing'):
+      a = ui.ActivityIndicator()
+      a.style = ui.ACTIVITY_INDICATOR_STYLE_WHITE_LARGE 
+      a.hides_when_stopped = True
+      a.frame =(100,100,200,200)
+      a.name = message
+      a.background_color ='red'
+      a.start_animating()        
+      a.present('sheet', hide_close_button=True)
+      return a
+        
+  def reset_waiting(self, object):
+      object.stop()
+      object.close() 
+      
 class Coord(tuple):
     """ a simple class to allow addition and slicing
     example: coord = Coord(rc)
@@ -646,6 +661,7 @@ class dotdict(dict):
     __getattr__ = dict.get
     __setattr__ = dict.__setitem__
     __delattr__ = dict.__delitem__      
+
 
 
 

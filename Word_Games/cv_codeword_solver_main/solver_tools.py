@@ -212,25 +212,6 @@ class CodewordSolverDFS():
                 word_list, else False.
         '''
         return all([self._word_trie.search(search_string) for search_string in word_list])
-        
-    def all_words_are_valid2(self, word_list):
-        '''
-        For each word in word_list, including words containing wildcard characters ("."),
-        search the trie to find a match. Unless there is a match for every word in
-        word_list, return False.
-        
-        Args:
-            word_list (list): List of decoded words, possibly containing
-                wildcard characters.
-                
-        Returns:
-            bool: True if there exists a match in the trie for every word in
-                word_list, else False.
-        '''       
-        possible = [len([word for word in self.all_word_dict[len(search_string)] if re.compile(search_string).search(word)])> 0
-                    for search_string in word_list]
-        return  all(possible)  
-        
             
     def print_decoded_letters(self):
         '''
