@@ -5,8 +5,11 @@ Chris Thomas May 2024
 # Modifications to allow predefined grid filled with numbers
 # in this case random crossword creation is not used and a
 # solver is called instead
+# if the solver fails, first check the number grid
+# if all correct, then reason is missing word in words_alpha.txt
+# allow 2nd solver and inspect any words with dot in word.
+# add that word to words_alpha.txt and solver should then work.
 Chris Thomas October 2024
-The games uses a 20k word dictionary
 """
 import os
 import sys
@@ -411,7 +414,7 @@ class CrossNumbers(LetterGame):
                  cx.number_words_solve(max_iterations=30,
                                        max_possibles=None)
                  nonzero = np.argwhere(self.number_board > 0)
-                 [board_rc(loc, self.solution_board, self.solution_dict[self.number_board[tuple(loc)]])
+                 [board_rc(loc, self.solution_board, self.solution_dict.get(self.number_board[tuple(loc)], '.'))
                        for loc in nonzero]       
                except (Exception):
                    print(traceback.format_exc())    
