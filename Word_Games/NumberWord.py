@@ -23,7 +23,7 @@ current = os.path.dirname(os.path.realpath(__file__))
 parent = os.path.dirname(current)
 sys.path.append(parent)
 grandparent = os.path.dirname(parent)
-sys.path.append(grandparent)
+#sys.path.append(grandparent)
 from cv_codeword_solver_main.solver_tools import CodewordSolverDFS, WordDictionary
 from Letter_game import LetterGame, Player
 from gui.gui_interface import Gui, Squares
@@ -406,12 +406,16 @@ class CrossNumbers(LetterGame):
            success = self.solve()
            self.gui.set_message2(f'Successful decode {success}')
            if not success:
-             cx.set_props(**transfer_props(['solution_dict', 'number_board', 'copy_known']))
-             cx.number_words_solve(max_iterations=30,
-                                   max_possibles=None)
-             nonzero = np.argwhere(self.number_board > 0)
-             [board_rc(loc, self.solution_board, self.solution_dict[self.number_board[tuple(loc)]])
-                   for loc in nonzero]                              
+               try:
+                 cx.set_props(**transfer_props(['solution_dict', 'number_board', 'copy_known']))
+                 cx.number_words_solve(max_iterations=30,
+                                       max_possibles=None)
+                 nonzero = np.argwhere(self.number_board > 0)
+                 [board_rc(loc, self.solution_board, self.solution_dict[self.number_board[tuple(loc)]])
+                       for loc in nonzero]       
+               except (Exception):
+                   print(traceback.format_exc())    
+                   self.gui.set_prompt('Solution failed, No hints available')        
            self.gui.reset_waiting(wait)
         else:
             try:
@@ -557,7 +561,7 @@ class CrossNumbers(LetterGame):
         # sit here until piece place on board 
         rc = self.wait_for_gui()
         # print('selection position',rc)
-        self.gui.set_prompt(f'selected {rc}')
+        # self.gui.set_prompt(f'selected {rc}')
         if rc == (-1, -1):
           return (None, None), 'Enter'  # pressed enter button
           
