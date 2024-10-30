@@ -284,7 +284,7 @@ class LetterGame():
   def format_cols(self, my_list, columns=3, width=1):
     msg = []
     if len(my_list) < columns:
-       return ''.join(my_list)
+       return ' '.join(my_list)
        
     match columns:
        case 2:

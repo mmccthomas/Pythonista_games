@@ -5,11 +5,8 @@ Chris Thomas May 2024
 # Modifications to allow predefined grid filled with numbers
 # in this case random crossword creation is not used and a
 # solver is called instead
-# if the solver fails, first check the number grid
-# if all correct, then reason is missing word in words_alpha.txt
-# allow 2nd solver and inspect any words with dot in word.
-# add that word to words_alpha.txt and solver should then work.
 Chris Thomas October 2024
+The games uses a 20k word dictionary
 """
 import os
 import sys
@@ -175,7 +172,7 @@ class CrossNumbers(LetterGame):
               t.position = (x + int(n % max_items ) * size , h + (2* int(n / max_items) )* size + y)
               parent.add_child(t)
           
-    def update_board(self, hint=False, filter_placed=True, tile_color='yellow', empty=False):
+    def update_board(self, hint=False, filter_placed=True, tile_color='yellow'):
         """ redraws the board with numbered squares and blank tiles for unknowns
         and letters for known
         empty board is array of characters, with # for block
@@ -216,10 +213,7 @@ class CrossNumbers(LetterGame):
                   # fill other cells of same number                                                           
                   k = self.known_dict[self.number_board[tuple(loc)]][0]
                   board_rc(loc, self.board, k)
-                  
-        if empty is True:
-        	 self.board = self.empty_board.copy()
-        	 
+       
         # display the letters remaining to be placed
         known = [val[0] for val in self.known_dict.values() if val[0] != ' ']
         missing = set('abcdefghijklmnopqrstuvwxyz').difference(set(known))
@@ -321,7 +315,7 @@ class CrossNumbers(LetterGame):
             self.known_dict[no] = [letter, True]
                
         self.copy_known()
-        self.gui.update(self.empty_board)
+        self.gui.update(self.board)
         return
       
     def finish_population_of_grid(self):
@@ -369,7 +363,7 @@ class CrossNumbers(LetterGame):
             return result
         code_dict, all_encoded_words, word_trie = self.create_solve_dict()
         solver = CodewordSolverDFS(all_encoded_words, code_dict,
-                                   word_trie, self.all_word_dict, use_heuristics=True)
+                                   word_trie, use_heuristics=True)
         solver.solve()
         decoded_words = solver.decode_words_in_list(all_encoded_words)
         result = check_results(word_trie, decoded_words)
@@ -402,6 +396,7 @@ class CrossNumbers(LetterGame):
         if self.filled_board:
             self.decode_filled_board()
             
+        #self.copy_board(self.empty_board)
         cx = CrossWord(self.gui, self.word_locations, self.all_words)
         cx.set_props(**transfer_props(['board', 'empty_board', 'all_word_dict',
                                        'max_depth', 'debug']))
@@ -416,7 +411,7 @@ class CrossNumbers(LetterGame):
                  cx.number_words_solve(max_iterations=30,
                                        max_possibles=None)
                  nonzero = np.argwhere(self.number_board > 0)
-                 [board_rc(loc, self.solution_board, self.solution_dict.get(self.number_board[tuple(loc)], '.'))
+                 [board_rc(loc, self.solution_board, self.solution_dict[self.number_board[tuple(loc)]])
                        for loc in nonzero]       
                except (Exception):
                    print(traceback.format_exc())    
@@ -433,11 +428,13 @@ class CrossNumbers(LetterGame):
                 print(traceback.format_exc())
             finally:
                 self.gui.reset_waiting(wait)
-
+            
+        self.gui.update(self.board)
+        # self.print_board()
         self.create_number_board()
-        self.update_board(empty=True)
-       
-        x, y, w, h = self.gui.grid.bbox    
+        self.update_board()
+        x, y, w, h = self.gui.grid.bbox
+    
         self.gui.set_message('')
         self.gui.set_enter('Hint', position=(w, h + 5), fill_color='red')
         
@@ -507,10 +504,6 @@ class CrossNumbers(LetterGame):
         self.gui.add_numbers([Squares(tuple(block), '', 'black' , z_position=30, alpha = .5)
                               for block in blocks],
                              clear_previous=True)
-        nonblocks = np.argwhere(self.board != BLOCK) 
-        self.gui.add_numbers([Squares(tuple(block), '', 'white' , z_position=30, alpha = .5)
-                              for block in blocks],
-                             clear_previous=True)                    
         return
     
     def process_turn(self, move, board):

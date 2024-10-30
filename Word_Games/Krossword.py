@@ -40,6 +40,7 @@ class KrossWord(LetterGame):
   def __init__(self):
     
     # allows us to get a list of rc locations
+    self.strikethru = False
     self.log_moves = True
     self.debug = False
     self.table = None
@@ -198,7 +199,7 @@ class KrossWord(LetterGame):
             
             possible_direction = self.find_possibles(start, word)
             if possible_direction is None:
-            	return False
+              return False
             #print()
             #print(start, no, word, self.print_possible(possible_direction))
             # try only one possible
@@ -233,7 +234,7 @@ class KrossWord(LetterGame):
       
       if placed == 0 and total_placed != len(self.all_words) and iteration < 20:
          if enable_guesses:
-         	  enable_best_guess = True
+            enable_best_guess = True
          placed = 1
       else:
         enable_best_guess = False
@@ -249,19 +250,24 @@ class KrossWord(LetterGame):
     return empty
   
                 
-  def print_board(self):
+  def print_board(self, remove=None):
     """
     Display the  players game board
     """
-    display_words = self.wordlist
+    display_words = self.wordlist.copy()
+    
     msg = ''
     for k, v in display_words.items():
+      try: 
+         v.remove(remove)
+      except (ValueError):
+          pass
       msg += f'\n{k}\n'
       try:
           max_len = max([len(word) for word in v]) + 1
       except ValueError:
           max_len = 10
-      msg += self.format_cols(v, columns=3, width=max_len)
+      msg += self.format_cols(v, columns=3, width=max_len+1)
       #msg += '\t'.join(v)
     
     #if self.gui.gs.device.endswith('_landscape'):
@@ -386,6 +392,7 @@ class KrossWord(LetterGame):
       return list(dict.fromkeys(moves)) 
            
     def strike(text):
+      """ convert all letters to strikethru """
       result = ''
       for c in text:
           result = result + c + '\u0336'
@@ -434,11 +441,13 @@ class KrossWord(LetterGame):
                   self.board[coord] = letter
                 #strike thru text
                 if all([self.board[coord] == self.solution[coord] for coord in move]):
-                   word =self.wordlist[int(self.start_dict[start])][selection_row]
-                   word = strike(word)
+                   word =self.wordlist[int(self.start_dict[start])][selection_row]                   
                    self.wordlist[int(self.start_dict[start])][selection_row] = word
-                   self.print_board()
-                
+                   if self.strikethru:
+                       word = strike(word)
+                       self.print_board()
+                   else:
+                        self.print_board(word)                                  
                 self.gui.update(self.board)  
                 return
               elif selection == "Cancelled_":
@@ -542,6 +551,7 @@ if __name__ == '__main__':
     if quit:
       break
   
+
 
 
 
