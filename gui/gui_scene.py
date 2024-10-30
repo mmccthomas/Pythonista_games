@@ -954,7 +954,7 @@ class GameBoard(Scene):
     self.view.close()
     # wait until closed
     while self.view.on_screen:
-      print('waiting for close')
+      #print('waiting for close')
       sleep(.2)
     
   def show_pause_menu(self):
