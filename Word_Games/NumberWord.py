@@ -33,6 +33,7 @@ from gui.gui_scene import Tile
 #  First item is huge list for solving existing grid,
 # and common lists when computing  grid
 WordleList = ['wordlists/words_alpha.txt',
+              'wordlists/extra_words.txt',
               'wordlists/5000-more-common.txt',
               'wordlists/words_20000.txt']
 BLOCK = '#'
@@ -465,7 +466,7 @@ class CrossNumbers(LetterGame):
         # choose only first item in wordslist for filled board (usually words_alpha)
         # or the rest for random puzzle
         if self.filled_board:
-          file_list = [file_list[0]]
+          file_list = file_list[0:2]
         else:
           file_list = file_list[1:]
         LetterGame.load_words(self, word_length, file_list=file_list)

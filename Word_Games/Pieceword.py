@@ -105,7 +105,8 @@ class PieceWord(LetterGame):
             assert all([len(row) == len(frame[0]) for row in frame]), 'Error in string lengths'
             # convert to numpy
             frame = np.array([np.array(row.lower(), dtype=str) for row in frame])
-            
+            frame = np.char.replace(frame, "'", '')
+            frame = np.char.replace(frame, '/', '')
             frame = frame.view('U1').reshape((-1, self.image_dims[1] * TILESIZE))
             # replace spaces and dot by hash for display
             frame[frame == ' '] = '#'
