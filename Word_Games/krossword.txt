@@ -1996,3 +1996,77 @@ Puzzle23_frame:
 ' / / / / / / / / / / /l/ '
 ' / /11/ / / / / / /12/ / /y'
 ' / / / / / /13/ / / / / / '
+
+Puzzle24:
+#394-81
+1
+Pertinent
+Phosphate
+Plead
+Presence
+Putty
+2
+Debrief
+Dew
+Dominoes
+Dossier
+3
+Crinoline
+Cerebrum
+Capybara
+4
+Deepen
+Denarius
+Dingo
+Dram
+Dulcet
+5
+Cheers
+Churned
+Coconut
+Correct
+Creel
+6
+Sienna
+Sari
+Spinneret
+Sneer
+7
+Eden
+Erroneous
+Emir
+Eiderdown
+8
+Time
+Tab
+Titillate
+Treetop
+9
+Flea
+Fruit
+Fold
+Flue
+10
+Tethered
+Tinpot
+Toe
+Tutu
+11
+Pheromone
+Punter
+Puddle
+
+Puzzle24_frame:
+' / / / / / / / /1/ / / / '
+' / /2/ / /s/ / / / / / / '
+' / / / / / /r/ / / / /3/ '
+' / / / / / / /e/ / / / / '
+' / / / / / / / /e/ / / / '
+' /4/ / / / / / / /h/ / / '
+' / / / / / / / / / /5c/ / '
+' / / / / / / / / /h/ / / '
+' / / / / / / / /u/ / / / '
+' / / /6/ / / /r/ / / / /7'
+'8/ / / / / /n/ /9/ / / / '
+' / / / /10/e/ / / / / / / '
+' / / / /d/ / /11/ / / / / '
