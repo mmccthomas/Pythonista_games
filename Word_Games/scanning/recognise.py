@@ -411,6 +411,76 @@ class Recognise():
        df['r'] = r
        
        return df
+    
+    def normalise(self, df):    
+		    #try something else.
+		    # fit poly lines to rach group of points in y and x
+		    # then find which poly line each point is closest to
+		    def poly(df, sort, axis):
+		        # fit a polynomial to each line
+		        df2 = df.sort_values(by=sort,  ignore_index=True)        
+		        diffs = np.diff(df2[axis])
+		        mx = np.max(diffs)
+		        mn = np.min(diffs)
+		        idx = np.argwhere(diffs>mx/2).T.flatten() + 1
+		        if DEBUG:
+		            print(df2.to_string())
+		            print(idx)
+		        idx = np.insert(idx, 0, 0)
+		        idx = np.append(idx, [len(df2)])
+		        # each span from idx-1, idx
+		        polycoeffs = []
+		        for index, span in  enumerate(idx[:-1]):          
+		          lower_bound = span
+		          upper_bound = idx[index+1]
+		          xy = np.array(df2[sort[::-1]])[lower_bound:upper_bound,:]
+		          x, y = xy.T
+		          p = np.polyfit(x, y, deg=1)
+		          polycoeffs.append(p)
+		          #calculate the trendline
+		          trendpoly = np.poly1d(p) 
+		          xs = np.linspace(0,1,20)
+		          if axis == 'y':
+		             plt.plot(xs, trendpoly(xs))
+		          else:
+		            plt.plot(trendpoly(xs), xs)
+		        return polycoeffs
+		        
+		    # remove any alpha   
+		    df = df[df['label'].str.isnumeric()] 
+		    py = poly(df, ['y', 'x'], 'y')
+		    px = poly(df, ['x', 'y'], 'x')
+		    # print(px)
+		    # print(py)
+		    x, y = np.array(df[['x','y']]).T
+		    plt.scatter(x,y, color='red' , s=10)      
+		    plt.show()  
+		    #now find which polynominal gives least error
+		    r=[]
+		    c=[]
+		    for dp in np.array(df[['x','y']]):
+		      min_error = 10000
+		      x, y = dp[0], dp[1]
+		      for i, p in enumerate(py):          
+		          error = abs(np.polyval(p, x)-y)
+		          if error < min_error:
+		            min_error = error
+		            idy = i
+		      min_error = 10000
+		      for i, p in enumerate(px):          
+		          error = abs(np.polyval(p, y) - x )
+		          if error < min_error:
+		            min_error = error
+		            idx = i
+		      r.append(idy)
+		      c.append(idx)
+		    # add rc columns
+		    df["c"] = c
+		    df["r"] = r
+		      #print(f'{dp=}, r={idy}, c={idx}')
+		    self.Nx = len(px)
+		    self.Ny = len(py)
+		    return df
            
     def hough_line(self,img, angle_step=1, lines_are_white=True, value_threshold=5):
             """
@@ -483,7 +553,7 @@ class Recognise():
             plt.show()                      
             
             accumulator, thetas, rhos = self.hough_line(img)
-            self. gshow_hough_line(img, accumulator, thetas, rhos, save_path='imgs/output.png')
+            self.show_hough_line(img, accumulator, thetas, rhos, save_path='imgs/output.png')
     
  
         

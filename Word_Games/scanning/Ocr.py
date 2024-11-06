@@ -40,11 +40,12 @@ import numpy as np
 from PIL import Image
 from io import BytesIO
 from  recognise import Recognise
-import testgrid
+# import testgrid
 from time import sleep
 savefile= 'Ocr_save'
 tmp_directory = '///private/var/mobile/Containers/Data/Application/BF0000C4-73CE-4920-B411-8C8662899F1B/tmp'
 MSG = ('','')
+
 
 class Player():
     def __init__(self):
@@ -61,7 +62,7 @@ class Player():
 
 class OcrCrossword(LetterGame):
     def __init__(self, all_text, board=None, board_size=None, asset=None, autoload=False):
-        self.debug = True
+        self.debug = False
         self.board = board
         self.load(autoload=autoload) # attempt to load temp file
         self.SIZE = self.get_size(board=self.board, board_size=board_size)
@@ -633,7 +634,7 @@ class OcrCrossword(LetterGame):
         if rc:
             # for number grids we need to obtain row and column for numbers
             # not needed for text
-            self.recognise.Nx, self.recognise.Ny = testgrid.normalise(df)
+            df = self.recognise.normalise(df)
             #df = self.recognise.convert_to_rc(df)
 
             # These 2 lines work very well to fill number grid, but overwrites part of display
@@ -671,7 +672,7 @@ class OcrCrossword(LetterGame):
                 if boxes is not None:
                     self.draw_rectangles(boxes)
                     print('no boxes', len(boxes))
-                    sleep(3)
+                    sleep(.5)
                 print(f'found {len(boxes)} boxes')
                 total_rects = boxes
 
@@ -781,7 +782,8 @@ class OcrCrossword(LetterGame):
             df_all = np.round(df_all, 4).reset_index(drop=True)
             # remove the large boxes
             df_all.drop(df_all[df_all.areax1000 > box_area/8].index, inplace=True)
-            print(df_all.to_string())
+            if self.debug:
+               print(df_all.to_string())
             # now we know X and Y
             # we have subrects
             return df_all
