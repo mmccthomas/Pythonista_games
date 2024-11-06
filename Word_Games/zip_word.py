@@ -15,11 +15,8 @@ from textwrap import wrap
 from itertools import zip_longest
 from time import sleep, time
 from queue import Queue
-current = os.path.dirname(os.path.realpath(__file__))
-parent = os.path.dirname(current)
-sys.path.append(parent)
-grandparent = os.path.dirname(parent)
-sys.path.append(grandparent)
+import base_path
+base_path.add_paths(__file__)
 from Letter_game import LetterGame, Player
 from gui.gui_interface import Gui
 from crossword_create import CrossWord
@@ -144,6 +141,9 @@ class ZipWord(LetterGame):
     """
     Main method that prompts the user for input
     """
+    wait = self.gui.set_waiting('Solving')
+    def transfer_props(props):
+       return  {k: getattr(self, k) for k in props}
     cx = CrossWord(self.gui, self.word_locations, self.all_words)
     self.gui.clear_messages()
     self.gui.set_message2(f'{self.puzzle}')
@@ -152,17 +152,15 @@ class ZipWord(LetterGame):
     self.partition_word_list()
     self.compute_intersections()
     self.max_depth = 3
-    cx.set_props(board=self.board,
-                 empty_board=self.empty_board,
-                 all_word_dict=self.all_word_dict,
-                 max_depth=self.max_depth,
-                 debug=self.debug)
+    cx.set_props(**transfer_props(['board', 'empty_board', 'all_word_dict', 
+                                   'max_depth', 'debug']))
     cx.populate_words_graph(max_iterations=1000, length_first=False)
     self.check_words()
     self.create_number_board()
     self.gui.build_extra_grid(self.gui.gs.DIMENSION_X, self.gui.gs.DIMENSION_Y,
                               grid_width_x=1, grid_width_y=1,
                               color='grey', line_width=1)
+    self.gui.reset_waiting(wait)
     while True:
       move = self.get_player_move(self.board)
       self.process_turn(move, self.board)

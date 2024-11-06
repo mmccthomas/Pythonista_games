@@ -9,11 +9,6 @@ attempts to automate grid creation ahve not been succesful so far
 """
 import os
 import sys
-current = os.path.dirname(os.path.realpath(__file__))
-parent = os.path.dirname(current)
-sys.path.append(parent)
-grandparent = os.path.dirname(parent)
-sys.path.append(grandparent)
 import random
 import console
 import dialogs
@@ -24,6 +19,8 @@ import numpy as np
 from time import sleep, time
 from queue import Queue
 from collections import defaultdict
+import base_path
+base_path.add_paths(__file__)
 from Letter_game import LetterGame, Player, Word
 import gui.gui_scene as gscene
 from gui.gui_interface import Gui, Squares, Coord
@@ -138,13 +135,11 @@ class DropWord(LetterGame):
     self.gui.clear_numbers()
     
   def fill_crossword(self):
-
+     def transfer_props(props):
+       return  {k: getattr(self, k) for k in props}
      cx = CrossWord(self.gui, self.word_locations, self.all_words)
-     cx.set_props(board=self.board,
-                  empty_board=self.empty_board, 
-                  all_word_dict=self.all_word_dict, 
-                  max_depth=self.max_depth,
-                  debug=self.debug)
+     cx.set_props(**transfer_props(['board', 'empty_board', 'all_word_dict', 
+                                   'max_depth', 'debug']))
      cx.populate_words_graph(max_iterations=200,
                              length_first=False,
                              max_possibles=100)
@@ -158,7 +153,8 @@ class DropWord(LetterGame):
   def run(self):
     """
     Main method that prompts the user for input
-    """    
+    """ 
+    wait = self.gui.set_waiting('Generating Puzzle')   
     self.partition_word_list() 
     self.compute_intersections()
     if self.debug:
@@ -166,7 +162,7 @@ class DropWord(LetterGame):
     self.fill_crossword()
     self.drop_words()
     self.gui.set_message('')
-    
+    self.gui.reset_waiting(wait)
     while True:
       move = self.get_player_move(self.board)               
       finish = self.process_turn( move, self.board) 

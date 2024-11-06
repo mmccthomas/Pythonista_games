@@ -10,6 +10,7 @@ The games uses a 20k word dictionary
 """
 import os
 import sys
+import base_path
 import random
 import dialogs
 import numpy as np
@@ -19,11 +20,7 @@ from time import sleep
 from queue import Queue
 from ui import Image
 from scene import Texture
-current = os.path.dirname(os.path.realpath(__file__))
-parent = os.path.dirname(current)
-sys.path.append(parent)
-grandparent = os.path.dirname(parent)
-#sys.path.append(grandparent)
+base_path.add_paths(__file__)
 from cv_codeword_solver_main.solver_tools import CodewordSolverDFS, WordDictionary
 from Letter_game import LetterGame, Player
 from gui.gui_interface import Gui, Squares
