@@ -11,6 +11,9 @@ The games all use the Scene module, which is a thin wrapper around the Apple UiK
 
 A generic gui framework has been developed to place a grid at maximum size, along with buttons and messages
 
+Copy the file base_path.py to Python Modules/site-packages(user) to enable correct path searching.
+
+After git download, the Pythonista_games folder should be moved to SCRIPT LIBRARY/This iPad folder
 
 Games are:
 
