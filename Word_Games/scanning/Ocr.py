@@ -16,6 +16,7 @@ import os
 import sys
 import clipboard
 import dialogs
+import console
 import traceback
 from time import time
 from queue import Queue
@@ -62,7 +63,7 @@ class Player():
 
 class OcrCrossword(LetterGame):
     def __init__(self, all_text, board=None, board_size=None, asset=None, autoload=False):
-        self.debug = False
+        self.debug = True
         self.board = board
         self.load(autoload=autoload) # attempt to load temp file
         self.SIZE = self.get_size(board=self.board, board_size=board_size)
@@ -446,7 +447,10 @@ class OcrCrossword(LetterGame):
 
                 case 'Recognise Text':
                     if self.image_mode:
-                        self.recognise_area(rc=False)
+                        text_sort = console.alert('Text format', 'Select text format',
+                                     'No format (pieceword)', 'Sorted length and alpha', 
+                                     'Sorted alpha', hide_cancel_button=True)
+                        self.recognise_area(rc=False, text_sort=text_sort)
 
                 case 'Recognise Pieceword':
                     if self.image_mode:
@@ -604,7 +608,7 @@ class OcrCrossword(LetterGame):
         return df
 
 
-    def recognise_area(self, defined_area=(0,0,1,1), rc=True):
+    def recognise_area(self, defined_area=(0,0,1,1), rc=True, text_sort=None):
         '''recognise text in defined area'''
         if self.asset is None:
             return
@@ -647,7 +651,22 @@ class OcrCrossword(LetterGame):
         try:
             self.all_text = list(df.label)
             self.draw_rectangles(df)
-            self.filter(sort_alpha=False, max_length=None, min_length=None, sort_length=False, remove_numbers=False, reverse=rc)
+            if not rc:              
+              match text_sort:
+                case 1:
+                  sort_alpha = False
+                  sort_length = False
+                case 1:
+                  sort_alpha = True
+                  sort_length = True
+                case 2:
+                  sort_alpha = True
+                  sort_length = False
+                case _:
+                  sort_alpha = False
+                  sort_length = False
+                  
+            self.filter(sort_alpha=sort_alpha, max_length=None, min_length=None, sort_length=sort_length, remove_numbers=False, reverse=rc)
         except (AttributeError):
             self.gui.set_message(f'No text found in {self.defined_area}')
         return df
@@ -917,4 +936,6 @@ def main():
 
 if __name__ == '__main__':
     main()
+
+
 

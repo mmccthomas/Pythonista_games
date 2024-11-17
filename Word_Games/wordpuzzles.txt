@@ -4846,3 +4846,282 @@ Puzzle54-91_frame:
 ' / / / / / / /#/ / / / / / / '
 ' /#/ /#/ /#/ /#/ /#/ /#/ /#/ '
 '3/1/7/1/#/ / / / / /#/ / / / '
+
+Puzzle55-26:
+ADO
+ART
+BIB
+BOA
+CEP
+COP
+EGG
+EMU
+FLU
+GIG
+ITS
+KIT
+LAP
+PEA
+WAD
+AMMO
+COIL
+CUBE
+JUMP
+KNOW
+LURE
+LUSH
+LYRE
+MESS
+NAPE
+OMEN
+PERP
+PLOD
+SAND
+SNOB
+SWAN
+TRAD
+WEED
+YOUR
+BOGUS
+DOWSE
+DOYEN
+DWELL
+ETUDE
+FIBRE
+FLORA
+LOVER
+ONSET
+OPTIC
+SHREW
+TWANG
+WORLD
+BANANA
+DETAIN
+EMERGE
+HOWLER
+LAUREL
+MATRIX
+ORDAIN
+QUARRY
+SURTAX
+TARIFF
+VECTOR
+HARBOUR
+PREQUEL
+TRUFFLE
+VETERAN
+ADHERENT
+COCKATOO
+CYLINDER
+ORACULAR
+TEMPORAL
+ARMADILLO
+CONTUSION
+INTRINSIC
+
+Puzzle55-26_frame:
+' / / /#/ /#/ /#/#/#/#/ / / / / / / / /#/ '
+' /#/#/ / / / / / / / / /#/ /#/#/ /#/ /#/ '
+' /#/#/#/ /#/ /#/#/ /#/ /#/ / / / / / /#/ '
+' / / / / /#/#/ /#/ /#/#/#/ /#/#/ /#/ / / '
+'#/ /#/ /#/ /#/ / / / / /#/#/ / / /#/ /#/#'
+' / / / /#/ /#/ /#/ /#/ /#/#/ /#/#/ / / / '
+'#/ /#/#/#/ / / / /#/ / / / / / / /#/ /#/ '
+'#/#/ / / / /#/ /#/#/#/ /#/ /#/#/#/#/ /#/ '
+'#/#/#/ /#/ /#/ /#/#/#/#/#/ / / /#/ /#/#/ '
+'#/ / / / / / / /#/#/#/#/#/ /#/ / / / / / '
+'#/#/#/ /#/#/#/ /#/#/#/#/#/ /#/ /#/ /#/ /#'
+'#/ / / / / / /#/#/#/#/#/#/ /#/ / / /#/ /#'
+'#/#/#/#/ /#/#/ /#/#/#/#/#/#/#/ /#/ /#/#/#'
+'#/ /#/#/ /#/b/i/b/#/ /#/ / / / / / / / / '
+' / / / / / /#/ / / / / /#/ /#/ /#/#/ /#/ '
+'#/ /#/#/ / / / / /#/ /#/#/ /#/ / / / / / '
+' / / /#/ / / / /#/ / / / / /#/#/#/#/ /#/ '
+' /#/ /#/ /#/ /#/#/#/ /#/ /#/ /#/#/ / / / '
+' / / / /#/ / / / / / /#/ / / / /#/ /#/#/ '
+' /#/ /#/#/#/ /#/#/ /#/#/ /#/ /#/#/ /#/#/ '
+'#/#/ /#/ / / / / / / / / /#/ / / / / / / '
+
+Puzzle56-95:
+AND
+ASH
+BAT
+COP
+CUR
+EVE
+HIT
+ITS
+LAM
+ODD
+OLD
+ONE
+RAW
+SAD
+SUN
+BASS
+CASK
+CHOP
+CUBE
+DINE
+GEAR
+ITCH
+LOOM
+LOUT
+MATT
+NAAN
+NUMB
+OATH
+RARE
+SHAH
+TRAP
+YOGI
+YOUR
+ZINC
+ARENA
+ARGON
+ASTER
+CHAOS
+CHIRP
+COVEN
+ODOUR
+OWNER
+RISER
+SLICK
+STOKE
+TIDAL
+UNLET
+BOOHOO
+ESTEEM
+EXCEED
+HERBAL
+LAGOON
+NOUGHT
+REASON
+ROSARY
+SASHAY
+TROIKA
+WARMTH
+BOROUGH
+BREEDER
+FUNFAIR
+TRIBUNE
+DEMONISE
+EXTERIOR
+FOOTSORE
+OBDURATE
+PROLOGUE
+GUNPOWDER
+JAUNDICED
+STAGEHAND
+
+Puzzle56-95_frame:
+' / / /#/ /#/ /#/#/#/#/ / / / / / / / /#/ '
+' /#/#/ / / / / / / / / /#/ /#/#/ /#/ /#/ '
+' /#/#/#/ /#/ /#/#/ /#/ /#/ / / / / / /#/ '
+' / / / / /#/#/ /#/ /#/#/#/ /#/#/ /#/ / / '
+'#/ /#/ /#/ /#/ / / / / /#/#/ / / /#/ /#/#'
+' / / / /#/ /#/ /#/ /#/ /#/#/ /#/#/ / / / '
+'#/ /#/#/#/ / / / /#/ / / / / / / /#/ /#/ '
+'#/#/ / / / /#/ /#/#/#/ /#/ /#/#/#/#/ /#/ '
+'#/#/#/ /#/ /#/ /#/#/#/#/#/ / / /#/ /#/#/ '
+'#/f/u/n/f/a/i/r/#/#/#/#/#/ /#/ / / / / / '
+'#/#/#/ /#/#/#/ /#/#/#/#/#/ /#/ /#/ /#/ /#'
+'#/ / / / / / /#/#/#/#/#/#/ /#/ / / /#/ /#'
+'#/#/#/#/ /#/#/ /#/#/#/#/#/#/#/ /#/ /#/#/#'
+'#/ /#/#/ /#/ / / /#/ /#/ / / / / / / / / '
+' / / / / / /#/ / / / / /#/ /#/ /#/#/ /#/ '
+'#/ /#/#/ / / / / /#/ /#/#/ /#/ / / / / / '
+' / / /#/ / / / /#/ / / / / /#/#/#/#/ /#/ '
+' /#/ /#/ /#/ /#/#/#/ /#/ /#/ /#/#/ / / / '
+' / / / /#/ / / / / / /#/ / / / /#/ /#/#/ '
+' /#/ /#/#/#/ /#/#/ /#/#/ /#/ /#/#/ /#/#/ '
+'#/#/ /#/ / / / / / / / / /#/ / / / / / / '
+
+Puzzle57-78:
+ARC
+BUN
+COT
+DEN
+FEE
+FOP
+LEA
+NOD
+OPT
+RAM
+RAY
+TRY
+AIRCREW
+ANISEED
+CAMBRIC
+CAROTID
+COFFEES
+COMMUTE
+CONDUIT
+CONVENT
+CUTLASS
+DISCARD
+DRYNESS
+DUDGEON
+ENLIVEN
+EXPOUND
+FONDANT
+LOUTISH
+MINERAL
+MUDFLAP
+NUCLEUS
+OATCAKE
+PARLOUS
+PECKISH
+PONTIFF
+PORTENT
+RESERVE
+ROBOTIC
+ROLLMOP
+SCEPTIC
+SEXTANT
+SNOOKER
+STRIPED
+SUNSPOT
+TONNAGE
+TOPKNOT
+TREMOLO
+WHEATEN
+ANTIBODY
+BUDDHIST
+DOGMATIC
+WATERLOO
+ABATEMENT
+GASTROPUB
+SADDLEBAG
+SPRINKLER
+STEADFAST
+SUCCESSOR
+TRICOLOUR
+WALKABOUT
+
+Puzzle57-78_frame:
+' / / / / / / /#/#/ / / / / / / /#/#/ / / / / / / '
+' /#/ /#/#/#/ /#/#/ /#/#/o/#/#/ /#/#/ /#/#/#/ /#/ '
+' / / /#/#/#/ /#/#/ /#/#/ /#/#/ /#/#/ /#/#/#/ / / '
+' /#/#/ / / / / / / / / /#/ / / / / / / / / /#/#/ '
+' /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ '
+' /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ '
+' / / / / / / /#/#/ / / / / / / /#/#/ / / / / / / '
+'#/#/#/ /#/#/#/#/#/#/#/#/ /#/#/#/#/#/#/#/#/ /#/#/#'
+'#/#/#/ /#/#/#/#/#/#/#/#/ /#/#/#/#/#/#/#/#/ /#/#/#'
+' / / / / / / /#/#/ / / / / / / /#/#/ / / /o/ / / '
+' /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ '
+' /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ '
+' / / /#/ / / / / / / / /#/ / / / / / / / /#/ / / '
+' /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ '
+' /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ '
+' / / / / / / /#/#/ / / / / / / /#/#/ / / / / / / '
+'#/#/#/ /#/#/#/#/#/#/#/#/ /#/#/#/#/#/#/#/#/ /#/#/#'
+'#/#/#/ /#/#/#/#/#/#/#/#/ /#/#/#/#/#/#/#/#/ /#/#/#'
+' / / / / / / /#/#/ / / / / / / /#/#/ / / / / / / '
+' /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ '
+' /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ '
+' /#/#/ / / / / /o/ / / /#/ / / / / / / / / /#/#/ '
+' / / /#/#/#/ /#/#/ /#/#/ /#/#/ /#/#/ /#/#/#/ / / '
+' /#/ /#/#/#/ /#/#/ /#/#/ /#/#/ /#/#/ /#/#/#/ /#/ '
+' / / / / / / /#/#/ / / / / / / /#/#/ / / / / / / '

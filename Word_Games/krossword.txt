@@ -2070,3 +2070,177 @@ Puzzle24_frame:
 '8/ / / / / /n/ /9/ / / / '
 ' / / / /10/e/ / / / / / / '
 ' / / / /d/ / /11/ / / / / '
+
+Puzzle25:
+1
+SEWN
+SOLUTION
+STAINED
+STALEMATE
+2
+BLINDLY
+BLUEBIRD
+BROTHER
+3
+ADDLE
+AIM
+ALL
+ANT
+ARE
+4
+TAD
+TEA
+TEN
+THE
+TIED
+5
+SEEN
+SESSION
+SIDE
+SNIDE
+SURGE
+6
+PAD
+PLAID
+PREYS
+PRIVATELY
+PUMA
+7
+TAGS
+TAN
+THIS
+TOTEM
+8
+OBESE
+ODE
+9
+ACUMEN
+AGHAST
+ANKLET
+ARRAY
+10
+CAKE
+CAR
+COMPLIANT
+CORDIALLY
+CRESCENDO
+CRIB
+CRUSH
+CRY
+11
+GARNISHED
+GARRULOUS
+GEL
+GIN
+GNU
+GOT
+GROUNDED
+12
+AMMONIA
+ANNUL
+ASIDE
+13
+MAROONED
+MILLINER
+MOBILITY
+MUSKET
+
+Puzzle25_frame:
+' / / / / / / / / /1/ / / '
+'y/ / / / / /2/ / / / / / '
+' /l/ / /3/ / / / / /4/ / '
+' / /l/ / / / /5/ / / / / '
+'6/ / /a/ / / / / / / / / '
+' / /7/ /i/ / / / / / /8/ '
+' / / / / /d/ / / / / / / '
+' / / / / / /r/ / / / / /9'
+' / / / / / / /o/ / / / / '
+'t/n/a/i/l/p/m/o/10c/ / / / '
+' / / / / / / / / / /11/ / '
+' /12/ / / / / / / / / / / '
+' / / / / / / /13/ / / / / '
+
+Puzzle26:
+1
+SEEDLINGS
+SHOWER
+SNOWDROP
+SPRING
+SUNSHINE
+2
+PHENOMENON
+POCK
+PUPS
+3
+MEKONG
+MINNOWS
+MOOING
+4
+TAILWIND
+THRUSHES
+TULIPS
+TUNE
+5
+CALF
+COLCHICUM
+CONTRAST
+COURSE
+6
+COL
+CORRIDOR
+COWSLIPS
+7
+OFT
+OKRA
+ONE
+8
+CATKINS
+CHICK
+CROCUS
+CUCKOO
+CYGNETS
+9
+CHEEPS
+CLOD
+CREDIT
+10
+LAIR
+LESS
+LIEGE
+11
+SEDUM
+SITH
+SKIPS
+SPOOR
+12
+VERSION
+VIEW
+VIM
+VIRGINIA
+13
+TIE
+TIP
+TOE
+14
+APT
+ARIES
+ASH
+15
+AIR
+APSE
+ARARAT
+
+Puzzle26_frame:
+' / / / / / / /1/ / / / / '
+' / / / / / / / / /2/ / / '
+' / / / / / /3/ / / / / / '
+'4/ / / / / / / / / / / / '
+' / / / / /5/ / / / / / / '
+' /6/ / / / / / /7/ / / / '
+' / / / / / / / / / / / /8'
+' / / / / / /9/ / / / / / '
+' / / /10/ / / / /11/ / / / '
+' / / / / / / /e/ / / / / '
+' / / / /12/ / / /o/ / / / '
+' / / / / / / / / /13t/i/p/ '
+'14/ / / / / / / / / / /15/ '
