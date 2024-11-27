@@ -140,16 +140,17 @@ class DropWord(LetterGame):
      cx = CrossWord(self.gui, self.word_locations, self.all_words)
      cx.set_props(**transfer_props(['board', 'empty_board', 'all_word_dict', 
                                    'max_depth', 'debug']))
-     cx.populate_words_graph(max_iterations=200,
+     self.board = cx.populate_words_graph(max_iterations=200,
                              length_first=False,
-                             max_possibles=100)
+                             max_possibles=100,
+                             swordsmith=True)
      self.board = np.array(self.board)
      self.board[self.board == '.'] = BLOCK
      fixed = len([word for word in self.word_locations if word.fixed]) 
      no_words = len(self.word_locations)      
      self.gui.set_message(f'Filled {fixed}/ {no_words} words')       
      #self.gui.update(self.board)                
-  
+        
   def run(self):
     """
     Main method that prompts the user for input

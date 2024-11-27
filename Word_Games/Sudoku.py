@@ -8,11 +8,9 @@ import numpy as np
 from Letter_game import LetterGame, Player
 import sudoko_solve
 from cages import Cages
-current = os.path.dirname(os.path.realpath(__file__))
-parent = os.path.dirname(current)
-sys.path.append(parent)
-grandparent = os.path.dirname(parent)
-sys.path.append(grandparent)
+import base_path
+base_path.add_paths(__file__)
+
 from gui.gui_interface import Gui, Squares
 
 

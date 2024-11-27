@@ -20,11 +20,8 @@ import random
 import numpy as np
 import traceback
 from copy import deepcopy
-current = os.path.dirname(os.path.realpath(__file__))
-parent = os.path.dirname(current)
-sys.path.append(parent)
-grandparent = os.path.dirname(parent)
-sys.path.append(grandparent)
+import base_path
+base_path.add_paths(__file__)
 from word_square_gen import create_word_search
 from Letter_game import LetterGame, Player
 from gui.gui_interface import Gui, Squares, Coord

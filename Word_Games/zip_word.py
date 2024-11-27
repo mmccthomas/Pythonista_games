@@ -136,7 +136,7 @@ class ZipWord(LetterGame):
     self.gui.set_moves(msg, font=(font, fontsize),
                        anchor_point=anchor, position=position)
     self.gui.update(self.board)
-  
+         
   def run(self):
     """
     Main method that prompts the user for input
@@ -154,7 +154,7 @@ class ZipWord(LetterGame):
     self.max_depth = 3
     cx.set_props(**transfer_props(['board', 'empty_board', 'all_word_dict', 
                                    'max_depth', 'debug']))
-    cx.populate_words_graph(max_iterations=1000, length_first=False)
+    self.board = cx.populate_words_graph(max_iterations=1000, length_first=False)
     self.check_words()
     self.create_number_board()
     self.gui.build_extra_grid(self.gui.gs.DIMENSION_X, self.gui.gs.DIMENSION_Y,

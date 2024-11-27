@@ -2,6 +2,8 @@ import random
 import console
 import dialogs
 import ui
+import base_path
+base_path.add_paths(__file__)
 from time import sleep
 from queue import Queue
 from Letter_game import LetterGame, Player

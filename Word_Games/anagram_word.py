@@ -7,15 +7,13 @@ The games uses a 20k word dictionary
 """
 import os
 import sys
-current = os.path.dirname(os.path.realpath(__file__))
-parent = os.path.dirname(current)
-sys.path.append(parent)
-grandparent = os.path.dirname(parent)
-sys.path.append(grandparent)
+import base_path
+base_path.add_paths(__file__)
 import random
 import console
 import dialogs
 import re
+import numpy as np
 import traceback
 from time import sleep, time
 from queue import Queue
@@ -24,6 +22,7 @@ from Letter_game import LetterGame, Player, Word
 import gui.gui_scene as gscene
 from gui.gui_interface import Gui, Squares
 from crossword_create import CrossWord
+
 WordleList = [ 'wordlists/5000-more-common.txt', 'wordlists/words_20000.txt'] 
 BLOCK = '#'
 SPACE = ' '
@@ -178,6 +177,8 @@ class Anagram(LetterGame):
     """
     Main method that prompts the user for input
     """
+    def transfer_props(props):
+       return  {k: getattr(self, k) for k in props}
     cx = CrossWord(self.gui, self.word_locations, self.all_words)
     self.gui.clear_messages()
     #self.word_locations = []
@@ -189,9 +190,10 @@ class Anagram(LetterGame):
     self.compute_intersections()
     if self.debug:
         print(self.word_locations)
-    cx.set_props(board=self.board, empty_board=self.empty_board, 
-                 all_word_dict=self.all_word_dict, max_depth=self.max_depth)
-    cx.populate_words_graph(max_iterations=200, length_first=False, max_possibles=100)  
+        
+    cx.set_props(**transfer_props(['board', 'empty_board', 'all_word_dict', 
+                                   'max_depth', 'debug']))
+    self.board = cx.populate_words_graph(max_iterations=200, length_first=False, max_possibles=100, swordsmith=True)  
     self.populate_order = cx.populate_order
     # self.print_board()
     self.check_words()
@@ -240,8 +242,8 @@ class Anagram(LetterGame):
          boards[name]  = board
   
     #if not hasattr(self, 'puzzle'):        
-    self.puzzle = random.choice(list(boards))
-    #self.puzzle = 'Puzzle2'
+    self.puzzle = random.choice(list(boards)[:5])
+    # self.puzzle = 'Puzzle3'
     self.board = boards[self.puzzle]
     self.word_locations = []
     self.length_matrix()                  
@@ -402,4 +404,5 @@ if __name__ == '__main__':
     if quit:
       break
   
+
 

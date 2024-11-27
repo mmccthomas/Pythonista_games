@@ -1,12 +1,10 @@
 # ageneral purpose starting point for letter tile games -
+#import base_path
+#base_path.main(__file__)
 import os
 import sys
-current = os.path.dirname(os.path.realpath(__file__))
-parent = os.path.dirname(current)
-sys.path.append(parent)
-grandparent = os.path.dirname(parent)
-sys.path.append(grandparent)
-#sys.path.append(f'{parent}/gui')
+import base_path
+base_path.add_paths(__file__)
 
 from datetime import datetime
 from time import sleep, time

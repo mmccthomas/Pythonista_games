@@ -275,43 +275,68 @@ class CrossWord():
                  break
       if self.debug:
         print(self.populate_order)
-         
-  def populate_words_graph(self, length_first=True, max_iterations=2000, max_possibles=None):
+        
+  def solve_swordsmith(self):
+        """ solve using swordsmith implementation"""    
+        import swordsmith.swordsmith as sword
+        # convert board to grid, replace space with dot, and hash with space
+        self.board = np.array(self.board)
+        grid = np.char.replace(np.char.replace(self.board, ' ', '.'), '#',' ')               
+        crossword = sword.BritishCrossword.from_grid(grid)
+        filler = sword.DFSFiller()
+        filler.fill(crossword=crossword, wordlist=sword.Wordlist(self.all_words), animate=False)    
+        crossword.__generate_grid_from_slots()
+        #for slot in crossword.slots:
+        #	 for i, idx in enumerate(slot):
+        #	  self.board[idx] = crossword.words[slot][i]
+        self.board = np.array(crossword.grid)
+        self.board[self.board == ' '] = '#'
+        self.populate_order = crossword.words.values()    
+        for word in self.word_locations:
+          word.word = crossword.words[tuple(word.coords)]
+          word.fixed = crossword.is_word_filled(word.word)
+        if self.debug: 
+            print(crossword)
+                
+  def populate_words_graph(self, length_first=True, max_iterations=2000, max_possibles=None, swordsmith=False):
     # for all words attempt to fit in the grid, allowing for intersections
     # some spaces may be known on empty board
     self.start_time = time()
     index = 0 
-    self.populate_order = []
-    while any([not word.fixed for word in self.word_locations]):
-        fixed =  [word for word in self.word_locations if word.fixed]
-        if self.debug:
-            self.gui.set_message(f' placed {len(fixed)} {index} iterations')
-        word = self.get_next_cross_word(index, max_possibles,length_first)   
-        
-        if word is None:
-          if self.debug:
-              try:
-                print(f'options for word at {word.start} are {options}')
-                print('possibles for stuck word', self.possibles)
-              except(AttributeError):
-                pass
-          continue
+    if swordsmith:
+      self.solve_swordsmith()
+    else:         
+        self.populate_order = []
+        while any([not word.fixed for word in self.word_locations]):
+            fixed =  [word for word in self.word_locations if word.fixed]
+            if self.debug:
+                self.gui.set_message(f' placed {len(fixed)} {index} iterations')
+            word = self.get_next_cross_word(index, max_possibles,length_first)   
             
-        if self.debug:
-          try:
-            #self.gui.gs.highlight_squares(word.coords)            
-            self.gui.update(self.board)
-            sleep(0.25)  
-          except(AttributeError) as e:
-            pass
-        if index == max_iterations:
-          break
-        
-        options = self.look_ahead_3(word, max_possibles=max_possibles) # child, coord)   
-        if options is None:
-          break                   
-        index += 1
-        
+            if word is None:
+              if self.debug:
+                  try:
+                    print(f'options for word at {word.start} are {options}')
+                    print('possibles for stuck word', self.possibles)
+                  except(AttributeError):
+                    pass
+              continue
+                
+            if self.debug:
+              try:
+                #self.gui.gs.highlight_squares(word.coords)            
+                self.gui.update(self.board)
+                sleep(0.25)  
+              except(AttributeError) as e:
+                pass
+            if index == max_iterations:
+              break
+            
+            options = self.look_ahead_3(word, max_possibles=max_possibles) # child, coord)   
+            if options is None:
+              break                   
+            index += 1
+            
     fixed = [word for word in self.word_locations if word.fixed]   
     
     #self.update_board(filter_placed=False)
@@ -325,6 +350,7 @@ class CrossWord():
     # print(msg)   
     self.gui.set_prompt(msg)
     self.gui.update(self.board)
+    return self.board
     
   
   def get_word(self, wordlist, req_letters, wordlength):
@@ -729,6 +755,8 @@ class CrossWord():
             
     finally:       
         return options # unplaced option   
+
+
 
 
 

@@ -11,6 +11,7 @@ The games uses a 20k word dictionary
 import os
 import sys
 import base_path
+base_path.add_paths(__file__)
 import random
 import dialogs
 import numpy as np
@@ -20,7 +21,7 @@ from time import sleep
 from queue import Queue
 from ui import Image
 from scene import Texture
-base_path.add_paths(__file__)
+
 from cv_codeword_solver_main.solver_tools import CodewordSolverDFS, WordDictionary
 from Letter_game import LetterGame, Player
 from gui.gui_interface import Gui, Squares
@@ -418,9 +419,10 @@ class CrossNumbers(LetterGame):
         else:
             try:
               wait = self.gui.set_waiting('Generating')      
-              cx.populate_words_graph(max_iterations=200,
+              self.board = cx.populate_words_graph(max_iterations=200,
                                       length_first=False,
-                                      max_possibles=100)   
+                                      max_possibles=100,
+                                      swordsmith=True)                                       
               self.finish_population_of_grid()
             except (Exception):
                 print(traceback.format_exc())

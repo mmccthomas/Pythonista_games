@@ -7,6 +7,8 @@ from PIL import Image
 import ui
 import io
 import numpy as np
+import base_path
+base_path.add_paths(__file__)
 from types import SimpleNamespace
 from Letter_game import LetterGame
 import gui.gui_scene as gscene
@@ -303,8 +305,7 @@ class PieceWord(LetterGame):
       
   def restart(self):
     self.gui.gs.close()
-    self.__init__()
-    self.run()
+    g = PieceWord().run()
        
     
 if __name__ == '__main__':

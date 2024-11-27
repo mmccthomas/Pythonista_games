@@ -6,11 +6,8 @@ from time import sleep
 import random
 import numpy as np
 import traceback
-current = os.path.dirname(os.path.realpath(__file__))
-parent = os.path.dirname(current)
-sys.path.append(parent)
-grandparent = os.path.dirname(parent)
-sys.path.append(grandparent)
+import base_path
+base_path.add_paths(__file__)
 from word_square_gen import create_word_search
 from Letter_game import LetterGame, Player
 from gui.gui_interface import Gui, Squares, Coord
@@ -58,7 +55,7 @@ class WordSearch(LetterGame):
     
   def print_board(self):
     """
-    Display the  players game board, we neve see ai
+    Display the  players game board
     """
     display_words = [word.capitalize() for word in self.wordlist]
     try:
@@ -68,7 +65,7 @@ class WordSearch(LetterGame):
     _, _, w, h = self.gui.grid.bbox
     if self.gui.gs.device.endswith('_landscape'):
         msg = self.format_cols(display_words, columns=2, width=max_len)
-        self.gui.set_moves(msg, font=('Avenir Next', 25), position=(w+40,0))
+        self.gui.set_moves(msg, font=('Avenir Next', 25), anchor_point=(0,0),position=(w+40,0))
     elif self.gui.gs.device.endswith('_portrait'):
         msg = self.format_cols(display_words, columns=5, width=max_len)
         self.gui.set_moves(msg, font=('Avenir Next', 20), position=(0, h+40) )

@@ -13,6 +13,8 @@ import io
 import numpy as np
 import textwrap
 import random
+import base_path
+base_path.add_paths(__file__)
 from types import SimpleNamespace
 from Letter_game import LetterGame
 import gui.gui_scene as gscene

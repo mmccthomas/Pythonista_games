@@ -8,11 +8,8 @@ The games uses a 20k word dictionary
 """
 import os
 import sys
-current = os.path.dirname(os.path.realpath(__file__))
-parent = os.path.dirname(current)
-sys.path.append(parent)
-grandparent = os.path.dirname(parent)
-sys.path.append(grandparent)
+import base_path
+base_path.add_paths(__file__)
 import random
 from time import sleep
 import traceback
