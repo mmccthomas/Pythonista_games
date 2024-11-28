@@ -12,6 +12,7 @@ import traceback
 from  collections import Counter
 import matplotlib.colors as mcolors
 from collections import defaultdict
+from types import SimpleNamespace as sname
 BLOCK = '#'
 SPACE = ' '
 
@@ -276,20 +277,27 @@ class CrossWord():
       if self.debug:
         print(self.populate_order)
         
-  def solve_swordsmith(self):
+  def solve_swordsmith(self, strategy='dfs'):
         """ solve using swordsmith implementation"""    
         import swordsmith.swordsmith as sword
         # convert board to grid, replace space with dot, and hash with space
         self.board = np.array(self.board)
         grid = np.char.replace(np.char.replace(self.board, ' ', '.'), '#',' ')               
         crossword = sword.BritishCrossword.from_grid(grid)
-        filler = sword.DFSFiller()
-        filler.fill(crossword=crossword, wordlist=sword.Wordlist(self.all_words), animate=False)    
-        crossword.__generate_grid_from_slots()
-        #for slot in crossword.slots:
-        #	 for i, idx in enumerate(slot):
-        #	  self.board[idx] = crossword.words[slot][i]
-        self.board = np.array(crossword.grid)
+        filler = sword.get_filler(sname(**{'strategy': strategy, 'k':5}))
+        #filler = sword.DFSFiller()
+        # filler = sword.DFSBackjumpFiller()
+        # filler = sword.MinlookFiller(5)
+        # filler = sword.MinlookBackjumpFiller(5)
+        wordlist = sword.Wordlist(self.all_words)
+        filler.fill(crossword=crossword, wordlist=wordlist, animate=True)    
+        print('finished')
+        print(crossword.words)
+        #crossword.__generate_grid_from_slots()
+        for slot in crossword.slots:
+        	 for i, idx in enumerate(slot):
+           	  self.board[idx] = crossword.words[slot][i]
+        #self.board = np.array(crossword.grid)
         self.board[self.board == ' '] = '#'
         self.populate_order = crossword.words.values()    
         for word in self.word_locations:
@@ -297,14 +305,15 @@ class CrossWord():
           word.fixed = crossword.is_word_filled(word.word)
         if self.debug: 
             print(crossword)
+        return crossword.index
                 
-  def populate_words_graph(self, length_first=True, max_iterations=2000, max_possibles=None, swordsmith=False):
+  def populate_words_graph(self, length_first=True, max_iterations=2000, max_possibles=None, swordsmith_strategy=False):
     # for all words attempt to fit in the grid, allowing for intersections
     # some spaces may be known on empty board
     self.start_time = time()
     index = 0 
-    if swordsmith:
-      self.solve_swordsmith()
+    if swordsmith_strategy:
+      index = self.solve_swordsmith(strategy=swordsmith_strategy)
     else:         
         self.populate_order = []
         while any([not word.fixed for word in self.word_locations]):
@@ -344,7 +353,8 @@ class CrossWord():
         self.gui.print_board(self.board)
         print('Population order ', self.populate_order)
     ptime = self.delta_t('time', do_print=False)
-    msg = f'Filled {len(fixed)}/ {len(self.word_locations)} words in {index} iterations, {ptime}secs'
+    method = '' if not swordsmith_strategy  else swordsmith_strategy
+    msg = f'Filled {len(fixed)}/ {len(self.word_locations)} words in {index} iterations,  {ptime}secs, {method}'
     words=len([w for w in self.word_locations if w.word])
     print('no words', words)
     # print(msg)   

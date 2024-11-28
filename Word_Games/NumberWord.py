@@ -422,7 +422,7 @@ class CrossNumbers(LetterGame):
               self.board = cx.populate_words_graph(max_iterations=200,
                                       length_first=False,
                                       max_possibles=100,
-                                      swordsmith=True)                                       
+                                      swordsmith_strategy='dfs')                                       
               self.finish_population_of_grid()
             except (Exception):
                 print(traceback.format_exc())

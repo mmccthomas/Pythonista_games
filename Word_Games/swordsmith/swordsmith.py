@@ -22,6 +22,7 @@ class Crossword:
         self.crossings = defaultdict(lambda: defaultdict(tuple))    # slot => slots that cross it => square where they cross
         self.words = {}                                             # slot => word in that slot
         self.wordset = set()                                        # set of filled words in puzzle
+        self.index = 0                                              # counter for no iterations
     
     def __str__(self):
         return '\n'.join(', '.join(str(square) for square in slot) + ': ' + self.words[slot] for slot in self.slots)
@@ -532,6 +533,7 @@ class DFSFiller(Filler):
     - backtracks if there is a slot with no matches"""
 
     def fill(self, crossword, wordlist, animate):
+        crossword.index += 1
         if animate:
             #utils.clear_terminal()
             print(crossword)
@@ -555,7 +557,7 @@ class DFSFiller(Filler):
         # randomly shuffle matches
         matches = list(matches)
         shuffle(matches)
-
+        print(matches)
         for match in matches:
             if not Filler.is_valid_match(crossword, wordlist, slot, match):
                 continue
@@ -581,8 +583,9 @@ class DFSBackjumpFiller(Filler):
     Each iteration returns (is_filled, failed_slot)"""
 
     def fill(self, crossword, wordlist, animate):
+        crossword.index += 1
         if animate:
-            utils.clear_terminal()
+            #utils.clear_terminal()
             print(crossword)
             print()
 
@@ -604,7 +607,7 @@ class DFSBackjumpFiller(Filler):
         # randomly shuffle matches
         matches = list(matches)
         shuffle(matches)
-        
+        print(matches)
         for match in matches:
             if not Filler.is_valid_match(crossword, wordlist, slot, match):
                 continue
@@ -635,8 +638,9 @@ class MinlookFiller(Filler):
         self.k = k
 
     def fill(self, crossword, wordlist, animate):
+        crossword.index += 1
         if animate:
-            utils.clear_terminal()
+            #utils.clear_terminal()
             print(crossword)
             print()
         
@@ -658,7 +662,7 @@ class MinlookFiller(Filler):
         # randomly shuffle matches
         matches = list(matches)
         shuffle(matches)
-
+        print(matches)
         while matches:
             match_index, failed_indices = Filler.minlook(crossword, wordlist, slot, matches, self.k)
 
@@ -667,20 +671,20 @@ class MinlookFiller(Filler):
             
             # remove failed matches and chosen match
             matches = [matches[i] for i in range(len(matches)) if i != match_index and i not in failed_indices]
-            
             # if no matches were found, try another batch if possible
             if match_index == -1:
                 continue
 
             if not Filler.is_valid_match(crossword, wordlist, slot, match):
                 continue
-
+            print('putting', match)
             crossword.put_word(match, slot)
             
             if self.fill(crossword, wordlist, animate):
                 return True
-        
+            print('now trying', match)
         # if no match works, restore previous word
+        print('backing up')
         crossword.put_word(previous_word, slot)
         return False
 
@@ -692,14 +696,16 @@ class MinlookBackjumpFiller(Filler):
     - backtracks if there is a slot with no matches
 
     Each iteration returns (is_filled, failed_slot)
+    SHOULD JUMPBACK TO LAST CHOICE OF MATCH
     """
     
     def __init__(self, k):
         self.k = k
 
     def fill(self, crossword, wordlist, animate):
+        crossword.index += 1
         if animate:
-            utils.clear_terminal()
+            #utils.clear_terminal()
             print(crossword)
             print()
         
@@ -721,7 +727,6 @@ class MinlookBackjumpFiller(Filler):
         # randomly shuffle matches
         matches = list(matches)
         shuffle(matches)
-
         while matches:
             match_index, failed_indices = Filler.minlook(crossword, wordlist, slot, matches, self.k)
 
@@ -737,21 +742,127 @@ class MinlookBackjumpFiller(Filler):
 
             if not Filler.is_valid_match(crossword, wordlist, slot, match):
                 continue
-
+     
             crossword.put_word(match, slot)
             
             is_filled, failed_slot = self.fill(crossword, wordlist, animate)
             if is_filled:
                 return True, None
-            if failed_slot not in crossword.crossings[slot]:
-                # undo this word, keep backjumping
-                crossword.put_word(previous_word, slot)
-                return False, failed_slot
+            
+            if failed_slot  not in crossword.crossings[slot]:
+                  # undo this word, keep backjumping
+                  crossword.put_word(previous_word, slot)
+                  return False, failed_slot
         
         # if no match works, restore previous word
         crossword.put_word(previous_word, slot)
         return False, slot
 
+class MinlookSingleFiller(Filler):
+    """Fills the crossword using a dfs algorithm with minlook heuristic:
+    - keeps selecting unfilled slot with fewest possible matches
+    - considers k random matching word, chooses word with the most possible crossing words (product of # in each slot)
+    - backtracks if there is a slot with no matches
+
+    Each iteration returns (is_filled, failed_slot)
+    SHOULD JUMPBACK TO LAST CHOICE OF MATCH
+    """
+    
+    def __init__(self, k):
+        self.k = k
+    def fill(self, crossword, wordlist, animate):
+      crossword.index += 1
+      while not crossword.is_filled():
+        if animate:
+            #utils.clear_terminal()
+            print(crossword)
+            print()
+
+        # if the grid is filled, succeed if every word is valid and otherwise fail
+        if crossword.is_filled():
+            return True
+
+        # choose slot with fewest matches
+        slot, num_matches = Filler.fewest_matches(crossword, wordlist)
+
+        # if some slot has zero matches, fail
+        if num_matches == 0:
+            return False
+        
+        # iterate through all possible matches in the fewest-match slot
+        previous_word = crossword.words[slot]
+        # choose slot with fewest matches
+        matches = wordlist.get_matches(crossword.words[slot])
+        print(matches)
+        if len(matches) == 1:
+            match = list(matches)[0]
+            if not Filler.is_valid_match(crossword, wordlist, slot, match):
+                continue
+
+            crossword.put_word(match, slot)
+
+            if self.fill(crossword, wordlist, animate):
+                return True
+
+        # if no match works, restore previous word
+        crossword.put_word(previous_word, slot)
+
+        return False
+
+    def _fill(self, crossword, wordlist, animate):
+        if animate:
+            #utils.clear_terminal()
+            print(crossword)
+            print()
+        
+        # if the grid is filled, succeed
+        if crossword.is_filled():
+            return True, None
+
+        # choose slot with fewest matches
+        slot, num_matches = Filler.fewest_matches(crossword, wordlist)
+
+        # if some slot has zero matches, fail
+        if num_matches == 0:
+            return False, slot
+        
+        # iterate through all possible matches in the fewest-match slot
+        previous_word = crossword.words[slot]
+        matches = wordlist.get_matches(crossword.words[slot])
+
+        # randomly shuffle matches
+        matches = list(matches)
+        shuffle(matches)
+        while matches:
+            match_index, failed_indices = Filler.minlook(crossword, wordlist, slot, matches, self.k)
+
+            if match_index != -1:
+                match = matches[match_index]
+            
+            # remove failed matches and chosen match
+            matches = [matches[i] for i in range(len(matches)) if i != match_index and i not in failed_indices]
+            
+            # if no matches were found, try another batch if possible
+            if match_index == -1:
+                continue
+
+            if not Filler.is_valid_match(crossword, wordlist, slot, match):
+                continue
+     
+            crossword.put_word(match, slot)
+            
+            is_filled, failed_slot = self.fill(crossword, wordlist, animate)
+            if is_filled:
+                return True, None
+            
+            if failed_slot  not in crossword.crossings[slot]:
+                  # undo this word, keep backjumping
+                  crossword.put_word(previous_word, slot)
+                  return False, failed_slot
+        
+        # if no match works, restore previous word
+        crossword.put_word(previous_word, slot)
+        return False, slot
 
 WORDLIST_FOLDER = 'wordlist/'
 GRID_FOLDER = ''
@@ -791,6 +902,9 @@ def get_filler(args):
         return MinlookFiller(args.k)
     elif args.strategy == 'mlb':
         return MinlookBackjumpFiller(args.k)
+    elif args.strategy == 'mls':
+        return MinlookSingleFiller(args.k)    
+        
     else:
         return None
 
@@ -853,6 +967,9 @@ def main():
 
 if __name__ == "__main__":
     main()
+
+
+
 
 
 

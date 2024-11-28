@@ -15,6 +15,7 @@ from textwrap import wrap
 from itertools import zip_longest
 from time import sleep, time
 from queue import Queue
+import numpy as np
 import base_path
 base_path.add_paths(__file__)
 from Letter_game import LetterGame, Player
@@ -154,7 +155,11 @@ class ZipWord(LetterGame):
     self.max_depth = 3
     cx.set_props(**transfer_props(['board', 'empty_board', 'all_word_dict', 
                                    'max_depth', 'debug']))
-    self.board = cx.populate_words_graph(max_iterations=1000, length_first=False)
+    # strategy options 'dfs', 'dfsb',  'minlook', 'mlb'                     
+    self.board = cx.populate_words_graph(swordsmith_strategy='dfs')
+    if np.argwhere(self.board=='.').size > 0:
+    	 # failed, so use original
+       self.board = cx.populate_words_graph(max_iterations=1000, length_first=False)
     self.check_words()
     self.create_number_board()
     self.gui.build_extra_grid(self.gui.gs.DIMENSION_X, self.gui.gs.DIMENSION_Y,
