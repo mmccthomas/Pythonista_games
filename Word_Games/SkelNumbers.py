@@ -27,8 +27,13 @@ class SkelNumbers(CrossNumbers):
   
   def __init__(self):
     CrossNumbers.__init__(self)
-    self.max_items = 15
-    
+    self.max_items = 15 # items in decode list column
+  
+  def initialise_board(self):  
+  	  # dont allow filled crossword
+  	  # only list items beginning with 'Puzzle'
+  	  CrossNumbers.initialise_board(self, non_filled_only=True)
+  	
   def generate_word_number_pairs(self):
     """ create 2 dictionaries
     solution contains complete number, letter pairs
@@ -47,11 +52,7 @@ class SkelNumbers(CrossNumbers):
       self.known_dict[no] =[self.solution_dict[no][0], True]
     #self.known_dict[' '] = [' ', False]
     #self.known_dict['.'] = ['.', False]
-    self.letters = self.letters[3:]
-    
-  def print_square(self, process, color=None):
-    # dont print
-    return
+    self.letters = self.letters[3:]     
     
   def create_number_board(self):
     """ redraws the board with numbered squares and blank tiles for unknowns
@@ -59,7 +60,8 @@ class SkelNumbers(CrossNumbers):
     # start with empty board    
     self.empty_board =np.array(self.empty_board)
     self.board = np.array(self.board) 
-    self.solution_board = self.board.copy()    
+    if not hasattr(self, 'solution_board'):
+       self.solution_board = self.board.copy()    
     # allow for incomplete board, change space and dot to block
     self.solution_board[self.solution_board == '.'] = BLOCK
     self.solution_board[self.solution_board == SPACE] = BLOCK
@@ -89,60 +91,21 @@ class SkelNumbers(CrossNumbers):
     for i, group in enumerate(groups):
       for item in group:
        self.solution_board[tuple(item)] = BLOCKS[i % 4]
-       
-    self.number_board = np.zeros(self.board.shape, dtype=int)
+    CrossNumbers.create_number_board(self) 
+    #self.number_board = np.zeros(self.board.shape, dtype=int)
     # letter list for player selection
-    self.letters = [letter for letter in (BLOCKS[-1] + 'abcdefghijklmnopqrstuvwxyz')]
-    
-  def process_turn(self, move, board):
-    """ process the turn
-    move is coord, new letter
-    """    
-    if move:
-      coord, letter = move
-      if move == ((None, None), None):
-        return False
-      r,c = coord
-      if letter == 'Enter':
-        # show all incorrect squares
-        self.update_board(hint=True, tile_color='clear')
-        dialogs.hud_alert('Incorrect squares marked orange', duration=2)
-        #self.gui.set_prompt('Incorrect squares marked orange')
-        
-        # now turn off marked squares
-        #sleep(2)
-        for k,v in self.known_dict.items():
-          if not v[1]:
-            self.known_dict[k] = [' ', False]
-        self.update_board(hint=False, tile_color='clear')
-        return False
-      elif letter == 'Finish':
-        return True    
-      elif letter != '':
-        no = board[r][c]
-        if no != BLOCK:
-          correct = (self.solution_dict[no][0] == letter) or ((letter in BLOCKS) and (self.solution_dict[no][0] in BLOCKS))
-          if correct:
-            self.known_dict[no] = self.solution_dict[no]
-          else:
-            self.known_dict[no] = [letter, correct]
-          self.update_board(tile_color='clear')          
-          return False 
-        else:
-          return False     
-      return True
+    #self.letters = [letter for letter in (BLOCKS[-1] + 'abcdefghijklmnopqrstuvwxyz')]    
              
-  def game_over(self):
-    """ check for finished game   
-    no more empty letters left in board and all known dict items are correct"""
-    no_blanks =  ~np.any(self.board == SPACE)
-    letters_ok = True
-    for v in self.known_dict.values():
-    	if v[0] != SPACE and not v[1] :
-    		letters_ok = False
-    		break
-    return no_blanks and letters_ok
-    
+  def restart(self):
+        self.gui.gs.close()
+        self.finished = False
+        g = SkelNumbers()
+        g.run() 
+        while (True):
+            quit = g.wait()
+            if quit:
+              break
+                
 if __name__ == '__main__':
   g = SkelNumbers()
   g.run()  

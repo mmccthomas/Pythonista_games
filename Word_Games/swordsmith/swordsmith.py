@@ -557,7 +557,8 @@ class DFSFiller(Filler):
         # randomly shuffle matches
         matches = list(matches)
         shuffle(matches)
-        print(matches)
+        if animate:
+           print(matches)
         for match in matches:
             if not Filler.is_valid_match(crossword, wordlist, slot, match):
                 continue

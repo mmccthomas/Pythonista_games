@@ -36,7 +36,7 @@ WordleList = ['wordlists/words_alpha.txt',
               'wordlists/words_20000.txt']
 BLOCK = '#'
 SPACE = ' '
-
+BLOCKS = '¥&€█'
 
 def board_rc(rc, board, value):
     board[rc[0]][rc[1]] = value
@@ -187,7 +187,7 @@ class CrossNumbers(LetterGame):
         """
         nonzero = np.argwhere(self.number_board > 0)
         square_list = [Squares(tuple(loc), self.number_board[tuple(loc)], 'white' ,
-                               z_position=30, alpha=.5,
+                               z_position=30, alpha=.25,
                                font=('Avenir Next', 15),
                                text_anchor_point=(-1, 1))
                        for loc in nonzero]
@@ -205,9 +205,11 @@ class CrossNumbers(LetterGame):
     
         else:
               # clear wrong squares
+              if wrong.size >0:
+                print('wrong letter', self.board[tuple(wrong[0])])
+                print('wrong', wrong)
               [board_rc(loc, self.board, ' ') for loc in wrong]
-    
-              #TODO modify this to allow for incomplete dict
+              # TODO removing correct letter
               for loc in nonzero:
                   # fill other cells of same number                                                           
                   k = self.known_dict[self.number_board[tuple(loc)]][0]
@@ -455,11 +457,20 @@ class CrossNumbers(LetterGame):
         self.finished = True
         self.check_words()
         self.gui.show_start_menu()
-          
+    
     def game_over(self):
-        """ check for finished game
-        all letters match solution or more empty letters left in board"""
-        return np.all(self.solution_board == self.board) or np.all(np.char.isalpha(self.board) & self.number_board > 0)
+        """ check for finished game   
+        no more empty letters left in board and all known dict items are correct
+        also allows for SkelNumbers version"""
+        full_squares =  ~np.any(self.board == SPACE)
+        letters_ok = True
+        # need to allow for unused letters
+        for v in self.known_dict.values():
+          if v[0] != SPACE and not v[1] :
+            letters_ok = False
+            break
+        return full_squares and letters_ok
+              
              
     def load_words(self, word_length, file_list=WordleList):
         # choose only first item in wordslist for filled board (usually words_alpha)
@@ -470,7 +481,7 @@ class CrossNumbers(LetterGame):
           file_list = file_list[1:]
         LetterGame.load_words(self, word_length, file_list=file_list)
       
-    def initialise_board(self):
+    def initialise_board(self, non_filled_only=False):
         # detects if board has digits, indicating a prefilled board
         boards = {}
         if self.word_dict:
@@ -481,7 +492,8 @@ class CrossNumbers(LetterGame):
              board =  [row.split('/') for row in board]
              name  = key.split('_')[0]      
              boards[name] = board
-      
+        if non_filled_only:
+          boards = {name: board for name, board in boards.items() if name.startswith('Puzzle')}
         self.puzzle = self.select_list(boards)
         if not self.puzzle:
             self.puzzle = random.choice(list(boards))
@@ -535,6 +547,9 @@ class CrossNumbers(LetterGame):
             correct_letter = self.solution_dict.get(no, None)
             if correct_letter:
                 correct = correct_letter == letter
+                # this is for SkelNumbers to make all blocks equivalent
+                if letter in BLOCKS and correct_letter[0] in BLOCKS:
+                  correct = True
             else:
                 correct = True
                 self.solution_dict[no] = letter
@@ -618,5 +633,6 @@ if __name__ == '__main__':
         quit = g.wait()
         if quit:
           break
+
 
 

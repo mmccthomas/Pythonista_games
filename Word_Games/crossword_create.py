@@ -281,23 +281,16 @@ class CrossWord():
         """ solve using swordsmith implementation"""    
         import swordsmith.swordsmith as sword
         # convert board to grid, replace space with dot, and hash with space
-        self.board = np.array(self.board)
+        self.board = np.array(self.empty_board)
         grid = np.char.replace(np.char.replace(self.board, ' ', '.'), '#',' ')               
         crossword = sword.BritishCrossword.from_grid(grid)
         filler = sword.get_filler(sname(**{'strategy': strategy, 'k':5}))
-        #filler = sword.DFSFiller()
-        # filler = sword.DFSBackjumpFiller()
-        # filler = sword.MinlookFiller(5)
-        # filler = sword.MinlookBackjumpFiller(5)
         wordlist = sword.Wordlist(self.all_words)
-        filler.fill(crossword=crossword, wordlist=wordlist, animate=True)    
-        print('finished')
-        print(crossword.words)
-        #crossword.__generate_grid_from_slots()
+        filler.fill(crossword=crossword, wordlist=wordlist, animate=self.debug)    
         for slot in crossword.slots:
         	 for i, idx in enumerate(slot):
            	  self.board[idx] = crossword.words[slot][i]
-        #self.board = np.array(crossword.grid)
+
         self.board[self.board == ' '] = '#'
         self.populate_order = crossword.words.values()    
         for word in self.word_locations:
