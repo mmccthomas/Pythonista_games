@@ -26,7 +26,7 @@ BREAD
 BROILING
 4
 SANDPIPER
-SAVOY#
+SAVOY
 SEAM
 SHY
 SLIGO
@@ -411,26 +411,11 @@ Puzzle5_frame:
 ' / / / / / /6c/a/m/e/l/ / '
 ' / / / / /e/ / / / / /7/ '
 '8/ / / /n/ / / / / / / / '
-' / /t/t/ / / / / / / / / '
+' / / /t/ / / / / / / / / '
 ' / /a/ / /9/ / / / / / / '
-' /u/b/ / / / / /10/ / / / '
-'r/ /m/ / / / / / / / / / '
-'11/ /o/ /12/ / / / / / / / '
-' / /13w/ / / / / / / / / /14'
-
-Puzzle5__frame:
-' / / / /1/ / / / / / / / '
-' / /2/ / / /3/ / / / / / '
-' / / / / / / / / / / / /4'
-' / / /5/ / / / / / / / / '
-' / / / / / /6/ / / / / / '
-' / / / / / / / / / / /7/ '
-'8a/ / / / / / / / / / / / '
-'t/ / / / / / / / / / / / '
-'s/ / /e/ /9/ / / / / / / '
-'y/ /b/ / / / / /10/ / / / '
-'r/u/ / / / / / / / / / / '
-'11c/ / / /12/ / / / / / / / '
+' /u/ / / / / / /10/ / / / '
+'r/ / / / / / / / / / / / '
+'11/ / / /12/ / / / / / / / '
 ' / /13/ / / / / / / / / /14'
 
 Puzzle6:
@@ -2244,3 +2229,258 @@ Puzzle26_frame:
 ' / / / /12/ / / /o/ / / / '
 ' / / / / / / / / /13t/i/p/ '
 '14/ / / / / / / / / / /15/ '
+
+Puzzle27:
+#486-59
+1
+FAITH
+FASTEN
+FRAUD
+FRENETIC
+2
+SECT
+SHE
+SKI
+SPA
+3
+BALSA
+BURR
+BOTTOM
+4
+BASE
+BET
+BROOM
+BUDDHIST
+BYE
+5
+PACE
+PEAS
+PRINTER
+6
+SOU
+STILT
+STY
+7
+SANITY
+SCARCE
+SCENIC
+SEDUCER
+SLIT
+8
+MARINARA
+MONGOOSE
+MUMBLED
+9
+SERRATE
+SON
+SUMMIT
+10
+TALC
+THEORIST
+TIARAS
+11
+ECSTATIC
+EDITOR
+EIGHTEEN
+ENAMOURED
+12
+FERN
+FISCAL
+13
+PHARAOH
+PICA
+PIE
+PRISMS
+PUN
+14
+SACRIFICE
+SANDS
+SCRAM
+SERENADER
+SQUID
+15
+PASSION
+PEACH
+PENANCE
+POINTED
+PRECIOUS
+
+Puzzle27_frame:
+' / / / / / / /1/ / / / / '
+' / /2/ / / / / / / / / /3'
+'n/ / / /4/ / / / / / / / '
+' /e/ / / / /5/ / / / / / '
+' / /e/ / / / / / / /6/ /r'
+'7/ / /t/ / / / / / / /o/8'
+' / / / /h/9/ / / / /t/ / '
+' / / /10/ /g/ / / /i/ / / '
+' / / / / / /i/ /d/ / / / '
+' / / / / / / /11e/ / / / / '
+' /12/ / / / / / / / / /13/ '
+' / / / / / / / /14/ / / / '
+' / / / / / /15/ / / / / / '
+
+Puzzle28:
+#486-116
+1
+MAINSTAY
+METTLE
+MUG
+MYRRH
+2
+CART
+CELL
+CHEQUERS
+CLIQUE
+COOL
+3
+HACIENDA
+HALE
+HAY
+HER
+4
+DEARLY
+DELAY
+DOZEN
+DRY
+DURUM
+5
+ABOUT
+ALLY
+ARDOUR
+6
+KELP
+KETTLE
+KNELL
+KNIGHT
+7
+PILOT
+PLURAL
+PREMIERE
+PRIORY
+PULL
+PUREBRED
+8
+NETBALL
+NOMAD
+NOVELTY
+9
+SAG
+SEER
+SELLER
+SET
+SLOPPY
+SOLO
+10
+GAP
+GLORIOUS
+GUERRILLA
+GUM
+GUPPY
+11
+UNITED
+UPKEEP
+USUAL
+12
+VERBATIM
+VEX
+VOLE
+
+Puzzle28_frame:
+' / / / /1/ / / / / / / / '
+' / / / / / / / / /2/ / / '
+' /3h/ / / / / / / / / / / '
+' /a/a/ / / / / / / / / / '
+' /c/ /l/ / / /4/ / / / / '
+' /i/ / /e/ / / / / / / /5'
+'6/e/ / / / / / / / / / / '
+' /n/ / / /7/ / / / / / / '
+' /d/ / / / / / / / / /8/ '
+' /a/9/ / / / / / / / / / '
+' / / / / / / / / / /10/ / '
+' / / / / / / / /11/ / / / '
+' / / /12/ / / / / / / / / '
+
+Puzzle29:
+#486-164
+1
+TANGO
+TANYARD
+TWIG
+2
+SILO
+SLUR
+SNOWMAN
+SPIRIT
+SPOON
+3
+HELP
+HOP
+HORNPIPE
+4
+OIL
+OLD
+OOZE
+OXEN
+5
+ELAN
+ELECTORAL
+EPIC
+6
+CAREER
+CAROUSEL
+CHIP
+CRUEL
+7
+FALSETTO
+FELL
+FELONY
+FINE
+FUSION
+8
+PARK
+PETAL
+PETROL
+PICADOR
+PRAISE
+PYLON
+9
+GAUNTLET
+GAZELLE
+GENTLY
+10
+MAELSTROM
+MAT
+MEAN
+MINK
+MOP
+MUG
+11
+DAY
+DEEP
+DUET
+DUTY
+12
+WAYFARER
+WREATH
+WRY
+13
+RADIO
+ROSE
+ROYALTY
+RUDOLF
+
+Puzzle29_frame:
+' / / / / / /1/ / / / / / '
+' / / /2/ / / / / / / / / '
+'3/ / / / / / / / / /4/ / '
+' / / / /5/ / / / / / / / '
+' / / / / / / / / / / / / '
+' /6/ / / / / / / /7/ / / '
+' / / / / /8/ / / / / / / '
+' / / / / / / / / / / / /9'
+' / /10m/a/e/l/s/t/r/o/m/ / '
+' / / /a/ / / /11/ / / / / '
+' / / / /t/ / / / / / / / '
+' / / / / / / / / / / /12/ '
+' / / / / /13/ / / / / / / '

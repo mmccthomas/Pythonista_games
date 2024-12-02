@@ -1,0 +1,105 @@
+Puzzle:
+ALPHABET
+AMBUSH
+ARTIST
+BAIT
+BANISH
+BIVOUAC
+BOLLARD
+BORE
+BURSAR
+CENSOR
+CHOICE
+COSMETIC
+DRESSER
+ENDEAVOUR
+ENTENTE
+GLASSES
+HACK
+HATCHET
+HAVOC
+HELM
+HONEY
+MAST
+MATCHSTICK
+MEDIATE
+METRIC
+PARAGON
+PATIO
+PHIAL
+PLACATE
+POTASH
+SAMBUCA
+SCREEN
+SOOTHE
+STOP
+
+Puzzle_frame:
+'e/ /s/b/ / / / / / / /a/b'
+' /b/ / / /c/ / / / / / / '
+' /p/ / / / / / / /b/ / / '
+' / / /h/s/ /s/ / / /m/ / '
+' /c/ / / / / / / / / / / '
+' / / / / / / / /p/ / / /h'
+' /h/ / /d/ / / / / / / /p'
+' /b/ / / / / /g/ / / /p/ '
+' / / /a/ / / /b/ / / / / '
+' / / / / / / / / /m/ /a/ '
+' / / / / /c/h/ / / / / / '
+'p/ / / / / / / / / / /e/ '
+'m/ / / / / / /s/ / / /h/m'
+
+Puzzle2:
+ANTLER
+DECEMBER
+AVENUE
+DIET
+CANAPE
+DISC
+CANDLE
+DRAM
+CHEER
+DRUM
+CHURCH
+FASTEN
+CLASSIC
+FINLAND
+DEAR
+FIREPLACE
+FROST
+GRANDMA
+HERB
+HYMNAL
+IGLOO
+IMBIBE
+ISSUE
+MAGI
+MAMMOTH
+MINISTER
+MITTENS
+MUFF
+PARSNIP
+PIECE
+REBORN
+REMORSE
+REPLENISH
+SAVOURY
+SCARF
+SEASON
+SNOWMAN
+STRUDEL
+
+Puzzle2_frame:
+'s/ / / / /a/ /s/ /a/ / / '
+' / /s/ / / / / / / /s/ /m'
+' / / / / / / / /s/ / / / '
+' /r/ /c/ / / / / / / / / '
+' / / /i/ /c/ / / / / /i/f'
+' /h/ / / / / / / / /f/ /m'
+' /c/p/ / /r/c/ / / / / / '
+' /d/ / / / / / / / / / /m'
+'d/ / / / / / / / / /f/d/ '
+'h/ / / / / / / / /d/ / / '
+'m/ / / / / / / /p/ /r/ / '
+' /c/ / /d/g/ / / /d/ / / '
+'m/i/ / / / / /f/ / / / / '
