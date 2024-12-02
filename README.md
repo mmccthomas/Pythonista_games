@@ -102,6 +102,12 @@ Place the given words in their correct locations given then starting points
 
 Entry point : Word_Games/KrossWord.py
 
+Five ways
+————————-
+A variant of KrossWord where each starting location is shown
+
+Entry point : Word_Games/Fiveways.py
+
 Wordle clone
 ------------
 Choose 5 letters based upon scores for previous guess
@@ -228,6 +234,11 @@ All games have a Pause Menu button in top left corner with various options
 
 Crossword filling with random words proved particularly challenging, but was mostly successful. 
 I would be very interested in any improvements.
+
+Improvement to crossword filling has been achieved by using swordsmith routines from  
+https://github.com/adamaaronson/swordsmith.
+This does not always succeed for some Zipword puzzles, so mine is used a a backup. 
+
 
 Some games, e.g. wordsearch, rely upon touch dragging to select direction and length. 
 
