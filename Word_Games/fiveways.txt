@@ -103,3 +103,220 @@ Puzzle2_frame:
 'm/ / / / / / / /p/ /r/ / '
 ' /c/ / /d/g/ / / /d/ / / '
 'm/i/ / / / / /f/ / / / / '
+
+Puzzle3:
+ABROAD
+AIRSICK
+ARCADE
+CAMP
+CANTINA
+CHART
+CRICKET
+CURRENCY
+DUCKLING
+EDELWEISS
+FJORD
+FRECKLE
+FUEL
+ICECREAM
+INGOT
+IRELAND
+ITALY
+ITINERARY
+MAMBO
+MERCHANT
+MIGRATE
+MOUNTAIN
+MUSKET
+PEACE
+PITCH
+PRIORITY
+PROMOTE
+SCOOP
+SIGN
+SOIREE
+STEER
+SWEDEN
+SWEET
+TARMAC
+TREASURE
+TUNNEL
+
+Puzzle3_frame:
+' / /m/ / / / / /i/ / / /s'
+' / / / / /t/ /p/ / / /i/ '
+'m/ / / / / / / / / / / /i'
+' / / / / / / / / / / / / '
+' / / /i/s/ / / / / / / / '
+' / / / /c/ / / / / / / / '
+' / /s/ /p/f/ /i/ / / / / '
+' /f/s/ /c/ /m/ / /c/d/ / '
+' / / / / / / / / / /f/ /e'
+' / / /s/ / /a/ / / / / /c'
+'s/t/ / / / / / / / / / / '
+' / / /m/ / / / / / / / / '
+'m/p/ / / /a/ / /a/t/ /c/p'
+
+Puzzle4:
+BANQUET
+BANTER
+BOILER
+BROIL
+CANARY
+CHAPLAIN
+CHEEKY
+COOKIE
+CUPOLA
+EMIRATE
+ESCAPADE
+GANACHE
+GUAVA
+GUILE
+JOUST
+JOVIAL
+MEMENTO
+OSMOSIS
+OUNCE
+OXEYE
+PARRY
+PATE
+PERSPEX
+PESTER
+PETTY
+PITY
+POISED
+SIRLOIN
+SLURRY
+SNAG
+SURGEON
+SYNAPSE
+SYNTAX
+TRUCE
+TRY
+TWANG
+TWEAK
+USURP
+
+Puzzle4_frame:
+'b/ / / /c/ / /p/ / / / /e'
+' / / / / /s/s/ / / /b/ / '
+'o/ / / / / / / / / / /c/ '
+'p/ / / / / / / / /p/ / / '
+' /b/ /g/ / / / / / / / / '
+' / / / / / / / / /c/ /o/ '
+' / /m/ /s/ / /e/c/ / /t/ '
+' / / / / / /s/ / / / /g/ '
+' / / /p/ / / / / / /o/ /j'
+'b/ /p/ / / / / / /g/ / / '
+'t/ / / / / /j/p/ / / / / '
+'p/ / / / / / / / /c/ /t/ '
+' / / / /t/u/s/ / / / /s/ '
+
+Puzzle5:
+BALSAM
+BOHEMIA
+BOOK
+CAVA
+CHURLISH
+CRIMINAL
+DEER
+DELTA
+DELUXE
+DRAM
+EDIT
+EXTEND
+FIELDWORK
+FLAW
+FLECK
+FORT
+GAIT
+GALLEON
+GRIDDLE
+GURGLE
+GURU
+HASSLE
+HURTLE
+INHERIT
+KINDRED
+PANACHE
+PANCAKE
+PEONY
+PIANO
+POOL
+RAITA
+RATEL
+RHEBOK
+SCRAMBLE
+SCREAM
+SHADE
+SNIPE
+SOLITUDE
+TIPTOED
+
+Puzzle5_frame:
+'b/ / /g/p/r/f/ / / / /b/ '
+'d/ / / / / / / / / /d/ / '
+' / / / / / /t/ / /e/r/ / '
+'f/ / / / /c/ /e/d/ / /s/ '
+'s/ /p/ /p/ /k/ / / / / / '
+' / / / / / / / / /f/ / / '
+' /g/ / / / / / /g/ / / /p'
+' /r/ / /s/ / / / / / /g/ '
+' / / / / / / / / / / / / '
+' / / / / / / / / /p/ / / '
+' / / / / / /s/ / /h/ / /c'
+' / / /f/c/ / / / / /s/ /h'
+'b/ /i/ / / / / /g/ / / /d'
+
+Puzzle6:
+AGOG
+ANGORA
+BARITONE
+BESPOKE
+BODGE
+BOURBON
+CARAMEL
+CATSUIT
+CAVORT
+CINNAMON
+COTTON
+CROOK
+ILEUM
+IMMATURE
+IMMUNE
+IMPEL
+LASSOED
+LOGGIA
+LOGIC
+NOVEL
+NOVICE
+POULT
+PRESENT
+PRESSURE
+PRESUME
+PRIEST
+SPITFIRE
+SPORTIVE
+STET
+STOICAL
+STOMACH
+TALON
+TAMPER
+TOOK
+TOOT
+WEALTH
+
+Puzzle6_frame:
+'c/i/ / / / / / /t/ / / / '
+'t/a/ /p/ / / / / / /w/ /t'
+' / /i/ / / / / / / / / / '
+' / / / / / / / / /p/ / / '
+' / / / /c/ /b/ / /c/l/ / '
+'p/ / / / / / /i/ / / /n/ '
+' / / / / / /s/ / / / / / '
+' / / / / / / /s/ / / / /l'
+' /p/ / / / / / / / / /b/ '
+' /b/ / / / / / / /t/ / / '
+' / /n/ / / / /c/p/ / / / '
+'a/ / / / /i/l/ / / / / /c'
+'c/s/ / / / / / / /s/s/b/ '

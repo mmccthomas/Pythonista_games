@@ -52,7 +52,7 @@ class FiveWays(KrossWord):
     for word in self.all_words:
       self.start_dict[word[0]]['words'].append(word)
     # sort longest to shortest
-    self.wordlist[None]  = sorted(self.wordlist[None], key=len, reverse=True)
+    self.wordlist[None]  = sorted(self.wordlist[None]) #, key=len, reverse=True)
     self.update_matches() 
       
   def run(self):
@@ -66,46 +66,3 @@ if __name__ == '__main__':
     quit = g.wait()
     if quit:
       break
-  
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

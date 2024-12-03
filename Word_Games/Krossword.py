@@ -15,7 +15,7 @@ import sys
 import re
 from itertools import groupby
 from queue import Queue
-from time import sleep
+from time import sleep, time
 import random
 import numpy as np
 import traceback
@@ -114,6 +114,9 @@ class KrossWord(LetterGame):
                        continue
                    elif word == match[:word_len]:
                      # found complete match
+                     # TODO this can find very rare false positives where placed words
+                     # just happens to satisfy word to be yet placed
+                     # this is flagged when wordlist is empty but not all squares filled
                      return [(coord, index, word, pos)]
                    else:
                        m = re.compile(match[:word_len])
@@ -122,7 +125,14 @@ class KrossWord(LetterGame):
        return  possibles
       
   def board_is_full(self):
-    return np.all(np.char.isalpha(self.board))
+    """board is full
+    OR no words left in wordlist """
+    board_full = np.all(np.char.isalpha(self.board))
+    wordlist = [word for words in self.wordlist.values() for word in words]
+    wordlist_empty = len(wordlist)== 0
+    if wordlist_empty:
+      print(f'All words used, {board_full=}')
+    return board_full or wordlist_empty
   
   def word_is_full(self, possibles):
        """ check if possible already contains filled word"""       
@@ -225,6 +235,7 @@ class KrossWord(LetterGame):
         previous_board = self.board.copy()
         previous_letter_board = self.letter_board.copy()
         if self.debug:
+            print('remaining words', self.wordlist)
             print(possibles)
         for i, possible in enumerate(possibles):
             if self.debug:
@@ -234,7 +245,7 @@ class KrossWord(LetterGame):
             if self.fill():
                 return True
             # back here if match failed
-            # if no match works, restore previous word
+            # if no match works, restore previous word and board
             self.board = previous_board
             self.letter_board = previous_letter_board
             # cancel the placement
@@ -246,16 +257,16 @@ class KrossWord(LetterGame):
     """solve the krossword
     use dfs search.
     """  
+    t = time()
     self.fill()
+    solve_time = time() - t
     complete = 'Board Complete' if self.board_is_full() else 'Board not Complete'
-    self.gui.set_prompt(f'Placed {self.placed} words ,{complete} in {self.iteration_counter} iterations')
+    self.gui.set_prompt(f'Placed {self.placed} words ,{complete} in {self.iteration_counter} iterations, {solve_time:.3f}secs')
     self.gui.set_message('')   
     self.solution = self.board.copy()
-    empty = np.sum(self.board == SPACE)
     self.board = self.empty_board
     self.wordlist = self.wordlist_original.copy()
     self.gui.update(self.board)  
-    return empty 
                 
   def print_board(self, remove=None):
     """
@@ -302,25 +313,25 @@ class KrossWord(LetterGame):
      return LetterGame.get_size(self, gridsize)
      
   def create_wordlist_dictionary(self):
-  	  # split the words and numbers into dictionary
-	    key = None
-	    w_dict = {}
-	    w_list = []
-	    for word in self.wordlist:
-	      # skip comment
-	      if word.startswith('#'):
-	        continue
-	      if word.isnumeric():
-	        if key:
-	          w_dict[key] = w_list # remove empty string
-	          w_list = []
-	        key = word      
-	      else:
-	        w_list.append(word)
-	    w_dict[key] = w_list # remove empty string   
-	    
-	    return w_dict
-  	
+      # split the words and numbers into dictionary
+      key = None
+      w_dict = {}
+      w_list = []
+      for word in self.wordlist:
+        # skip comment
+        if word.startswith('#'):
+          continue
+        if word.isnumeric():
+          if key:
+            w_dict[key] = w_list # remove empty string
+            w_list = []
+          key = word      
+        else:
+          w_list.append(word)
+      w_dict[key] = w_list # remove empty string   
+      
+      return w_dict
+    
   def initialise_board(self):
     """ create start_dict with structure
     {: {words: [wordlist], coords: {Coord: [matches], Coord: [matches], ...}}"""
@@ -561,7 +572,7 @@ class KrossWord(LetterGame):
     self.print_board()
     self.empty_board = self.board.copy()
     self.wordlist_original = deepcopy(self.wordlist)
-    error = self.solve(enable_guesses=False) 
+    self.solve(enable_guesses=False) 
     while True:
       move = self.get_player_move(self.board)
       if move[0] == HINT:
@@ -590,6 +601,9 @@ if __name__ == '__main__':
     if quit:
       break
   
+
+
+
 
 
 
