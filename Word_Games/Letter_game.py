@@ -229,9 +229,9 @@ class LetterGame():
     self.gui.require_touch_move(False)
     self.gui.allow_any_move(True)
     for k, v in kwargs.items():
-    	setattr(self, k, v)
+      setattr(self, k, v)
     if self.column_labels_one_based:
-    	self.gui.gs.column_labels = '1 2 3 4 5 6 7 8 9 10111213141516171819202122232425262728293031'
+      self.gui.gs.column_labels = '1 2 3 4 5 6 7 8 9 10111213141516171819202122232425262728293031'
     self.gui.setup_gui(log_moves=True)
     
     # menus can be controlled by dictionary of labels and functions without parameters
@@ -388,7 +388,7 @@ class LetterGame():
       selection = dialogs.list_dialog(prompt, items)
       
       if selection == 'cancelled_':
-        	return None 
+          return None 
       if len(selection):
           if self.debug:   
             print(f'{selection=}')
@@ -643,7 +643,7 @@ class LetterGame():
     else:
         selection = console.input_alert("What is the dimension of the board (X, Y)? (Default is 5x5)\nEnter 2 numbers:")
     try:
-    	# can use space, comma or x for seperator
+      # can use space, comma or x for seperator
       size = selection.replace(',',' ').replace('x', ' ').split() 
       if len(size) == 2:
         self.sizey = int(size[1])
@@ -855,16 +855,15 @@ class LetterGame():
   def wait(self):
     #wait until closed by gui or new game
     while True:
-      if not self.gui.v.on_screen:
+      if  not self.gui.v.on_screen:
         print('View closed, exiting')
         return True
-        break
+        
       if self.finished: # skip if in game
         try:
           if not self.q.empty():
-            item = self.q.get(block=False)
-            # print('item', item)
-            if item is self.quit:
+            item = self.q.get(block=False)           
+            if item  == self.quit:
               return True
             item() 
         except (Exception) as e:
@@ -880,6 +879,7 @@ if __name__ == '__main__':
     quit = g.wait()
     if quit:
       break
+
 
 
 

@@ -38,7 +38,7 @@ class KrossWord(LetterGame):
   def __init__(self):
     self.wordfile = 'krossword.txt'
     # allows us to get a list of rc locations
-    self.strikethru = False
+    self.strikethru = True
     self.log_moves = True
     self.debug = False
     self.table = None
@@ -130,7 +130,7 @@ class KrossWord(LetterGame):
     board_full = np.all(np.char.isalpha(self.board))
     wordlist = [word for words in self.wordlist.values() for word in words]
     wordlist_empty = len(wordlist)== 0
-    if wordlist_empty:
+    if wordlist_empty and self.debug:
       print(f'All words used, {board_full=}')
     return board_full or wordlist_empty
   
@@ -253,7 +253,7 @@ class KrossWord(LetterGame):
 
         return False
                      
-  def solve(self, enable_guesses=False):    
+  def solve(self):    
     """solve the krossword
     use dfs search.
     """  
@@ -261,18 +261,20 @@ class KrossWord(LetterGame):
     self.fill()
     solve_time = time() - t
     complete = 'Board Complete' if self.board_is_full() else 'Board not Complete'
-    self.gui.set_prompt(f'Placed {self.placed} words ,{complete} in {self.iteration_counter} iterations, {solve_time:.3f}secs')
+    msg = f'Placed {self.placed} words ,{complete} in {self.iteration_counter} iterations, {solve_time:.3f}secs'
+    self.gui.set_prompt(msg)
     self.gui.set_message('')   
     self.solution = self.board.copy()
     self.board = self.empty_board
     self.wordlist = self.wordlist_original.copy()
-    self.gui.update(self.board)  
+    self.gui.update(self.board) 
+    return msg
                 
   def print_board(self, remove=None):
     """
     Display the  players game board
     """
-    display_words = self.wordlist.copy()
+    display_words = self.wordlist
     
     msg = ''
     for k, v in display_words.items():
@@ -321,7 +323,7 @@ class KrossWord(LetterGame):
         # skip comment
         if word.startswith('#'):
           continue
-        if word.isnumeric():
+        if word.isnumeric(): # key for krossword
           if key:
             w_dict[key] = w_list # remove empty string
             w_list = []
@@ -333,7 +335,9 @@ class KrossWord(LetterGame):
       return w_dict
     
   def initialise_board(self):
-    """ create start_dict with structure
+    """ For krossword board text may be number or number letter
+        For fiveways board text may only be letter
+    create start_dict with structure
     {: {words: [wordlist], coords: {Coord: [matches], Coord: [matches], ...}}"""
     
     def split_text(s):
@@ -347,7 +351,9 @@ class KrossWord(LetterGame):
     number_letters = np.array([(r,c) for c in range(self.sizex) 
                                for r in range(self.sizey) 
                                if len(list(split_text(board[r][c])))>1])
+                               
     numbers = np.argwhere(np.char.isnumeric(self.board))
+    
     self.start_dict = {}
     square_list = []
     for number in np.append(numbers, number_letters, axis=0):
@@ -362,15 +368,16 @@ class KrossWord(LetterGame):
       
       square_list.append(Squares(number, no, 'yellow', z_position=30,
                                         alpha=0.5, font=('Avenir Next', 18),
-                                        text_anchor_point=(-1.1, 1.2)))
-                        
+                                        text_anchor_point=(-1.1, 1.2)))                     
     self.gui.add_numbers(square_list)
+    # number clues display as blank
     self.board[np.char.isnumeric(self.board)] = SPACE
     
 
     w_dict = self.create_wordlist_dictionary()
     # letter board is invisble version of board, 
     # where numbers have been replaced by start letter
+    # we dont want to see equivalent letters on board, but solver needs them
     self.letter_board = self.board.copy()
     for k, words  in w_dict.items():
       self.start_dict[str(k)]['words'] = words
@@ -422,8 +429,9 @@ class KrossWord(LetterGame):
         else:
             return False
             
-  def process_turn(self, move, board):
+  def process_turn(self, move, board, test=None):
     """ process the turn
+        provide test as selection to skip input list
     """
     #self.delta_t('start process turn')
     def uniquify(moves):
@@ -434,7 +442,8 @@ class KrossWord(LetterGame):
       """ convert all letters to strikethru """
       result = ''
       for c in text:
-          result = result + c + '\u0336'
+          #.                    minus sign below  striketrhu
+          result = result + c + '\u0320' + '\u0336'
       return result
           
    # try to deal with directions 
@@ -444,36 +453,37 @@ class KrossWord(LetterGame):
         if self.straight_lines_only:
           move = self.predict_direction(move)
         else:
-          pass
           move = uniquify(move)        
         
         try:
-            start = move[0]
-            for index, letter_dict in self.start_dict.items():
-                if Coord(start) in list(letter_dict['coords'].keys()):
-                  break                
-            try:    
-                item_list = self.wordlist[index]
-            except (KeyError): # for Fiveways
-               item_list = [l for l in self.wordlist[None] if l.startswith(self.board[start])]
-               
-            prompt = f"Select from {len(item_list)} items"
-            if len(item_list) == 0:
-               raise (IndexError, "list is empty")
+              start = move[0]
+              for index, letter_dict in self.start_dict.items():
+                  if Coord(start) in list(letter_dict['coords'].keys()):
+                    break                
+              try:    
+                  item_list = self.wordlist[index]
+              except (KeyError): # for Fiveways
+                 item_list = [l for l in self.wordlist[None] if l.startswith(self.board[start])]
+                 
+              prompt = f"Select from {len(item_list)} items"
+              if len(item_list) == 0:
+                 raise (IndexError, "list is empty")
       
-             
-            # return selection
-            self.gui.selection = ''
-            selection = ''
-            while self.gui.selection == '':
-              self.gui.input_text_list(prompt=prompt, items=item_list, position=(800, 0))
-              while self.gui.text_box.on_screen:
-                try:
-                  selection = self.gui.selection.lower()
-                  selection_row = self.gui.selection_row
-                except (Exception) as e:
-                  print(e)
-                  print(traceback.format_exc())
+              if test is None: 
+                # return selection
+                self.gui.selection = ''
+                selection = ''
+                while self.gui.selection == '':
+                  self.gui.input_text_list(prompt=prompt, items=item_list, position=(800, 0))
+                  while self.gui.text_box.on_screen:
+                    try:
+                      selection = self.gui.selection.lower()
+                      selection_row = self.gui.selection_row
+                    except (Exception) as e:
+                      print(e)
+                      print(traceback.format_exc())
+              else:
+                   selection, selection_row = test
                   
               if selection in item_list and len(move) == len(selection):
                 self.gui.selection = ''
@@ -485,19 +495,23 @@ class KrossWord(LetterGame):
                     print('letter ', selection, 'row', selection_row)
                 for coord, letter in zip(move, selection):
                   self.board[coord] = letter
-                #strike thru text
-                if all([self.board[coord] == self.solution[coord] for coord in move]):
-                   try:
-                       word =self.wordlist[index][selection_row]            
-                   except (KeyError): # for Fiveways
-                       word =self.wordlist[None][selection_row]      
+                  
+                #check if correct
+                if all([self.board[coord] == self.solution[coord] for coord in move]):                 
+                   word = item_list[selection_row]      
+                                                                   
+                   #strikethru or remove from list    
                    if self.strikethru:
-                       word = strike(word)
+                       try:
+                           self.wordlist[index][selection_row] = strike(word)
+                       except (KeyError): # for Fiveways
+                           self.wordlist[None][self.wordlist[None].index(word)] = strike(word)           
                        self.print_board()
                    else:
                         self.print_board(remove=word)                                  
                 self.gui.update(self.board)  
                 return
+                
               elif selection == "Cancelled_":
                 return
               else:
@@ -542,9 +556,8 @@ class KrossWord(LetterGame):
     self.gui.clear_numbers()      
     try:
        #self.moves.reverse()
-       length = len(self.moves)
-       for i in range(length):
-           self.board, self.wordlist = self.moves[i]
+       for move in self.moves:
+           self.board, self.wordlist = move
            self.gui.update(self.board)
            self.print_board()
            sleep(1)
@@ -552,7 +565,6 @@ class KrossWord(LetterGame):
       return
       
   def run(self):
-    # LetterGame.run(self)
     """
     Main method that prompts the user for input
     """
@@ -572,15 +584,14 @@ class KrossWord(LetterGame):
     self.print_board()
     self.empty_board = self.board.copy()
     self.wordlist_original = deepcopy(self.wordlist)
-    self.solve(enable_guesses=False) 
+    self.solve() 
+    # user interaction loop
     while True:
       move = self.get_player_move(self.board)
       if move[0] == HINT:
         self.undo()
       move = self.process_turn(move, self.board)
-  
-      # if finish:
-      #  break
+
       if self.game_over():
         break
     
@@ -600,36 +611,5 @@ if __name__ == '__main__':
     quit = g.wait()
     if quit:
       break
-  
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 

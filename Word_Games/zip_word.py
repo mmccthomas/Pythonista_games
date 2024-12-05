@@ -29,8 +29,9 @@ FINISHED = (-10, -10)
 
 class ZipWord(LetterGame):
   
-  def __init__(self):
+  def __init__(self, test=None):
     self.debug = False
+    self.test = test
     # allows us to get a list of rc locations
     self.log_moves = True
     self.word_dict = {}
@@ -158,7 +159,7 @@ class ZipWord(LetterGame):
     # strategy options 'dfs', 'dfsb',  'minlook', 'mlb'                     
     self.board = cx.populate_words_graph(swordsmith_strategy='dfs')
     if np.argwhere(self.board=='.').size > 0:
-    	 # failed, so use original
+       # failed, so use original
        self.board = cx.populate_words_graph(max_iterations=1000, length_first=False)
     self.check_words()
     self.create_number_board()
@@ -166,19 +167,20 @@ class ZipWord(LetterGame):
                               grid_width_x=1, grid_width_y=1,
                               color='grey', line_width=1)
     self.gui.reset_waiting(wait)
-    while True:
-      move = self.get_player_move(self.board)
-      self.process_turn(move, self.board)
-      sleep(1)
-      if self.game_over():
-        break
-    
-    self.gui.set_message2('Game over')
-    self.gui.set_message('')
-    self.gui.set_prompt('')
-    sleep(4)
-    self.finished = True
-    self.gui.show_start_menu()
+    if self.test is None:
+        while True:
+          move = self.get_player_move(self.board)
+          self.process_turn(move, self.board)
+          sleep(1)
+          if self.game_over():
+            break
+        
+        self.gui.set_message2('Game over')
+        self.gui.set_message('')
+        self.gui.set_prompt('')
+        sleep(4)
+        self.finished = True
+        self.gui.show_start_menu()
       
   def game_over(self):
     """ check for finished game
@@ -196,7 +198,7 @@ class ZipWord(LetterGame):
       selection = dialogs.list_dialog(prompt, items)
       
       if selection == 'cancelled_':
-        	return None 
+          return None 
       if len(selection):
           if self.debug:   
             print(f'{selection=}')
@@ -214,11 +216,13 @@ class ZipWord(LetterGame):
          board = [row.split('/') for row in board]
          name = key.split('_')[0]
          word_lists[name] = [self.word_dict[name], board]
-        
-    self.puzzle = random.choice(list(word_lists))
-    self.puzzle = self.select_list(word_lists)
-    if not self.puzzle:
-    	self.puzzle = random.choice(list(word_lists))
+    if self.test is None:     
+        self.puzzle = random.choice(list(word_lists))
+        self.puzzle = self.select_list(word_lists)
+        if not self.puzzle:
+          self.puzzle = random.choice(list(word_lists))
+    else:
+        self.puzzle = self.test  
     self.all_words, self.board = word_lists[self.puzzle]
     self.all_words = [word.lower() for word in self.all_words]
     # parse board to get word objects
@@ -353,5 +357,6 @@ if __name__ == '__main__':
     if quit:
       break
   
+
 
 

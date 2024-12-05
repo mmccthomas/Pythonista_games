@@ -16,6 +16,7 @@ import random
 import dialogs
 import numpy as np
 import traceback
+import string
 from itertools import groupby
 from time import sleep
 from queue import Queue
@@ -52,7 +53,9 @@ def copy_board(board):
   
 class CrossNumbers(LetterGame):
   
-    def __init__(self):
+    def __init__(self, test=None):
+        # test overrides manual selections
+        self.test = test
         self.debug = False
         # allows us to get a list of rc locations
         self.log_moves = True
@@ -95,7 +98,7 @@ class CrossNumbers(LetterGame):
         solution contains complete number, letter pairs
         known_dict contains partial known items
         """
-        self.letters = [letter for letter in 'abcdefghijklmnopqrstuvwxyz']
+        self.letters = [letter for letter in string.ascii_lowercase]
         numbers = list(range(1, 27))
         if not self.filled_board:
             shuffled = random.sample(self.letters, k=len(self.letters))
@@ -204,12 +207,8 @@ class CrossNumbers(LetterGame):
             self.gui.put_numbers(items)
     
         else:
-              # clear wrong squares
-              if wrong.size >0:
-                print('wrong letter', self.board[tuple(wrong[0])])
-                print('wrong', wrong)
+              # clear wrong squares               
               [board_rc(loc, self.board, ' ') for loc in wrong]
-              # TODO removing correct letter
               for loc in nonzero:
                   # fill other cells of same number                                                           
                   k = self.known_dict[self.number_board[tuple(loc)]][0]
@@ -217,7 +216,7 @@ class CrossNumbers(LetterGame):
        
         # display the letters remaining to be placed
         known = [val[0] for val in self.known_dict.values() if val[0] != ' ']
-        missing = set('abcdefghijklmnopqrstuvwxyz').difference(set(known))
+        missing = set(string.ascii_lowercase).difference(set(known))
         missing = [letter.upper() for letter in missing]
         self.gui.set_message2(f'Missing letters {missing}')
                                
@@ -378,9 +377,10 @@ class CrossNumbers(LetterGame):
              for loc in nonzero]
         return result
         
-    def run(self):
+    def run(self, test=None):
         """
         Main method that prompts the user for input
+        if test is provided, skips user interaction
         """
         def transfer_props(props):
            return {k: getattr(self, k) for k in props}
@@ -439,24 +439,28 @@ class CrossNumbers(LetterGame):
     
         self.gui.set_message('')
         self.gui.set_enter('Hint', position=(w, h + 5), fill_color='red')
-        
-        while True:
-          move = self.get_player_move(self.board)
-          finish = self.process_turn( move, self.number_board)
-          sleep(1)
-          if finish:
-            break
-          if self.game_over():
-            break
-        
-        self.gui.set_message2('Game over')
-        dialogs.hud_alert('Game Over')
-        self.gui.set_message('')
-        self.gui.set_prompt('')
-        sleep(4)
-        self.finished = True
-        self.check_words()
-        self.gui.show_start_menu()
+        if self.test is None:
+            while True:
+              move = self.get_player_move(self.board)
+              finish = self.process_turn( move, self.number_board)
+              sleep(1)
+              if finish:
+                break
+              if self.game_over():
+                break
+            
+            self.gui.set_message2('Game over')
+            dialogs.hud_alert('Game Over')
+            self.gui.set_message('')
+            self.gui.set_prompt('')
+            sleep(4)
+            self.finished = True
+            self.check_words()
+            self.gui.show_start_menu()
+        else: 
+             self.finished = True
+             self.gui.v.close()
+             
     
     def game_over(self):
         """ check for finished game   
@@ -494,9 +498,13 @@ class CrossNumbers(LetterGame):
              boards[name] = board
         if non_filled_only:
           boards = {name: board for name, board in boards.items() if name.startswith('Puzzle')}
-        self.puzzle = self.select_list(boards)
-        if not self.puzzle:
-            self.puzzle = random.choice(list(boards))
+        if self.test is None:
+           self.puzzle = self.select_list(boards)
+           if not self.puzzle:
+              self.puzzle = random.choice(list(boards))
+        else:           
+            self.puzzle = self.test
+            
         self.board = boards[self.puzzle]
         
         self.word_locations = []
@@ -546,13 +554,14 @@ class CrossNumbers(LetterGame):
             no = self.number_board[(r,c)]
             correct_letter = self.solution_dict.get(no, None)
             if correct_letter:
-                correct = correct_letter == letter
+                correct = correct_letter[0] == letter
+                
                 # this is for SkelNumbers to make all blocks equivalent
                 if letter in BLOCKS and correct_letter[0] in BLOCKS:
                   correct = True
-            else:
-                correct = True
-                self.solution_dict[no] = letter
+            #else:
+            #    correct = True
+            #    self.solution_dict[no] = letter
             self.known_dict[no] = [letter, correct]
             self.update_board()
                 
@@ -626,13 +635,16 @@ class CrossNumbers(LetterGame):
   
               
 if __name__ == '__main__':
-    g = CrossNumbers()
+    g = CrossNumbers() #test='Puzzle1')
     g.run()
       
     while (True):
         quit = g.wait()
         if quit:
           break
+
+
+
 
 
 

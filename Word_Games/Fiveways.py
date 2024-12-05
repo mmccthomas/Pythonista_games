@@ -15,7 +15,8 @@ class FiveWays(KrossWord):
   def __init__(self):
     KrossWord.__init__(self)   # same as KrossWord
     self.debug = False
-    self.wordfile = 'fiveways.txt'         
+    self.wordfile = 'fiveways.txt'
+    self.strikethru = False 
   
   def initialise_board(self):
     """ initialise board and start_dict
@@ -51,8 +52,8 @@ class FiveWays(KrossWord):
 
     for word in self.all_words:
       self.start_dict[word[0]]['words'].append(word)
-    # sort longest to shortest
-    self.wordlist[None]  = sorted(self.wordlist[None]) #, key=len, reverse=True)
+    # sort alphabetically    - was longest to shortest
+    self.wordlist[None]  = sorted(self.wordlist[None]) #,key=len, reverse=True)
     self.update_matches() 
       
   def run(self):
