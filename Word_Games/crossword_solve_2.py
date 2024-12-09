@@ -92,6 +92,11 @@ class AlternativeSolve(LetterGame):
             this is probably the best next place to look."""
             
             def score(word_obj):
+                """produce a score for word solution
+                if given list of (Word object, word), it scores
+                length of list, length of Word, and number of alphanumerics in 
+                Word
+                """
                 length = 100
                 max_length = 100
                 if isinstance(word_obj, list):
@@ -104,8 +109,7 @@ class AlternativeSolve(LetterGame):
                         10 * sum([c.isalnum() for c in word_obj.match_pattern]) +
                         int(1000 * (1/ length))
                        )            
-            fewest_matches = 100
-            fewest_possibles = []
+            
             all_possibles = [self.find_possibles(word_obj)  
                              for word_obj in self.word_locations if not word_obj.fixed]
             
@@ -127,41 +131,14 @@ class AlternativeSolve(LetterGame):
                return (None, 0)
                
             fewest_possibles = all_possibles[-1]
-            fewest_matches = len(fewest_possibles)   
+            fewest_matches = len(fewest_possibles)
+            
             if self.debug:                
-                [print(f'{possible[0]}, {len(possible)=}, match {possible[0][0].match_pattern}, score {score(possible)}') for possible in all_possibles[-5:]]      
+                [print(f'{possible[0]}, match {possible[0][0].match_pattern}, len {len(possible)},score {score(possible)}') for possible in all_possibles[-5:]]      
                 print('Selecting', fewest_possibles[0])      
             
             return fewest_possibles, fewest_matches           
-            """
-            for word_obj in self.word_locations:
-                 if word_obj.fixed:
-                     continue  
-                 possibles = self.find_possibles(word_obj)
-                 
-                 if len(possibles) == 0:
-                     # if there is a position with no matches, induce a backtrack
-                     # to last choice
-                     if self.debug:                          
-                         print(f'No possibles for {word_obj} {word_obj.match_pattern}')
-                     return (None, 0)
-                                  
-                 # if min length choose it
-                 if len(possibles) < fewest_matches:
-                        fewest_matches = len(possibles)
-                        fewest_possibles = possibles.copy()                        
-                        fewest_score = score(word_obj)
-                        
-                 elif len(possibles) == fewest_matches:
-                        # we'd like to choose best choice otherwise'
-                        if possibles != fewest_possibles:
-                         # score = length + 10 * no matching letters
-                         if score(word_obj) > fewest_score:
-                            fewest_possibles = possibles.copy() 
-                            fewest_score = score(word_obj)       
-            """                                               
-                  
-             
+            
     def place_word(self, possible, previous=False):
           """ fill board
           if previous is True, fill with match """      
@@ -183,8 +160,7 @@ class AlternativeSolve(LetterGame):
                 print(f'{word} not in wordlist')
               self.placed += 1          
           else:
-              # board has already reverted
-        
+              # board has already reverted       
               self.wordlist.append(word)
               word_obj.word = ''
               word_obj.fixed = False              
@@ -217,9 +193,9 @@ class AlternativeSolve(LetterGame):
             #store a copy of the current board
             previous_board = self.board.copy()
             
-            if self.debug:
-                #print('remaining words', self.wordlist)
-                print(possibles)
+            #if self.debug:
+            #    #print('remaining words', self.wordlist)
+            #    print(possibles)
                 
             # randomising choices allows different solve path on each run
             # can solve failures
@@ -241,10 +217,12 @@ class AlternativeSolve(LetterGame):
     
             return False
             
-    def try_multiple(self, filepath, tries=5):
+    def try_multiple(self, filepath, board, tries=5):
      self.start_time=time()
-     for iteration in range(tries):   
-       if iteration == tries - 2:
+     for iteration in range(tries):  
+       self.board = np.array(board) 
+       self.update_matches()
+       if iteration == tries - 1:
           self.debug = True    
        self.fill()
        print()
@@ -252,7 +230,7 @@ class AlternativeSolve(LetterGame):
        if self.board_is_full():
            break
        else:
-           print(f'trying again, {iteration} {"="*50}')            
+           print(f'trying again, {iteration+1} {"="*50}')            
            print()
      self.delta_t('elapsed')
      return self.board
@@ -280,7 +258,9 @@ if __name__ == '__main__':
      obj.SIZE = max(obj.board.shape)
      obj.length_matrix()
      obj.compute_intersections()
-     obj.update_matches()
-     obj.try_multiple(filename)        
+     
+     obj.try_multiple(filename, board)        
+
+
 
 
