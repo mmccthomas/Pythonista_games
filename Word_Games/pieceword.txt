@@ -2362,7 +2362,7 @@ QUEU XS S.
 663-91_frame:
  U ATE A U C
 ESTM LINGSIO
- U OLD T U O
+ U OLD T U D
    OTELY S S
 INE    D LIT
 M N H ER I U
@@ -2447,3 +2447,475 @@ OOTSTR I AFE
  I N U K.   
 SCUASLACK.  
 I NE E H.   
+
+486-4:
+''
+7, 5
+1921180214251001172713340515242806030931263020070016112204123332082329
+
+486-4_text:
+1 Female tender of flocks?
+2 Parrot-fashion method of earning •
+  Breathe heavily
+3 Put into words
+4 Pupa's covering • -—your time,
+  waiting for a suitable moment
+5 Have a wager
+6 Lose colour and brightness •
+  Destiny, chance
+7 Select by ballot • Cove or bay •
+  Breeze
+8 Mountain ash tree • Construct, build
+9 Person who looks after another
+10 Dispersed as seed • Inner
+   Hebridean island
+11 Force from a position of power •
+   Greek pastry
+12 Declaim, rave • Talk boastfully
+13 Place of gladiatorial combat
+14 Large Bedfordshire airport •
+   The ones here
+15 Sheet of window glass • Edible part
+   of a cow's stomach • Pavement's
+   border
+16 Rough attempt • High-spirited,
+   forward
+17 Poke your nose in
+18 Door-to-door salesperson •
+   Bathroom stone
+19 Relating to the science of movement
+20 Emporium • Gas used in
+   fluorescent lights
+21 In low spirits
+
+486-4_frame:
+ V  D DES E  PE
+SE BETR PT F L 
+ERBA EATE Y PUM
+NLEN EA. DYNM S
+ U OUSTHE M ILO
+ARET SE KHEAN B
+OONAB RT VOTS S
+ P  E V L ROANT
+DE KERICE G D A
+T W STBIDHERW S
+EREC O F  L ROT
+R. HAW FACULE A
+RENHEPA AAMIIND
+ T E APRYI NCT 
+RIPRTI H RTE H 
+COC T INGSOWC A
+K C LUS EI. EON
+ FAPANTE RAND T
+  AKYEEROI AE I
+TON. RT AMARWAN
+E TRAGOWNE D. C
+
+486-84:
+''
+7, 5
+123
+
+486-84_text:
+1 Strong, bright, deep red colour •
+  With great speed
+2 Ostrich-like Australian bird
+3 Twist or force out of normal shape •
+  Relating to wedlock
+4 Style of American theatrical dance
+5 Greek goddess of the rainbow •
+  Tempt, entice
+6 Corridor inside a house
+7 Star sign, the Lion • Electrically
+  charged particle
+8 Very strong alloy of iron and carbon •
+  Gather (grain) after a harvest
+9 Right given by the franchise • Curved
+  out of shape
+10 Person who disappears illegally
+11 Single step in running or walking
+   • Twisted threads that hold
+   a candle flame
+12 Nagged
+13 Man's partner in marriage •
+   Impudent behaviour
+14 In possession of a weapon • Frame
+   supporting a picture during painting
+15 Small horse-like animal •
+   Bill run up in a bar
+16 Maker, originator
+17 Soft inner white skin of an orange •
+   Crooked, askew
+18 Domestic canine
+19 Holding of land or property for a short
+   period • Etch a design on metal
+   using acid
+20 Organ controlling equilibrium
+21 Worked out, concluded •
+   Fingerless gloves
+   
+486-84_frame:
+ S EATI AANC. G
+LEA G L G I ASE
+  BDOGA OUCE T 
+DLYY E A IONTEN
+E UEAR LUN IU E
+TALD MAY ENTDED
+A RMSON RWIFCON
+D E N EMUE A W 
+R STORT MASSPEC
+K EAPICRIALL. Y
+ IR A O NL OCK 
+S MARICONTAB. G
+ABSOR E.  W E E
+CE. AW PAIS RY 
+HEN I T.  HAN L
+E. TAPK H CR O 
+RME I  PITH TEE
+ E LLWS O A E. 
+E EAVENGRLEODER
+RE T N H A S WI
+M UENSITTVOTKED
+
+486-126:
+''
+7, 5
+123
+
+486-126_text:
+1 Goes for a swim • Leisurely stroll
+2 Disconnect or loosen
+3 Sheet of canvas on a mast •
+  Sunrise direction
+4 Without, minus • Rest on bended
+  legs • Batten
+5 Snooker player's rod • Anticipated
+  end of a journey (inits)
+6 Form of fuel • Terror • Prison
+  chamber
+7 Provide with weapons
+8 Outdoor time-telling device •
+  Swaggered
+9 Garland of flowers
+10 One at a time • Wander, tour
+11 Existed • Succour
+12 Traditional Austrian frock •
+   Dignified, stately
+13 Any Swiss peak
+14 Muggy • Vast
+15 Transgress
+16 Male monarch • Party dance •
+   Chilled
+17 Extreme delight • Deceive, swindle
+18 Human energy field • Light
+   sleeveless padded jacket •
+   Matting fibre
+19 Last word in the Bible •
+   Entry on a list
+20 ___John, knighted pianist
+21 Highly seasoned stew of meat and
+   vegetables • Country house
+
+486-126_frame:
+ SI. ALESBLERAV
+WASTEDI. E N L 
+ DIR ACOKT CUGU
+B ENEE A N. O D
+AIR P LTODIANSE
+C. REA E  N   O
+CEDY TT AITEARM
+  O.  E NN. L B
+OIRL ARAGGRALEI
+KINO.  S ONG A 
+W. SUNNTI F MME
+AURE O E ILE. V
+EL ATH U S KNGL
+AID. ILESCUE E 
+ST ELLO. E DRND
+  KHESM IMENRAM
+OAS. UE S. EE. 
+ M AILNGEOUTEAS
+A IL LALPG CBAT
+CONETAS IJOYE O
+T CD CSINA GL S
+
+486-140:
+''
+7, 5
+123
+
+486-140_text:
+1 Normal, ordinary • Rib, taunt
+2 Noble rank • Mound of stones, built
+  as a memorial • Clump (of fur)
+3 Cheeky or racy • More unusual
+4 Fail to mention • Satirical show •
+  Travelled
+5 Early American settler with a strict
+  religious code
+6 Variety of goat's-milk cheese • Send
+  back to custody
+7 Faux, blunder
+8 More obvious • Foretell
+9 Reside • Impolite
+10 Body of soldiers • Lean, bony bit of
+   meat, especially neck of mutton •
+   Crème de la crème
+11 Nocturnal flying mammal • Centre
+   of our solar system
+12 Basmati, eg • Firmly stretched •
+   One of a pair
+13 Rise quickly • Paint layer
+14 Shake, oscillate • 12.00 hours
+15 Made a hole in soil
+16 More unsightly • Gazed in
+   astonishment
+17 Figure, digit
+18 Sea-fish common off the coasts of
+   Britain • Bravery award • Of rain,
+   fall heavily
+19 Lawlessness, disorder • Group of
+   witches
+20 Middle of the leg • Seat guide •
+   Light toboggan
+21 Attempt again • Royal domain
+
+486-140_frame:
+OMIAR UGLG B W 
+I NRATN AUN RED
+CHE V LINT T RU
+HAOL T COH UAT 
+E UAIROONEARSAY
+ETRY O R R S T 
+IERARM E SUAE W
+ NU A PLAL CAN 
+G MRIC LIAUCREM
+PASN N SOT ROVE
+R PUGEVIB PUR L
+A LM D N VREEAL
+ENTCRA U  S E S
+K ET SINEMEREFT
+ANDIGHVE EDAR A
+I CEASY SS IGAW
+KNEN T BAE NAL 
+E RDDEE TDUGL T
+S CEST E EVUPED
+SHE S ICTRITL A
+Y RWINDE  S EEM
+
+664-14:
+''
+9, 4
+123
+
+664-14_text:
+2 Process that ends with giving birth
+4 Felines' favourite plant • Any of two
+6 Give one's attention to (a problem) •
+  Clergyman's square cap
+8 French diacritic • Toasted fruity bun
+10 Gin flavouring • Witch's magic
+   formula • Midge
+12 Joke • Hot but damp • Aspiring to be creative
+14 Variety of Indian bread •
+   Male deliverer of letters
+16 Complaining • Husky (voice)
+18 Person's entire assets, as mentioned in a will •
+   Double-breasted jacket
+20 Devoid of feelings
+
+664-14_frame:
+PEL Y  I ITH
+ L LESAKE E 
+UMI D. K IRE
+D C. UHROL G
+REA. P V    
+I M. LEEFD A
+TNIO. D U I 
+ M PATIONEAC
+RES G T T. O
+ A. C.  TG T
+ILLROC. E.  
+R.  R   PE R
+  II.  CAER 
+OSTS.   NS. 
+ U T. ADDTTA
+ L GRISLOI. 
+TIO. N.  N. 
+ S. ESJESF. 
+S N T  R  T 
+I PMOTMANCHA
+N U R. I  E 
+C EE SPINNAT
+A T.   T.   
+L ET HTATRTY
+ATYP E W    
+G.    CED.  
+ER S B L.   
+
+664-71:
+''
+9, 4
+1322251510053017342919270628113101320702201621120309001814230426083324
+
+664-71_text:
+1 Spanish wine store • Make a raised design
+3 Dyestuff • Disconnected from
+  a computer network
+5 Delineating
+6 Bloodsucking arachnid • Watched
+7 Map book
+8 Roman number XI • Assent
+9 Corkscrew-shaped tool for boring
+  holes in wood
+10 Chain of undersea rocks • Loud sound
+11 Company's emblem • Do as instructed
+12 Food-carrying board • Nobleman ranked
+   between a marquess and a viscount
+13 Bone encasing the brain
+14 Hot-tasting dish • Professional
+15 Serve food
+16 Tibetan Buddhist priest • Beach substance
+17 Small but powerful car
+19 Connection, collaboration •
+   Overturn (a boat)
+21 Oleaginous • Tax refund
+
+664-71_frame:
+A. F LANGR A
+SUPLOG. UERT
+P IY EARLN E
+LIA N TLAI B
+ N. D  O BEY
+ GRTICUGEB E
+N CLAMSS U E
+    I. E CUR
+Y R D INEC E
+L.  BO. SMBO
+EXP H INIU B
+R. PIGR EFFL
+  S E. U H R
+LLITCHERMELE
+  C O  E O P
+I XKULDEGAND
+CHI R A E O 
+A OATEMEN Z 
+IZEA EISO. A
+ L    R UVEN
+TE T OEAS. A
+S.  A A IREE
+CON T SKEE. 
+R. YEDK. TRA
+ Y APST I.  
+O OT TING.  
+ N EBA. E.  
+ 
+664-91:
+''
+9, 4
+3208021500180422090703272123102617251105060134133129192024141230283316
+
+664-91_text:
+2 Untaught
+3 Tidings • Wander at random
+4 Not called for
+5 Gather • Swaying gait
+6 Name for the heather genus of plants
+7 Washed • Royal household servant
+9 Pancake Day fruit • Tot up • Not at any time
+11 Sending a message by phone •
+   Mopped up with a swab
+13 Lost pet • Free, disencumber •
+   Each of a number
+15 Fine plaster used architecturally •
+   Disease, ailment
+16 Hooded and padded raincoat
+17 Social circle • Crackling sound on the radio
+18 Science of reasoned thinking
+19 Rudely stare at • Small toboggan
+20 Caretaker
+
+664-91_frame:
+   AY. D BAT
+   R. UIT C 
+OVECCO S LEM
+T UA USTR I 
+AINGED U DLE
+C EU DSTU L 
+P AE OMAN O 
+INTWAD G PON
+S TA RVER S 
+OGL EV O T A
+     ATICIVE
+   MAL N D R
+UGE O  M H P
+   TINOBTIEU
+    S. R T L
+ARK N NDUYEO
+ O  E. A.  M
+OGIADDRIC NE
+A UN OO IHED
+STAG STEXI. 
+C BE EU EON 
+ L  T E EERY
+CIEMILCON E 
+ O. N T TADY
+   A LRID.  
+   RGE M    
+NEWA S B.   
+
+641-107:
+''
+9, 4
+2908272103153000061333201016311817142509040134022824321122261223190507
+
+641-107_text:
+1 Smallest in amount • Esoteric, mystic
+3 Informed • Rink sport
+5 Give in
+6 Gone by, no longer existing • Granny
+7 Japanese seafood delicacy
+8 Roving • Amount
+9 Wading bird
+10 Small amount or a Greek letter •
+   Strap that is part of a bridle
+11 Viral social media post • Real
+12 Tyre inflater • Aristocratic title
+13 Short Japanese poem
+14 Watching animals in the wild • Heavenly
+15 Indication of a heartbeat
+16 Raised platform for a speaker in a hall •
+   Camper's home
+17 Jumping game on a pavement
+19 Jamming • Small active dog originally
+   used for hunting
+21 Mat, snarl • Dogged
+
+641-107_frame:
+ L.  HU. LT 
+RENARIDIV A 
+ I   PE. ING
+O UERRE UIER
+SAFI SDER L 
+E TRIT. NTY 
+WESEINUSH O 
+H P. G U SCO
+ISEUKEGRE K 
+WED N  E. O 
+ R. I E T R 
+ TAANA H PAS
+I. A AIOTG T
+NUMMEMS.    
+T. P SPUME G
+  SCCU. TGIN
+ANTA PTCHU A
+  EKATH INGL
+DAIE RENTT O
+ D RUE I    
+ V L D C D S
+N M FEL AM R
+INE E SURBER
+T NADVT. L A
+S. R PAIK.  
+HOPERR L.   
+O ED AULS.  

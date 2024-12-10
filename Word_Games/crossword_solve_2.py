@@ -24,17 +24,15 @@ class AlternativeSolve(LetterGame):
     """
     
     def __init__(self, gui, board, word_locations, wordlist):
-        self.debug = True
+        self.debug = False
         self.gui = gui
         self.word_locations = word_locations
         self.wordlist = wordlist
         self.iteration_counter = 0
         self.placed = 0
         if board:
-            self.board = np.array(board)
-          
+            self.board = np.array(board)          
             self.SIZE = max(self.board.shape)
-            self.convert_to_start_dict()
             self.update_matches()
     
     def print_board(self, board, which=None):
@@ -216,6 +214,9 @@ class AlternativeSolve(LetterGame):
                 print(f'trying again, {iteration+1} {"="*30}')
                 print()
         self.delta_t('elapsed')
+        if self.gui:
+        	  msg = f'Filled {self.placed}/ {len(self.word_locations)} words in {self.iteration_counter} iterations,  {(time()-self.start_time):.3f}secs'
+        	  self.gui.set_message(msg)
         return self.board
 
                                             

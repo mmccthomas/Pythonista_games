@@ -320,3 +320,58 @@ Puzzle6_frame:
 ' / /n/ / / / /c/p/ / / / '
 'a/ / / / /i/l/ / / / / /c'
 'c/s/ / / / / / / /s/s/b/ '
+
+Puzzle7:
+ABSTAIN
+ACME
+AMBIENCE
+CAMEL
+CANE
+CELEBRATION
+CHAMPAGNE
+CHIME
+CONIFER
+EARMUFFS
+ENTRANCE
+FALSE
+FEAST
+FINANCE
+FLUE
+GIFT
+HOPEFUL
+MAIL
+MERRY
+NUTCRACKER
+PATH
+PITCHER
+POINSETTIA
+POSTMEN
+PRESENT
+REINDEER
+REJOICE
+REPLETE
+RIGATONI
+SAINT
+SHINE
+SKIS
+SPRUCE
+STOCKING
+SUN
+TITAN
+TREACLE
+TUREEN
+
+Puzzle7_frame:
+'h/n/ / /c/ / / / / / /c/ '
+' / /f/ / / / / / / / / /s'
+' / /p/p/ / / /s/ / / / / '
+'g/t/ / / / / / / /a/ / / '
+' / / / / / / /a/p/ / /e/f'
+' / / / /f/ / / / /e/ / /r'
+' / / /p/t/ / / / / /c/ / '
+'a/ / / / / / / / / / /r/ '
+' / / / / / /s/ /t/ / / / '
+'c/ / /s/ / / / / / / / / '
+' /c/ / /p/s/ / / / / / / '
+' / / / / / /r/ / /s/m/ / '
+'c/ / / /f/ / / /r/ / /m/ '

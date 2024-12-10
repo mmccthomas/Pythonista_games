@@ -504,21 +504,6 @@ Puzzle6_frame:
 ' / /12/ / / / / / / / / / '
 ' / / / / /13/ / / / / / / '
 
-Puzzle_6_frame:
-' / / /1/ / / / / / / / / '
-' / / / / / / / / / /2/ / '
-' / / / / / / /3b/ / / / / '
-' /4/ / / / / /l/ /5c/o/l/t'
-' / / / / / / /a/o/ / / /6'
-'7/ / / / / / /r/ / / / / '
-' / / / / / /a/n/8/ / / / '
-' / / / /9/c/ /e/ / / / / '
-' / / / /l/ / /y/ / / / / '
-' / / /e/ / / / / /10/ / / '
-' / / / / / / / / / / /11/ '
-' / /12/ / / / / / / / / / '
-' / / / / /13/ / / / / / / '
-
 Puzzle7:
 #437-95
 1
@@ -750,24 +735,8 @@ JESTER
 JOURNEY
 JOVIAL
 JUNCTION
-# changed start letters
 
 Puzzle9_frame:
-' / / / /1/ / / / / / / / '
-' / / / / / /2/ / / / / / '
-'t/3/ / / / / / / /4/ / / '
-' /e/ / / / / / / / / /5/ '
-' / /6p/ / / / / / / / / / '
-' / / /r/ /7/ / / / / / / '
-' / / / /o/ / / / / / / /8'
-' / / / / /p/9/ / / / / / '
-'10/ / / / / /e/ / / / / / '
-' / / /11/ / / /r/ / / / / '
-' / / / / / / / /t/ / / / '
-' / / / /12/ / / / /y/ / / '
-' / / / / / / /13/ / / / / '
-
-Puzzle9_original_frame:
 ' / / / /1/ / / / / / / / '
 ' / / / / / /2/ / / / / / '
 ' /3/ / / / / / / /4/ / / '
@@ -849,24 +818,8 @@ TREATY
 JANITOR
 JOSTLE
 JOYSTICK
-# changed start letters
 
 Puzzle10_frame:
-' / / / / / / / / /1/ / / '
-' / / / / / / / / / / /2/ '
-' / /3/ / / / / / / / / / '
-' / / / / / / / / / / / / '
-' /4/ / / / /5p/i/e/t/y/ / '
-' / / / / / /l/ / / / / /6'
-' / / / / / /a/ / / / / / '
-'7/ / / / / /n/ / / / / / '
-' / / /8/ / /e/ / / / / / '
-' / / / / / / / /9/ / / / '
-' / / / / / / / / / /10/ / '
-' / / / /11/ / / / / / / / '
-' / / / / / / /12/ / / / / '
-
-Puzzle10_original_frame:
 ' / / / / / / / / /1/ / / '
 ' / / / / / / / / / / /2/ '
 ' / /3/ / / / / / / / / / '
@@ -2484,3 +2437,165 @@ Puzzle29_frame:
 ' / / / /t/ / / / / / / / '
 ' / / / / / / / / / / /12/ '
 ' / / / / /13/ / / / / / / '
+
+Puzzle30:
+#
+1
+BARBER
+BOOKMAKER
+BOUTIQUE
+BUTCHER
+2
+CAKESTAND
+CAVE
+CLOUDBERRY
+3
+SEERSUCKER
+SKIFFLE
+SOAPBOX
+STAGGER
+4
+SCAMP
+SINGLETON
+SKETCHING
+SUSHI
+5
+SCAPEGOAT
+SIXER
+SOFTENER
+SPECIMEN
+6
+GAH
+GENUS
+GONER
+GRADIENT
+GROG
+7
+SHINY
+STARRY
+SUE
+8
+INTERCEDING
+IRATE
+IRAN
+IRONY
+9
+CABLE
+CORNS
+CRYING
+10
+PANDA
+PESO
+PIER
+PRAY
+11
+GLEE
+GOOSEBERRY
+GUM
+GUT
+12
+BARN
+BEE
+BIORHYTHM
+BOB
+
+Puzzle30_frame:
+' / / / / /1/ / / / / / / '
+' / / /2/ / / / / / / / / '
+' / / / / / /3/ / / / / / '
+' / / / /4/ / / / / / / / '
+'5/ / / / / / / / / / / / '
+' / / / / / / / / / / /6/ '
+' / / / / / / /7/ / / / / '
+' / / / / / / / / / / / / '
+' /8/ / / / / / / / / / /9'
+' / / / / / / / /10/ / / / '
+' / /11/ / / / / /e/ / / /b'
+' / / / / / / / / /e/ /o/ '
+' / / / / / / / / / /12b/ / '
+
+Puzzle31:
+#
+1
+BARBER
+BEE
+BEWILDERS
+BLATANT
+BRA
+2
+PEARL
+PENCE
+POTEEN
+PUTT
+3
+ABSENTEE
+ANEMONE
+AREA
+ATE
+4
+MALT
+MEANEST
+MESS
+5
+ADO
+AGREE
+ALEE
+AND
+ATLAS
+6
+SELECTION
+SINEW
+STAND
+STARE
+STRAW
+7
+EAT
+EMERGE
+ENDURE
+ETA
+8
+PASTEL
+PEASANT
+PHOBIA
+PREEN
+PRETEND
+PROUD
+9
+RAISE
+RELOCATE
+REMITTENT
+ROULETTE
+ROWAN
+10
+CEDE
+CRY
+CUSTODIAN
+11
+SAILING
+SKI
+SUCH
+12
+VANISH
+VEILED
+VIOLET
+VISCOUNT
+13
+DARE
+DELTA
+DEVOTEDLY
+DINOSAUR
+
+Puzzle31_frame:
+' / / / / / / / / / /1/ / '
+' / / /2/ / / / / / / / / '
+' / / / / / / /3/ / / / / '
+' / / / /4/ / / / / / / / '
+'t/5/ / / / / / /6/ / / / '
+' /n/ / / / / / / / / /7/ '
+' / /u/ / /8/ / / / / / /t'
+' / / /o/ / / / / / / /e/ '
+'9/ / / /c/ / / / / /l/ / '
+' / / / / /s/ / / /o/ / /10'
+' / / / /11/ /i/ /i/ / / / '
+' / / / / / / /12v/ / / / / '
+' / / / / / / / / /13/ / / '

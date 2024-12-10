@@ -21,6 +21,7 @@ base_path.add_paths(__file__)
 from Letter_game import LetterGame, Player
 from gui.gui_interface import Gui
 from crossword_create import CrossWord
+from crossword_solve_2 import AlternativeSolve
 WordList = 'wordpuzzles.txt'
 BLOCK = '#'
 SPACE = ' '
@@ -147,6 +148,7 @@ class ZipWord(LetterGame):
     def transfer_props(props):
        return  {k: getattr(self, k) for k in props}
     cx = CrossWord(self.gui, self.word_locations, self.all_words)
+    cs = AlternativeSolve(self.gui, self.board, self.word_locations, self.all_words)
     self.gui.clear_messages()
     self.gui.set_message2(f'{self.puzzle}')
     x, y, w, h = self.gui.grid.bbox
@@ -156,12 +158,14 @@ class ZipWord(LetterGame):
     self.max_depth = 3
     cx.set_props(**transfer_props(['board', 'empty_board', 'all_word_dict', 
                                    'max_depth', 'debug']))
-    # strategy options 'dfs', 'dfsb',  'minlook', 'mlb'                     
-    self.board = cx.populate_words_graph(swordsmith_strategy='dfs')
-    if np.argwhere(self.board=='.').size > 0:
+    # strategy options 'dfs', 'dfsb',  'minlook', 'mlb'  
+    self.board = cs.try_multiple(self.puzzle, self.board.copy(), 10)                 
+    #self.board = cx.populate_words_graph(swordsmith_strategy='dfs')
+    if np.argwhere(self.board==' ').size > 0:
+       print('board from AlternativeSolve', np.argwhere(self.board==' ').size)
        # failed, so use original
        self.board = cx.populate_words_graph(max_iterations=1000, length_first=False)
-    self.check_words()
+    # self.check_words()
     self.create_number_board()
     self.gui.build_extra_grid(self.gui.gs.DIMENSION_X, self.gui.gs.DIMENSION_Y,
                               grid_width_x=1, grid_width_y=1,
@@ -357,6 +361,7 @@ if __name__ == '__main__':
     if quit:
       break
   
+
 
 
 

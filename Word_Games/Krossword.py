@@ -236,7 +236,7 @@ class KrossWord(LetterGame):
         previous_letter_board = self.letter_board.copy()
         if self.debug:
             print('remaining words', self.wordlist)
-            print(possibles)
+            print(f'{possibles=}')
         for i, possible in enumerate(possibles):
             if self.debug:
                 print('iteration', i)
@@ -285,7 +285,9 @@ class KrossWord(LetterGame):
       if k:
           msg += f'\n{k}\n'
       try:
-          max_len = max([len(word) for word in v]) + 1
+          # word length for only alphanumeric characters ( not strrikethru)
+          max_len = max([sum([c.isalnum() for c in word]) for word in v]) + 2
+          
       except ValueError:
           max_len = 10
       v = [word.capitalize() for word in v]
@@ -611,5 +613,6 @@ if __name__ == '__main__':
     quit = g.wait()
     if quit:
       break
+
 
 

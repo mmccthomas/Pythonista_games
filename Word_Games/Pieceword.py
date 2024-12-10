@@ -25,7 +25,7 @@ class PieceWord(LetterGame):
     LetterGame.__init__(self, column_labels_one_based=True)
     self.first_letter = False
     self.tiles = None
-    self.debug = True
+    self.debug = False
     self.load_words_from_file(PUZZLELIST, no_strip=True) 
     self.selection = self.select_list()
     if self.selection is False:
