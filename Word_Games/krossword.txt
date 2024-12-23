@@ -2599,3 +2599,273 @@ Puzzle31_frame:
 ' / / / /11/ /i/ /i/ / / / '
 ' / / / / / / /12v/ / / / / '
 ' / / / / / / / / /13/ / / '
+
+Puzzle32:
+1
+WAN
+WINDMILL
+WRY
+2
+PAGE
+PHLEGM
+PIN
+POLYGON
+3
+ECHO
+EGG
+ELM
+ETCH
+ETERNALLY
+EYE
+4
+SCAR
+SIGN
+SLEIGHT
+SPLIT
+SUNDIAL
+5
+DOOR
+DREAMLAND
+DUCT
+6
+LAWYER
+LAYERED
+LINT
+7
+CEREAL
+CHARIOT
+CODE
+CORGI
+COTTON
+CURLY
+8
+KERB
+KILN
+KINETIC
+9
+ANGRY
+APSE
+ATE
+AWRY
+10
+OMEN
+ORANGERY
+ORNATE
+OSTLER
+OUT
+OWL
+11
+TAIL
+TEA
+TIC
+TOW
+12
+UNBEATEN
+UPSURGE
+USE
+13
+HAIRDO
+HANDBAG
+HANGMAN
+HEAR
+
+Puzzle32_frame:
+' / / / / / / / / / /1/ / '
+' / / / / / / /2/ / / / / '
+'y/ / / /3/ / / / / / / / '
+' /r/ / / / / / / / / /4/ '
+' / /e/ / / / / / /5/ / / '
+'6/ / /g/ / /7/ / / / / / '
+' / / / /n/ / / / / / / /8'
+' / / /9/ /a/ / / / / / / '
+' / / / / / /r/ / / / / / '
+' / / / / / / /10o/ / / / / '
+' / / / / / / /m/ / /11/ / '
+' /12/ / / / / /e/ / / / / '
+' / / / / /13/ /n/ / / / / '
+
+Puzzle33:
+1
+SHOCK
+STARTLE
+STREWTH
+SUDDEN
+SURPRISE
+2
+BAR
+BEER
+BOOST
+BRIE
+BUN
+3
+NOEL
+NOR
+NOT
+NUN
+4
+CAT
+CLOUD
+COCOA
+CORE
+CRITERION
+CTENOID
+5
+PENTHOUSE
+PINT
+PLOVER
+PROUD
+PROWESS
+6
+PEELS
+PHOENIX
+РОЕТ
+POT
+PYLON
+7
+EARNEST
+ENSNARE
+ERUDITE
+EXERTS
+8
+CAVERNS
+CAVORT
+CERISE
+CUCKOO
+9
+TERN
+TERSE
+TOE
+TOSH
+TREAT
+10
+UGLY
+UNDERRATE
+UNIT
+URALS
+URN
+11
+TELEX
+TENNER
+THROVE
+TIE
+TONER
+TOTE
+TUSK
+12
+WAR
+WET
+WOE
+WOK
+13
+PEN
+PIE
+PRO
+14
+MAIN
+MAY
+MIEN
+MUG
+15
+SEEDILY
+SKIT
+SLEEK
+SOON
+
+Puzzle33_frame:
+' / / / / /1/ / / / / / / '
+' / / / / / / / / / /2/ / '
+' / /3/ / / / / / / / / / '
+' / / / /4c/r/i/t/e/r/i/o/n'
+' / / / / /t/5/ / / / / / '
+' / / / / / /e/ /6/ / / / '
+' / / / / / / /n/ / / / /7'
+' /8/ / / / / / /o/ / / / '
+' / / /9/ / / / / /i/ / / '
+'10/ / / / / / /11/ / /d/ / '
+' / / / / / / / / / /12/ / '
+' / / / /13/ / / / / / / / '
+' / /14/ / / / / / /15/ / / '
+
+Puzzle34:
+1
+SEQUIN
+SHIMMER
+SHINE
+SPANGLES
+SPARKLER
+2
+SEAMS
+SEARCH
+SNEEZE
+3
+SHOEHORN
+SIBILANCE
+SIN
+SNAIL
+SOU
+SUE
+4
+BANAL
+BEL
+BERRIES
+BOHEMIAN
+BURGLED
+5
+FEWEST
+FILLIP
+FRESH
+FURLONG
+6
+REALISE
+REGENT
+ROAD
+ROUBLE
+7
+TAILOR
+THEORISES
+THIEF
+TRIO
+TROUNCE
+TRUE
+TRY
+8
+SELDOM
+SEVEN
+SISAL
+SLOTHFUL
+SWIRL
+9
+CEDAR
+CENTRUM
+CLEAN
+CONGA
+CSARDAS
+10
+EIRE
+ENROL
+ERR
+11
+CAN
+CAR
+CHI
+COALMINE
+COMO
+12
+FEN
+FOE
+FRAGRANCE
+
+Puzzle34_frame:
+' / / / / /1/ / / / / / / '
+' / / / / / / / / / / /2/ '
+' / /3s/i/b/i/l/a/n/c/e/ / '
+' / / /h/ / / / / / / / / '
+' / / / /o/ /4/ / / / / / '
+' / / / / /e/ / / / / / / '
+' /5/ / / / /h/6/ / / / / '
+' / / / /7/ / /o/ / / / / '
+'8/ / / / / / / /r/ / / /9'
+' / / / / / / / /10/n/ / / '
+' / / / /11/ / / / / / / / '
+' / / / / / / / / / / / / '
+' / / / / / / / / / /12/ / '

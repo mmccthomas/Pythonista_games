@@ -665,7 +665,9 @@ class OcrCrossword(LetterGame):
                 case _:
                   sort_alpha = False
                   sort_length = False
-                  
+            else:
+            	  sort_alpha = False     
+            	  sort_length = False  
             self.filter(sort_alpha=sort_alpha, max_length=None, min_length=None, sort_length=sort_length, remove_numbers=False, reverse=rc)
         except (AttributeError):
             self.gui.set_message(f'No text found in {self.defined_area}')

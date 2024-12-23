@@ -1050,8 +1050,6 @@ E. NOTYING BI N
   EE A.  IREAL 
 INDL ILAGG D L 
 
-
-
 484_4:
 ''
 7, 5
@@ -2899,4 +2897,240 @@ CIEMILCON E
    RGE M    
 NEWA S B.   
 
+487-4:
+''
+7, 5
+123
 
+487-4_frame:
+CALSAYC M N STA
+ BIT EACELAYE R
+LIDAGL R O ERAN
+M PCERNNYFERSIE
+ELE RE E E GIT 
+NEDARDLEYREENEW
+PROERTIRS S D C
+ I R H BULLIETT
+SERIREDOM E  U 
+HETPILSTABLEBAY
+ D ON P SL MALA
+AINDECESTIF T W
+HIN D E NTRAA L
+E EPESDEEE ZNTE
+DIDU E EVABO W 
+ DOADVMAR Z  P 
+D BRE  N REDZAR
+EMBEMPCABE I P 
+ O. X ROPFISRY 
+MBRVISE PU CC S
+E I C  SLSTOARE
+
+487-4_text:
+1 Relating to the Treasury •
+  Promotional announcement
+2 Odd, unusual
+3 Calm and dependable •
+  Extended kingdom
+4 Utter
+5 Most profound • Cuddle
+6 Golf score of two under par
+7 Situation that causes difficulties • Augur
+8 Confused scuffle
+9 Letter embellishment • Hooligan, in
+  Scotland • Killed
+10 Bullet with a visible wake • Daytime nap
+   in hot countries
+11 Go back to (the same place)
+12 On a ship or plane • Most up-to-date
+13 Tie the knot? • Sweeping cove •
+   --- Osmond, 1970s teen idol
+14 Summer dish
+15 Nightclub show • Famous London
+   sports stadium
+16 Articles of porcelain
+17 Baby's complete wardrobe •
+   Came or went in
+18 Performed, carried out
+19 Treads and risers • Purloin, filch
+20 Gold bars
+21 Haphazard • Edict, judicial decision
+
+487-83:
+''
+7, 5
+123
+
+487-83_frame:
+IREATOE EDRESE 
+D RN NASS Y L M
+EARTEDS PTEPAGU
+ONASE NTEPEDLAP
+N D AEY AR I P 
+DE IC  BREREOPN
+EDYL TERYO O D 
+ I ATA O BOUGON
+ONGT RPERE SE I
+ P A LADASEEGIO
+OSEROBI IO N TR
+ U  U LOCUPLKET
+ H  NE E O RTHE
+NCEIC EASPOO UN
+ O  AL L S SAND
+C U P SIPLEGNTI
+HIPCOVER ON  I 
+R P E COHMELOCA
+AM  RER I LEDEN
+ BEL SCAVIA  W 
+EE ARCE E TAREL
+
+487-83_text:
+1 Simmer angrily • Drank in
+  small mouthfuls
+2 Reveal, bring to light
+3 High-lying country • Form a whole
+4 Deliberate, done on purpose
+5 Rodent of the guinea pig family •
+  Facts and figures
+6 Elaborate heavy silk material
+7 Closely packed • Poverty-stricken
+8 Requiring oxygen to breathe
+9 Object of historic interest •
+  Lengthwise
+10 Wrath, rage
+11 Sprang, like a ball • Wild fruit that is
+   very high in vitamin C
+12 Location of the cochlea
+13 Imagine while asleep • Openly
+   distrustful
+14 Popular flowering house plant
+15 Native American dwelling • Come to
+   a point
+16 Slip back into bad ways
+17 Game played on a small billiard
+   table • RC ceremony
+18 Ancient stone coffin
+19 Musical section to be played in slow
+   time • Flowing smoothly, in music
+20 Act of betrayal
+21 Pendant containing a picture •
+   Thawed
+   
+487-117:
+''
+7,5
+123
+
+487-117_frame:
+P IT IRIPULE. T
+OILE N N B XE. 
+U MRIGINGBAPSOF
+IRAPUDU YTRUI A
+ A A AST G ST L
+RIAN F I U TMIL
+I ISOYY L S DIN
+N RE.  CYCEN R 
+GGY. F A  P AKE
+BEEALTAPTTRO N 
+I C E M EE UCY 
+NATCRAALSEELA G
+ E CLETIOMPEL B
+ DEU F.   R EMU
+O RR FLESGING S
+RIOA EEONNSCG. 
+G TR A. E.    S
+A ILITD. EANACK
+G MN Y.   I  D 
+AGOILLFOOWANCLI
+D BS I D.    Y 
+
+487-117_text:
+1 Meal's last course • Great event which
+  cannot be explained
+2 Since
+3 Counterfeited • Wild rose bush
+4 Fitting, suitable • Drone, queen or
+  worker for example
+5 Correct and tasteful behaviour
+6 Too, as well • Flying insect that bites
+7 Musical composition for three
+  instruments • Flat wooden fruit basket
+8 Sound of a plucked string, or a
+  nasal tone
+9 Furniture item similar to a chaise longue
+  • Sew using a large running stitch
+10 Formal permanent record,
+   carved or written
+11 Substance traded on the world
+   market in barrels • Poorly, unwell
+12 Without significance
+13 Bean used as a meat substitute •
+   Major division of geological time
+14 Happening, brewing
+15 Move house stealthily to avoid creditors
+   • Gentle in manner
+16 Ancient city conquered with the
+   help of a wooden horse •
+   Christmas dessert
+17 Person who rides a bike
+18 Long fish with a smooth scaleless skin •
+   Soft bread roll
+19 Drive forward • Variety of curry named
+   after the dish in which it is served
+20 Flightless Australian bird
+21 Ropes and chains holding up a ship's
+   sails • Skinny and gaunt
+
+487-164:
+''
+7, 5
+123
+
+487-164_frame:
+  GI GENGA. KUD
+S IU E E IDO.  
+N CMEAOSEN WTRI
+TOGHISE HAGEO T
+ U E TL Y I U E
+ESER R. DKARRED
+  N T E ENEREAR
+UNEA SN D X ACE
+R E T D. DORVEN
+N.  S O NUNTOS 
+C CL FAVA.  REG
+E H U   CEGSKE 
+ GA S NDAUEDUST
+TORMENIOT A  E 
+ DR R ATEBLENDE
+TENO LRAMSER L 
+ R ULAE IOVABOR
+HARS NT ADEN G 
+N I T  C ISSRAI
+ALMDITBEXCUM C 
+C.  C  R ENAHOS
+
+487-164_text:
+1 Mathematical diagram with
+  rectangular blocks
+2 Drill • Species of wild goat
+3 Turn (a dial) back to zero
+4 List of business • Gave out
+  or published
+5 Small amount • Floating waste matter
+6 Japanese fighting sport • Permit
+7 Corn or wheat, for example
+8 Donations to the poor • Spanish
+  sparkling wine
+9 Selected, picked
+10 Accolade, acclaim • Sunken-cheeked
+11 Device for controlling fluid flow
+12 Kiddie's three-wheeler • Wine residue
+13 Stone Age monument
+14 Man-made god • Coastal mound
+15 _up, given much medicine
+16 Less relaxed • Moneymaker
+17 Ellipse • Look out on
+18 Solidify • Person selling a house
+19 Vigour
+20 Food list • Emend
+   (a journalist's work)
+21 Wound like a stream

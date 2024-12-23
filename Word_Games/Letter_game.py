@@ -387,7 +387,7 @@ class LetterGame():
       prompt = ' Select puzzle'
       selection = dialogs.list_dialog(prompt, items)
       
-      if selection == 'cancelled_':
+      if selection == None: # 'cancelled_':
           return None 
       if len(selection):
           if self.debug:   

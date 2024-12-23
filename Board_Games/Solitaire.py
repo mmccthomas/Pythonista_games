@@ -4,7 +4,7 @@ import os
 import sys
 import base_path
 base_path.add_paths(__file__)
-
+from demolition_config import *
 from scene import *
 from gui.game_menu import MenuScene
 from ui import Path
@@ -44,11 +44,11 @@ class SolitaireGame(Scene):
                                     parent=self)
                     
     for col in range(8):
-    	  # column labels    
+        # column labels    
         LabelNode(str(col+1), font=('Avenir Next', 30), position=(col*(cardsize[0]+10)+X_OFF, 730), parent=self)      
         # foundation labels         
         LabelNode(str(col%4+1), font=('Avenir Next', 20), position=(col*(cardsize[0]+10)+25, 925), parent=self)     
-        i =['\u2660', '\u2663', '\u2665', '\u2666']                      
+        i =['\u2660', '\u2665', '\u2666','\u2663',  ]                      
         LabelNode(i[col%4], font=('Avenir Next', 80), position=((col%4+4)*(cardsize[0]+10)+85, 850), z_position=10, parent=self)          
     # foundation and freecell positions
     self.foundation_positions = []
@@ -75,7 +75,7 @@ class SolitaireGame(Scene):
 
                                                                 
   def setup(self):
-    self.background_color = COLORS["bg"]
+    #self.background_color = COLORS["bg"]
   
     # Root node for all game elements
     
@@ -92,6 +92,7 @@ class SolitaireGame(Scene):
     except AttributeError:
       self.setup_ui()
     self.show_cards()
+    self.save_game()
     
   def show_cards(self):
       # clear all positions
@@ -105,13 +106,13 @@ class SolitaireGame(Scene):
           card.tileobject.z_position=20-int(2*row+1)
         
       #redraw foundations  
-      print('foundation',self.newgame.foundation)  
+      #print('foundation',self.newgame.foundation)  
       for col, found in enumerate(self.newgame.foundation):
-      	if found:
+        if found:
             found[-1].tileobject.position = self.foundation_positions[col+4]
           
             for item in found[:-1]:
-            	item.tileobject.remove_from_parent()
+              item.tileobject.remove_from_parent()
               #item.tileobject = None #position = self.foundation_positions[col+4]
               #card.tileobject.z_position=int(2*row+1)
               
@@ -121,8 +122,55 @@ class SolitaireGame(Scene):
           for item in cell:
               item.tileobject.position = self.foundation_positions[col]
               
-        
-         
+  def save_game(self):
+  	# save in format for solver to read
+    # save game.txt in format
+    #xxx xxx xxx xxx   # foundations: S, H, D, C
+    #yyy yyy yyy yyy   # freecells: 0, 1, 2, 3
+    #cascade[0]
+    #cascade[1]
+    #...
+    #cascade[7]
+    #Example:
+
+    #None None A 2
+    #6d 5c None None
+    #6c 8s Jc 4s 9s 7c Kh
+    def convert_foundation(foundation):
+    	
+    	return s
+    for found in self.newgame.foundation:
+    	pass
+    for cell in self.newgame.cell:
+    	pass
+    for pile in self.newgame.pile:
+    	pass
+    g = self.newgame
+    s = ''
+    for i in range(4):
+        if g.foundation[i]:
+            rankIndex = g.foundation[i]-1
+            rank = all_ranks[rankIndex]
+        else:
+            rank = None
+        s += str(rank) + ' '
+    s += '\n'
+    for i in range(4):
+        s += str(g.cell[i]) + ' '
+    s += '\n'
+    for i in range(8):
+        for j in range(len(g.pile[i])):
+                s += str(g.pile[i][j])[:2] + ' '
+        s += '\n'
+    s = s.replace('T', '10')
+    with open('game.txt', 'w') as f:
+    	f.write(s)
+    return s       
+    
+  def read_moves(self):
+  	  # read moves file to replay solution
+  	  pass
+  	         
   def show_start_menu(self):
     self.pause_game()
     self.menu = MenuScene('New Game?', '', ['Play', 'Quit'])
@@ -246,9 +294,10 @@ class SolitaireGame(Scene):
         
         self.newgame.print_game()
         self.show_cards()
+        self.save_game()
         self.debug.text = str(error)
         if self.newgame.win_game():
-        	dialogs.hud_alert('Win game')
+          dialogs.hud_alert('Win game')
                     
   def menu_button_selected(self, title):
     """ choose to play again or quit """
@@ -270,6 +319,7 @@ class SolitaireGame(Scene):
 
 if __name__ == '__main__':
   run(SolitaireGame(), PORTRAIT, show_fps=False)
+
 
 
 

@@ -375,3 +375,56 @@ Puzzle7_frame:
 ' /c/ / /p/s/ / / / / / / '
 ' / / / / / /r/ / /s/m/ / '
 'c/ / / /f/ / / /r/ / /m/ '
+
+Puzzle8:
+AGGRESSOR
+ANKLET
+APPLAUSE
+APRICOT
+CAVALIER
+CORAL
+CORE
+CORNMEAL
+COVERT
+EMPIRE
+ETHOS
+GREASE
+GRIMACE
+GROOMSMAN
+GUILLEMOT
+HICCUP
+HONEY
+HUMMUS
+LEYLANDII
+LORIS
+MADRIGAL
+MINDSET
+MINUTE
+ONUS
+ONYX
+OSTLER
+RELIC
+RETURN
+SAMBA
+SCRUNCH
+SEASON
+SENTIMENT
+STUD
+SYNOD
+TANTRUM
+UNICORN
+
+Puzzle8_frame:
+'s/ / /s/ / / / / / / / /h'
+' /g/ / / / / / / / / /a/s'
+' / / / /a/ / / / / /r/ / '
+' / /m/ / / / / /c/h/ / / '
+' / / / / /u/ / / / / / / '
+'h/ / / / / / / / / / /o/c'
+' /c/ / / / /t/ / / / / / '
+' / / / / / / / / / / /o/ '
+'l/ / /c/ / / / /s/ / / /e'
+' / /g/ / / / / / / / /l/r'
+'s/c/ / / / / / / / / / /e'
+'o/ /g/ /a/ / / / / / / / '
+'a/ /m/ /s/ / /g/ / / / /m'
