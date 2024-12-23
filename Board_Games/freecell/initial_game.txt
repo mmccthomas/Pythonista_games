@@ -1,0 +1,10 @@
+Foundations: H-5 C-2 D-4 S-5 
+Freecells:  QC  KH  QS    
+: JD TC 9D 8S 7D 6C 5D 4C
+: 6S 7H KS 3C KD
+: KC QH JS TH 9C 8H 7C 6H 5C
+: JH
+: TS 9H 8C
+: 
+: 
+: QD JC TD 9S 8D 7S 6D
