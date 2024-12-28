@@ -18,23 +18,24 @@ A state is a 3-tuple, consisting of:
                   cascades, that column will be a tuple of 7 2-tuples
 '''
 
-from Functions import *
-from Classes import *
-from GameFunctions import *
+from freeCellSolver.Functions import *
+from freeCellSolver.Classes import *
+from freeCellSolver.GameFunctions import *
 
-def remakeGame(firstState, movesLst, waitForInput=False):
+def remakeGame(firstState, movesLst, waitForInput=False, noprint=False):
     '''
     Given an initial state and a list of moves, will recreate the game, printing
     out each subsequent state and the move preceding it.
     '''
     totalMoves = len(movesLst)
     state = firstState
-    for i, move in enumerate(movesLst):
-        if waitForInput:
-            input('Hit <Enter> to see the next move!')
-        print(f'Move {i+1} of {totalMoves}: {move}')
-        state = executeCommand(state, move)
-        printState(state)
+    if not noprint: 
+		    for i, move in enumerate(movesLst):
+		        if waitForInput:
+		            input('Hit <Enter> to see the next move!')
+		        print(f'Move {i+1} of {totalMoves}: {move}')
+		        state = executeCommand(state, move)
+		        printState(state)
 
 def findLowestState(Set, func):
     '''
@@ -71,7 +72,7 @@ def game_is_won(state):
         if potentialCard:
             return False
     for val in foundation:
-        if val is not 13:
+        if val != 13:
             return False
     return True
 
@@ -180,15 +181,18 @@ def constructPath(state, parentAndPathDict):
     of all moves made to get from the initial state in the dictionary to the
     state passed as an argument.
     '''
+    states = []
     actionsLst = []
     while True:
         row = parentAndPathDict.get(state)
         if not row:
             break
-        actionsLst.append(row[1])
+        actionsLst.append(row[1])        
         state = row[0]
+        states.append(state)
     actionsLst.reverse()
-    return actionsLst
+    states.reverse()
+    return actionsLst, states
 
 def hFunction(state, cycles):
     '''
@@ -281,7 +285,9 @@ def executeCommand(state, str):
     result of the previous move.
     '''
     foundation, freecell, cascades = tuple(map(list, state))
-    cascades = list(map(list, cascades))
+    # deal with empty pile
+    cascades = [list(p) if p else [] for p in cascades]
+    #cascades = list(map(list, cascades))
     # All mutable things now
     cmd = str.strip().split()
     if cmd[0] == 'cf' and len(cmd) == 2:
@@ -347,8 +353,10 @@ def updateCycles(child, move, cycles):
         cards list to append to the cascade before adding the card, finds what
         new cycles would be created as a result of adding that card.
         '''
-        
-        cascade1 = list(cascades[col1])
+        if cascades[col1]:
+            cascade1 = list(cascades[col1])
+        else:
+        	cascade1 = []
         if extraCards:
              cascade1 += extraCards
         if not cascade1:
