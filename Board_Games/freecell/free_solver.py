@@ -458,6 +458,7 @@ class Solver():
       moveFile = args.moveFile
       searchType = args.searchType
       self.no_print = args.noprint
+      self.moves = 0
       if searchType not in range(1, 7):
           raise ValueError("Search Type must be an integer from 1-6")
       self.cap = args.cap
@@ -490,6 +491,7 @@ class Solver():
       if not answerLst:
           print(f'No move list printed')
           return
+      self.moves = len(answerLst[0])
       # output changed  to pickled answerList 
       # contains moves and states
       import pickle
