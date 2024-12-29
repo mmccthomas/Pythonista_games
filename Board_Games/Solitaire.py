@@ -1,8 +1,6 @@
-# TODO fix post completion code
-# allow resolve after solve
-# still stops before end
-
 """ Solitaire
+uses Freecell base  https://github.com/yintellect/free-cell-python
+and solver by Akshay Yeluri https://github.com/akshayyeluri/freeCell
 """
 import base_path
 base_path.add_paths(__file__)
@@ -46,23 +44,19 @@ class Tile(SpriteNode):
     self.number = 1
     self.set_pos((x, y))
     
-  def set_pos(self, xy, moveslow=True):
+  def set_pos(self, xy):
     """
     Sets the position of the tile in the grid.
     """      
     pos = Vector2()
     pos.x, pos.y  = xy
-    if self.position != xy and pos != (-200, 0) and moveslow:
-      fast = f'{pos} slow move'
+    if self.position != xy:
       self.run_action(A.sequence(
         A.move_to(pos.x,pos.y, MOVE_SPEED), 
         A.wait(MOVE_SPEED), 
         A.remove)) 
-      #sleep(MOVE_SPEED)
-    else:
-        fast = None
+      #sleep(MOVE_SPEED
     self.position = pos
-    return fast
 
         
 class SolitaireGame(Scene):
@@ -101,7 +95,7 @@ class SolitaireGame(Scene):
     self.all_boxes = self.foundation_bboxes
     
     for col in range(8):
-        self.pile_positions.append([Point(self.fpos[col].x, pile_start_y - row * cy / 3) for row in range(18)])
+        self.pile_positions.append([Point(self.fpos[col].x, pile_start_y - row * cy / 3) for row in range(30)])
         
     self.all_boxes.extend([Rect(*p, *cardsize) for pile in self.pile_positions for p in pile])
     
@@ -110,7 +104,8 @@ class SolitaireGame(Scene):
     self.ui_root = Node(parent=self)
   
     self.score_label = LabelNode('0', font=('Avenir Next', 20),
-                                  position=(60, 10),
+                                  position=(60, 20),
+                                  anchor_point=(0, 0),
                                   parent=self)
     self.line_label = LabelNode('Time 0', font=('Avenir Next', 30), 
                                 position=(w/2,h), 
@@ -125,9 +120,9 @@ class SolitaireGame(Scene):
     SpriteNode('iow:pause_32', position=(32, h - 36),
                               parent=self)
     self.debug = LabelNode('FreeCell', font=('Avenir Next', 20), 
-                                    position=(w / 2, 20),
-                                    anchor_point=(1, 0),
-                                    parent=self)
+                           position=(w / 2, 20),
+                           anchor_point=(1, 0),
+                           parent=self)
                     
     for col in range(8):
         # column labels    
@@ -183,20 +178,19 @@ class SolitaireGame(Scene):
     except AttributeError:
       self.setup_ui()
     self.define_cards()
-    self.show_cards(moveslow=False)
+    self.show_cards()
     self.game_str = self.save_game()
     self.resume_game()
     self.debug.text = 'FreeCell'
   
-  def show_cards(self, moveslow=True):
+  def show_cards(self):
       # for solved games, foundation is only top card.
       # we need to delete lower cards
-      #for card in self.all_cards:
-      #   card.tileobject.set_pos((-200,0))
+
       #redraw piles
       for col, pile in enumerate(self.newgame.pile):
         for row, card in enumerate(reversed(pile)):
-          card.tileobject.set_pos(self.pile_positions[col][len(pile)-row], moveslow=moveslow)
+          card.tileobject.set_pos(self.pile_positions[col][len(pile)-row])
           card.tileobject.z_position=20-int(2*row+1)
           
         
@@ -206,9 +200,10 @@ class SolitaireGame(Scene):
         if found != [] and found != [None]:
             top_card = found[-1]
             top_card_face, top_card_suit = (card_indexes.index(top_card.face)+1, 'shcd'.index(top_card.suit))
-            top_card.tileobject.set_pos(self.fpos[col+4], moveslow=moveslow)
+            top_card.tileobject.set_pos(self.fpos[col+4])
             
             # delete cards below top found
+            # wait for card movement to finish
             sleep(MOVE_SPEED)
             for face_no in range(top_card_face,1,-1):
               try:
@@ -224,7 +219,7 @@ class SolitaireGame(Scene):
       for col, cell in enumerate(self.newgame.cell):
          if cell:
             for item in cell:
-              item.tileobject.set_pos(self.fpos[col], moveslow=moveslow)
+              item.tileobject.set_pos(self.fpos[col])
               
   def save_game(self):
     # save in format for solver to read
@@ -285,14 +280,35 @@ class SolitaireGame(Scene):
           print('index', index)
           g.print_game()
       self.show_cards()
+      # wait for card movement to finish
       sleep(MOVE_SPEED)
       
+  def place_last(self):
+  	  # solve leaves one card left.
+  	  # place this card
+  	  # place last card in cascade
+  	  print('pile',self.newgame.pile)
+  	  if len(sum(self.newgame.pile, [])) == 1:
+  	  	
+  	     for index, pile in enumerate(self.newgame.pile):
+  	  	     if pile:
+  	  	     	  # only 1
+  	  	     	  card = pile[-1]
+  	  	     	  print(card)
+  	  	     	  self.move(f'p{index+1}',f'f{"shcd".index(card.suit)+1}')
+  	  #try to move freecell to foundation
+  	  print('cells', self.newgame.cell)
+  	  for index, card in enumerate(self.newgame.cell):
+  	  	  if card:
+  	  	  	self.move(f'c{index+1}',f'f{"shcd".index(card[-1].suit)+1}')
+  	  	     	  
   @ui.in_background         
-  def read_moves(self):
+  def read_moves(self, fast=False):
       # read moves file which is a pickled list of tuples for each move
       # moves file is zero based index
       global MOVE_SPEED
-      MOVE_SPEED = 0.2
+      if not fast:
+         MOVE_SPEED = 0.2
       g = self.newgame  
       import pickle
       if self.read_pickle:
@@ -301,25 +317,27 @@ class SolitaireGame(Scene):
         print(f'statefile.pkl has {len(moves)} states')
         for index, state in enumerate(states):
             self.decode_state( index, state)
+            self.score += 1
         # finish is accomplished by hand
+        self.place_last()
         g.print_game()               
-        self.debug.text = 'Solve Complete - finish manually'
         
-  def solve(self):
+        
+  @ui.in_background          
+  def solve(self, fast=False):
     # call solver using game.txt  
     print('solve this\n', self.game_str)
     try:
-        Solver().solve(SimpleNamespace(**{'gameFile': 'None', 
+        s = Solver()
+        s.solve(SimpleNamespace(**{'gameFile': 'None', 
                                        'moveFile': 'moves.txt', 
                                        'searchType': 1,
                                        'startFile': self.game_str,
                                        'cap': 1000000,
                                        'noprint': True}))
-        self.read_moves()  
-        all_kings = all([card[-1].face=='K' for card in self.newgame.foundation])
-        if self.newgame.win_game() or all_kings:
-              dialogs.hud_alert('Win game')
-              self.show_start_menu()
+        self.debug.text = f'Solved in {s.counter} states, {s.moves} moves'                              
+        self.read_moves(fast)
+        
         
         
     except RuntimeError:         
@@ -329,11 +347,11 @@ class SolitaireGame(Scene):
      
   def show_start_menu(self, title=''):
     self.pause_game()
-    self.menu = MenuScene('Main Menu', title,  ['Continue', 'New Game', 'Complete', 'Quit'])
+    self.menu = MenuScene('Main Menu', title,  ['Continue', 'New Game', 'Complete', 'Complete Fast', 'Quit'])
     self.present_modal_scene(self.menu)  
           
   def update_score(self):
-    self.score_label.text = str(self.score)    
+    self.score_label.text = f'Moves {self.score}'
     self.line_label.text = f'Time {self.timer}'     
   
   def did_change_size(self):
@@ -433,6 +451,7 @@ class SolitaireGame(Scene):
             print(f'from {x1} to {x2} {error=} cells={self.newgame.cell}, found={self.newgame.foundation}')
         self.newgame.print_game()
         self.show_cards()
+        self.score += 1
         self.game_str = self.save_game()
         # self.debug.text = str(error)
         kings = []
@@ -457,9 +476,14 @@ class SolitaireGame(Scene):
         self.dismiss_modal_scene()
         self.newgame = Freecell()
         self.setup()       
-    elif title.startswith('Complete'):
+    elif title== 'Complete':
         self.dismiss_modal_scene()
         self.solve()        
+        self.menu = None
+        self.resume_game()
+    elif title== 'Complete Fast':
+        self.dismiss_modal_scene()
+        self.solve(fast=True)        
         self.menu = None
         self.resume_game()
     else:
