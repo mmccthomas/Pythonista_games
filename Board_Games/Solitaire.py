@@ -462,7 +462,7 @@ class SolitaireGame(Scene):
               kings.append(False)
         all_kings = all(kings)
         if all_kings:
-          dialogs.hud_alert('Win game')
+          dialogs.hud_alert('Game Complete')
           self.show_start_menu()
                     
   def menu_button_selected(self, title):
