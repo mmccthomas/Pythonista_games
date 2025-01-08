@@ -4,12 +4,13 @@
 import base_path
 base_path.add_paths(__file__)
 from random import choices, shuffle, seed, randint
-from deck import Deck
+from freecell.deck import Deck
 from copy import deepcopy, copy
 import console
+from objc_util import ObjCClass, get_possible_method_names
 #import inspect
 from time import time
-BLACK = (0,0,0)
+WHITE = (1,1,1)
 RED = (1, 0, 0)
 STOCK = 0
 WASTE = 1
@@ -162,7 +163,7 @@ class State():
     def print_game(self, move=None):
         self.update_game()
         #[print(section, state) for section, state in zip(['Stock', 'Waste', 'Foundation', 'Tableau'], [self.stock, self.waste, self.foundation, #self.tableau])]
-        console.set_color(*BLACK)
+        console.set_color()
         print("Stock:   Waste:      Foundation:")
         #cell and foundation        
         print(f'  {len(self.stock):2d}       {len(self.waste)}     Spades Hearts Clubs Diamonds')   
@@ -202,7 +203,7 @@ class State():
                       else:
                           card = str(stack[i]) if stack[i].get_face_up()  else '####  '
                       print(f'{card:<6}', end='')
-                      console.set_color(*BLACK)
+                      console.set_color()
                   except IndexError:
                       print(" "*6, end='')                  
               print()          
@@ -228,7 +229,7 @@ class Game:
     def __init__(self):
         self.iteration_counter = 0
         self.debug = False
-        self.no_turn_cards = 1
+        self.no_turn_cards = 3
         self.state = State()
         self.state.new_game()
         self.dealstock()
@@ -495,12 +496,14 @@ class Game:
             if self.debug: print("stock is empty")
             #if the stock is  empty
             s.stock = s.waste[::-1] + s.stock
+            [card.set_face_up(False) for card in s.stock]
             #We put the cards of the waste at the bottom of the stock (at the beginning of the list)
             s.waste.clear()
             #We clear the waste
         #we add the last three card of the stock to the waste
         s.waste.extend(s.stock[::-1][:self.no_turn_cards])
         [card.set_face_up(True) for card in s.waste]
+
         del s.stock[-self.no_turn_cards:]
 
         #no new card discovered, we save this info
@@ -709,43 +712,48 @@ class Game:
              
           return score, depth 
      
-def get_solvable():
+def get_solvable(debug=False, initial_seed=1327):
     """ return a solvable game """
-    while True:
+    if initial_seed:
+        _seed = initial_seed
+    else: 
         _seed = randint(1,10000)
         seed(_seed)
+    while True:        
         game = Game()
-        game.debug = False
+        game.debug = debug
         result = game.search(depth=2)
         print('result', result)
         game.state.print_game()
         if result:
-        	  # solved game
-        	  # reset same game
+            # solved game
+            # reset same game
             seed(_seed)   
             game = Game()
             break
+    print(_seed)
     return game
                                          
     
 if __name__ == '__main__':
   console.clear()
-  game = get_solvable()
+  game = get_solvable(False, 1327)
   game.state.print_game()
-  '''
+  
   # find solvability with varying depth
   count = 0
-  N = 0
+  N = 1
   D = 1
   counts = []
   times = []
-  for d in range(1,6):
+  for d in range(2,3):
     tstart = time()
     for i in range(1,N):
       seed(i+N)
       print('\nStart state, ', i, d)
       game = Game()
       game.debug = False
+      game.no_turn_cards = 1
       t = time()
       # game.playRollout(3)
       result = game.search(depth=D)
@@ -763,7 +771,8 @@ if __name__ == '__main__':
     times.append(time()-tstart)
   print('counts', counts)
   print('times', times)
-  ''' 
+   
+
 
 
 
