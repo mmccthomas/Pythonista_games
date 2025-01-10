@@ -1,4 +1,7 @@
-#taken from https://github.com/AryKno/klondike_solver_AI
+# taken from https://github.com/AryKno/klondike_solver_AI
+# which was based upon https://web.stanford.edu/~bvr/pubs/solitaire.pdf
+# original code had many anonymous indexes etc
+# changed to Move and state classes
 # changed move[1] to move.src_deck etc 
 # lots of anonymous indices
 import base_path
@@ -10,7 +13,6 @@ import console
 from objc_util import ObjCClass, get_possible_method_names
 #import inspect
 from time import time
-WHITE = (1,1,1)
 RED = (1, 0, 0)
 STOCK = 0
 WASTE = 1
@@ -23,7 +25,7 @@ class Move:
     """ class to encapsulate a card move 
     includes testing and single card simple heuristics
     """
-    
+            
     def __init__(self,priority=0,src_stack=0, src_index=0, dest_stack=0, dest_index=0, card=None):
         self.priority = priority
         self.src_stack = src_stack
@@ -49,60 +51,71 @@ class Move:
     # define hash and eq to allow set operations 
     def __hash__(self):
         return hash((self.src_stack, self.src_index, self.dest_stack,
-                    self.dest_index, self.card))
+                    self.dest_index, self.card.strep()))
     
     def __eq__(self, other):
        return (self.src_stack == other.src_stack
               and  self.src_index == other.src_index
               and self.dest_stack == other.dest_stack
               and self.dest_index == other.dest_index
-              and self.card == other.card)
+              and self.card.strep() == other.card.strep())
 
     def is_empty(self):
       return all([self.priority==0, self.src_stack==0, 
                   self.src_index==0, self.dest_stack==0, 
                   self.dest_index==0])
                     
-    def heuristic(self):
+    def heuristic(self, original=False):
         #return the heuristic of a move
         #the moves are stored as a tuple (source stack,source card number, destination stack, destination card number)
         #move between build or waste to suit = 5pt
-        if self.card.face == 'A':
-            return 10
-        if self.card.face == 'K' and self.dest_index <= 0:
-            return 9
-        if self.card.face == 'Q' and self.dest_index <= 2:
-            return 9 
-        # moving would clear column
-        if self.src_index == 0:
-            return  8            
-        if self.to_foundation():
-            return 5
-        #move between waste to build = 5 pts
-        if self.waste_to_stack():
-            return 4
-        #move between suit stack and build stack
-        if self.waste_or_foundation_to_stack():
-            return -10                 
-        #any moves that don't comply with the strategy above = 0       
-        return 0
+        if original:
+            if self.to_foundation():
+                return 5
+            if self.waste_to_build():
+                return 5
+            if self.foundation_to_build():
+                return -10                 
+            #any moves that don't comply with the strategy above = 0       
+            return 0
+          
+        else:
+            if self.card.face == 'A':
+                return 10
+            if self.card.face == 'K' and self.dest_index <= 0:
+                return 9
+            if self.card.face == 'Q' and self.dest_index <= 2:
+                return 9 
+            # moving would clear column
+            if self.src_index == 0:
+                return  8            
+            if self.to_foundation():
+                return 5
+            #move between waste to build = 5 pts
+            if self.waste_to_build():
+                return 4
+            #move between suit stack and build stack
+            if self.foundation_to_build():
+                return -10                 
+            #any moves that don't comply with the strategy above = 0       
+            return 0
      
-    def stack_to_stack(self):
-        return self.from_stack() and self.to_stack()  
+    def build_to_build(self):
+        return self.from_build() and self.to_build()  
         
-    def waste_to_stack(self):
-        return self.src_stack   == WASTE and self.to_stack()
+    def waste_to_build(self):
+        return self.src_stack   == WASTE and self.to_build()
         
-    def waste_or_foundation_to_stack(self):
-        return self.src_stack >= FOUNDATION and self.src_stack < TABLEAU and self.to_stack()
+    def foundation_to_build(self):
+        return self.src_stack >= FOUNDATION and self.src_stack < TABLEAU and self.to_build()
         
     def to_foundation(self):
-        return self.dest_stack >= FOUNDATION and self.dest_stack < TABLEAU and (self.from_stack() or self.src_stack  == WASTE)
+        return self.dest_stack >= FOUNDATION and self.dest_stack < TABLEAU and (self.from_build() or self.src_stack  == WASTE)
         
-    def to_stack(self):
+    def to_build(self):
         return self.dest_stack >= TABLEAU and self.dest_stack <= TABLEAU_END
         
-    def from_stack(self):
+    def from_build(self):
         return  self.src_stack >= TABLEAU and self.src_stack<=TABLEAU_END
 
     def set_priority(self, priority):
@@ -135,7 +148,70 @@ class State():
         return (self.foundation == other.foundation and self.tableau == other.tableau)
         
     def ident(self):
-        return sum(self.foundation, []) + sum(self.tableau, []) # + self.waste
+        return self.crc_encode()
+        
+    def encode(self): 
+        """ turn state into string """
+        
+        long_string = '-'.join(
+                       [''.join([card.strep()+str(int(card.face_up)) for card in self.stock]),
+                        ''.join([card.strep()+str(int(card.face_up)) for card in self.waste]),
+                        '-'.join([''.join([card.strep()+str(int(card.face_up)) for card in pile]) for pile in self.foundation]),
+                        '-'.join([''.join([card.strep()+str(int(card.face_up)) for card in pile]) for pile in self.tableau])
+                       ])
+        return long_string
+        
+    def decode(self, long_string):
+        """ split long string back to state """
+        
+        all_cards = sum(self.game, [])
+        game = []
+        sections = long_string.split('-')
+        for section in sections:
+          sec_list = []
+          for i in range(0, len(section), 3):
+            str_ = section[i:i+3]
+            for card in all_cards:
+              # compare first 2 chars
+              if card.strep() == str_[:2]:
+                sec_list.append(card)
+                # set card face_up to 3rd char 
+                card.set_face_up(int(str_[2]))
+                break
+          game.append(sec_list)
+        self.game = game
+        self.stock = game[0]
+        self.waste = game[1]
+        self.foundation = game[2:6]
+        self.tableau = game[6:]
+        return self
+
+    
+    def crc_encode(self):
+      """ simple representation of game state by 4 character hex code
+      may be used simply to distinguish one state from another
+      not possible to recover state
+      """
+      def crc16(data : bytearray, offset , length):
+          if data is None or offset < 0 or offset > len(data)- 1 and offset+length > len(data):
+              return 0
+          crc = 0
+          for i in range(0, length):
+              crc ^= data[offset + i]
+              for j in range(0,8):
+                  if (crc & 1) > 0:
+                      crc = (crc >> 1) ^ 0x8408
+                  else:
+                      crc = crc >> 1
+          return crc      
+      byte_repr = bytes(self.encode(), 'utf8')
+      crc_code = crc16(byte_repr, 0, len(byte_repr))
+      return hex(crc_code)
+    
+    def number_face_ups(self, long_string):
+        # count number of faceup cards
+        # search string for suit code and get next character 0 or 1
+        return sum([int(longstring[i+1]) for i,  char_ in enumerate(longstring) if char_ in 'shcd'])
         
     def update_game(self):
         #this flattens lists to allow indexing from base methods
@@ -209,7 +285,8 @@ class State():
               print()          
         print('------------------------------------------------')
 
-       
+# #########################################################################################################
+              
 class Game:
 
     #content of the game. game[0]=stock, game[1]=waste, game[2-5]=suits stacks game[6-12] = build stacks
@@ -218,7 +295,6 @@ class Game:
     #same for the others
     game_history = []
     moves_history = []
-    newCard_history = [] #save if a card has been faced up or picked up from the waste
     rollout_moves_lists = []
 
     rolloutCounter = 0
@@ -229,40 +305,55 @@ class Game:
     def __init__(self):
         self.iteration_counter = 0
         self.debug = False
+        self.use_original = True
         self.no_turn_cards = 3
         self.state = State()
         self.state.new_game()
         self.dealstock()
-        self.game_history.append(self.state)
+        self.game_history.append(self.state.encode())
         if self.debug: print(self.state.print_game())
       
     def isOver(self):
         #the game is over if the 4 suit stacks are full with the same color
         return all([len(f)==13 for f in self.state.foundation])
         
-    def diff_heuristic(self,move):
+    def diff_heuristic(self,move, original=False):
         #called if several moves have the highest score, decide between the moves, which one is the best
         #move between build to build
         # stack is index 6-13
         game = self.state.game
-        if move.to_foundation():
-           return 10
-           
-        if move.src_stack  == WASTE:
-            card = self.state.waste[-1]
-        else:
-            card = game[move.src_stack][move.src_index]
-        #print('card to move', card)
-        if move.stack_to_stack():
-            #if the move empties a stack, priority = 1
-            if len(game[move.src_stack][:-1]) == 0:
-                return 3
-            #if the move turn a face-down card, over
-            if game[move.src_stack][move.src_index-1].face_up == False:
-                return 7 
-                #return len(game[move.src_stack][:-1])+1 #return the number of face down card
+        card = move.card
+        if original:
+            if move.build_to_build():
+                #if the move empties a stack, priority = 1
+                if len(game[move.src_stack][:-1]) == 0:
+                    return 1
+                #if the move turn a face-down card, over
+                if game[move.src_stack][move.src_index-1].face_up == False:
+                    #return the number of face down card
+                    return sum([~card.face_up for card in game[move.src_stack][:move.src_index]])
+            
+        else: 
+            # these are modified heuristics that i tried
+            if move.to_foundation():
+               return 10
+               
+            if move.src_stack  == WASTE:
+                card = self.state.waste[-1]
+            else:
+                card = game[move.src_stack][move.src_index]
+            #print('card to move', card)
+            if move.build_to_build():
+                #if the move empties a stack, priority = 1
+                if len(game[move.src_stack][:-1]) == 0:
+                    return 3
+                #if the move turn a face-down card, over
+                if game[move.src_stack][move.src_index-1].face_up == False:
+                    return 7 
+                    #return len(game[move.src_stack][:-1])+1 #return the number of face down card
+                    
         #if the move is between waste and builds
-        if move.waste_to_stack():
+        if move.waste_to_build():
             #if the move is not a king
             if card.face != 'K':
                 return 1
@@ -270,13 +361,12 @@ class Game:
             queen_known = False
             for stack in self.state.tableau:
                 for c in stack:
-                   if c.face_up and c.face=='Q' and c.color != card.color:
-                       queen_known = True
-                       break 
+                    if c.face_up and c.face=='Q' and c.color != card.color:
+                        queen_known = True
+                        break 
             if card.face == 'K' and queen_known :
                 return 1
-            #if the move is a king and its matching queen is unknown
-            if card.face == 'K':
+            if card.face == 'K' and not queen_known:
                 return -1
         
         #any other move
@@ -335,7 +425,7 @@ class Game:
         """ sort the available moves, best is last """
         #we evaluate the priority for the first time
         for move in moves_list:
-            move.priority += move.heuristic()
+            move.priority += move.heuristic(self.use_original)
             #we update the priority
         #we update the sort the moves_list with highest priority last
         best = sorted(moves_list, key = lambda x: x.priority)
@@ -344,7 +434,7 @@ class Game:
         if(len(best)>1):
             #there's several moves at the maximum value, we use the other priority calculator
             for move in best:
-               move.priority += self.diff_heuristic(move) #we had the previous calculated heuristic to the new one
+               move.priority += self.diff_heuristic(move, self.use_original) #we had the previous calculated heuristic to the new one
             best = sorted(best, key = lambda x: x.priority)              
             #best = [move for move in best if move.priority == best[-1].priority]            
         return best
@@ -404,7 +494,7 @@ class Game:
             self.moves_history.append(Move())
             print("deal the stock, no moves")
         
-        self.game_history.append(self.savegame())
+        self.game_history.append(self.state.encode())
            
         
     def evaluate_game(self,moves_list):
@@ -421,22 +511,20 @@ class Game:
         card = move.card
         
         #the source is a build
-        if move.from_stack():         
+        if move.from_build():         
             # cant move a king from start position into stack or on top of  another stack
-            if card.face == 'K' and move.to_stack() and move.src_index == 0:
+            if card.face == 'K' and move.to_build() and move.src_index == 0:
                 return False
 
-        if move.to_stack():
+        if move.to_build():
             #the destination is a build stack
             if len(s.tableau[move.dest_stack-TABLEAU]) == 0:
                 #the build stack is empty
                 return card.face == 'K' 
                 #the first card must be a king
             else:
-                if card.face == 'K':
-                  pass
                 dest_card = s.tableau[move.dest_stack-TABLEAU][-1]
-                # print(f'{card.next_up()=}, {dest_card.face=} , {card.color=},{dest_card.color=}' )
+                if self.debug: print(f'{card.next_up()=}, {dest_card.face=} , {card.color=},{dest_card.color=}' )
                 return (card.next_up() == dest_card.face) and (card.color != dest_card.color)
                 #true if the source card's number is lower and if the colors are differents
            
@@ -457,17 +545,13 @@ class Game:
                         
     def make_faceup(self, move):
         # try to make card below face up
-        if move.from_stack():
-            #if the move come from a build stack
-            try:
-                card_below = self.state.tableau[move.src_stack-TABLEAU][move.src_index-1]
-                faceup = card_below.face_up
-                card_below.set_face_up(True)               
-                self.newCard_history.append(not faceup) #  a new card has been discovered
-            except IndexError:
-              self.newCard_history.append(False)
-        else:
-            self.newCard_history.append(move.src_stack  == WASTE)
+        if move.from_build():
+           #if the move come from a build stack
+           try:
+              card_below = self.state.tableau[move.src_stack-TABLEAU][move.src_index-1]
+              card_below.set_face_up(True)               
+           except IndexError:
+              pass
             
     def make_move(self,move):
         #update the game list
@@ -506,8 +590,6 @@ class Game:
 
         del s.stock[-self.no_turn_cards:]
 
-        #no new card discovered, we save this info
-        self.newCard_history.append(False)
 
     def defeat(self,moves_list):
         #this function check the move_history and the game, for any dead end
@@ -522,7 +604,7 @@ class Game:
                         print("DEFEAT DETECTED")
                         return True #there's several deal of stock in the row, the game is in a dead end
             #test if there's an exchange between stacks and if there is dealstock between them
-            if t.stack_to_stack():            
+            if t.build_to_build():            
                 #if the game is stuck in a juggle between builds
                 count = 0
                 for i in range(1,len(self.moves_history)+1):
@@ -544,15 +626,14 @@ class Game:
         
         #if there's still face down cards
         if anyFaceDown and self.state.stock :
-            for i, newcard in enumerate(reversed(self.newCard_history)):            
-                if newcard == 1:
-                    print("card uncovered")
-                    return False #no defeat
-                else:
-                    print(count)
-                    count +=1
-                if count >=20:
-                    return True        
+            # if any cards uncovered no defeat
+            face_ups = self.state.number_face_ups(self.game_history[-1])
+            for i, state in reversed(self.game_history[:-1]):
+                 if i > 20:
+                     return True
+                 if self.state.number_face_ups(state) < face_ups:
+                     return False               
+                                 
         return False #no defeat       
           
     def filter_repetitive(self, available_moves):
@@ -561,7 +642,7 @@ class Game:
     def repetitive_move(self, move):
         #return true if the move is repetitive
         #check if the move is only between builds or between suits or between builds and suits        
-        if move.stack_to_stack():
+        if move.build_to_build():
             card = move.card
             moved_cards = [move.card for move in self.moves_history]
             '''
@@ -592,7 +673,7 @@ class Game:
 
     def savegame(self):
     #return a copy of the game state      
-        return copy(self.state)
+        return self.state.encode()
         
     def cycle_stock(self):
         """ transfer from stock until available move or return to start position """  
@@ -632,6 +713,7 @@ class Game:
         self.available_moves = self.evaluate_moves(self.available_moves)
                              
     def search(self, depth=0):
+        # basis of this is https://web.stanford.edu/~bvr/pubs/solitaire.pdf
         # For each step, find best of available moves
         # then look forward for each option to grade the most effective
         # depth 2 seems to give best result
@@ -668,7 +750,7 @@ class Game:
               self.make_move(moves[-1])
               if self.debug: print(moves[-1])
               self.moves_history.append(moves[-1])     
-              self.game_history.append(self.state)
+              self.game_history.append(self.state.encode())
               if self.debug: self.state.print_game()         
               continue
           else:
@@ -676,22 +758,22 @@ class Game:
               # which move is really best?
               # look forward N moves and return evaluation of each choice
               scores = []
-              initial_state = deepcopy(self.state)
+              initial_state = self.state.encode()
               for move in moves:
                   # store a copy of the current board
-                  previous_state = deepcopy(self.state)
+                  previous_state = self.state.encode()
                   score = self.iteration_loop(depth, move)[0] + move.priority
                   scores.append(score)
-                  self.state = deepcopy(previous_state)
+                  self.state = self.state.decode(previous_state)
                  
               if self.debug: print('scores:', scores)
               if self.debug: [print(move) for move in  moves]
               move_no = scores.index(max(scores))
-              self.state = initial_state
+              self.state = self.state.decode(initial_state)
               self.make_move(moves[move_no])
               if self.debug: print('Moved', moves[move_no])
               self.moves_history.append(moves[move_no])
-              self.game_history.append(self.state)
+              self.game_history.append(self.state.encode())
               if self.debug: self.state.print_game()                        
           
     def iteration_loop(self, depth=0, move=None):        
@@ -737,23 +819,32 @@ def get_solvable(debug=False, initial_seed=1327):
     
 if __name__ == '__main__':
   console.clear()
-  game = get_solvable(False, 1327)
+  #game = get_solvable(False, 1327)
+  game = Game()
+  game.search(depth=2)
+  game.state.print_game()
+  #_code = game.state.crc_encode()
+  long_str = game.state.encode()
+  game.state.decode(long_str)
+  print(game.state.crc_encode())
   game.state.print_game()
   
+      
+  #print(f'{_code=}')
   # find solvability with varying depth
   count = 0
-  N = 1
+  N = 30
   D = 1
   counts = []
   times = []
-  for d in range(2,3):
+  for d in range(2,5):
     tstart = time()
     for i in range(1,N):
-      seed(i+N)
+      seed(i)
       print('\nStart state, ', i, d)
       game = Game()
       game.debug = False
-      game.no_turn_cards = 1
+      game.no_turn_cards = 3
       t = time()
       # game.playRollout(3)
       result = game.search(depth=D)
@@ -772,6 +863,9 @@ if __name__ == '__main__':
   print('counts', counts)
   print('times', times)
    
+
+
+
 
 
 

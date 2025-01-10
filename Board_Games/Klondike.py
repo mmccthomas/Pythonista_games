@@ -37,8 +37,22 @@ TABLEAU = 6
 TABLEAU_END = 12
 
 A = Action
-card_indexes = 'A23456789TJQK'
+CARD_INDEXES = 'A23456789TJQK'
 
+def set_waiting(message='Processing'):
+      a = ui.ActivityIndicator()
+      a.style = ui.ACTIVITY_INDICATOR_STYLE_WHITE_LARGE      
+      a.hides_when_stopped = True
+      a.frame =(100,100,200,200)
+      a.name = message
+      a.background_color ='red'
+      a.start_animating()        
+      a.present('sheet', hide_close_button=True)
+      return a
+        
+def reset_waiting(object):
+      object.stop()
+      object.close() 
 
 class Tile(SpriteNode):
   """
@@ -72,8 +86,9 @@ class KlondikeGame(Scene):
   """
   def __init__(self):
       """ define newgame with random deck """
-      self.debug_print = False
+      self.debug_print = True
       self.inbuilt_cards = False
+      self.game_history = []
       self.face_index = {'A': 1, '2': 2, '3': 3, '4': 4,
                          '5': 5, '6': 6, '7': 7, '8': 8,
                          '9': 9, 'T': 10, 'J': 11, 'Q': 12, 'K': 13}
@@ -82,8 +97,10 @@ class KlondikeGame(Scene):
       self.suit_name = {'c': 'Clubs', 'h': 'Hearts', 's': 'Spades', 'd': 'Diamonds'}
       self.game = get_solvable(initial_seed=None)
       self.start_state = deepcopy(self.game)
-      self. game.no_turn_cards = 1
+      self.game.no_turn_cards = 1
       self.state = self.game.state
+      # flat list of all cards
+      self.all_cards = sum(self.state.game, []) 
       self.game.debug = False
       self.state.print_game()
       Scene.__init__(self)
@@ -146,6 +163,9 @@ class KlondikeGame(Scene):
               anchor_point=(0.5, 0), parent=self)
     SpriteNode('iow:pause_32', position=(32, h - 36),
                parent=self)
+    SpriteNode('iow:arrow_return_left_32', position=(w-36,  h - 72),
+               parent=self)
+               
     self.debug = LabelNode('FreeCell', font=('Avenir Next', 20),
                            position=(w / 2, 20),
                            anchor_point=(1, 0),
@@ -177,35 +197,57 @@ class KlondikeGame(Scene):
                   position=(self.fpos[i%4 + 4].x + cx/2, foundation_start_y + cy/2),
                   anchor_point=(0.5, 0.5),
                   z_position=1, parent=self)
-    
-  def define_cards(self, state=None):
+  
+  def card_image(self, card, position=None):
+      if self.inbuilt_cards:
+         face = '10' if card.face == 'T' else card.face
+         if card.get_face_up():
+            image = f'card:{self.suit_name[card.suit]}{face}' 
+         else:
+             image = 'card:BackGreen1'
+      else:
+          if card.get_face_up():
+             image = f'./freeCellSolver/pics/{self.face_index[card.face]:02d}{card.suit}.gif'
+          else:
+              image = f'./freeCellSolver/pics/back111.gif'
+      if position:       
+         # existing image, just change texture       
+         card.tileobject.texture = Texture(ui.Image.named(image))
+         card.tileobject.size = cardsize                       
+      else:       
+         card.tileobject = Tile(image, 0,0,
+                                 z_position=10,
+                                 parent=self)
+         
+                              
+                              
+  def change_card_images(self, state):
+    # call this on iteration to change card image
+    # decode state long_string and change image if any face_up has changed
+    for i, char_ in enumerate(state):
+       if char_ in 'shcd':
+          card_str = state[i-1:i+1]
+          faceup = int(state[i+1])   
+          card = self.str_to_card(card_str)
+          assert card is not None, 'error in  card string'
+          # card.face_up has already changed, so cant detect changed
+          if True: # card.face_up is not bool(faceup):
+            
+            card.set_face_up(faceup)
+            position = card.tileobject.position
+            self.card_image(card, position)
+            
+       
+  def define_cards(self):
       """ create card images and store in card objects """
-      if state is None:
-         state = self.state
       try:
         for card in self.all_cards:
-          card.tileobject.remove_from_parent()
+            card.tileobject.remove_from_parent()
       except (AttributeError):
-          pass
-      # flat list
-      self.all_cards = sum(state.game, [])
+          pass      
       for card in self.all_cards:
-              if self.inbuilt_cards:
-                  face = '10' if card.face == 'T' else card.face
-                  if card.get_face_up():
-                      image = f'card:{self.suit_name[card.suit]}{face}' 
-                  else:
-                      image = 'card:BackGreen1'
-              else:
-                  if card.get_face_up():
-                       image = f'./freeCellSolver/pics/{self.face_index[card.face]:02d}{card.suit}.gif'
-                  else:
-                       image = f'./freeCellSolver/pics/back111.gif'
-              card.tileobject = (Tile(image, 0, 0,
-                                z_position=10,
-                                parent=self))
-
-                                                          
+          self.card_image(card)
+                                                                        
   def setup(self):
     """ initialise game """
     global MOVE_SPEED
@@ -215,22 +257,25 @@ class KlondikeGame(Scene):
     MOVE_SPEED = 0.001
     # only set up fixed items once
     try:
-      a = self.score_label.text
+      _ = self.score_label.text
     except AttributeError:
       self.setup_ui()
+    self.game_history.append(self.game.state.encode())
     self.define_cards()
     self.show_cards()
     #self.game_str = self.save_game()
     self.resume_game()
-    self.debug.text = 'Klondike'
+    self.debug.text = 'Klondike'  
   
   def show_cards(self, state=None):
       """Draw cards in positions determined by game state
-      For solved games, foundation is only top card.
-      we need to delete lower cards
+      # For solved games, foundation is only top card.
+      # we need to delete lower cards
       """
       if state is None:
           state = self.state
+      else:
+         state = self.state.decode(state)
       # redraw piles
       for col, pile in enumerate(state.tableau):
         for row, card in enumerate(reversed(pile)):
@@ -238,26 +283,10 @@ class KlondikeGame(Scene):
           card.tileobject.z_position = 20 - int(2*row + 1)
         
       # redraw foundations
-      # only show top one in each pile
       for col, found in enumerate(state.foundation):
-        if found != []:
-            top_card = found[-1]
-            top_card_face, top_card_suit = (card_indexes.index(top_card.face) + 1,
-                                            'shcd'.index(top_card.suit))
-            top_card.tileobject.set_pos(self.fpos[col + 4])
-            
-            # delete cards below top found
-            # wait for card movement to finish
-            sleep(MOVE_SPEED)
-            for face_no in range(top_card_face, 1, -1):
-              try:
-                lower_card = self.tuple_to_card((face_no - 1, top_card_suit))
-                lower_card.tileobject.z_position = -1
-                lower_card.tileobject.remove_from_parent()
-                self.all_cards.remove(lower_card)
-                lower_card.tileobject = None
-              except (AttributeError):
-                pass
+          for row, card in enumerate(found):
+              card.tileobject.set_pos(self.fpos[col+4])
+              card.tileobject.z_position = int(2*row + 1)
               
       # redraw stock
       for cell in state.stock:
@@ -265,100 +294,40 @@ class KlondikeGame(Scene):
               cell.tileobject.set_pos(self.fpos[0])
       # redraw waste
       # top card at location 3, next at 2, all others at 1
+      print(state.waste[-3:])
       waste_length = len(state.waste)
-      for index, cell in enumerate(state.waste):
-          if index == waste_length-1:
-            pos = self.fpos[3]
-          elif index == waste_length-2:
-            pos = self.fpos[2]
-          else:
-            pos = self.fpos[1]
-          cell.tileobject.set_pos(pos)
-  """          
-  def save_game(self):
-    # save in format for solver to read
-    
-    def convert_foundation(foundation):
+      for index, cell in enumerate(reversed(state.waste)):
+          match index:
+            case 0:
+              pos = 3
+            case 1:
+              pos = 2
+            case _:
+              pos = 1            
+          cell.tileobject.set_pos(self.fpos[pos])  
+          cell.tileobject.z_position = pos
+       
+  def str_to_card(self, card_str):
+      for card in self.all_cards:
+          if card.strep() == card_str:
+             return card
+      return None
       
-      find highest card in each pile
-      assumes last card is highest
-      in order S, H, C, D
-      
-      order = 'shcd'
-      f_order = ['None', 'None', 'None', 'None']
-      for f in foundation:
-        if f:
-         card = f[-1]
-         if card:
-           f_order[order.index(card.suit)] = card.face
-      return ' '.join(f_order)
-    
-    g = self.state
-    cstr = []
-    for c in g.stock:
-      if not c:
-        str_ = 'None'
-      else:
-        str_ = c[-1].face + c[-1].suit
-      cstr.append(str_)
-    s = '\n'.join([convert_foundation(g.foundation),
-                   ' '.join([c[-1].face + c[-1].suit if c else 'None' for c in g.cell]),
-                   '\n'.join([' '.join([p.face + p.suit for p in pile]) for pile in g.tableau])])
-    s = s.replace('T', '10')  # 10 is T in freecell, 10 in solver
-    return s
-    """
-        
-  def tuple_to_card(self, t):
-    """convert tuple t (face_no, suit_no) to card object"""
-    try:
-        face, suit = t
-        for card in self.all_cards:
-           if card.face == self.rev_index[face] and card.suit == self.suit_range[suit]:
-               return card
-    except (IndexError, AttributeError, TypeError, KeyError):
-       return None
-          
-  # @ui.in_background
+  @ui.in_background
   def decode_state(self, index, state):
       """convert from solver state to freecell properties
+      state is longstring
       print game and move cards
       """
-      #g = self.state
-      #foundation, freecells, cascade = state
-      #g.foundation = [[self.tuple_to_card((f, i))] if f else [] for i, f in enumerate(foundation)]
-      # need empty g.cell to be [], not [None]
-      #g.cell = [[self.tuple_to_card(t)] if t else [] for t in freecells]
-      #g.tableau =  [[self.tuple_to_card(t) for t in pile] if pile else [] for pile in cascade]
       if self.debug_print:
           print('index', index)
-          state.print_game()
-      self.define_cards(state)
+          self.state.decode(state).print_game()
+      self.change_card_images(state)
       self.show_cards(state)
       # wait for card movement to finish
       sleep(MOVE_SPEED)
       
-  def place_last(self):
-      """solve leaves one card left.
-      place this card
-      place last card in cascade
-      """
-      print('pile', self.state.tableau)
-      if len(sum(self.state.tableau, [])) == 1:
-        
-         for index, pile in enumerate(self.state.tableau):
-             if pile:
-                # only 1
-                card = pile[-1]
-                print(card)
-                # call move with p# f#
-                self.move(f'p{index+1}',f'f{self.suit_range.index(card.suit)+1}')
-      # try to move freecell to foundation
-      print('cells', self.state.cell)
-      for index, card in enumerate(self.state.cell):
-          if card:
-            # call move with c# f#
-            self.move(f'c{index+1}',f'f{self.suit_range.index(card[-1].suit)+1}')
-                
+  
   @ui.in_background
   def read_moves(self, fast=False):
       """read state file which is a pickled tuple of lists for each move
@@ -372,21 +341,22 @@ class KlondikeGame(Scene):
       for index, state in enumerate(states):
             self.decode_state(index, state)
             self.score += 1
-      # finish is accomplished by hand
-      # self.place_last()
+      
       self.state.print_game()
         
   @ui.in_background
   def solve(self, fast=False):
     """call solver using game_str """
     #print('solve this\n', self.game_str)
-    for card in self.all_cards:
-          card.tileobject.remove_from_parent()
-          card.tileobject=None
+
     try:
         self.game.game_history = []
-        self.game.search(depth=2)              
+        wait = set_waiting('Getting game')
+        self.game.search(depth=2)      
+        reset_waiting(wait)
+                
         self.debug.text = f'Solved in {self.game.iteration_counter} moves'
+        [print(game) for game in self.game.game_history]
         self.read_moves(fast)
                 
     except RuntimeError:
@@ -430,9 +400,12 @@ class KlondikeGame(Scene):
       
   def touch_began(self, touch):
     self.selected = None
+    self.start = None
     if touch.location.x < 48 and touch.location.y > self.size.h - 48:
       self.show_start_menu()
-      
+    if touch.location.x > self.size.w - 48 and touch.location.y > self.size.h - 96: 
+       self.undo()
+       return
     # start will be c1-8, f1-4, p1-4
     self.start = self.decode_position(touch)
     for pile in self.state.tableau:
@@ -474,7 +447,8 @@ class KlondikeGame(Scene):
         if pos.contains_point(touch.location):
           self.selected.tileobject.position = (pos[0], pos[1])
           break
-    self.move(self.start, self.end, self.selected)
+    if self.start:
+        self.move(self.start, self.end, self.selected)
            
   def decode_position(self, touch):
       """ find if touch in tableau, stock, waste or foundation 
@@ -490,7 +464,7 @@ class KlondikeGame(Scene):
             break
       
       if not y:
-          return f'p{x}_{y_index}'
+          return f't{x}_{y_index}'
       elif x < 1:
           return f's{x}_{y_index}'
       elif x < 4:
@@ -500,63 +474,79 @@ class KlondikeGame(Scene):
       else:
           print(x, y)
           return 'None'
-          
+  
+  @ui.in_background
+  def undo(self):
+      try:
+          self.state = self.state.decode(self.game_history.pop())    
+          self.score -= 1
+          if self.debug_print: self.state.print_game()
+          self.change_card_images(self.state.encode())
+          self.show_cards()
+          print(self.game_history)
+      except IndexError:
+        dialogs.hud_alert('No more moves')
+      
   @ui.in_background
   def move(self, start, end, card):
       """ respond to p|f|c #  for start and end """
-      print(start, end)
+      if self.debug_print: print(start, end)
         
       x1, x2 = int(start[1]), int(end[1])
       move = None
+      self.game.availableMoves() 
       # Move(priority,src_stack, src_index, dest_stack, dest_index, card)
       # ignore index_to
       match (start[0], end[0]):
-          case ('p', 'f'):
+          case ('t', 'f'):
             index = int(start[3:])
             move = Move(0, x1+TABLEAU, index, x2+FOUNDATION, -1, card)
-          case ('p', 'p'):
-            index_from = int(start[3:])
-            # 
-            move = Move(0, x1+TABLEAU, index_from, x2+TABLEAU, -1, card)
+          case ('t', 't'):
+            # deal with single touch, make best move with same src_stack
+            if x1 == x2:
+               for move in reversed(self.game.available_moves):
+               	if self.debug_print: print(self.game.available_moves)
+               	print('available', move.src_stack, x1+TABLEAU)
+                if move.src_stack == x1+TABLEAU:
+                  return move
+            else:   
+                index_from = int(start[3:])
+                move = Move(0, x1+TABLEAU, index_from, x2+TABLEAU, -1, card)
+          case ('w', 'w'):
+              # deal with single touch
+              for move in reversed(self.game.available_moves):
+                if move.src_stack == WASTE:
+                  break
           case ('w', 'f'):
-            index_from = len(self.state.waste)-1
-            # index_to = len(self.state.foundation[x2])-1
-            move = Move(0, 1, index_from, x2+FOUNDATION, -1, card)
+            move = Move(0, 1, -1, x2+FOUNDATION, -1, card)
           case (('s', 'w')| ('s', 's')):
-            print('deal')
+            if self.debug_print: print('deal')
             self.game.dealstock()
             move = None
-          case ('w', 'p'):
-            #index_to = len(self.state.tableau[x2])-1
+          case ('w', 't'):
             move = Move(0, 1, -1, x2+TABLEAU, -1, card)
       if move:
-            print(f'from {x1} to {x2} {move=}')
-      self.game.availableMoves() 
-      print('move=', move)   
-      print(self.game.available_moves)
+            if self.debug_print: print(f'from {x1} to {x2} {move=}')
+      
+      if self.debug_print: print('move=', move)   
+      if self.debug_print: print(self.game.available_moves)
       if move:
         for poss_move in self.game.available_moves:
-        	  #only check card and from to stacks
+            #only check card and from to stacks, use poss_move to match
             if (move.src_stack == poss_move.src_stack
               and move.dest_stack == poss_move.dest_stack
-              and move.card == poss_move.card):
+              and move.card.strep() == poss_move.card.strep()):
                 self.game.make_move(poss_move)
-      self.state.print_game()
-      self.define_cards()
+      if self.debug_print: self.state.print_game()
+      longstring = self.game.state.encode()
+      self.change_card_images(longstring)
       self.show_cards()
+      self.game_history.append(longstring)
       self.score += 1
       #self.game_str = self.save_game()
-        
-      kings = []
-      for card in self.state.foundation:
-          if card:
-             kings.append(card[-1].face == 'K')
-          else:
-              kings.append(False)
-      all_kings = all(kings)
-      if all_kings:
-          dialogs.hud_alert('Game Complete')
-          self.show_start_menu()
+      if self.game.isOver():
+         dialogs.hud_alert('Game Complete')
+         self.show_start_menu()
                     
   def menu_button_selected(self, title):
     """ choose to play again or quit """
@@ -567,7 +557,7 @@ class KlondikeGame(Scene):
           self.resume_game()
         case 'Restart':
            self.dismiss_modal_scene()
-           self.game = self.start_state
+           self.game = deepcopy(self.start_state)
            self.state = self.game.state
            self.setup()
         case 'New Game':
@@ -592,21 +582,6 @@ class KlondikeGame(Scene):
            
 if __name__ == '__main__':
   run(KlondikeGame(), PORTRAIT, show_fps=False)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
