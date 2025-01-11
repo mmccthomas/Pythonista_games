@@ -14,7 +14,7 @@ from gui.game_menu import MenuScene
 from freecell.klondike_solver import Game, get_solvable, Move, State
 # constants 
 TOP_GAP = 80
-MID_GAP = 20
+MID_GAP = 10
 X_OFF = 10
 MOVE_SPEED = 0.001
 INITIAL_LINE_SPEED = 1
@@ -94,7 +94,7 @@ class KlondikeGame(Scene):
       """ define newgame with random deck """
       self.debug_print = True
       self.inbuilt_cards = False
-      self.deal = 1
+      self.deal = 3
       self.game_history = []
       self.face_index = {'A': 1, '2': 2, '3': 3, '4': 4,
                          '5': 5, '6': 6, '7': 7, '8': 8,
@@ -142,7 +142,7 @@ class KlondikeGame(Scene):
        
     self.all_boxes = self.foundation_bboxes
     #tableau
-    for col in range(8):
+    for col in range(7):
         self.pile_positions.append([Point(col*(cx+10)+X_OFF, pile_start_y - row*cy/3)
                                     for row in range(30)])
         
@@ -178,10 +178,10 @@ class KlondikeGame(Scene):
                            anchor_point=(1, 0),
                            parent=self)
                     
-    for col in range(8):
+    for col in range(7):
         # column labels
-        LabelNode(str(col+1), font=('Avenir Next', 20),
-                  position=(self.fpos[col].x + cx/2, foundation_start_y-MID_GAP),
+        LabelNode(str(col), font=('Avenir Next', 20),
+                  position=(self.pile_positions[col][0].x + cx/2, foundation_start_y-2*MID_GAP),
                   anchor_point=(0.5, 0.5),
                   parent=self)
         # foundation labels
@@ -274,7 +274,7 @@ class KlondikeGame(Scene):
     
     self.show_cards()
     self.resume_game()
-    self.debug.text = 'Klondike'  
+    self.debug.text = f'Klondike game: {self.game.state.crc_encode()}'  
   
   def show_cards(self, state=None):
       """Draw cards in positions determined by game state
