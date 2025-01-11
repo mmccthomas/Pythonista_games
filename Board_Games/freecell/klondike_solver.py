@@ -13,6 +13,7 @@ import console
 from objc_util import ObjCClass, get_possible_method_names
 #import inspect
 from time import time
+from collections import Counter
 RED = (1, 0, 0)
 STOCK = 0
 WASTE = 1
@@ -208,10 +209,13 @@ class State():
       crc_code = crc16(byte_repr, 0, len(byte_repr))
       return hex(crc_code)
     
-    def number_face_ups(self, long_string):
-        # count number of faceup cards
-        # search string for suit code and get next character 0 or 1
-        return sum([int(longstring[i+1]) for i,  char_ in enumerate(longstring) if char_ in 'shcd'])
+    def number_face_ups(self, longstring):
+        # count number of faceup cards in foundation and tableau
+        # find remainder of string after location of 2nd seperator
+        str_ = longstring[longstring.index('-', longstring.index('-') +1)+1:]
+        #print(f'{longstring=}, {str_=}') 
+        # search string for suit code and get next character 0 or 1       
+        return sum([int(str_[i+1]) for i,  char_ in enumerate(str_) if char_ in 'shcd'])
         
     def update_game(self):
         #this flattens lists to allow indexing from base methods
@@ -304,13 +308,16 @@ class Game:
 
     def __init__(self):
         self.iteration_counter = 0
-        self.debug = False
-        self.use_original = True
-        self.no_turn_cards = 3
+        self.debug = True
+        self.use_original = False
+        self.no_turn_cards = 3       
+        self.game_history = [] 
         self.state = State()
         self.state.new_game()
         self.dealstock()
         self.game_history.append(self.state.encode())
+        self.state.uncovered = 7
+        self.state.counts = 1
         if self.debug: print(self.state.print_game())
       
     def isOver(self):
@@ -419,7 +426,7 @@ class Game:
         # remove duplicates
         self.available_moves =  list(set(self.available_moves))
          # if no moves are available, we deal the stock        
-        return len(self.available_moves) > 0
+        return self.available_moves
            
     def evaluate_moves(self,moves_list):
         """ sort the available moves, best is last """
@@ -524,7 +531,7 @@ class Game:
                 #the first card must be a king
             else:
                 dest_card = s.tableau[move.dest_stack-TABLEAU][-1]
-                if self.debug: print(f'{card.next_up()=}, {dest_card.face=} , {card.color=},{dest_card.color=}' )
+                #if self.debug: print(f'{card.next_up()=}, {dest_card.face=} , {card.color=},{dest_card.color=}' )
                 return (card.next_up() == dest_card.face) and (card.color != dest_card.color)
                 #true if the source card's number is lower and if the colors are differents
            
@@ -571,6 +578,7 @@ class Game:
         # remove any other move using same card
         self.available_moves = [move_ for move_ in self.available_moves if move_.card != move.card]
         self.state.update_game()
+        # self.moves_history.append(move)        
 
     def dealstock(self):
         #deal the stock        
@@ -591,19 +599,18 @@ class Game:
         del s.stock[-self.no_turn_cards:]
 
 
-    def defeat(self,moves_list):
-        #this function check the move_history and the game, for any dead end
-    
-        if len(self.moves_history)>11:
+    def defeat(self):
+        #this function checks the game_history for any dead end
+        counts = Counter([self.state.number_face_ups(state) for state in self.game_history])                 
+        self.state.uncovered = max(counts.keys())
+        self.state.counts = counts[self.state.uncovered]
+        
+        if len(self.moves_history) > 11:
+            print('checking history')
             #if the game history contains at least 12 moves
-            t = moves_list[-1] #the last move
-            if t.is_empty():
-                #if the last move is a deal of the stock
-                for i in range(1,11): #we check if the last 10 moves are to deal the stock
-                    if self.game_history[-i] != t:
-                        print("DEFEAT DETECTED")
-                        return True #there's several deal of stock in the row, the game is in a dead end
+            
             #test if there's an exchange between stacks and if there is dealstock between them
+            """
             if t.build_to_build():            
                 #if the game is stuck in a juggle between builds
                 count = 0
@@ -617,23 +624,14 @@ class Game:
                                or (t.src_stack == prev.dest_stack and t.dest_stack == prev.src_stack):
                                 #there's a juggle between 
                                 return True
-            
-        #we check if anynew card has not been discovered for a while
-        count = 0
-        #if there's still card in the stock
-        #test if there's still facedown cards
-        anyFaceDown = any([~card.face_up for stack in self.state.tableau for card in stack])
-        
-        #if there's still face down cards
-        if anyFaceDown and self.state.stock :
-            # if any cards uncovered no defeat
-            face_ups = self.state.number_face_ups(self.game_history[-1])
-            for i, state in reversed(self.game_history[:-1]):
-                 if i > 20:
-                     return True
-                 if self.state.number_face_ups(state) < face_ups:
-                     return False               
-                                 
+            """
+            #we check if anynew card has not been discovered for a while
+            # detect a run of 20 same value if not at endgame     
+            for number, count in counts.items():
+                if count > 20 and number != 52:
+                    print('finished due to no new cards')
+                    return True   
+                              
         return False #no defeat       
           
     def filter_repetitive(self, available_moves):
@@ -706,11 +704,12 @@ class Game:
     def get_moves(self):
         # filter and grade available moves
         self.available_moves.clear()
-        self.availableMoves()
+        self.available_moves = self.availableMoves()
         self.available_moves = self.filter_repetitive(self.available_moves)
         self.cycle_stock()  
         # sort and filter moves to return list with best priorities last
         self.available_moves = self.evaluate_moves(self.available_moves)
+        return self.available_moves
                              
     def search(self, depth=0):
         # basis of this is https://web.stanford.edu/~bvr/pubs/solitaire.pdf
@@ -729,7 +728,7 @@ class Game:
           if self.isOver():
               return True
 
-          self.get_moves()
+          self.available_moves = self.get_moves()
                                  
           if len(self.available_moves)==0:
               if self.debug:
@@ -820,6 +819,7 @@ def get_solvable(debug=False, initial_seed=1327):
 if __name__ == '__main__':
   console.clear()
   #game = get_solvable(False, 1327)
+  seed(1)
   game = Game()
   game.search(depth=2)
   game.state.print_game()
@@ -833,36 +833,45 @@ if __name__ == '__main__':
   #print(f'{_code=}')
   # find solvability with varying depth
   count = 0
-  N = 30
+  N = 500
   D = 1
+  card_turns = 3
   counts = []
   times = []
-  for d in range(2,5):
-    tstart = time()
-    for i in range(1,N):
-      seed(i)
-      print('\nStart state, ', i, d)
-      game = Game()
-      game.debug = False
-      game.no_turn_cards = 3
-      t = time()
-      # game.playRollout(3)
-      result = game.search(depth=D)
-      print(f'{"Complete" if result is True else "Defeat"} in time {time()-t:.3f} secs {game.iteration_counter} counts')
-      print('\nEnd state')
-      game.state.print_game()
-      if result :
-        count += 1
-      # for i in range(0):
-      #     game.play()
-      #     game.state.print_game()
-    print('solved', count, 'in ', N)
-    print('total time=', time()-tstart)
-    counts.append(count)
-    times.append(time()-tstart)
+  with open(f'klondike_winning.txt', 'w') as f:
+      for d in range(4,5):
+        tstart = time()
+        for i in range(1,N):
+          seed()
+          print('\nStart state, ', i, d)
+          game = Game()
+          game.debug = False
+          game.no_turn_cards = card_turns
+          t = time()
+          # game.playRollout(3)
+          result = game.search(depth=D)
+          print(f'{"Complete" if result is True else "Defeat"} in time {time()-t:.3f} secs {game.iteration_counter} counts')
+          print('\nEnd state')
+          game.state.print_game()
+          if result :
+            f.write(game.game_history[0] + '\n')
+            print('winning start state', game.game_history[0])
+            count += 1
+          # for i in range(0):
+          #     game.play()
+          #     game.state.print_game()
+        print('solved', count, 'in ', N)
+        print('total time=', time()-tstart)
+        counts.append(count)
+        times.append(time()-tstart)
   print('counts', counts)
   print('times', times)
    
+
+
+
+
+
 
 
 
