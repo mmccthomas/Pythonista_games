@@ -1,10 +1,11 @@
+import os
 class Card:
     # A face list to build card
     face_range = ['A', '2', '3', '4', '5', '6', '7', '8', '9', 'T', 'J', 'Q', 'K']
     # A index to refer face easily
     face_index = {'A': 1, '2': 2, '3': 3, '4': 4, '5': 5, '6': 6, '7': 7, '8': 8, '9': 9, 'T': 10,
                    'J': 11, 'Q': 12, 'K': 13}
-
+    reverse_index = {v: k for k, v in face_index.items()}
     # A suit list to build card: c = clubs, s = spade, h = heart, d=  diamond
     suit_range = ['c', 'h', 's', 'd']
     suit_name = {'c': 'Clubs', 'h': 'Hearts', 's': 'Spades', 'd': 'Diamonds'}
@@ -18,11 +19,19 @@ class Card:
         if face in self.face_range and suit in self.suit_range:
             self.face = face
             self.suit = suit
-            if self.face == 'T':
-            	  self.image = f'card:{self.suit_name[self.suit]}10'
-            else:
-                self.image = f'card:{self.suit_name[self.suit]}{self.face}'
-            self.tileobject = None
+            
+            ''' Arguments:
+            value   -- card's value from 1-13
+            sVal    -- card's suit (from 0-3, same as corresponding all_suits val)
+            '''
+            self.rank = face
+            self.suit_ = self.suit.upper()
+            
+            
+            self.sVal = self.suit_index[self.suit] - 1
+            self.value = self.face_index[self.face]
+            # 0 is black, 1 is red
+            self.cVal = self.sVal % 2
         else:
             self.face = None
             self.suit = None
@@ -34,6 +43,7 @@ class Card:
             self.color = 'B'
         else:
             self.color = None
+        self.face_up = True
 
     # string representation of class Card
     def __str__(self):
@@ -45,8 +55,18 @@ class Card:
     # enter a card name in the shell to print the card
     def __repr__(self):
         return self.__str__()
-
-
+    
+    def __eq__(self, other):
+    	  return self.face == other.face and self.suit == other.suit
+    	  
+    def __hash__(self):
+    	 return hash((self.value, self.sVal))
+    	 
+    @property
+    def strep(self):
+    	  # return 2 character representation e.g. Qh
+        return f'{self.face}{self.suit}'	
+         
     # set methods to change face and suit of a card;
     # seldom used in game implementation, build to follow class convention.
 
@@ -59,6 +79,10 @@ class Card:
     def set_tileobject(self, tile):
         self.tileobject = tile
 
+    
+    def set_face_up(self, face_up):
+        self.face_up = bool(face_up)
+        
     # get methods to access attributes of Card class;
 
     def get_face(self):
@@ -69,6 +93,9 @@ class Card:
 
     def get_color(self):
         return self.color
+        
+    def get_face_up(self):
+        return self.face_up
 
     def get_face_index(self):
         return self.face_index.get(self.face)
@@ -85,15 +112,34 @@ class Card:
     def equal_suit(self, other):
         return self.suit == other.suit
 
-
+    def next_up(self):
+        '''returns next face in sequence
+        k> a'''
+        try:
+            return self.reverse_index[self.face_index[self.face]+ 1]
+        except KeyError:
+            return None
+            
+    def next_down(self):
+        '''returns previous face in sequence
+        a> None'''
+        try:
+            return self.reverse_index[self.face_index[self.face] -1 ]
+        except KeyError:
+            return None
 
 def main():
     test_card = Card('K', 's')
     print(test_card)
-    for k in test_card.face_range:
-    	print(Card(k,'s').image)
-  
+    print(test_card.next_up())
+    print(test_card.next_down())
+    test_card = Card('A', 's')
+    print(test_card)
+    print(test_card.next_up())
+    print(test_card.next_down())
 
 
 if __name__ == "__main__":
     main()
+
+
