@@ -6,7 +6,7 @@ Module includes utility functions, as well as functions that primarily act
 on games (full free cell objects).
 '''
 
-from Classes import *
+from freecell.Classes import *
 from time import time
 
 def testTime(func, object, bound):

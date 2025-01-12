@@ -11,7 +11,7 @@ from types import SimpleNamespace
 base_path.add_paths(__file__)
 from gui.game_menu import MenuScene
 from freecell.freecell import Freecell
-from freeCellSolver.free_solver import Solver
+from freecell.free_solver import Solver
 
 w, h = get_screen_size()
 # w, h = 1112, 834

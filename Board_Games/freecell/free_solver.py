@@ -8,12 +8,12 @@ This module solves FreeCell games using a variety of algorithms.
 import sys
 import base_path
 base_path.add_paths(__file__)
-import freeCellSolver.GameFunctions as G
+import freecell.GameFunctions as G
 # GameFunctions also includes utilities, mostly functions that act on games
 # (FreeCell objects), as opposed to states
-import freeCellSolver.Classes as C
+import freecell.Classes as C
 # Classes is just the Card and FreeCell classes, very basic objects
-import freeCellSolver.StateFunctions as S
+import freecell.StateFunctions as S
 # StateFunctions has a lot of important functions, primarily acting on states
 # which are immutable tuples that package all the information in a freecell
 # game into a single snapshot

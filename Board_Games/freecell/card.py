@@ -55,6 +55,9 @@ class Card:
 
     def set_suit(self, suit):
         self.suit = suit
+        
+    def set_tileobject(self, tile):
+        self.tileobject = tile
 
     # get methods to access attributes of Card class;
 

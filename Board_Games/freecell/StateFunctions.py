@@ -18,9 +18,9 @@ A state is a 3-tuple, consisting of:
                   cascades, that column will be a tuple of 7 2-tuples
 '''
 
-from freeCellSolver.Functions import *
-from freeCellSolver.Classes import *
-from freeCellSolver.GameFunctions import *
+from freecell.Functions import *
+from freecell.Classes import *
+from freecell.GameFunctions import *
 
 def remakeGame(firstState, movesLst, waitForInput=False, noprint=False):
     '''
