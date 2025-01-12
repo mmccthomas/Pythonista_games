@@ -62,6 +62,11 @@ class Card:
     def __hash__(self):
     	 return hash((self.value, self.sVal))
     	 
+    @property
+    def strep(self):
+    	  # return 2 character representation e.g. Qh
+        return f'{self.face}{self.suit}'	
+         
     # set methods to change face and suit of a card;
     # seldom used in game implementation, build to follow class convention.
 
@@ -72,7 +77,7 @@ class Card:
         self.suit = suit
     
     def set_face_up(self, face_up):
-        self.face_up = face_up
+        self.face_up = bool(face_up)
         
     # get methods to access attributes of Card class;
 

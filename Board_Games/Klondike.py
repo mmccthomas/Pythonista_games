@@ -94,7 +94,7 @@ class KlondikeGame(Scene):
       """ define newgame with random deck """
       self.debug_print = True
       self.inbuilt_cards = False
-      self.deal = 3
+      self.deal = 1
       self.game_history = []
       self.face_index = {'A': 1, '2': 2, '3': 3, '4': 4,
                          '5': 5, '6': 6, '7': 7, '8': 8,
@@ -102,12 +102,13 @@ class KlondikeGame(Scene):
       self.rev_index = {v: k for k, v in self.face_index.items()}
       self.suit_range = ['s', 'h', 'c', 'd']
       self.suit_name = {'c': 'Clubs', 'h': 'Hearts', 's': 'Spades', 'd': 'Diamonds'}
-      self.game = Game() #get_solvable(initial_seed=None)
+      self.game = Game()
       new_hand = get_winning_hand(self.deal)
       self.game.state = self.game.state.decode(new_hand)
       self.start_state = new_hand  
       # flat list of all cards
       self.all_cards = sum(self.game.state.game, []) 
+      # assign a Tile object to each card object
       self.define_cards()   
       self.game.debug = False
       
@@ -131,13 +132,9 @@ class KlondikeGame(Scene):
     self.foundation_bboxes = []
     self.pile_positions = []
     # stock, waste and foundation
+    off = {2: 0.9, 3: 1.8} # place waste piles, default=0
     for i in range(8):
-       if i == 2:
-           self.fpos.append(Point(i*(cx+10)+X_OFF - cx*0.9, foundation_start_y))
-       elif i == 3:
-           self.fpos.append(Point(i*(cx+10)+X_OFF - cx*1.8, foundation_start_y))   
-       else:
-           self.fpos.append(Point(i*(cx+10)+X_OFF, foundation_start_y))
+       self.fpos.append(Point(i*(cx+10) + X_OFF - cx*off.get(i, 0), foundation_start_y))       
        self.foundation_bboxes.append(Rect(*self.fpos[-1], *cardsize))
        
     self.all_boxes = self.foundation_bboxes
@@ -165,9 +162,9 @@ class KlondikeGame(Scene):
     self.stock_no =LabelNode('0', font=('Avenir Next', 30),
               position=(self.fpos[0].x+cx, self.fpos[0].y+cy),
               anchor_point=(1, 0), parent=self)
-    LabelNode('', font=('Avenir Next', 30),
-              position=(self.fpos[1].x, self.fpos[0].y+cy+20),
-              anchor_point=(0.5, 0), parent=self)
+    #LabelNode('', font=('Avenir Next', 30),
+    #          position=(self.fpos[1].x, self.fpos[0].y+cy+20),
+    #          anchor_point=(0.5, 0), parent=self)
     SpriteNode('iow:pause_32', position=(32, h - 36),
                parent=self)
     SpriteNode('iow:arrow_return_left_32', position=(w-36,  h - 72),
@@ -240,8 +237,7 @@ class KlondikeGame(Scene):
             
             card.set_face_up(faceup)
             position = card.tileobject.position
-            self.card_image(card, position)
-            
+            self.card_image(card, position)            
        
   def define_cards(self):
       """ create card images and store in card objects """
@@ -261,8 +257,7 @@ class KlondikeGame(Scene):
     self.score = 0
     self.game.state.print_game()
     self.game.moves_history = []
-    self.game.game_history = []
-    
+    self.game.game_history = []    
     self.game.no_turn_cards = self.deal
     MOVE_SPEED = 0.001
     # only set up gui items once
@@ -320,18 +315,17 @@ class KlondikeGame(Scene):
        
   def str_to_card(self, card_str):
       for card in self.all_cards:
-          if card.strep() == card_str:
+          if card.strep == card_str:
              return card
       return None
       
   # @ui.in_background
   def decode_state(self, index, state):
-      """convert from solver state to freecell properties
+      """convert from solver state
       state is longstring
       print game and move cards
       """
-      if self.debug_print:
-          print('index', index)          
+      if self.debug_print: print('index', index)          
       self.game.state = self.game.state.decode(state)
       self.game.state.print_game()
       if self.game.isOver():
@@ -342,8 +336,7 @@ class KlondikeGame(Scene):
       # wait for card movement to finish
       sleep(MOVE_SPEED)
       return self.game.state
-      
-  
+       
   @ui.in_background
   def read_moves(self, fast=False):
       """read state file which is a pickled tuple of lists for each move
@@ -383,7 +376,8 @@ class KlondikeGame(Scene):
   def show_start_menu(self, title=''):
     self.pause_game()
     self.menu = MenuScene('Main Menu', title,
-                          ['Continue', 'Restart', 'New Game', 'Complete',
+                          ['Continue', 'Restart', 
+                           'New Game', 'Complete',
                            'Complete Fast', 'Quit'])
     self.present_modal_scene(self.menu)
           
@@ -431,16 +425,14 @@ class KlondikeGame(Scene):
                 self.selected = card
                 return
           except AttributeError:
-            pass
-    
+            pass    
     try:
         card = self.game.state.stock[-1]
         if card.tileobject.bbox.contains_point(touch.location):
                 self.selected = card
                 return
     except (AttributeError, IndexError):
-            pass
-    
+            pass    
     try:
         card = self.game.state.waste[-1]
         if card.tileobject.bbox.contains_point(touch.location):
@@ -474,7 +466,6 @@ class KlondikeGame(Scene):
       y = (touch.location.y - self.fpos[0].y - 50) > 0
       y_index = 0
       for index, box in enumerate(self.all_boxes[8:]):
-          # 8*30 positions
           if box.contains_point(touch.location):
             y_index = index % 30
             break
@@ -494,12 +485,12 @@ class KlondikeGame(Scene):
   @ui.in_background
   def undo(self):
       try:
-          self.game.state = self.game.state.decode(self.game.game_history.pop())    
+          self.game.game_history.pop()
+          self.game.state = self.game.state.decode(self.game.game_history[-1])    
           self.score -= 1
           if self.debug_print: self.game.state.print_game()
           self.change_card_images(self.game.state.encode())
           self.show_cards()
-          print(self.game.game_history)
       except IndexError:
         dialogs.hud_alert('No more moves')
       
@@ -510,7 +501,6 @@ class KlondikeGame(Scene):
         
       x1, x2 = int(start[1]), int(end[1])
       move = None
-      #self.game.state.print_game()
       self.game.available_moves.clear()
       valid_moves = self.game.availableMoves()
       best_moves = self.game.evaluate_moves(valid_moves)
@@ -524,11 +514,10 @@ class KlondikeGame(Scene):
               # deal with single touch, make best move with same src_stack
               if x1 == x2:
                  if self.debug_print: [print(m) for m in best_moves]
-                 for move in reversed(valid_moves):
-                     
-                     print('available', move.src_stack, x1+TABLEAU)
+                 for move in reversed(valid_moves):                     
+                     if self.debug_print: print('available', move.src_stack, x1+TABLEAU)
                      if move.src_stack == x1+TABLEAU:
-                        print('make move', move)
+                        if self.debug_print: print('make move', move)
                         break
               else:   
                   index_from = int(start[3:])
@@ -558,9 +547,17 @@ class KlondikeGame(Scene):
             #only check card and from to stacks, use poss_move to match
             if (move.src_stack == poss_move.src_stack
               and move.dest_stack == poss_move.dest_stack
-              and move.card.strep() == poss_move.card.strep()):
+              and move.card.strep == poss_move.card.strep):
                 self.game.make_move(poss_move)
                 self.game.moves_history.append(poss_move)
+                break
+         # try move from fojndation?
+         if (start[0], end[0]) == ('f', 't'):
+           try:
+               self.game.make_move(move)
+               self.game.moves_history.append(move)
+           except Exception as e:
+               print(e)
       if self.debug_print: self.game.state.print_game(move)
       longstring = self.game.state.encode()
       self.change_card_images(longstring)
@@ -612,6 +609,9 @@ class KlondikeGame(Scene):
            
 if __name__ == '__main__':
     run(KlondikeGame(), PORTRAIT, show_fps=False)
+
+
+
 
 
 

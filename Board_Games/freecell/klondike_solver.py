@@ -52,15 +52,16 @@ class Move:
     # define hash and eq to allow set operations 
     def __hash__(self):
         return hash((self.src_stack, self.src_index, self.dest_stack,
-                    self.dest_index, self.card.strep()))
+                    self.dest_index, self.card.strep))
     
     def __eq__(self, other):
        return (self.src_stack == other.src_stack
               and  self.src_index == other.src_index
               and self.dest_stack == other.dest_stack
               and self.dest_index == other.dest_index
-              and self.card.strep() == other.card.strep())
-
+              and self.card.strep == other.card.strep)
+              
+    @property
     def is_empty(self):
       return all([self.priority==0, self.src_stack==0, 
                   self.src_index==0, self.dest_stack==0, 
@@ -71,11 +72,11 @@ class Move:
         #the moves are stored as a tuple (source stack,source card number, destination stack, destination card number)
         #move between build or waste to suit = 5pt
         if original:
-            if self.to_foundation():
+            if self.to_foundation:
                 return 5
-            if self.waste_to_build():
+            if self.waste_to_build:
                 return 5
-            if self.foundation_to_build():
+            if self.foundation_to_build:
                 return -10                 
             #any moves that don't comply with the strategy above = 0       
             return 0
@@ -90,34 +91,40 @@ class Move:
             # moving would clear column
             if self.src_index == 0:
                 return  8            
-            if self.to_foundation():
+            if self.to_foundation:
                 return 5
             #move between waste to build = 5 pts
-            if self.waste_to_build():
+            if self.waste_to_build:
                 return 4
             #move between suit stack and build stack
-            if self.foundation_to_build():
+            if self.foundation_to_build:
                 return -10                 
             #any moves that don't comply with the strategy above = 0       
             return 0
-     
-    def build_to_build(self):
-        return self.from_build() and self.to_build()  
-        
-    def waste_to_build(self):
-        return self.src_stack   == WASTE and self.to_build()
-        
-    def foundation_to_build(self):
-        return self.src_stack >= FOUNDATION and self.src_stack < TABLEAU and self.to_build()
-        
-    def to_foundation(self):
-        return self.dest_stack >= FOUNDATION and self.dest_stack < TABLEAU and (self.from_build() or self.src_stack  == WASTE)
-        
-    def to_build(self):
-        return self.dest_stack >= TABLEAU and self.dest_stack <= TABLEAU_END
-        
+   
+    @property  
     def from_build(self):
         return  self.src_stack >= TABLEAU and self.src_stack<=TABLEAU_END
+
+    @property   
+    def to_build(self):
+        return self.dest_stack >= TABLEAU and self.dest_stack <= TABLEAU_END
+
+    @property                          
+    def build_to_build(self):
+        return self.from_build and self.to_build
+
+    @property                
+    def waste_to_build(self):
+        return self.src_stack   == WASTE and self.to_build
+        
+    @property    
+    def foundation_to_build(self):
+        return self.src_stack >= FOUNDATION and self.src_stack < TABLEAU and self.to_build
+        
+    @property    
+    def to_foundation(self):
+        return self.dest_stack >= FOUNDATION and self.dest_stack < TABLEAU and (self.from_build or self.src_stack  == WASTE)    
 
     def set_priority(self, priority):
         self.priority = priority
@@ -155,10 +162,10 @@ class State():
         """ turn state into string """
         
         long_string = '-'.join(
-                       [''.join([card.strep()+str(int(card.face_up)) for card in self.stock]),
-                        ''.join([card.strep()+str(int(card.face_up)) for card in self.waste]),
-                        '-'.join([''.join([card.strep()+str(int(card.face_up)) for card in pile]) for pile in self.foundation]),
-                        '-'.join([''.join([card.strep()+str(int(card.face_up)) for card in pile]) for pile in self.tableau])
+                       [''.join([card.strep + str(int(card.face_up)) for card in self.stock]),
+                        ''.join([card.strep + str(int(card.face_up)) for card in self.waste]),
+                        '-'.join([''.join([card.strep + str(int(card.face_up)) for card in pile]) for pile in self.foundation]),
+                        '-'.join([''.join([card.strep + str(int(card.face_up)) for card in pile]) for pile in self.tableau])
                        ])
         return long_string
         
@@ -174,7 +181,7 @@ class State():
             str_ = section[i:i+3]
             for card in all_cards:
               # compare first 2 chars
-              if card.strep() == str_[:2]:
+              if card.strep == str_[:2]:
                 sec_list.append(card)
                 # set card face_up to 3rd char 
                 card.set_face_up(int(str_[2]))
@@ -188,7 +195,7 @@ class State():
         return self
 
     
-    def crc_encode(self):
+    def crc_encode(self, longstring=None):
       """ simple representation of game state by 4 character hex code
       may be used simply to distinguish one state from another
       not possible to recover state
@@ -204,8 +211,11 @@ class State():
                       crc = (crc >> 1) ^ 0x8408
                   else:
                       crc = crc >> 1
-          return crc      
-      byte_repr = bytes(self.encode(), 'utf8')
+          return crc 
+      if longstring is None:     
+          byte_repr = bytes(self.encode(), 'utf8')
+      else:
+      	  byte_repr = bytes(longstring, 'utf8')
       crc_code = crc16(byte_repr, 0, len(byte_repr))
       return hex(crc_code)
     
@@ -331,7 +341,7 @@ class Game:
         game = self.state.game
         card = move.card
         if original:
-            if move.build_to_build():
+            if move.build_to_build:
                 #if the move empties a stack, priority = 1
                 if len(game[move.src_stack][:-1]) == 0:
                     return 1
@@ -342,7 +352,7 @@ class Game:
             
         else: 
             # these are modified heuristics that i tried
-            if move.to_foundation():
+            if move.to_foundation:
                return 10
                
             if move.src_stack  == WASTE:
@@ -350,7 +360,7 @@ class Game:
             else:
                 card = game[move.src_stack][move.src_index]
             #print('card to move', card)
-            if move.build_to_build():
+            if move.build_to_build:
                 #if the move empties a stack, priority = 1
                 if len(game[move.src_stack][:-1]) == 0:
                     return 3
@@ -360,7 +370,7 @@ class Game:
                     #return len(game[move.src_stack][:-1])+1 #return the number of face down card
                     
         #if the move is between waste and builds
-        if move.waste_to_build():
+        if move.waste_to_build:
             #if the move is not a king
             if card.face != 'K':
                 return 1
@@ -518,12 +528,12 @@ class Game:
         card = move.card
         
         #the source is a build
-        if move.from_build():         
+        if move.from_build:         
             # cant move a king from start position into stack or on top of  another stack
-            if card.face == 'K' and move.to_build() and move.src_index == 0:
+            if card.face == 'K' and move.to_build and move.src_index == 0:
                 return False
 
-        if move.to_build():
+        if move.to_build:
             #the destination is a build stack
             if len(s.tableau[move.dest_stack-TABLEAU]) == 0:
                 #the build stack is empty
@@ -536,7 +546,7 @@ class Game:
                 #true if the source card's number is lower and if the colors are differents
            
         #from x stack to suits # S, H, C, D
-        if move.to_foundation():
+        if move.to_foundation:
             top_card = (move.src_index == len(s.tableau[move.src_stack-TABLEAU])-1) or (move.src_stack  == WASTE)
             if top_card: #In any case, a card that is moved to a suit stack is at the end of its stack
                 if len(self.state.game[move.dest_stack]) == 0:
@@ -552,7 +562,7 @@ class Game:
                         
     def make_faceup(self, move):
         # try to make card below face up
-        if move.from_build():
+        if move.from_build:
            #if the move come from a build stack
            try:
               card_below = self.state.tableau[move.src_stack-TABLEAU][move.src_index-1]
@@ -565,7 +575,7 @@ class Game:
         #move is a Move object
         #print("make_move.move= ", move)
         
-        if move.to_foundation():
+        if move.to_foundation:
             #top card only
             self.state.foundation[suit_order.index(move.card.suit)].append(move.card)
             self.state.game[move.src_stack].pop()
@@ -640,7 +650,7 @@ class Game:
     def repetitive_move(self, move):
         #return true if the move is repetitive
         #check if the move is only between builds or between suits or between builds and suits        
-        if move.build_to_build():
+        if move.build_to_build:
             card = move.card
             moved_cards = [move.card for move in self.moves_history]
             '''
