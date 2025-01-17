@@ -3,6 +3,7 @@ import time
 import string
 import numpy as np
 import re
+import inspect
 
 class TrieNode:
     def __init__(self):
@@ -40,7 +41,7 @@ class WordDictionary:
 
 class CodewordSolverDFS():
     
-    def __init__(self, encoded_words, code_dict, word_trie, all_word_dict, use_heuristics=True):
+    def __init__(self, encoded_words, code_dict, word_trie, use_heuristics=True):
         """
         Args:
             encoded_words (list[list[int]]): List with one sub-list per encoded word.
@@ -58,7 +59,11 @@ class CodewordSolverDFS():
         self.encoded_words = encoded_words
         self.code_dict = code_dict
         self._word_trie = word_trie
-        self.all_word_dict = all_word_dict
+        self.debug = False
+        self.dots = 0
+        self.word_missing_dict = {}
+        self.best_wordset = []
+        self.initial_depth = len(inspect.stack())
         
         # Create a list of letters sorted by most frequently occurring
         self._letter_frequency = [str(char) for char in "etaonihsrlducmwyfgpbvkjxqz"]
@@ -147,6 +152,11 @@ class CodewordSolverDFS():
             bool: True if valid letter assignments are successfully found for
                 all numbers, False otherwise.
         """
+        def score(decoded_words):
+            total_len = len(''.join(decoded_words))
+            alpha = sum([c != '.' for c in ''.join(decoded_words)])
+            return int(100 * alpha / total_len )
+                    
         # Assignments for initial call to solve
         if encoded_words is None:
             encoded_words = self.encoded_words.copy()
@@ -161,13 +171,18 @@ class CodewordSolverDFS():
             return True
         else:
             num = empty_numbers[0]
-            
+          
         # Try every available letter in place of the current empty number
+        if self.debug: print(f'Recursion depth >>>>>>>>>>>>>>>>>>>>>> {len(inspect.stack())- self.initial_depth}')
         for letter in available_letters:
             # Check if this letter is valid for this number
             self.code_dict[num] = letter
             decoded_words = self.decode_words_in_list(encoded_words)
+            if self.debug: print(f'Number {num}: Trying {letter}')
+            if self.debug: print('Decoded words would be', decoded_words)
+            
             if self.all_words_are_valid(decoded_words):
+                if self.debug: print(f'Valid. Score {score(decoded_words)}%\n')
                 # Create letter/number lists to pass to next call to solve()
                 next_available_letters = [l for l in available_letters if l != letter]
                 next_empty_numbers = [number for number in empty_numbers if number != num]
@@ -175,8 +190,26 @@ class CodewordSolverDFS():
                     # This means there are no more empty numbers, so we are finished
                     return True      
             else:
+                if self.debug: print(f'NOT valid. Score {score(decoded_words)}%\n')
+                ok_words = [self._word_trie.search(search_string) for search_string in decoded_words]
+                list_invalid = [word for word, ok in zip(decoded_words, ok_words) if not ok]
+                if self.debug: print('invalid ', list_invalid)
+                
+                if self.debug:
+                    # calculate a score of number of dots in words
+                    best = score(decoded_words)                                        
+                    if best  > self.dots:
+                        self.best_wordset = decoded_words.copy()
+                        self.dots = best      
+                    if len(list_invalid) == 1: 
+                            print('above word may not be in wordlist')
+                            self.word_missing_dict[best] = (list_invalid[0], ok_words.index(False))
+                            # self.best_wordset = decoded_words.copy()
+                             
+                if self.debug: print()
                 # We have run out of letters to try. Undo assignment, then backtrack.
                 self.code_dict[num] = "."
+        if self.debug: print(f'No more letters so previous guess is incorrect, backing up to depth  {len(inspect.stack())- self.initial_depth -1}\n')
         return False
 
 
@@ -224,3 +257,7 @@ class CodewordSolverDFS():
             end_str = "\n" if (i+1) % 13 == 0 else " "
             print(f"{letter.upper()}", end=end_str)
             
+
+
+
+

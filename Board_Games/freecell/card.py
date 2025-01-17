@@ -57,7 +57,7 @@ class Card:
         return self.__str__()
     
     def __eq__(self, other):
-    	  return self.face == other.face and self.suit == other.suit
+    	  return self.strep == other.strep
     	  
     def __hash__(self):
     	 return hash((self.value, self.sVal))
@@ -75,10 +75,6 @@ class Card:
 
     def set_suit(self, suit):
         self.suit = suit
-        
-    def set_tileobject(self, tile):
-        self.tileobject = tile
-
     
     def set_face_up(self, face_up):
         self.face_up = bool(face_up)

@@ -2900,7 +2900,7 @@ NEWA S B.
 487-4:
 ''
 7, 5
-123
+3300292611222101300210180532152306310917273419250703142024280412131608
 
 487-4_frame:
 CALSAYC M N STA
@@ -2917,7 +2917,7 @@ HETPILSTABLEBAY
 AINDECESTIF T W
 HIN D E NTRAA L
 E EPESDEEE ZNTE
-DIDU E EVABO W 
+DIDU E E ABO W 
  DOADVMAR Z  P 
 D BRE  N REDZAR
 EMBEMPCABE I P 
@@ -2958,7 +2958,7 @@ E I C  SLSTOARE
 487-83:
 ''
 7, 5
-123
+1824262708320729051134061621101320001525033014331223310904021719222801
 
 487-83_frame:
 IREATOE EDRESE 
@@ -2966,7 +2966,7 @@ D RN NASS Y L M
 EARTEDS PTEPAGU
 ONASE NTEPEDLAP
 N D AEY AR I P 
-DE IC  BREREOPN
+DE IC  BREREOPH
 EDYL TERYO O D 
  I ATA O BOUGON
 ONGT RPERE SE I
@@ -3018,7 +3018,7 @@ EE ARCE E TAREL
 487-117:
 ''
 7,5
-123
+0614300521172013191504253308290028022231112632092718123407030123241610
 
 487-117_frame:
 P IT IRIPULE. T
@@ -3083,7 +3083,7 @@ D BS I D.    Y
 487-164:
 ''
 7, 5
-123
+2906052732082211332330003415170419262018030702121025281614132101240931
 
 487-164_frame:
   GI GENGA. KUD
@@ -3134,3 +3134,139 @@ C.  C  R ENAHOS
 20 Food list • Emend
    (a journalist's work)
 21 Wound like a stream
+
+665_14''
+9, 4
+123
+
+665-14_text:
+1 Protein-rich vegetarian foodstuff • Picture
+  from a negative • Sweet teatime food
+3 Sensitively
+5 Old tourist coach
+6 Foot covering • Heroic work
+7 Using oxygen for metabolic purposes
+8 Surpass • Garnish
+9 Typically English drink • Hole-piercing tool
+10 Large percussion instrument • Seam, stratum
+11 Dark brown pigment
+12 Blackboard support, perhaps • 1940s jazz style
+13 Partake of food • Road-surfacing material
+   or sailor
+14 Inert gas • Subside
+15 Completely, entirely
+16 Low-carb, high-fat diet • Conifer
+17 Part of a musical instrument which
+   enhances sounds
+19 Counsellor
+21 Egg on • Before the expected time •
+   Spun thread
+   
+665-71:
+''
+9, 4
+123
+
+665-71_text:
+1 Stocky, short and thick • Coral formation
+2 Alfresco
+3 Popular ground-cover plant with pendulous
+  flowers • Showy splendour, brilliant display
+4 Austere, rigorous
+5 Relating to sight • Adult butterfly
+6 Wood pin • Slide • Seed pods also
+  known as gumbo or ladies' fingers
+7 Prank • Central cathedral section
+8 Do up laces again • Group of lines in a song
+9 Device used to store an electric charge
+10 Guide • Contribution to a discussion
+11 Lay at rest
+12 Durum wheat dough used in Italian cookery •
+   Requested
+13 Inhumation
+14 Moribund • Container for milk bottles
+15 Ignore (a correction) • Blood vessel
+16 Tongue-shaped flatfish • Inconsiderate speed•
+   Alternative name for the broad bean
+17 Venomous snake • Adjust (an alarm)
+18 Mythical beast much like a horse
+19 Credit, prestige • Musical drama
+20 Footslogger
+21 Filthy • Poke fun at
+
+664-91:
+''
+9, 4
+123
+
+664-91_text:
+1 Beat out and separate grain from •
+  Iced coffee, eg
+3 (Of language) expressing criticism
+5 Three-wheeled cycle • Occupy the
+  throne
+6 Overshadowed (by)
+7 Distinctive period of time •
+  Pull with difficulty
+8 Compel
+10 Handled clumsily • Make easier to understand
+12 All-powerful leader • Free of a toll
+14 Simultaneous occurrence
+15 Misery • Be poorly
+16 Severe lack of water
+17 Group summoned by a sheriff in westerns •
+   Vote into power
+19 Mollycoddle
+21 Harshly criticised • Songbird
+
+664-107:
+''
+9, 4
+1917232927280922260416342010321430031202130506071115240008182521333101
+
+664-107_frame:
+I UECTI. A E
+CENS ETEDR A
+K ISED. EE R
+L E DOTTED F
+YX   B. D E 
+  LSPIRE ODO
+ G. T SSMAVA
+TIPLATH. C D
+ N  T ET UR 
+ I LITI. K. 
+LERO OTUB IS
+ R CON. AL U
+ COTATT SGES
+W O G EDEO T
+ACMJI N ABHA
+ MELEMC IE M
+C.  C IONL A
+LORITET EINT
+ R IMP I IAH
+LE S E ONC U
+ F PYR U ING
+L FESS R  EJ
+INF E BIE S 
+N RERN N ISU
+ATEENTWER.  
+U NT E D.   
+DUDS DE F.  
+
+664-107_text:
+1 Develop • Leader, saviour
+3 Onion _, South Asian snack •
+  Holding as a prisoner
+5 Rising prices • Ornamental stone
+7 Quail • Person you eat with in the military
+9 Peak of perfection • Single part of a composite
+  bloom • Defective bomb
+11 Plumper • Warned
+13 Put a match to • Placed at irregular intervals •
+   Variety of bean
+15 Plan secretly with others • Property
+   detected by the nose
+17 Body of land surrounded by water •
+   Creature with many legs
+19 Gadget, utensil • Jettison
+21 Brass-coloured mineral • Neglected

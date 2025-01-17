@@ -2869,3 +2869,160 @@ Puzzle34_frame:
 ' / / / /11/ / / / / / / / '
 ' / / / / / / / / / / / / '
 ' / / / / / / / / / /12/ / '
+
+Puzzle35:
+1
+BALE
+BLOSSOM
+BULLETIN
+BURY
+2
+DELAYED
+DESIRE
+DROMEDARY
+3
+SENTIMENT
+SERIOUSLY
+STY
+SUN
+SWEETENER
+4
+NATION
+NEPHEW
+NERD
+NEWEST
+NOUN
+NUDE
+5
+SEES
+SERENADE
+SETTLE
+SLEIGH
+SOAR
+SUNDIAL
+6
+MANATEE
+MESSY
+MODESTY
+MORELLO
+7
+ABNORMAL
+ADO
+AMATEUR
+ANGST
+ANIL
+ARE
+8
+CENTRE
+CHALK
+COD
+COURT
+CROTCHET
+9
+BAIL
+BELIE
+BOUND
+BROKEN
+10
+CANASTA
+CHAR
+CORE
+CURLY
+11
+ACACIA
+ADEPTLY
+AND
+12
+ECHOED
+ELM
+EUPHEMISM
+
+Puzzle35_frame:
+' / / /1/ / / / / / / / / '
+' /2/ / / / / / / / / / / '
+' / / / /y/l/s/u/o/i/r/e/3s'
+' / / / / / / /4/ / / /e/ '
+' / / / / / / / / / /n/ / '
+' / / / / / /5/ / /t/ / / '
+'6/ / / / / / / /i/ / / / '
+' / /7/ / / / /m/ / / / / '
+' / / / / /8/e/ / / / / / '
+' / / / / /n/ / / / / /9/ '
+' / / / /t/ / / / /10/ / / '
+' / / / / / / /11/ / / / / '
+' / / / / / / / / / /12/ / '
+
+Puzzle36:
+1
+GASWORKS
+GAUNTLET
+GEMINI
+GREENGROCER
+2
+BAREFOOT
+BASALT
+BLEND
+BUCKET
+BUREAUCRAT
+3
+EER
+EPAULETTES
+ERA
+4
+HINDU
+HOME
+HOUR
+5
+SAGE
+SOULFUL
+SURRENDER
+6
+SELLER
+SMOOCH
+SUAVE
+SUGAR
+7
+GENOME
+GENTLY
+GEUM
+GRAFFITI
+8
+EGRET
+ENVY
+EUROCHEQUE
+9
+BANGLADESHI
+BOYS
+BUMBLEBEE
+BUTTERNUT
+10
+SEAFRET
+SIERRA
+SQUEEZER
+11
+ENAMEL
+ENSUE
+ERE
+12
+AMEND
+ASS
+ATLANTIC
+13
+SAFE
+SET
+SPY
+
+Puzzle36_frame:
+' / / / / / / /1/ / / / / '
+' / / / / /2/ / / / / / / '
+' / /3/ / / / / / / / / / '
+' / / / / / / / / / /4/ / '
+' / / / / / / / / / / / / '
+' / / / / / / / / / / / / '
+' / / / /5/ / / / / / / / '
+' /6/ / / / / / / / / / /7'
+' / / /8/ / / / / / / / / '
+'9/ / / / / / /e/ / / / / '
+' / / / / / / / /f/ / /10/t'
+' / / / / / / /11/ /a/ /e/ '
+' / /12/ / / / / / / /13s/ / '

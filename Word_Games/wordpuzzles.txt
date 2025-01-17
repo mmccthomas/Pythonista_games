@@ -6789,3 +6789,282 @@ Puzzle76-21_frame:
 ' / / / / / / / / /#/ /#/ /#/#/#/#/ /#/ /#'
 '#/#/#/#/ /#/ /#/ /#/ / / / / / /#/#/#/ /#'
 ' / / / / / / /#/ /#/ /#/#/#/#/#/ / / / / '
+
+Puzzle77-26:
+ANT
+CAB
+COO
+CUD
+DAD
+ERR
+HOT
+OHM
+RAM
+RYE
+TAG
+TAX
+TEE
+TUB
+WAN
+AMMO
+CHIC
+CHUM
+CLAM
+CORE
+DEAF
+DEAN
+DOVE
+ESPY
+EURO
+GALA
+IRIS
+OMIT
+PINT
+REEK
+SOLE
+SPAN
+VIVA
+WAIL
+ATLAS
+CROWN
+DIVOT
+FEVER
+FORGO
+GUILD
+IDEAL
+KENDO
+LATEX
+ONSET
+SAUNA
+STRAW
+TITLE
+BARTER
+DOWSER
+LATENT
+LESSOR
+MANNER
+NOTARY
+ORNATE
+SAWYER
+SNOOZE
+TIERED
+USURER
+BLENDER
+EARDRUM
+SAVELOY
+TERMITE
+BLUEBELL
+ESTIMATE
+MARITIME
+NORTHERN
+REAWAKEN
+OPTOMETRY
+PEREGRINE
+UNDERGRAD
+
+Puzzle77-26_frame:
+' / / /#/ /#/ /#/#/#/#/ / / / / / / / /#/ '
+' /#/#/ / / / / / / / / /#/ /#/#/ /#/ /#/ '
+' /#/#/#/ /#/ /#/#/ /#/ /#/ / / / / / /#/ '
+' / / / / /#/#/ /#/ /#/#/#/ /#/#/ /#/ / / '
+'#/ /#/ /#/ /#/a/t/l/a/s/#/#/ / / /#/ /#/#'
+' / / / /#/ /#/ /#/ /#/ /#/#/ /#/#/ / / / '
+'#/ /#/#/#/ / / / /#/ / / / / / / /#/ /#/ '
+'#/#/ / / / /#/ /#/#/#/ /#/ /#/#/#/#/ /#/ '
+'#/#/#/ /#/ /#/ /#/#/#/#/#/ / / /#/ /#/#/ '
+'#/ / / / / / / /#/#/#/#/#/ /#/ / / / / / '
+'#/#/#/ /#/#/#/ /#/#/#/#/#/ /#/ /#/ /#/ /#'
+'#/ / / / / / /#/#/#/#/#/#/ /#/ / / /#/ /#'
+'#/#/#/#/ /#/#/ /#/#/#/#/#/#/#/ /#/ /#/#/#'
+'#/ /#/#/ /#/ / / /#/ /#/ / / / / / / / / '
+' / / / / / /#/ / / / / /#/ /#/ /#/#/ /#/ '
+'#/ /#/#/ / / / / /#/ /#/#/ /#/ / / / / / '
+' / / /#/ / / / /#/ / / / / /#/#/#/#/ /#/ '
+' /#/ /#/ /#/ /#/#/#/ /#/ /#/ /#/#/ / / / '
+' / / / /#/ / / / / / /#/ / / / /#/ /#/#/ '
+' /#/ /#/#/#/ /#/#/ /#/#/ /#/ /#/#/ /#/#/ '
+'#/#/ /#/ / / / / / / / / /#/ / / / / / / '
+
+Puzzle78-95:
+ASK
+ASS
+BAT
+BED
+CAP
+DAY
+EAU
+EBB
+EYE
+FLU
+LAC
+NUB
+SEA
+TEA
+TOY
+ABLE
+BLOB
+EURO
+EXAM
+FOOD
+FORK
+HEAR
+HERS
+INTO
+ITCH
+JOKE
+MEMO
+OPAL
+RELY
+RIFF
+ROPY
+ROTA
+SERF
+VETO
+ELVER
+EMAIL
+FAITH
+FAMED
+HUMAN
+MILKY
+PESTO
+RATTY
+SALAD
+SHALE
+UNLET
+USAGE
+VIDEO
+ALKALI
+AURORA
+GRANNY
+HAUNCH
+HUBBUB
+IGUANA
+OPAQUE
+PRELIM
+SALIVA
+TAHINI
+TRILBY
+BARGAIN
+CHAPATI
+HEARTEN
+INSURER
+BEARSKIN
+BERGAMOT
+ISOTONIC
+SHANGHAI
+TEMERITY
+FORSYTHIA
+LIGHTBULB
+SKYJACKER
+
+Puzzle78-95_frame:
+' / / /#/ /#/ /#/#/#/#/ / / / / / / / /#/ '
+' /#/#/ / / / / / / / / /#/ /#/#/ /#/ /#/ '
+' /#/#/#/ /#/ /#/#/ /#/ /#/ / / / / / /#/ '
+' / / / / /#/#/ /#/ /#/#/#/ /#/#/ /#/ / / '
+'#/ /#/ /#/ /#/ / / / / /#/#/ / / /#/ /#/#'
+' / / / /#/ /#/ /#/ /#/ /#/#/ /#/#/ / / / '
+'#/ /#/#/#/ / / / /#/ / / / / / / /#/ /#/ '
+'#/#/ / / / /#/ /#/#/#/ /#/ /#/#/#/#/ /#/ '
+'#/#/#/ /#/ /#/ /#/#/#/#/#/ / / /#/ /#/#/ '
+'#/ / / / / / / /#/#/#/#/#/ /#/ / / / / / '
+'#/#/#/ /#/#/#/ /#/#/#/#/#/ /#/ /#/ /#/ /#'
+'#/ / / / / / /#/#/#/#/#/#/ /#/ / / /#/ /#'
+'#/#/#/#/ /#/#/ /#/#/#/#/#/#/#/ /#/ /#/#/#'
+'#/ /#/#/ /#/ / / /#/ /#/l/i/g/h/t/b/u/l/b'
+' / / / / / /#/ / / / / /#/ /#/ /#/#/ /#/ '
+'#/ /#/#/ / / / / /#/ /#/#/ /#/ / / / / / '
+' / / /#/ / / / /#/ / / / / /#/#/#/#/ /#/ '
+' /#/ /#/ /#/ /#/#/#/ /#/ /#/ /#/#/ / / / '
+' / / / /#/ / / / / / /#/ / / / /#/ /#/#/ '
+' /#/ /#/#/#/ /#/#/ /#/#/ /#/ /#/#/ /#/#/ '
+'#/#/ /#/ / / / / / / / / /#/ / / / / / / '
+
+Puzzle79-78:
+ADO
+AWL
+BEG
+EMU
+MOB
+NAB
+OIL
+PET
+PIG
+SPA
+SUB
+TRY
+ACHIEVE
+BARRACK
+BEGUILE
+BREATHE
+COUNSEL
+CROFTER
+DESKTOP
+DISTURB
+DUCHESS
+DWINDLE
+ENTENTE
+EQUATOR
+GASTRIC
+GINGHAM
+HELIPAD
+MINERAL
+NEUTRAL
+NIGHTIE
+OPERATE
+PADDOCK
+PERTURB
+PHARAOH
+PIRANHA
+PLANTER
+RAINBOW
+RAMEKIN
+REREDOS
+RHUBARB
+RIPCORD
+RISIBLE
+ROBOTIC
+SCRUPLE
+SPANGLE
+VERTIGO
+VITAMIN
+WAGTAIL
+ANTIBODY
+BEDLINEN
+NATIONAL
+TAUTNESS
+IDENTIKIT
+INHERITOR
+NUTRITION
+OVERREACH
+REFURBISH
+SERRATION
+SPACESHIP
+SWIFTNESS
+
+Puzzle79-78_frame:
+' / / / / / / /#/#/ / / / / / / /#/#/ / / / / / / '
+' /#/ /#/#/#/ /#/#/ /#/#/ /#/#/ /#/#/ /#/#/#/ /#/ '
+' / / /#/#/#/ /#/#/ /#/#/ /#/#/ /#/#/ /#/#/#/ / / '
+' /#/#/ / / / / / / / / /#/ / / / / / / / / /#/#/ '
+' /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ '
+' /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ '
+' / / / / / / /#/#/ / / / / / / /#/#/ / / / / / / '
+'#/#/#/ /#/#/#/#/#/#/#/#/ /#/#/#/#/#/#/#/#/ /#/#/#'
+'#/#/#/ /#/#/#/#/#/#/#/#/ /#/#/#/#/#/#/#/#/ /#/#/#'
+' / / / / / / /#/#/ / / / / / /w/#/#/ / / / / / / '
+' /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ '
+' /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ '
+' /w/ /#/ / / / / / / / /#/ / / / / / / / /#/ / / '
+' /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ '
+' /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ '
+' / / / / / / /#/#/ / / / / / / /#/#/ / / / / / / '
+'#/#/#/ /#/#/#/#/#/#/#/#/ /#/#/#/#/#/#/#/#/ /#/#/#'
+'#/#/#/ /#/#/#/#/#/#/#/#/ /#/#/#/#/#/#/#/#/ /#/#/#'
+' / / / / / / /#/#/ /w/ / / / / /#/#/ / / / / / / '
+' /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ '
+' /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ '
+' /#/#/ / / / / / / / / /#/ / / / / / / / / /#/#/ '
+' / / /#/#/#/ /#/#/ /#/#/ /#/#/ /#/#/ /#/#/#/ / / '
+' /#/ /#/#/#/ /#/#/ /#/#/ /#/#/ /#/#/ /#/#/#/ /#/ '
+' / / / / / / /#/#/ / / / / / / /#/#/ / / / / / / '

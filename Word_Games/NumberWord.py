@@ -7,11 +7,21 @@ Chris Thomas May 2024
 # solver is called instead
 Chris Thomas October 2024
 The games uses a 20k word dictionary
+#
+# if grid has been produced from Ocr.py, there can be errors.
+# incorrect blocks, missing numbers, incorrect numbers
+# or word not in words_alpha.txt
+# To  find and diagnose if solution not possible
+# number could be wrong ( particularly 19 fo 9 etc)
+# or word not in wordlist
+# added code to :
+# check for number > 30 and report its location
+# report single word not found if solved more than 60%
+# to allow word to be added to extra_words.txt
+# report single word location to inspect numbers for that word
+# removed 2nd solver since it adds nothing more
+# and reporting best guess usually allows diagnosis
 """
-import os
-import sys
-import base_path
-base_path.add_paths(__file__)
 import random
 import dialogs
 import numpy as np
@@ -22,7 +32,9 @@ from time import sleep
 from queue import Queue
 from ui import Image
 from scene import Texture
-
+import inspect
+import base_path
+base_path.add_paths(__file__)
 from cv_codeword_solver_main.solver_tools import CodewordSolverDFS, WordDictionary
 from Letter_game import LetterGame, Player
 from gui.gui_interface import Gui, Squares
@@ -38,6 +50,7 @@ WordleList = ['wordlists/words_alpha.txt',
 BLOCK = '#'
 SPACE = ' '
 BLOCKS = '¥&€█'
+
 
 def board_rc(rc, board, value):
     board[rc[0]][rc[1]] = value
@@ -75,21 +88,21 @@ class CrossNumbers(LetterGame):
         self.gui.setup_gui(log_moves=False)
         
         # menus can be controlled by dictionary of labels and functions without parameters
-        self.gui.set_pause_menu({'Continue': self.gui.dismiss_menu, 
+        self.gui.set_pause_menu({'Continue': self.gui.dismiss_menu,
                                  'New ....': self.restart,
                                  'Reveal': self.reveal,
                                  'Quit': self.quit})
         self.gui.set_start_menu({'New Game': self.restart, 'Quit': self.quit})
               
-        self.load_words(word_length=None) #self.sizex)    
+        self.load_words(word_length=None)  # self.sizex)
         self.min_length = 2  # initial min word length
         self.max_length = 15  # initial  maximum word length
-        self.max_depth = 1  # search depth for populate  
+        self.max_depth = 1  # search depth for populate
         _, _, w, h = self.gui.grid.bbox
         if self.gui.device.endswith('_landscape'):
-           self.gui.set_enter('Hint', position = (w+100, -50))
+           self.gui.set_enter('Hint', position=(w+100, -50))
         else:
-          self.gui.set_enter('Hint', position=(w-65, h+30),size=(60, 40)) 
+          self.gui.set_enter('Hint', position=(w-65, h+30), size=(60, 40))
         self.display = 'tiles'
         self.max_items = 13  # items in key list
       
@@ -108,7 +121,7 @@ class CrossNumbers(LetterGame):
             choose_three = random.choices(numbers, k=3)
             self.known_dict = {number: [' ', False] for number in numbers}
             for no in choose_three:
-              self.known_dict[no] =[self.solution_dict[no][0], True]
+              self.known_dict[no] = [self.solution_dict[no][0], True]
             # fill any empty spaces
             self.board[self.board == '.'] = ' '
             self.board[self.board == SPACE] = BLOCK
@@ -118,8 +131,8 @@ class CrossNumbers(LetterGame):
             # known_dict has boolean showing whether incorrect
             self.known_dict = {number: [' ', False] for number in numbers}
             letter_pos = np.argwhere(np.char.isalpha(self.empty_board))
-            for loc in letter_pos:    
-                no =  self.number_board[tuple(loc)]
+            for loc in letter_pos:
+                no = self.number_board[tuple(loc)]
                 letter = self.empty_board[loc[0]][loc[1]]
                 self.known_dict[no] = [letter, True]
                 
@@ -146,7 +159,7 @@ class CrossNumbers(LetterGame):
                 vfunc = np.vectorize(func)
                 self.number_board = vfunc(self.solution_board)
             except (ValueError):
-              print(traceback.format_exc())   
+              print(traceback.format_exc())
       
     def display_numberpairs(self, tiles, off=0, max_items=13):
         """ display players rack
@@ -156,22 +169,22 @@ class CrossNumbers(LetterGame):
         _, _, w, h = self.gui.grid.bbox
         if self.gui.device.endswith('_landscape'):
             if self.sizey < max_items:
-              size =  self.gui.gs.SQ_SIZE * 13 / max_items
+              size = self.gui.gs.SQ_SIZE * 13 / max_items
             else:
-              size =  self.gui.gs.SQ_SIZE
+              size = self.gui.gs.SQ_SIZE
             x, y = 5, 0
-            x = x + off* size
-            for n, tile in enumerate(tiles):    
+            x = x + off*size
+            for n, tile in enumerate(tiles):
               t = Tile(Texture(Image.named(f'../gui/tileblocks/{tile}.png')), 0,  0, sq_size=size)
-              t.position = (w + x + 3 * int(n/max_items) * size , h - (n % max_items +1)* size + y)
+              t.position = (w + x + 3*int(n/max_items)*size , h - (n % max_items + 1)*size + y)
               parent.add_child(t)
-        else: 
+        else:
             size = self.gui.gs.SQ_SIZE * 0.9
             x, y = 30, 40
             y = y + off * size
-            for n, tile in enumerate(tiles):    
+            for n, tile in enumerate(tiles):
               t = Tile(Texture(Image.named(f'../gui/tileblocks/{tile}.png')), 0,  0, sq_size=size)
-              t.position = (x + int(n % max_items ) * size , h + (2* int(n / max_items) )* size + y)
+              t.position = (x + int(n % max_items)*size , h + (2*int(n / max_items) )*size + y)
               parent.add_child(t)
           
     def update_board(self, hint=False, filter_placed=True, tile_color='yellow'):
@@ -186,19 +199,19 @@ class CrossNumbers(LetterGame):
                      solution_board from create_number_board
                      TODO needs to allow for incomplete dictionary
                      solution_dict[no] =[' ', False]
-        Hint needs to allow for incomplete dictionary        
+        Hint needs to allow for incomplete dictionary
         """
         nonzero = np.argwhere(self.number_board > 0)
-        square_list = [Squares(tuple(loc), self.number_board[tuple(loc)], 'white' ,
+        square_list = [Squares(tuple(loc), self.number_board[tuple(loc)], 'white',
                                z_position=30, alpha=.25,
                                font=('Avenir Next', 15),
                                text_anchor_point=(-1, 1))
                        for loc in nonzero]
         self.gui.add_numbers(square_list, clear_previous=True)
         
-        wrong = np.argwhere((self.board != self.solution_board) &
-                            (self.board != ' ') & 
-                            (np.char.isalpha(self.solution_board)))
+        wrong = np.argwhere((self.board != self.solution_board)
+                            & (self.board != ' ')
+                            & (np.char.isalpha(self.solution_board)))
         if hint:
             # make wrong items orange temporarily
             # cleared when update_board called again
@@ -207,12 +220,12 @@ class CrossNumbers(LetterGame):
             self.gui.put_numbers(items)
     
         else:
-              # clear wrong squares               
-              [board_rc(loc, self.board, ' ') for loc in wrong]
-              for loc in nonzero:
-                  # fill other cells of same number                                                           
-                  k = self.known_dict[self.number_board[tuple(loc)]][0]
-                  board_rc(loc, self.board, k)
+            # clear wrong squares
+            [board_rc(loc, self.board, ' ') for loc in wrong]
+            for loc in nonzero:
+                # fill other cells of same number
+                k = self.known_dict[self.number_board[tuple(loc)]][0]
+                board_rc(loc, self.board, k)
        
         # display the letters remaining to be placed
         known = [val[0] for val in self.known_dict.values() if val[0] != ' ']
@@ -222,7 +235,7 @@ class CrossNumbers(LetterGame):
                                
         # create text list for known dict
         msg = []
-        list_known=list(self.known_dict.items())  # no,letter
+        list_known = list(self.known_dict.items())  # no,letter
         list_known = sorted(list_known, key=lambda x: x[1])
     
         # create a list of letters in correct order
@@ -243,9 +256,9 @@ class CrossNumbers(LetterGame):
             if no != ' ' and no != '.':
               msg.append(f'{no:>2} = {letter:<2} ')
             if self.gui.device in ['ipad_landscape', 'ipad13_landscape']:
-                 msg.append('\n' if i % 2 == 0 else ' ' * 2)
-            elif self.gui.device =='ipad_portrait':
-                 msg.append('\n' if i % 5 == 0 else ' ' * 2)
+                msg.append('\n' if i % 2 == 0 else ' ' * 2)
+            elif self.gui.device == 'ipad_portrait':
+                msg.append('\n' if i % 5 == 0 else ' ' * 2)
         msg = ''.join(msg)
         
         # should now have numbers in number board
@@ -268,7 +281,7 @@ class CrossNumbers(LetterGame):
         self.board = np.array(self.board)
         self.board[self.board == '-'] = ' '
         # deal with number/alpha combo
-        number_letters = np.array([(r,c) for c in range(self.sizex)
+        number_letters = np.array([(r, c) for c in range(self.sizex)
                                    for r in range(self.sizey)
                                    if len(list(split_text(self.board[r][c])))>1])
         numbers = np.argwhere(np.char.isnumeric(self.board))
@@ -284,6 +297,9 @@ class CrossNumbers(LetterGame):
             except (ValueError):
                 no = self.board[tuple(number)]
             self.number_board[tuple(number)] = int(no)
+            # check for invalid number
+            if int(no) > 30:
+                raise ValueError(f'Number {no} at location rc{number} is invalid (>30)')
                         
         self.board[np.char.isnumeric(self.board)] = ' '
         self.gui.update(self.board)
@@ -305,7 +321,7 @@ class CrossNumbers(LetterGame):
         """ take a number filled board, and display it"""
         self.decode_and_display_filled_board()
         self.empty_board = self.board.copy()
-        self.solution_dict ={}
+        self.solution_dict = {}
         # get starting known values
         letter_pos = np.argwhere(np.char.isalpha(self.board))
         for pos in letter_pos:
@@ -338,13 +354,23 @@ class CrossNumbers(LetterGame):
         code_dict = {i: "." for i in range(1, 27)}
         code_dict.update(given_letters)
                 
-        # Load the list of words and construct the trie    
+        # Load the list of words and construct the trie
         # print('Building trie word dictionary ...\n')
         word_trie = WordDictionary()
         [word_trie.add_word(word) for word in self.all_words]
         
         return code_dict, numbers, word_trie
-      
+        
+    def reconstruct_board(self, decoded_words):
+        # from solver decoded words reconstruct and print the board
+        # words are in same order and same length as self.word_locations
+        display_board = self.board.copy()
+        for decode, word in zip(decoded_words, self.word_locations):
+            for letter, coord in zip(decode, word.coords):
+                display_board[coord] = letter
+        self.gui.print_board(display_board, 'best try')
+                    
+        
     def solve(self):
         # solver from  https://github.com/rg1990/cv-codeword-solver
               
@@ -352,7 +378,7 @@ class CrossNumbers(LetterGame):
             # Check if the solver failed and notify the user
             result = True
             if np.any(["." in word for word in decoded_words]):
-                print("Solving failed! Incomplete words remain in decoded_words. Check puzzle details are correct.")    
+                print("Solving failed! Incomplete words remain in decoded_words. Check puzzle details are correct.")
                 result = False
             # Catch the case where the words don't have wildcards, but are nonsense words
             # if not np.all([word_trie.search(word) for word in decoded_words]):
@@ -364,6 +390,7 @@ class CrossNumbers(LetterGame):
         code_dict, all_encoded_words, word_trie = self.create_solve_dict()
         solver = CodewordSolverDFS(all_encoded_words, code_dict,
                                    word_trie, use_heuristics=True)
+        solver.debug = self.debug                           
         solver.solve()
         decoded_words = solver.decode_words_in_list(all_encoded_words)
         result = check_results(word_trie, decoded_words)
@@ -373,8 +400,27 @@ class CrossNumbers(LetterGame):
         if result:
             self.solution_dict = solver.code_dict.copy()
             nonzero = np.argwhere(self.number_board > 0)
-            [board_rc(loc, self.solution_board, self.solution_dict[self.number_board[tuple(loc)]]) 
+            [board_rc(loc, self.solution_board, self.solution_dict[self.number_board[tuple(loc)]])
              for loc in nonzero]
+        else:
+            if self.debug:
+              print('='*20,'DEBUG', '='*20)
+              try:
+                  max_percent = max(solver.word_missing_dict)
+                  print('possible unknown words', solver.word_missing_dict)
+                  if max_percent > 60:
+                      word, location = solver.word_missing_dict[max_percent]
+                      print(f'Most likely unknown word is {word}')
+                      print(f'if best set looks sensible, check unknown word {word} or numbers at {self.word_locations[location]}')
+              except ValueError:
+                pass
+              print('where number is percent of solved words, higher is better')
+              print()
+              print('best set was', solver.best_wordset)              
+              print()
+              
+              self.reconstruct_board(solver.best_wordset)
+              print('='*25)
         return result
         
     def run(self, test=None):
@@ -390,14 +436,14 @@ class CrossNumbers(LetterGame):
         self.print_square(None)
         self.partition_word_list()
         self.compute_intersections()
-        if self.debug:
-            print(self.word_locations)
+        #if self.debug:
+        #    print(self.word_locations)
         self.generate_word_number_pairs()
         self.create_number_board()
         if self.filled_board:
             self.decode_filled_board()
             
-        #self.copy_board(self.empty_board)
+        # self.copy_board(self.empty_board)
         cx = CrossWord(self.gui, self.word_locations, self.all_words)
         cx.set_props(**transfer_props(['board', 'empty_board', 'all_word_dict',
                                        'max_depth', 'debug']))
@@ -406,25 +452,26 @@ class CrossNumbers(LetterGame):
            wait = self.gui.set_waiting('Solving')
            success = self.solve()
            self.gui.set_message2(f'Successful decode {success}')
-           if not success:
+           if False: # not success:
                try:
                  cx.set_props(**transfer_props(['solution_dict', 'number_board', 'copy_known']))
                  cx.number_words_solve(max_iterations=30,
                                        max_possibles=None)
                  nonzero = np.argwhere(self.number_board > 0)
                  [board_rc(loc, self.solution_board, self.solution_dict[self.number_board[tuple(loc)]])
-                       for loc in nonzero]       
+                      for loc in nonzero]
+                 self.gui.set_prompt('Solution Complete')     
                except (Exception):
-                   print(traceback.format_exc())    
-                   self.gui.set_prompt('Solution failed, No hints available')        
+                   print(traceback.format_exc())
+                   self.gui.set_prompt('Solution failed, No hints available')
            self.gui.reset_waiting(wait)
         else:
             try:
-              wait = self.gui.set_waiting('Generating')      
+              wait = self.gui.set_waiting('Generating')
               self.board = cx.populate_words_graph(max_iterations=200,
-                                      length_first=False,
-                                      max_possibles=100,
-                                      swordsmith_strategy='dfs')                                       
+                  length_first=False,
+                  max_possibles=100,
+                  swordsmith_strategy='dfs')
               self.finish_population_of_grid()
             except (Exception):
                 print(traceback.format_exc())
@@ -442,7 +489,7 @@ class CrossNumbers(LetterGame):
         if self.test is None:
             while True:
               move = self.get_player_move(self.board)
-              finish = self.process_turn( move, self.number_board)
+              finish = self.process_turn(move, self.number_board)
               sleep(1)
               if finish:
                 break
@@ -457,24 +504,22 @@ class CrossNumbers(LetterGame):
             self.finished = True
             self.check_words()
             self.gui.show_start_menu()
-        else: 
-             self.finished = True
-             self.gui.v.close()
-             
-    
+        else:
+            self.finished = True
+            self.gui.v.close()
+                 
     def game_over(self):
-        """ check for finished game   
+        """ check for finished game
         no more empty letters left in board and all known dict items are correct
         also allows for SkelNumbers version"""
-        full_squares =  ~np.any(self.board == SPACE)
+        full_squares = ~np.any(self.board == SPACE)
         letters_ok = True
         # need to allow for unused letters
         for v in self.known_dict.values():
-          if v[0] != SPACE and not v[1] :
+          if v[0] != SPACE and not v[1]:
             letters_ok = False
             break
         return full_squares and letters_ok
-              
              
     def load_words(self, word_length, file_list=WordleList):
         # choose only first item in wordslist for filled board (usually words_alpha)
@@ -493,8 +538,8 @@ class CrossNumbers(LetterGame):
           for key, v in self.word_dict.items():
             if '_frame' in key:
              board = [row.replace("'", "") for row in v]
-             board =  [row.split('/') for row in board]
-             name  = key.split('_')[0]      
+             board = [row.split('/') for row in board]
+             name = key.split('_')[0]
              boards[name] = board
         if non_filled_only:
           boards = {name: board for name, board in boards.items() if name.startswith('Puzzle')}
@@ -502,7 +547,7 @@ class CrossNumbers(LetterGame):
            self.puzzle = self.select_list(boards)
            if not self.puzzle:
               self.puzzle = random.choice(list(boards))
-        else:           
+        else:
             self.puzzle = self.test
             
         self.board = boards[self.puzzle]
@@ -520,8 +565,8 @@ class CrossNumbers(LetterGame):
       
     def print_square(self, process, color=None):
         """ render the empty grid with black squares """
-        blocks = np.argwhere(self.board == BLOCK) 
-        self.gui.add_numbers([Squares(tuple(block), '', 'black' , z_position=30, alpha = .5)
+        blocks = np.argwhere(self.board == BLOCK)
+        self.gui.add_numbers([Squares(tuple(block), '', 'black', z_position=30, alpha=.5)
                               for block in blocks],
                              clear_previous=True)
         return
@@ -541,7 +586,7 @@ class CrossNumbers(LetterGame):
             self.update_board(hint=True)
             # now turn off marked squares
             sleep(2)
-            for k,v in self.known_dict.items():
+            for k, v in self.known_dict.items():
                 if not v[1]:
                     self.known_dict[k] = [' ', False]
             self.update_board(hint=False)
@@ -551,7 +596,7 @@ class CrossNumbers(LetterGame):
           elif letter != '':
             correct = False
             # check if correct, solution_dict might be incomplete
-            no = self.number_board[(r,c)]
+            no = self.number_board[(r, c)]
             correct_letter = self.solution_dict.get(no, None)
             if correct_letter:
                 correct = correct_letter[0] == letter
@@ -559,7 +604,7 @@ class CrossNumbers(LetterGame):
                 # this is for SkelNumbers to make all blocks equivalent
                 if letter in BLOCKS and correct_letter[0] in BLOCKS:
                   correct = True
-            #else:
+            # else:
             #    correct = True
             #    self.solution_dict[no] = letter
             self.known_dict[no] = [letter, correct]
@@ -582,7 +627,7 @@ class CrossNumbers(LetterGame):
         if board is None:
             board = self.board
         prompt = ("Select  position on board")
-        # sit here until piece place on board 
+        # sit here until piece place on board
         rc = self.wait_for_gui()
         # print('selection position',rc)
         # self.gui.set_prompt(f'selected {rc}')
@@ -602,7 +647,7 @@ class CrossNumbers(LetterGame):
           if len(possibles) == 0:
             raise (IndexError, "possible list is empty")
             
-          items = list(possibles)       
+          items = list(possibles)
           self.gui.selection = ''
           selection = ''
           while self.gui.selection == '':
@@ -621,13 +666,13 @@ class CrossNumbers(LetterGame):
             elif selection == "Cancelled_":
               return (None, None), None
             else:
-              return (None, None), None  
+              return (None, None), None
          
     def restart(self):
         self.gui.gs.close()
         self.finished = False
         g = CrossNumbers()
-        g.run() 
+        g.run()
         while (True):
             quit = g.wait()
             if quit:
@@ -635,13 +680,16 @@ class CrossNumbers(LetterGame):
   
               
 if __name__ == '__main__':
-    g = CrossNumbers() #test='Puzzle1')
+    g = CrossNumbers()  # test='Puzzle1')
     g.run()
       
     while (True):
         quit = g.wait()
         if quit:
           break
+
+
+
 
 
 

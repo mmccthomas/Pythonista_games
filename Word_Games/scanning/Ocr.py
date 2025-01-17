@@ -656,10 +656,10 @@ class OcrCrossword(LetterGame):
                 case 1:
                   sort_alpha = False
                   sort_length = False
-                case 1:
+                case 2:
                   sort_alpha = True
                   sort_length = True
-                case 2:
+                case 3:
                   sort_alpha = True
                   sort_length = False
                 case _:

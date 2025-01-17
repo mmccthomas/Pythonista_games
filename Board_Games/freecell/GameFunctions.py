@@ -6,7 +6,7 @@ Module includes utility functions, as well as functions that primarily act
 on games (full free cell objects).
 '''
 
-from freecell.Classes import *
+from freeCellSolver.Classes import *
 from time import time
 
 def testTime(func, object, bound):
@@ -34,7 +34,8 @@ def makeImmutableState(game):
     freecell = tuple(freecell)
     # Tuple of 4 values, which are either None (no cards in cell) or
     # themselves a 2-tuple representing a card
-    foundation = tuple([game.foundation[i] for i in range(4)])
+    foundation = tuple(game.foundation)
+    #foundation = tuple([tuple(game.foundation[i]) for i in range(4)])
     # Tuple of 4 int values (0 is none)
     cascades = []
     for cascade in game.cascade:
@@ -89,7 +90,7 @@ def load(game, s):
 
     Format of input string:
 
-    xxx xxx xxx xxx   # foundations: S, H, D, C
+    xxx xxx xxx xxx   # foundations: S, H, C, D
     yyy yyy yyy yyy   # freecells: 0, 1, 2, 3
     cascade[0]
     cascade[1]

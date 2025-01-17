@@ -1,3 +1,4 @@
+# these words were added to solve given puzzles
 sleaze
 supportiveness
 upfront
@@ -8,3 +9,9 @@ pavlova
 burnout
 beachhead
 jobseeker
+deckchair
+frontman
+whatsit
+overdub
+wiki
+oche
