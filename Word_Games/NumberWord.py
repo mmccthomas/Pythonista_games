@@ -69,7 +69,7 @@ class CrossNumbers(LetterGame):
     def __init__(self, test=None):
         # test overrides manual selections
         self.test = test
-        self.debug = False
+        self.debug = True
         # allows us to get a list of rc locations
         self.log_moves = True
         self.load_words_from_file('crossword_templates.txt')
@@ -230,7 +230,7 @@ class CrossNumbers(LetterGame):
         # display the letters remaining to be placed
         known = [val[0] for val in self.known_dict.values() if val[0] != ' ']
         missing = set(string.ascii_lowercase).difference(set(known))
-        missing = [letter.upper() for letter in missing]
+        missing = sorted([letter.upper() for letter in missing])
         self.gui.set_message2(f'Missing letters {missing}')
                                
         # create text list for known dict
@@ -369,6 +369,7 @@ class CrossNumbers(LetterGame):
             for letter, coord in zip(decode, word.coords):
                 display_board[coord] = letter
         self.gui.print_board(display_board, 'best try')
+        return display_board
                     
         
     def solve(self):
@@ -417,10 +418,9 @@ class CrossNumbers(LetterGame):
               print('where number is percent of solved words, higher is better')
               print()
               print('best set was', solver.best_wordset)              
-              print()
-              
-              self.reconstruct_board(solver.best_wordset)
-              print('='*25)
+              print()              
+              self.best_guess = self.reconstruct_board(solver.best_wordset)
+              print('='*25)             
         return result
         
     def run(self, test=None):
@@ -451,7 +451,7 @@ class CrossNumbers(LetterGame):
            # try cv_codeword_solver first. if it fails try crossword_create solver
            wait = self.gui.set_waiting('Solving')
            success = self.solve()
-           self.gui.set_message2(f'Successful decode {success}')
+           self.gui.set_prompt('Decode successful' if success else 'Decode failed')
            if False: # not success:
                try:
                  cx.set_props(**transfer_props(['solution_dict', 'number_board', 'copy_known']))
@@ -485,11 +485,14 @@ class CrossNumbers(LetterGame):
         x, y, w, h = self.gui.grid.bbox
     
         self.gui.set_message('')
+        print(' ')
+        print(' ') # to clear console
         self.gui.set_enter('Hint', position=(w, h + 5), fill_color='red')
         if self.test is None:
             while True:
               move = self.get_player_move(self.board)
               finish = self.process_turn(move, self.number_board)
+              self.gui.set_prompt('')
               sleep(1)
               if finish:
                 break
@@ -687,6 +690,7 @@ if __name__ == '__main__':
         quit = g.wait()
         if quit:
           break
+
 
 
 
