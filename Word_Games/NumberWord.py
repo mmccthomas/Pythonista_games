@@ -69,7 +69,7 @@ class CrossNumbers(LetterGame):
     def __init__(self, test=None):
         # test overrides manual selections
         self.test = test
-        self.debug = True
+        self.debug = False
         # allows us to get a list of rc locations
         self.log_moves = True
         self.load_words_from_file('crossword_templates.txt')
@@ -412,7 +412,9 @@ class CrossNumbers(LetterGame):
                   if max_percent > 60:
                       word, location = solver.word_missing_dict[max_percent]
                       print(f'Most likely unknown word is {word}')
-                      print(f'if best set looks sensible, check unknown word {word} or numbers at {self.word_locations[location]}')
+                      print(f'if best set looks sensible, check unknown word {word}')
+                      print(f'or numbers at {self.word_locations[location]}')
+                      print('Particularly check for 12, 13,14 instead of 2, 3, 4')
               except ValueError:
                 pass
               print('where number is percent of solved words, higher is better')
