@@ -11,10 +11,10 @@ The games all use the Scene module, which is a thin wrapper around the Apple UiK
 
 A generic gui framework has been developed to place a grid at maximum size, along with buttons and messages
 
-Copy the file base_path.py to Python Modules/site-packages(user) to enable correct path searching.
-
-After git download, the Pythonista_games folder should be moved to SCRIPT LIBRARY/This iPad folder using drag 
-and drop.
+Style note:
+Due to the limited debugging in Pythonista, I frequently used a non-preferred way to use list comprehensions
+e.g. [print(x) for x in iterable]
+This is to allow stepping over an iteration loop during debug.
 
 Games are:
 
@@ -99,16 +99,9 @@ Entry point : Word_Games/Dropword.py
 Krossword
 ---------
 A reverse wordsearch. 
-Place the given words in their correct locations given their starting points indicated by numbers.
+Place the given words in their correct locations given then starting points
 
 Entry point : Word_Games/KrossWord.py
-
-Five ways
----------
-A variant of KrossWord where each starting location letter is shown, but all words beginning with 
-that letter can be used.
-
-Entry point : Word_Games/Fiveways.py
 
 Wordle clone
 ------------
@@ -208,7 +201,6 @@ Tiles
 Sliding puzzle game
 can select numbers or any image from the photo library
 requires installation of slidingpuzzle from pypi
-Either use StaSH or zip the package and extract into Site Packages(user)
 
 Entry point : Board_Games/tiles.py
 
@@ -223,7 +215,6 @@ Ocr
 This is used to read text from an image, and also used to create crossword frame.
 Uses Apple UiKit for Ocr. Attempts made to read single letters from crossword grid, but not very successful.
 experiences crashes sometimes, hence each move is stored in numpy array for instant recovery.
-I use this to enter new puzzles. Mostly for personal use but Inwould be happy to provide more details if requested.
 
 Entry point : Word_Games/scanning/Ocr.py
 
@@ -238,15 +229,6 @@ All games have a Pause Menu button in top left corner with various options
 
 Crossword filling with random words proved particularly challenging, but was mostly successful. 
 I would be very interested in any improvements.
-
-Improvement to crossword filling has been achieved by using swordsmith routines from  
-https://github.com/adamaaronson/swordsmith.
-This does not always succeed for some Zipword puzzles, so mine is used a a backup. 
-
-Based on  this code I have implemented a version in crossword_solve_2.py which almost always solves
- Zipword puzzles. The entry point tries up to 5 times to solve, 
- which usually succeeds due to random choices implemented. Typical solve time is 80ms.
-
 
 Some games, e.g. wordsearch, rely upon touch dragging to select direction and length. 
 
