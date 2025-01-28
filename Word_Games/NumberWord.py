@@ -21,6 +21,8 @@ The games uses a 20k word dictionary
 # report single word location to inspect numbers for that word
 # removed 2nd solver since it adds nothing more
 # and reporting best guess usually allows diagnosis
+# TODO could the solver be faster? takes 2.5secs to form word_trie
+#  but very fast to search
 """
 import random
 import dialogs
@@ -28,7 +30,7 @@ import numpy as np
 import traceback
 import string
 from itertools import groupby
-from time import sleep
+from time import sleep, time
 from queue import Queue
 from ui import Image
 from scene import Texture
@@ -37,7 +39,7 @@ import base_path
 base_path.add_paths(__file__)
 from cv_codeword_solver_main.solver_tools import CodewordSolverDFS, WordDictionary
 from Letter_game import LetterGame, Player
-from gui.gui_interface import Gui, Squares
+from gui.gui_interface import Gui, Squares, Board
 from crossword_create import CrossWord
 from gui.gui_scene import Tile
 
@@ -70,6 +72,7 @@ class CrossNumbers(LetterGame):
         # test overrides manual selections
         self.test = test
         self.debug = False
+        self.use_np = False
         # allows us to get a list of rc locations
         self.log_moves = True
         self.load_words_from_file('crossword_templates.txt')
@@ -187,7 +190,7 @@ class CrossNumbers(LetterGame):
               t.position = (x + int(n % max_items)*size , h + (2*int(n / max_items) )*size + y)
               parent.add_child(t)
           
-    def update_board(self, hint=False, filter_placed=True, tile_color='yellow'):
+    def update_board(self, hint=False, filter_placed=True, tile_color='yellow', first_time=False):
         """ redraws the board with numbered squares and blank tiles for unknowns
         and letters for known
         empty board is array of characters, with # for block
@@ -222,10 +225,12 @@ class CrossNumbers(LetterGame):
         else:
             # clear wrong squares
             [board_rc(loc, self.board, ' ') for loc in wrong]
-            for loc in nonzero:
-                # fill other cells of same number
-                k = self.known_dict[self.number_board[tuple(loc)]][0]
-                board_rc(loc, self.board, k)
+            if not first_time:
+              for loc in nonzero:
+                  # fill other cells of same number. Dont do this initially
+                  # to allow initial board to match given puzzle
+                  k = self.known_dict[self.number_board[tuple(loc)]][0]
+                  board_rc(loc, self.board, k)
        
         # display the letters remaining to be placed
         known = [val[0] for val in self.known_dict.values() if val[0] != ' ']
@@ -298,6 +303,8 @@ class CrossNumbers(LetterGame):
                 no = self.board[tuple(number)]
             self.number_board[tuple(number)] = int(no)
             # check for invalid number
+            if int(no) < 1:
+                raise ValueError(f'Number {no} at location rc{number} is invalid (0)')
             if int(no) > 30:
                 raise ValueError(f'Number {no} at location rc{number} is invalid (>30)')
                         
@@ -330,7 +337,7 @@ class CrossNumbers(LetterGame):
             self.solution_dict[no] = letter
             self.known_dict[no] = [letter, True]
                
-        self.copy_known()
+        # self.copy_known()
         self.gui.update(self.board)
         return
       
@@ -356,9 +363,20 @@ class CrossNumbers(LetterGame):
                 
         # Load the list of words and construct the trie
         # print('Building trie word dictionary ...\n')
-        word_trie = WordDictionary()
-        [word_trie.add_word(word) for word in self.all_words]
-        
+        if not self.use_np:
+	        try:
+	          import pickle
+	          with open('word_trie.pk', 'rb') as f:
+	            word_trie = pickle.load(f)
+	        except Exception as e:
+	           # print('error', e)
+	           word_trie = WordDictionary()
+	           # TODO This is quite slow. is re.match on all_word_dict faster?
+	           [word_trie.add_word(word) for word in self.all_words]
+        else :
+        	  word_trie = None 
+        #with open('word_trie.pkl', 'wb') as f:
+        #   pickle.dump(word_trie, f)
         return code_dict, numbers, word_trie
         
     def reconstruct_board(self, decoded_words):
@@ -388,11 +406,15 @@ class CrossNumbers(LetterGame):
                 #raise RuntimeError(f"One or more decoded words are not valid:\n{decoded_words}")
                 result = False
             return result
+        t=time()
         code_dict, all_encoded_words, word_trie = self.create_solve_dict()
+        print(f'time to prepare {time()-t:.2f}s')
         solver = CodewordSolverDFS(all_encoded_words, code_dict,
-                                   word_trie, use_heuristics=True)
-        solver.debug = self.debug                           
+                                   word_trie, self.all_word_dict,  use_heuristics=True, use_np=self.use_np)                          
+        solver.debug = self.debug        
+        t=time()                
         solver.solve()
+        print(f'time to solve {time()-t:.2f}s')
         decoded_words = solver.decode_words_in_list(all_encoded_words)
         result = check_results(word_trie, decoded_words)
         if self.debug:
@@ -483,7 +505,7 @@ class CrossNumbers(LetterGame):
         self.gui.update(self.board)
         # self.print_board()
         self.create_number_board()
-        self.update_board()
+        self.update_board(first_time=True)
         x, y, w, h = self.gui.grid.bbox
     
         self.gui.set_message('')
@@ -559,7 +581,7 @@ class CrossNumbers(LetterGame):
         
         self.word_locations = []
         self.length_matrix()
-        print(len(self.board), len(self.board[0]))
+        #print(self.board), len(self.board[0]))
         
         # [print(word.coords) for word in self.word_locations]
         print('frame ', [len(y) for y in self.board])
@@ -692,6 +714,7 @@ if __name__ == '__main__':
         quit = g.wait()
         if quit:
           break
+
 
 
 

@@ -4,11 +4,15 @@
 # allow detection of missing word in dictionary
 # allow debug of incorrect number at location
 # CMT JAN 2025
+# note word trie creation takes 2,5secs, but solve is very fast
+# using re matching much slower
 import time
+from time import time
 import string
 import numpy as np
 import re
 import inspect
+import ui
 
 class TrieNode:
     def __init__(self):
@@ -46,7 +50,7 @@ class WordDictionary:
 
 class CodewordSolverDFS():
     
-    def __init__(self, encoded_words, code_dict, word_trie, use_heuristics=True):
+    def __init__(self, encoded_words, code_dict, word_trie,all_word_dict=None, use_heuristics=True, use_np=False):
         """
         Args:
             encoded_words (list[list[int]]): List with one sub-list per encoded word.
@@ -60,12 +64,13 @@ class CodewordSolverDFS():
 
         """
         # TODO - Determine which methods and attributes should be public/private
-        
+        self.all_word_dict = all_word_dict
         self.encoded_words = encoded_words
         self.code_dict = code_dict
         self._word_trie = word_trie
         self.debug = False
         self.best = 0
+        self.use_np = use_np
         self.word_missing_dict = {}
         self.best_wordset = []
         # find initial level for recursion depth reporting
@@ -75,7 +80,12 @@ class CodewordSolverDFS():
         self._letter_frequency = [str(char) for char in "etaonihsrlducmwyfgpbvkjxqz"]
         # Get lists of letters and numbers which are not yet paired
         self.available_letters, self.unknown_numbers = self._initialise_letter_and_number_lists(code_dict, encoded_words, use_heuristics)
-    
+        if self.use_np:
+            t= time()
+            self.np_all_words = {}
+            for length, words in self.all_word_dict.items():
+                self.np_all_words[length] = np.array([[ord(char_)-97 for char_ in word] for word in words])
+            print('np time', time()-t)
     
     def update_puzzle(self, new_encoded_words, new_code_dict, use_heuristics=True):
         '''
@@ -140,6 +150,7 @@ class CodewordSolverDFS():
         return available_letters, empty_numbers
     
     
+        
     def solve(self, encoded_words=None, available_letters=None, empty_numbers=None):
         """
         Recursively solve for the letter assignments in a list of encoded words.
@@ -161,12 +172,23 @@ class CodewordSolverDFS():
         CMT added some debug to allow diagnosis when solver fails
         Helps to  Highlight missing word in wordlist, or incorrect numbers
         """
-        def score(decoded_words):
+        def _score(decoded_words):
             """ count the number of alpha characters as percentage of total"""
             total_len = len(''.join(decoded_words))
             alpha = sum([c.isalpha() for c in ''.join(decoded_words)])
             return int(100 * alpha / total_len)
-                    
+            
+        def _capitalise(word, letter, cap=True):
+            """ underscore all occurences of letter in given word
+            optionally capitalise also"""
+            if cap:
+                return ''.join([l.upper()+ '\u0333' if l == letter else l for l in word])
+            else:
+                return ''.join([l+'\u0333' if l == letter else l for l in word])
+        
+        def depth():
+            return len(inspect.stack())- self.initial_depth
+                                    
         # Assignments for initial call to solve
         if encoded_words is None:
             encoded_words = self.encoded_words.copy()
@@ -183,21 +205,23 @@ class CodewordSolverDFS():
             num = empty_numbers[0]
           
         # Try every available letter in place of the current empty number
-        if self.debug: print(f'Recursion depth >>>>>>>>>>>>>>>>>>>>>> {len(inspect.stack())- self.initial_depth}')
+        if self.debug: print(f'Recursion depth >>>>>>>>>>>>>>>>>>>>>> {depth()}')
         for letter in available_letters:
             # Check if this letter is valid for this number
             self.code_dict[num] = letter
             decoded_words = self.decode_words_in_list(encoded_words)
             if self.debug:
-                print(f'Number {num}: Trying {letter}')
-                # capitalise the letter being tested                
-                words = [''.join([_letter.upper() if no == num else _letter
-                                  for no, _letter in zip(number, word)])
-                         for number, word in  zip(encoded_words, decoded_words)]
+                print(f'Number {num}: Trying {letter} in {_capitalise(available_letters, letter)}')
+                # underline the letter being tested                
+                words = [_capitalise(word, letter, cap=True) for word in  decoded_words]
                 print('Decoded words would be', words)
-            
-            if self.all_words_are_valid(decoded_words):
-                if self.debug: print(f'VALID. Completion {score(decoded_words)}%\n')
+            if self.use_np:
+                possibles = self.all_words_are_valid3(decoded_words)
+            else:
+            	  possibles = self.all_words_are_valid(decoded_words)
+            if all(possibles): # self.all_words_are_valid2(decoded_words)):
+                
+                if self.debug: print(f'VALID. Completion {_score(decoded_words)}%\n')
                 # Create letter/number lists to pass to next call to solve()
                 next_available_letters = [l for l in available_letters if l != letter]
                 next_empty_numbers = [number for number in empty_numbers if number != num]
@@ -205,24 +229,25 @@ class CodewordSolverDFS():
                     # This means there are no more empty numbers, so we are finished
                     return True      
             else:
+                self.code_dict[num] = "."
                 if self.debug:
                    # show trial and invalid word
-                   print(f'NOT valid. Completion {score(decoded_words)}%\n')
-                   ok_words = [self._word_trie.search(search_string) for search_string in decoded_words]
+                   print(f'NOT valid. Completion {_score(decoded_words)}%\n')
+                   ok_words = possibles # [self._word_trie.search(search_string) for search_string in decoded_words]
                    list_invalid = [word for word, ok in zip(decoded_words, ok_words) if not ok]
                    print('invalid ', list_invalid)                                
                    # calculate a score of number of alpha characters in words
-                   best = score(decoded_words)                                        
+                   best = _score(decoded_words)                                        
                    if best  > self.best:
                        self.best_wordset = decoded_words.copy()
                        self.best = best      
                    if len(list_invalid) == 1: 
                        print('above word may not be in wordlist')
                        self.word_missing_dict[best] = (list_invalid[0], ok_words.index(False))                             
-                   print()
-                   print(f'No more letters so previous guess is incorrect, backing up to depth {len(inspect.stack())- self.initial_depth -1}\n')
-                # We have run out of letters to try. Undo assignment, then backtrack.
-                self.code_dict[num] = "."
+                   print()                                                   
+                
+        # We have run out of letters to try. Undo assignment, then backtrack.
+        if self.debug: print(f'No more letters so previous guess is incorrect, backing up to depth {depth() - 1}\n')
         return False
 
     def decode_words_in_list(self, encoded_word_list):        
@@ -256,7 +281,44 @@ class CodewordSolverDFS():
             bool: True if there exists a match in the trie for every word in
                 word_list, else False.
         '''
-        return all([self._word_trie.search(search_string) for search_string in word_list])
+        return [self._word_trie.search(search_string) for search_string in word_list]
+        
+    def all_words_are_valid2(self, word_list):
+        '''
+        Use re module to search wordlist, is it faster? skips word trie creation
+        '''
+        possible = []
+        for search_string in word_list:
+            found = False
+            for word in self.all_word_dict[len(search_string)]:
+                if re.compile(search_string).search(word):
+                    found = True
+                    break
+            possible.append(found)
+
+        return  possible 
+        
+    # @ui.in_background           
+    def all_words_are_valid3(self, word_list):
+        '''
+        Using numpy to search wordlist, which has been converted to a dictionary of 2d integers 0-25
+        is it faster? also skips word trie
+        '''
+        possible = []
+        for search_string in word_list:
+        	  # t=time()
+        	  # convert word to numbers 0-25, dot is -50
+        	  np_search_no = np.array([ord(char_)-97 for char_ in search_string])
+        	  valid_pos = np_search_no > 0
+        	  # get np array of correct length
+        	  all_words = self.np_all_words[len(search_string)]
+        	  # subtract values, 0 is match
+        	  indexes = all_words[:, valid_pos] -  np_search_no[valid_pos]
+        	  # find if word is found
+        	  indexes = any(~np.any(indexes, axis=1))
+        	  possible.append(indexes)
+        	  # print('all', time()-t)
+        return  possible        
             
     def print_decoded_letters(self):
         '''
@@ -269,6 +331,11 @@ class CodewordSolverDFS():
             end_str = "\n" if (i+1) % 13 == 0 else " "
             print(f"{letter.upper()}", end=end_str)
             
+
+
+
+
+
 
 
 

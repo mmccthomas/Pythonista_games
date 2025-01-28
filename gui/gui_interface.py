@@ -505,9 +505,9 @@ class Gui():
     self.set_enter('')
     self.set_moves('')
     
-  def show_start_menu(self):
+  def show_start_menu(self, **kwargs):
     # pass start_menu call to gs_scene
-    self.gs.show_start_menu()
+    self.gs.show_start_menu(**kwargs)
     
   def set_pause_menu(self, menu_dict):
     self.gs.pause_menu = menu_dict
@@ -581,7 +581,52 @@ class Gui():
   def reset_waiting(self, object):
       object.stop()
       object.close() 
+
+class Board():
+    """ class to hold numpy 2d array representation of board
+    initial can be single element value or 2d array """
+    def __init__(self, sizex=None, sizey=None, dtype='U1', initial=None):
+        self.sizex = sizex
+        self.sizey = sizey
+        self.dtype = dtype
+        if initial:
+          if isinstance(initial, list):
+              self.b = np.array(initial)
+              self.sizey, self.sizex = self.b.shape
+              self.dtype = self.b.dtype
+          else:
+              self.b = np.full((sizey, sizex), initial)
+        else:
+            self.b = np.zeros((sizey, sizex), dtype=dtype)
+    
+    def valid_entry(self, value):
+        if self.dtype == int and type(value) == int:
+          return True
+        if self.b.dtype.kind == 'U':
+          return  len(value) == self.b.dtype.itemsize
+        return False
+
+    def get_rc(self, rc):
+      return self.b[rc]
       
+    def set_rc(self, rc, value):
+      if self.valid_entry(value):
+        self.b[rc] = value
+        
+    def copyboard(self):
+      return selfb.copy()
+      
+    def inside(self, rc):
+        """test if rc is within bounds of board """
+        r, c = rc 
+        try:
+          return  (0 <= r < self.sizey) and  (0 <= c <  self.sizex)
+        except(AttributeError):
+          return  (0 <= r < len(self.b)) and  (0 <= c <  len(self.b[0]))
+          
+    def getsize(self):
+      return (self.sizey, self.sizex)
+          
 class Coord(tuple):
     """ a simple class to allow addition and slicing
     example: coord = Coord(rc)
@@ -667,6 +712,9 @@ class dotdict(dict):
     __getattr__ = dict.get
     __setattr__ = dict.__setitem__
     __delattr__ = dict.__delitem__      
+
+
+
 
 
 
