@@ -151,7 +151,8 @@ def add_result(N,square, results):
         for i, val in enumerate(res_line):
             display[i, -1] = val
             display[i,-2] = '=' if i % 2 == 0 else ' '
-        display[1::2,-1] = '#' 
+        display[1::2,-2:] = '#' 
+    display[-1,-1] = '#' 
     display=np.transpose(display)    
     return display
 
