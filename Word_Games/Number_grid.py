@@ -5,6 +5,7 @@ import traceback
 from time import sleep, time
 from queue import Queue
 import numpy as np
+import console
 from Letter_game import LetterGame
 import latin_squares
 import sudoko_solve
@@ -37,7 +38,7 @@ class Player():
     
     self.PIECES = [f'../gui/tileblocks/{k}.png' for k in self.PIECE_NAMES]
     self.PIECE_NAMES.extend(list('+-*/=#'))
-    for k in ['add', 'sub', 'mult', 'div', 'eq', '&']:
+    for k in ['add_1', 'sub_1', 'mult_1', 'div', 'eq_1', 'grey_1_1']:
         self.PIECES.append(f'../gui/tileblocks/{k}.png')
     
     
@@ -71,21 +72,17 @@ class NumberGrid(LetterGame):
     self.gui.allow_any_move(True)    
     self.gui.setup_gui(log_moves=False)
     selected = self.resize_grid()
-    
+    self.gui.build_extra_grid(2*self.N+1, 2*self.N+1,
+                              grid_width_x=1, grid_width_y=1,
+                              color='lightgrey', line_width=2)
     # menus can be controlled by dictionary of labels and functions without parameters
     self.gui.set_pause_menu({'Continue': self.gui.dismiss_menu,
                              'New ....': self.restart,
                              'Hint': self.perform_hint,
                              'Reveal': self.reveal,
                              'Quit': self.quit})
-    self.gui.set_start_menu({'New Game': self.restart, 'Quit': self.quit})
-    
-    '''.                 r c.           cols.                rows
-    board dict converts from alpha numeric grid location to (r, c)
-     '''
-    self.board_dict={k: (v,i) for i in range(SIZE) for v, k in enumerate(sudoko_solve.unitlist[i])}
-    
-    # self.display_squares(color='red')
+    self.gui.set_start_menu({'New Game': self.restart, 'Quit': self.quit})    
+        
     x, y, w, h = self.gui.grid.bbox
     match  self.gui.device:
        case'ipad_landscape':
@@ -98,41 +95,16 @@ class NumberGrid(LetterGame):
            position = (w+10, 8*h/9)
        case 'ipad13_portrait':
            position = (8*w/9, h+50)
-    self.gui.set_enter('Note ', fill_color='clear', font=('Avenir Next', 50),position=position)
+    self.gui.set_enter('Note ', fill_color='clear',
+                       font=('Avenir Next', 50),
+                       position=position)
     self.gui.set_top('', position=(0, h+30))
-       
-  def display_squares(self, color=None):
-    """ render the empty grid with coloured and white squares """
-    self.gui.clear_numbers()
-    self.square_list = []
-    for r, row in enumerate(self.board):
-      for c, character in enumerate(row):
-        # every 3 in r and c direction
-        color_ = color if  ((r<3 or r>5) and (c<3 or c>5) or (2<r<6 and 2<c<6)) else 'white'
-        self.square_list.append(Squares((r, c), '' ,color_, z_position=30, 
-                                        alpha=.2, font=('Avenir Next', 20),
-                                        text_anchor_point=(-1, 1)))
-    self.gui.add_numbers(self.square_list)
-   
+          
   def create_number_board(self):
     """ redraws the board with cleared items blank tiles for unknowns
     and letters for known"""
     # start with empty board
     self.solution_board = self.copy_board(self.board)
-         
-  def process_wordlist(self,  sep=False):
-    puzzles = []
-    puzzle = ''
-    for line in self.wordlist:
-        if sep:
-            if '==' in line:
-                puzzles.append(puzzle+'\n')
-                puzzle = ''
-            else:
-                puzzle = puzzle + line.strip()
-        else:
-            puzzles.append(line)
-    return puzzles
     
   def resize_grid(self):
     selected = self.select_list()
@@ -141,17 +113,13 @@ class NumberGrid(LetterGame):
     for c in self.gui.game_field.children:
       c.remove_from_parent()
     self.gui.setup_gui(log_moves=False, grid_fill='white')
-    return selected
-                
-  def calc_board(self, board, values):
-     [self.board_rc(self.board_dict[k], board, ' ' if v in ['.', '0'] else v) for k, v in values.items()]
-     return board
+    return selected                
   
   def prepare_board(self):
-      items = list(range(1, self.N*self.N + 1))
+      items = list(range(1, self.N**2 + 1))
       # shuffle items
       random.shuffle(items)
-      square = np.array(items).reshape(self.N,self.N).astype('U2')
+      square = np.array(items).reshape(self.N, self.N).astype('U2')
       square, val = latin_squares.operators(self.N, square, add_only=False)
       display = latin_squares.add_result(self.N, square, val)   
       self.board =  latin_squares.create_empty(display)
@@ -159,14 +127,16 @@ class NumberGrid(LetterGame):
       locs = np.argwhere(np.char.isnumeric(self.board))        
       
       self.gui.add_numbers([Squares(loc, self.board[tuple(loc)] ,'black', z_position=30, 
-                                        alpha=0, font=('Avenir Next', self.gui.gs.SQ_SIZE/2),
-                                        text_anchor_point=(-.7,.6))
+                                    alpha=0,
+                                    font=('Arial Rounded MT Bold', self.gui.gs.SQ_SIZE/2),
+                                    text_anchor_point=(-0.75, 0.6))
                             for loc in locs])           
-      for loc in locs:
-          self.board[tuple(loc)] = ' '                                        
+      [self.board_rc(loc, self.board, ' ') for loc in locs]                                     
       self.gui.update(self.board)
+      
   #########################################################################
   # main loop
+  
   def run(self):
     """
     Main method that prompts the user for input
@@ -178,17 +148,17 @@ class NumberGrid(LetterGame):
     self.prepare_board()     
     self.gui.set_message2('')
     while True:
-      self.gui.set_top(f'Sudoko\t\tLevel {self.puzzle}\t\tHints : {self.hints}',
+      self.gui.set_top(f'Number Grid\t\tLevel {self.puzzle}\t\tHints : {self.hints}',
                        font=('Avenir Next', 20))
       move = self.get_player_move(self.board)
       sleep(1)
       moves = self.select(move, self.board, text_list=False)
-      self.process_selection(moves)
-      
+      self.process_selection(moves)      
       if self.game_over():
         break
     
     self.gui.set_message2('Game over')
+    console.hud_alert(f'{" "*20}Game Over{" "*30}\n\n')
     self.gui.set_message('')
     self.gui.set_prompt('')
     sleep(4)
@@ -233,7 +203,7 @@ class NumberGrid(LetterGame):
     board matches solution"""
     return np.all(self.board[:2*self.N, :2*self.N] == self.solution_board[:2*self.N, :2*self.N])
  
-  def update_notes(self, coord):
+  def _update_notes(self, coord):
      """ update any related notes using known validated number"""
      # remove note from validated cell
      self.notes.pop(coord, None)
@@ -274,11 +244,18 @@ class NumberGrid(LetterGame):
       """ add a note to a cell"""
       font=('Avenir', 6)
       msg = ''.join([f'{let}\n' if i % 4 == 3 else f'{let}  ' for i, let in enumerate(item)]).strip()
-      data = self.gui.get_numbers(pos)[pos]
-      data['text'] = msg
+      #data = self.gui.get_numbers(pos)
+      # data = data.get(pos, data)
+      #data['text'] = msg
+      self.gui.add_numbers([Squares(pos, msg, 'white',text_anchor_point=(-.7,.6) )], clear_previous=False) 
+      #self.gui.replace_numbers({pos: data}, font=font)
       
-      self.gui.put_numbers({pos: data}, font=font)
-  
+  def flash_square(self, coord, color='white'):
+      self.gui.clear_numbers(coord)     
+      self.gui.add_numbers([Squares(coord, '', color)], clear_previous=False)
+      sleep(1)                         
+      self.gui.clear_numbers(coord)     
+      
   def process_selection(self, move):
     """ process the turn
     move is coord, new letter, selection_row
@@ -295,7 +272,6 @@ class NumberGrid(LetterGame):
             return True
             
           elif letter != '':
-            # if Killer mode, need to always display totals
             if self.debug:
               print('processing', letter, coord)
             if self.get_board_rc(coord, self.board) != BLOCK:
@@ -306,37 +282,14 @@ class NumberGrid(LetterGame):
               if self.get_board_rc(coord, self.board) != self.get_board_rc(coord, self.solution_board):
                 if self.debug:
                    print('testing', letter, coord)
-                # make square flash yellow
-                #temp = self.gui.get_numbers(coord)
-                #tdata = temp[coord]
-                #data_temp = data.copy()
-                #data_temp['color'] = 'yellow'
-                #data_temp['alpha'] = 0.7
-                #self.gui.put_numbers({coord: data_temp})
-                sleep(1)
-                self.board_rc(coord, self.board, ' ')
-                
-                # clear note. should clear try value from note also
-                try:
-                       self.notes[(coord)].remove(letter)
-                except (KeyError, ValueError):
-                       pass
-                #data['text'] = ''
-                #self.gui.put_numbers({coord: data})
-                   
+                self.flash_square(coord, color='yellow')
+                # clear the guess
+                self.board_rc(coord, self.board, ' ')                            
                 self.hints += 1
                 
               else:  # correct (or lucky guess!)
-                #temp = self.gui.get_numbers(coord)
-                #data = temp[coord]
-                #if self.puzzle.startswith('Killer'):
-                #   data['text'] = str(self.totals[coord]) if coord in self.totals else ''
-                # else:
-                   # clear trial numbers
-                #    data['text'] = ''
-                #self.gui.put_numbers({coord: data})
-                pass
-              self.update_notes(coord)
+                  self.flash_square(coord, color='green')
+              #self.update_notes(coord)
               self.gui.update(self.board)
               return False
             else:
@@ -395,7 +348,7 @@ class NumberGrid(LetterGame):
                 position = (x + w, h / 2)
                 
             select_method = self.gui.input_text_list if text_list else self.gui.input_numbers
-            panel_choice = {3: 'Number_panel.pyui', 4: 'Number_panel16.pyui', 5: 'Number_panel25.pyui'}
+            panel_choice = {3: '../gui/Number_panel.pyui', 4: '../gui/Number_panel16.pyui', 5: '../gui/Number_panel25.pyui'}
             panel = select_method(prompt=prompt, items=items, position=position, panel=panel_choice[self.N],
                                       allows_multiple_selection = (long_press or self.hint))             
             while panel.on_screen:
@@ -438,10 +391,8 @@ class NumberGrid(LetterGame):
     
   def perform_hint(self):
     """ uncover a random empty square """
-    while True:
-      coord = (random.randint(0, 2*self.N-1), random.randint(0, 2*self.N-1))
-      if self.get_board_rc(coord, self.board) == SPACE:
-        break
+    locs = np.argwhere(self.board[:2*self.N-1, :2*self.N-1] == SPACE)
+    coord = tuple(random.choice(locs))
     self.board[coord] = self.solution_board[coord]
     self.gui.update(self.board)
     letter = self.get_board_rc(coord, self.solution_board)
@@ -455,16 +406,10 @@ class NumberGrid(LetterGame):
     self.__init__()
     self.run()
      
-  def display(self, values):
-    """Display these values as a 2-D grid.
-    A1=(0,0), A2=(0,1), B1=(1,0) etc"""
-    [self.board_rc(self.board_dict[k], self.board, ' ' if v in ['.', '0'] else v) for k, v in values.items()]
-    self.gui.update(self.board)
-    sleep(self.sleep_time)
-    
-          
 if __name__ == '__main__':
   NumberGrid().run()
+
+
 
 
 
