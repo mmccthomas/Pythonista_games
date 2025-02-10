@@ -17,6 +17,9 @@ from gui.gui_interface import Gui, Squares
 
 """ This game is a number grid puzzle
 You have to guess the numbers
+the totals for each row and columns are given
+and the arithmetic operators also
+Operations are processed in L-R and T-B order
 Chris Thomas Feb 2025
 
 """

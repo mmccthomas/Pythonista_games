@@ -66,6 +66,8 @@ NumberWords
 Crossword grid filled with a selection of words.
 Find the letter linked to each number.
 Idea taken from Puzzler magazine
+The first puzzles are randomly genererated and may not include all letters.
+All others are taken from published games in magazines and newspapers.
 
 Entry point : Word_Games/NumberWord.py
 
@@ -116,6 +118,15 @@ You must swap letters to descramble the quote.
 This is WIP as the game is not very interesting at present
 
 Entry point : Word_Games/Quoteword.py
+
+Number Grid
+-----------
+Presents a grid with spaces, arithmetic operators and totals
+Fill the spaces with unique numbers to complete the sums
+Operations are computed L-R and T-B
+Choose from 3x3 (nos 1-9), 4x4 (nos 1-16) or 5x5 (nos 1-25) if you dare
+
+Entry point: Word_Games/Number_grid.py
 
 TrainTracks
 -----------
@@ -209,6 +220,20 @@ Caterpillar
 a version of Snake modelled on The Very Hungry Caterpillar for my grandchildren
 
 Entry point : Board_Games/caterpillar.py
+
+Klondike
+--------
+Classic card game known also as Solitaire.
+Games have been preselected to be maybe solvable.
+Drag the cards to new positions or just touch the card to perform best move.
+
+Entry point : Card_Games/Klondike.py
+
+Freecell
+--------
+Classic solitaire card game.
+Drag the cards to new positions
+Entry point : Card_Games/Freecell.py
 
 Ocr
 ---
