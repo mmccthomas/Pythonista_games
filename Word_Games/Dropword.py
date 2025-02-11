@@ -170,12 +170,7 @@ class DropWord(LetterGame):
       if finish or self.game_over():
          break
     console.hud_alert('Game Over')
-    self.gui.set_message2('Game over')
-    self.gui.set_message('') 
-    self.gui.set_prompt('')
-    sleep(2)
-    self.finished = True
-    self.gui.show_start_menu()
+    self.complete()
 
   def game_over(self):
     """ check for finished game   

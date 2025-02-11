@@ -78,7 +78,7 @@ class Tile(SpriteNode):
     
     self.set_pos(row, col)
     
-  def set_pos(self, row, col=0, animation=True):
+  def set_pos(self, row, col=0, animation=False):
     """
     Sets the position of the tile in the grid.
     """
@@ -95,18 +95,16 @@ class Tile(SpriteNode):
     pos.x = col * self.SQ_SIZE + self.offset
     pos.y = (self.DIM_Y - 1 - row) * self.SQ_SIZE + self.offset
     
-    """
+    
     if animation:
-      spd = MOVE_SPEED
+      spd = animation
       wait = 0.02
-    else:
-      spd = 0.01
-      wait = 0.02
-    self.run_action(A.sequence(
-      A.move_to(pos.x,pos.y, spd),
-      A.wait(wait),
-      A.remove))
-    """
+    
+      self.run_action(A.sequence(
+        A.move_to(pos.x,pos.y, spd),
+        A.wait(wait),
+        A.remove))
+    
     self.position = pos
     
         
@@ -567,6 +565,8 @@ class GameBoard(Scene):
   def get_numbers(self, coords):
     """ get color and text of number square objects for temporary storage
     (coords): {shape:shapeNode, label:LabelNode}"""
+    if isinstance(coords, tuple):
+    	  coords = [coords]
     if isinstance(coords, list):
       items = {}
       for coord in coords:
@@ -581,20 +581,6 @@ class GameBoard(Scene):
            items[coord] = {'color': color, 'text': text,
                         'text_color': text_color, 'alpha': alpha}
         except (KeyError):
-          pass
-      return items
-    elif isinstance(coords, tuple):
-      items = {}
-      try:
-          v = self.numbers[coord]
-          color = v.shape.color
-          alpha = label.alpha            
-          text = v.label.text
-          text_color = v.label.color
-                
-          items[coords] = {'color': color, 'text': text,
-                       'text_color': text_color, 'alpha': alpha}
-      except (KeyError):
           pass
       return items
       
@@ -957,13 +943,26 @@ class GameBoard(Scene):
       #print('waiting for close')
       sleep(.2)
     
-  def show_pause_menu(self):
-    self.menu = MyMenu('Paused', '', [i for i in self.pause_menu])
+  def get_text_image(self, text, font, color):
+    """get a text string ss an image for use in Texture(img) """
+    w, h = ui.measure_string(text, font=font)
+    # Round up size to next multiple of screen scale
+    # (makes it easier to get crisp rendering in common cases)
+    s = get_screen_scale()
+    w = math.ceil(w / s) * s
+    h = math.ceil(h / s) * s
+    with ui.ImageContext(max(w, 1), max(h, 1)) as ctx:
+      ui.draw_string(text, (0, 0, w, h), font, color=color)
+      img = ctx.get_image()
+    return img
+    
+  def show_pause_menu(self, **kwargs):
+    self.menu = MyMenu('Paused', '', [i for i in self.pause_menu], **kwargs)
     self.present_modal_scene(self.menu)
     self.paused = True
 
-  def show_start_menu(self):
-    self.menu = MyMenu('New Game?', '', [i for i in self.start_menu])
+  def show_start_menu(self, **kwargs):
+    self.menu = MyMenu('New Game?', '', [i for i in self.start_menu], **kwargs)
     self.present_modal_scene(self.menu)
     self.paused = True
 
@@ -1067,8 +1066,8 @@ class BoxedLabel():
       self.update_text_positions()
       
   def get_text(self): 
-  	  return self.text
-  	          
+      return self.text
+              
   def set_props(self, **kwargs):
     # pass kwargs to box, or box text
     # text can change box size
@@ -1124,6 +1123,8 @@ if __name__ == "__main__":
                       level=logging.WARNING)
   run(GameBoard(), LANDSCAPE, show_fps=True)
     
+
+
 
 
 

@@ -1,15 +1,12 @@
-import os
-import sys
+
 import random
 import traceback
-from time import sleep, time
+from time import sleep
 from queue import Queue
 import numpy as np
 import console
 from Letter_game import LetterGame
 import latin_squares
-import sudoko_solve
-from cages import Cages
 import base_path
 base_path.add_paths(__file__)
 from gui.gui_interface import Gui, Squares
@@ -74,7 +71,7 @@ class NumberGrid(LetterGame):
     self.gui.require_touch_move(False)
     self.gui.allow_any_move(True)    
     self.gui.setup_gui(log_moves=False)
-    selected = self.resize_grid()
+    self.resize_grid()
     self.gui.build_extra_grid(2*self.N+1, 2*self.N+1,
                               grid_width_x=1, grid_width_y=1,
                               color='lightgrey', line_width=2)
@@ -84,7 +81,8 @@ class NumberGrid(LetterGame):
                              'Hint': self.perform_hint,
                              'Reveal': self.reveal,
                              'Quit': self.quit})
-    self.gui.set_start_menu({'New Game': self.restart, 'Quit': self.quit})    
+    self.gui.set_start_menu({'New Game': self.restart,
+                             'Quit': self.quit})    
         
     x, y, w, h = self.gui.grid.bbox
     match  self.gui.device:
@@ -161,12 +159,8 @@ class NumberGrid(LetterGame):
         break
     
     self.gui.set_message2('Game over')
-    console.hud_alert(f'{" "*20}Game Over{" "*30}\n\n')
-    self.gui.set_message('')
-    self.gui.set_prompt('')
-    sleep(4)
-    self.finished = True
-    self.gui.show_start_menu()
+    self.complete()
+    
   ######################################################################
   
   def select_list(self):
@@ -243,15 +237,14 @@ class NumberGrid(LetterGame):
      for pos, item in self.notes.items():
          self.add_note(pos, item)
          
-  def add_note(self, pos, item):
+  def add_note(self, coord, item):
       """ add a note to a cell"""
-      font=('Avenir', 6)
+      font=('Avenir', 30)
       msg = ''.join([f'{let}\n' if i % 4 == 3 else f'{let}  ' for i, let in enumerate(item)]).strip()
-      #data = self.gui.get_numbers(pos)
-      # data = data.get(pos, data)
-      #data['text'] = msg
-      self.gui.add_numbers([Squares(pos, msg, 'white',text_anchor_point=(-.7,.6) )], clear_previous=False) 
-      #self.gui.replace_numbers({pos: data}, font=font)
+      self.gui.clear_numbers(coord)     
+      self.gui.add_numbers([Squares(coord, msg, 'white',font=font, 
+                                    text_anchor_point=(-0.7,0.6) )],
+                                    clear_previous=False) 
       
   def flash_square(self, coord, color='white'):
       self.gui.clear_numbers(coord)     
@@ -328,7 +321,8 @@ class NumberGrid(LetterGame):
           # now open list
           if board is None:
               board = self.board
-          possibles = list(sudoko_solve.digits)  # 1 thru 9
+          possibles = [str(i) for i in range(1,26)]
+          
           items = possibles
           if long_press or self.hint:
               prompt = "Select multiple"
@@ -351,13 +345,16 @@ class NumberGrid(LetterGame):
                 position = (x + w, h / 2)
                 
             select_method = self.gui.input_text_list if text_list else self.gui.input_numbers
-            panel_choice = {3: '../gui/Number_panel.pyui', 4: '../gui/Number_panel16.pyui', 5: '../gui/Number_panel25.pyui'}
-            panel = select_method(prompt=prompt, items=items, position=position, panel=panel_choice[self.N],
-                                      allows_multiple_selection = (long_press or self.hint))             
+            panel_choice = {3: '../gui/Number_panel.pyui',
+                            4: '../gui/Number_panel16.pyui',
+                            5: '../gui/Number_panel25.pyui'}
+            panel = select_method(prompt=prompt, items=items, 
+                                  position=position, panel=panel_choice[self.N],
+                                  allows_multiple_selection = (long_press or self.hint))             
             while panel.on_screen:
                 sleep(.2)
                 try:
-                  selection = self.gui.selection.lower()
+                  selection = self.gui.selection
                   selection_row = self.gui.selection_row
                 except (AttributeError):  # got a list
                   selection = self.gui.selection
@@ -365,7 +362,6 @@ class NumberGrid(LetterGame):
                 except (Exception) as e:
                   print(e)
                   print(traceback.format_exc())           
-   
             if selection in items:
               self.gui.selection = ''
               if self.debug:
@@ -404,13 +400,16 @@ class NumberGrid(LetterGame):
     self.q.put(HINT)
     
   def restart(self):
-    self.gui.gs.close()
-    self.finished = False
+    print('restarting')
+    #self.q.put(FINISHED)
+    self.gui.gs.close()    
+    # self.finished = True
     self.__init__()
     self.run()
      
 if __name__ == '__main__':
   NumberGrid().run()
+
 
 
 

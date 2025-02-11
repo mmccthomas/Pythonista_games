@@ -173,7 +173,7 @@ class Gui():
 
         # Get the labels:
         label = sender.superview['label1']
-        if t in '0123456789':
+        if t.isnumeric():
             if not self.number_panel.allows_multiple_selection:
                 sender.background_color = 'yellow'
                 self.selection = t

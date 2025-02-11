@@ -65,10 +65,8 @@ class PieceWord(LetterGame):
       if self.game_over():
         break
     self.gui.set_message2('')
-    self.gui.set_message('')
-    self.gui.set_prompt('')
-    sleep(2)
-    self.gui.gs.show_start_menu()
+    self.complete()
+    
     
   def select_list(self):
       '''Choose which category'''
@@ -315,34 +313,3 @@ if __name__ == '__main__':
     quit = g.wait()
     if quit:
       break
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

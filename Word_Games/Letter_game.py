@@ -339,7 +339,18 @@ class LetterGame():
       words = [' '.join(headers), '\n', '\n'.join([' '.join(c) for c in cols])]
       no_lines = len(cols) + 1
       return words, ''.join(words), no_lines
-               
+  
+  def complete(self):
+      """ standard finish up the game """
+      console.hud_alert('Game Over')
+      self.gui.set_message('')
+      self.gui.set_prompt('')
+      sleep(4)
+      self.finished = True
+      self.gui.show_start_menu()
+      # allow menu item to be processed
+      self.wait_for_gui()
+                           
   def run(self):
     """
     Main method that prompts the user for input
@@ -371,11 +382,7 @@ class LetterGame():
        
     self.print_board()
     self.gui.set_message2(f'{self.game_over()} WON!')
-    self.gui.set_message('') 
-    self.gui.set_prompt('')
-    sleep(4)
-    self.finished = True
-    self.gui.gs.show_start_menu()
+    self.complete()
   
   def select_list(self, word_lists):
       '''Choose which category'''
@@ -461,8 +468,7 @@ class LetterGame():
       with open(f'{word_file}', 'r') as f:
         words = [line.strip() for line in f]
       all_word_list.extend(words)
-    
-    
+        
     if word_length:
         word_list = [line for line in all_word_list if len(line) == word_length]
     else:
@@ -480,7 +486,7 @@ class LetterGame():
                          'up': (-1, 0),  'diag_lr': (1, 1), 'diag_rl': (1, -1),
                          'diag_ul': (-1, -1), 'diag_ur': (-1, 1)}
     directions = [direction_lookup[d] for d in search_directions]      
-               
+              
     for r, row in enumerate(self.board):
       for c, character in enumerate(row):
         rc = r, c        
@@ -606,11 +612,8 @@ class LetterGame():
         return move
         
     else:
-      #board_rc(move, board, HIT)
-      #self.initialise_board()
       return move
-   
-        
+         
   def print_square(self, moves, color='orange', clear=True, alpha=0.5):
     #
     if clear:   
@@ -626,7 +629,6 @@ class LetterGame():
         rc = r,c
         square_list.append(Squares(rc, '', random.choice(['orange', 'green', 'clear', 'cyan', 'yellow']) , z_position=30, alpha = .5))
     self.gui.add_numbers(square_list)  
-
     
   def get_size(self, size=None):
     # size can override board size
@@ -879,6 +881,8 @@ if __name__ == '__main__':
     quit = g.wait()
     if quit:
       break
+
+
 
 
 

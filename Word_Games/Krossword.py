@@ -598,11 +598,7 @@ class KrossWord(LetterGame):
         break
     
     self.gui.set_message2('Game over')
-    self.gui.set_message('')
-    self.gui.set_prompt('')
-    sleep(4)
-    self.finished = True
-    self.gui.show_start_menu()
+    self.complete()
     
 
 if __name__ == '__main__':

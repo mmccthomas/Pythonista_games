@@ -71,7 +71,7 @@ class CrossNumbers(LetterGame):
     def __init__(self, test=None):
         # test overrides manual selections
         self.test = test
-        self.debug = False
+        self.debug = True
         self.use_np = False
         # allows us to get a list of rc locations
         self.log_moves = True
@@ -524,13 +524,9 @@ class CrossNumbers(LetterGame):
                 break
             
             self.gui.set_message2('Game over')
-            dialogs.hud_alert('Game Over')
-            self.gui.set_message('')
-            self.gui.set_prompt('')
-            sleep(4)
-            self.finished = True
             self.check_words()
-            self.gui.show_start_menu()
+            self.complete()
+            
         else:
             self.finished = True
             self.gui.v.close()
