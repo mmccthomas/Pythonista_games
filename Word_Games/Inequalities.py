@@ -9,15 +9,10 @@ import latin_squares
 import base_path
 base_path.add_paths(__file__)
 from gui.gui_interface import Gui, Squares
-# from  futoshiki_solver.generator import FutoshikiGenerator
-
-# from https://github.com/davidswarbrick/futoshiki-solver/tree/master
 
 """ This game is a number grid puzzle
 You have to guess the numbers
-the totals for each row and columns are given
-and the arithmetic operators also
-Operations are processed in L-R and T-B order
+the comparison between some adjacent numbers are given
 Chris Thomas Feb 2025
 
 """
@@ -26,7 +21,7 @@ SPACE = ' '
 FINISHED = (-10, -10)
 NOTE = (-1, -1)
 HINT = (-2, -2)
-SIZE = 9  # fixed for Sudoko
+SIZE = 5  # fixed
 
 class Player():
   def __init__(self):
@@ -34,28 +29,20 @@ class Player():
     self.PLAYER_1 = ' '
     self.PLAYER_2 = '@'
     self.EMPTY = ' '
-    self.PIECE_NAMES  = [str(i) for i in range(26)]
-    
-    
+    self.PIECE_NAMES  = [str(i) for i in range(26)]    
     self.PIECES = [f'../gui/tileblocks/{k}.png' for k in self.PIECE_NAMES]
     self.PIECE_NAMES.extend(["\u2228", "\u2227", "<", ">"])
     for k in ['down', 'up', 'left', 'right']:
-        self.PIECES.append(f'../gui/tileblocks/{k}.png')
-    
-    
+        self.PIECES.append(f'../gui/tileblocks/{k}.png')    
     self.PLAYERS = None
     
 class Futoshiki(LetterGame):
   
-  def __init__(self):
-    self.debug = False
-    self.solver = False
-    
+  def __init__(self): 
+    self.debug = False  
+    self.N = 5 
     self.sleep_time = 0.1
     self.hints = 0
-    self.cage_colors = ['teal', 'salmon', 'dark turquiose', 'yellow']
-    # self.cage_colors = ['lunar green', 'desert brown', 'cashmere', 'linen']
-    # self.cage_colors = ['#D8D0CD', '#B46543', '#DF5587', '#C83F5F']
     self.inequalities = ["\u2228", "\u2227", "<", ">"]
     # allows us to get a list of rc locations
     self.log_moves = False
@@ -114,7 +101,7 @@ class Futoshiki(LetterGame):
     
   def resize_grid(self):
     #selected = self.select_list()
-    self.N = 5 #int(self.puzzle[0])  
+    
     self.gui.gs.DIMENSION_X = self.gui.gs.DIMENSION_Y = 2*self.N -1
     for c in self.gui.game_field.children:
       c.remove_from_parent()
@@ -132,8 +119,8 @@ class Futoshiki(LetterGame):
       items = list(range(1, self.N + 1))
       random.shuffle(items)              
       rows = np.array(latin_squares.latin_square1(items, True))
-      diffs1 = np.sign(np.diff(rows, axis=1))
-      diffs2 = np.sign(np.diff(rows, axis=0))
+      diffsh = np.sign(np.diff(rows, axis=1))
+      diffsv = np.sign(np.diff(rows, axis=0))
       # print(is_latin_square(rows))
       self.gui.reset_waiting(wait)
       # fill board with numbers and logic symbols
@@ -143,12 +130,12 @@ class Futoshiki(LetterGame):
             self.board[2*i, 2*j] = char      
       ineq_list = []
       # add l_r inequalities
-      for i, row in enumerate(diffs1):
+      for i, row in enumerate(diffsh):
           for j, char in enumerate(row):
                 ineq_list.append((i*2, 2*j+1))
                 self.board[i*2, 2*j+1] = '<' if char>0 else '>'
       # add u_d inequalities          
-      for i, row in enumerate(diffs2):
+      for i, row in enumerate(diffsv):
           for j, char in enumerate(row):
                 ineq_list.append((i*2+1, 2*j))
                 self.board[i*2+1, 2*j] = "\u2227" if char>0 else "\u2228"      
@@ -191,7 +178,7 @@ class Futoshiki(LetterGame):
       self.gui.set_top(f'Futoshiki\t\tLevel {self.puzzle}\t\tHints : {self.hints}',
                        font=('Avenir Next', 20))
       move = self.get_player_move(self.board)
-      sleep(0.5)
+      sleep(0.1)
       moves = self.select(move, self.board, text_list=False)
       self.process_selection(moves)      
       if self.game_over():
@@ -217,7 +204,7 @@ class Futoshiki(LetterGame):
         self.gui.input_text_list(prompt=prompt, items=items, position=position)
         
         while self.gui.text_box.on_screen:
-          sleep(.2)
+          sleep(.1)
           try:
             selection = self.gui.selection
           except (Exception) as e:
@@ -237,7 +224,7 @@ class Futoshiki(LetterGame):
   def game_over(self):
     """ check for finished game
     board matches solution"""
-    return np.all(self.board[:2*self.N, :2*self.N] == self.solution_board[:2*self.N, :2*self.N])
+    return np.all(self.board == self.solution_board)
  
   def _update_notes(self, coord):
      """ update any related notes using known validated number"""
@@ -356,7 +343,8 @@ class Futoshiki(LetterGame):
         return self.hint_result[0], self.hint_result[1], None
         
       rc = moves
-      if self.get_board_rc(rc, self.board) == SPACE:
+      # process a touch on an empty number square
+      if np.array(rc) in self.number_locs and self.get_board_rc(rc, self.board) == SPACE:
           # now got rc as move
           # now open list
           if board is None:
@@ -449,6 +437,7 @@ class Futoshiki(LetterGame):
      
 if __name__ == '__main__':
   Futoshiki().run()
+
 
 
 
