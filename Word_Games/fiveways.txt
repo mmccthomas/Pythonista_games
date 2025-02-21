@@ -428,3 +428,220 @@ Puzzle8_frame:
 's/c/ / / / / / / / / / /e'
 'o/ /g/ /a/ / / / / / / / '
 'a/ /m/ /s/ / /g/ / / / /m'
+
+Puzzle9:
+ALPINE
+AMBER
+ANIMAL
+APHID
+ARABLE
+ARTY
+CALYPSO
+CARROT
+CHAIN
+CLAW
+DALMATIAN
+DIORAMA
+FANTAIL
+FEARSOME
+FLAMINGO
+FLOWER
+FORAGE
+HEART
+HECTARE
+HEDGE
+HILLY
+HOUND
+JUNIPER
+LAUREATE
+LEA
+MACAW
+MANGO
+MELON
+MIMIC
+PINEAPPLE
+SCAMPI
+SEASCAPE
+SPICE
+SQUIRREL
+SWEETPEA
+WALNUT
+WILLOW
+
+Puzzle9_frame:
+'f/ / / / / / / / / /h/ /s'
+'h/ /d/ / /s/ / / / / / / '
+' / /a/ / / /f/ / / / /m/c'
+' /h/ / / / / /a/m/ / / / '
+' / / / / /a/m/ / / /p/ / '
+'a/ / / / / / / / /a/ /s/ '
+' / / /h/ /f/l/ / / / / / '
+' / / / /s/ / / / / / / / '
+'f/ / / / /f/ / / / / / /c'
+' / / / / /w/j/ / / / / / '
+' / / / /m/ /c/ / / / / / '
+'d/ / / / / / /l/h/ / / / '
+'w/ / /c/s/ / / / / / / /a'
+
+Puzzle10:
+BANISH
+BEIGE
+BOULDER
+BRAVADO
+CADDIE
+CHIPBOARD
+CORROSIVE
+CRIMP
+CUBIT
+CYCLONE
+DEISM
+DENSITY
+DILUTION
+EBBING
+EBONY
+ECLIPSE
+EFFIGY
+ETHIC
+GATEWAY
+GAZETTEER
+GHAT
+GRAVY
+MAESTRO
+MARIMBA
+MELEE
+MIGHTY
+MODEST
+MOUSSE
+OPPONENT
+RAPID
+SENTIMENT
+SOMBRE
+STOOP
+STUN
+SUNTRAP
+WALTZER
+WIGWAM
+
+Puzzle10_frame:
+'c/m/ / / / / / /r/o/c/ / '
+' / / / / / /g/ / / /s/e/ '
+' / / / / / /b/ / / / / / '
+'c/ /c/d/ / / / / / / / / '
+' / / / / /m/ / / / / / /m'
+'c/ / / / / / / /b/ / / / '
+' / / / / /e/ /w/ / / / /d'
+' / / / /g/ / / / / / / / '
+' / / / / / /g/ / / / / /b'
+' / / /b/ / / / /m/s/ / / '
+'e/ / / /g/ / / / / / /c/s'
+'m/ / /e/ / / / /s/ / / / '
+' /s/ / /d/e/ /w/ / / / /m'
+
+Puzzle11:
+AGOG
+AIRY
+ALIGN
+ALMOND
+BALLAST
+BAYONET
+BEGONIA
+BRAY
+BUNGEE
+CALYPSO
+CAPACITY
+CASSOCK
+COATI
+COGENT
+CONDONE
+CUPFUL
+EARPLUG
+ELM
+EXODUS
+FAIRWAY
+FEN
+FETLOCK
+FLYER
+GAIT
+GEMINI
+GUSHING
+KISMET
+KNELT
+OBLOQUY
+OIL
+OVERTLY
+TANGO
+THONG
+TOGGLE
+TOURISM
+TOXIN
+TWITCH
+UPTAKE
+URCHIN
+URGE
+
+Puzzle11_frame:
+'k/ / / / / / /o/c/ /a/ / '
+' /c/ / / / /t/ / / / / / '
+' / / / / / / / / /c/ / /e'
+' / /f/c/ / / / / / / / / '
+'t/ / / / / /b/ / / / / /a'
+' / /o/ / / / / / /t/ / / '
+' / / / / /u/ / / / /u/b/ '
+'t/c/ / / / /f/g/ / / / / '
+' / / /f/ / /c/ /b/ /t/ / '
+' / / / /b/c/o/ / / / / /f'
+' / / /g/ / /a/e/ / / / / '
+' /e/a/ / / / / / / / /g/b'
+' /u/ / / / / /t/ / / / /k'
+
+Puzzle12:
+ACTUARY
+ALPHA
+ANGEL
+ASTRAL
+BEAST
+BIER
+BLOOM
+BOGEYMAN
+BOOK
+DOMINO
+DUAL
+DUNGEON
+DUST
+EMBER
+EMPEROR
+ERROR
+EXORCIST
+HEADSTONE
+INFERNO
+INFIDEL
+NUMBER
+PILLAR
+PROGRESS
+PROVERB
+REBELLION
+REVELATION
+ROOSTER
+SCYTHE
+SERIAL
+STOPPER
+TAIL
+THEOLOGY
+TREMOR
+TRIAL
+TRICK
+
+Puzzle12_frame:
+' /d/ /n/ / /t/ / / / / /r'
+' / / /d/ / / /e/e/ / / /b'
+' / / /b/ / / / /b/a/ / /r'
+' / / / / / / / / / / / / '
+' / / / /a/ /s/ / / / / / '
+' / / / / / / / / / / / / '
+' / / / / / / / /b/ / / / '
+'t/ / / / / / /r/ / / /i/ '
+'e/b/h/t/ / / / / /p/ / / '
+' / / /p/ / /s/d/ / /i/ / '
+' / / / / /p/ / / / / /s/ '
+' / /a/ / / /a/ /t/ / / / '
+' / / / /d/e/ / / / / / /t'

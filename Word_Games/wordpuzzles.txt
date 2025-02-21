@@ -7068,3 +7068,1575 @@ Puzzle79-78_frame:
 ' / / /#/#/#/ /#/#/ /#/#/ /#/#/ /#/#/ /#/#/#/ / / '
 ' /#/ /#/#/#/ /#/#/ /#/#/ /#/#/ /#/#/ /#/#/#/ /#/ '
 ' / / / / / / /#/#/ / / / / / / /#/#/ / / / / / / '
+
+Puzzle80-5:
+AMP
+BAP
+BYE
+DUO
+EAT
+LAM
+ROE
+SIP
+ENVY
+HUSK
+OBEY
+PIER
+POEM
+SETT
+SOIL
+TENT
+AGAVE
+AUDIT
+CHESS
+CYBER
+ENTRY
+IVORY
+MASON
+MIMIC
+PUTTY
+RUDDY
+ABLOOM
+ANGLER
+ANYONE
+EXEMPT
+FROSTY
+HUMANE
+SWIVEL
+TISSUE
+BOREDOM
+BRISTLY
+GYMSLIP
+PANICKY
+POSTMAN
+QUARTET
+RICKETY
+STUBBLE
+THIMBLE
+TRAINER
+TSARIST
+TYRANNY
+WORSTED
+AMBROSIA
+BROUGHAM
+CONSPIRE
+PERCEIVE
+UPPERCUT
+CIRCULATE
+CORKSCREW
+MODERNIST
+PETTICOAT
+TWENTIETH
+PROPAGATOR
+DISCERNIBLE
+NOURISHMENT
+STIPULATION
+
+Puzzle80-5_frame:
+'#/f/#/ /#/#/#/ /#/ / / / / / /#/ /#/#/#/ '
+' /r/ / / / / / /#/#/ /#/ /#/#/#/ / / / / '
+'#/o/#/ /#/ /#/ / / / / / / / / / /#/ /#/ '
+' /s/ / / / / /#/#/#/ /#/ /#/ /#/ / / / / '
+'#/t/#/ /#/ /#/#/ /#/ /#/ /#/ /#/ /#/ /#/ '
+' /y/ / / /#/#/ / / / / / / / / / / /#/#/ '
+' /#/#/ / / / / / /#/ /#/#/#/ /#/ /#/ / / '
+' /#/ /#/ /#/ / / / / / / /#/ / / / / /#/#'
+' /#/ /#/ /#/ /#/#/#/#/#/#/#/ / / /#/ / / '
+' / / / / / / / /#/#/#/#/#/ /#/ /#/#/#/ /#'
+' /#/ /#/ /#/ /#/#/#/#/#/#/ / / / / / / /#'
+' / / / / /#/ /#/#/#/#/#/#/ /#/ /#/#/#/ /#'
+' /#/ /#/#/ /#/ /#/#/#/#/#/ / / / / / / /#'
+'#/ / / / / / / / /#/#/#/#/ /#/ /#/ /#/ /#'
+'#/ /#/ /#/ /#/ / / / / /#/ / / /#/ /#/#/ '
+' / / / / / / /#/ /#/ /#/#/ /#/ / / / / / '
+'#/ /#/ /#/ /#/ / / / / /#/ /#/ /#/ /#/#/ '
+' / / / / / / / / /#/ /#/#/ /#/ / / / /#/ '
+' /#/#/ /#/ /#/ /#/ / / / / / /#/#/ /#/#/ '
+' / / / /#/ /#/ /#/#/ /#/#/ /#/#/#/ / / / '
+' /#/#/#/ / / / / / / / / /#/ / / / /#/#/ '
+
+Puzzle81-9:
+AIL
+BID
+BIG
+GUT
+MAR
+MOW
+NIL
+OLD
+RAW
+TAT
+TON
+TOY
+ANTHILL
+ASSAULT
+AVOCADO
+CALYPSO
+CARDIAC
+CERTAIN
+CHAOTIC
+CHEETAH
+CHIPPER
+CLANGER
+COMBUST
+CONCUSS
+CUTLASS
+DIVIDER
+DOORMAT
+DYNAMIC
+EGOTIST
+ENVELOP
+HAIRCUT
+HOLDALL
+OARSMAN
+OPERATE
+OSMOSIS
+OSTRICH
+PAYROLL
+POVERTY
+RESPOND
+ROBOTIC
+SKILFUL
+SNIPPET
+STAMINA
+STOPGAP
+TEACAKE
+TENUOUS
+THINKER
+TWINKLY
+ANECDOTE
+BESMIRCH
+LITIGATE
+PARALYSE
+BACKSPACE
+BELLYACHE
+CHINSTRAP
+CLUBHOUSE
+COMPONENT
+ENCHILADA
+HONEYCOMB
+SOPHOMORE
+
+Puzzle81-9_frame:
+' / / / / / / /#/#/ / / / /s/ / /#/#/ / / / / / / '
+' /#/ /#/#/#/ /#/#/ /#/#/ /#/#/ /#/#/ /#/#/#/ /#/ '
+' / / /#/#/#/ /#/#/ /#/#/ /#/#/ /#/#/ /#/#/#/ / / '
+' /#/#/ / / / / / / / / /#/ / / / / / / / / /#/#/ '
+' /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ '
+' /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ '
+' / / / / / / /#/#/ / / / / / / /#/#/ / / / / / / '
+'#/#/#/ /#/#/#/#/#/#/#/#/ /#/#/#/#/#/#/#/#/ /#/#/#'
+'#/#/#/ /#/#/#/#/#/#/#/#/ /#/#/#/#/#/#/#/#/ /#/#/#'
+' / / / / / / /#/#/ / / / / / / /#/#/ / / / / / / '
+' /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ '
+' /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ '
+' / / /#/ / / / / / / / /#/ / /s/ / / / / /#/ / / '
+' /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ '
+' /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ '
+' / / / / / / /#/#/ / / / / / / /#/#/ / / / / / / '
+'#/#/#/ /#/#/#/#/#/#/#/#/ /#/#/#/#/#/#/#/#/ /#/#/#'
+'#/#/#/ /#/#/#/#/#/#/#/#/ /#/#/#/#/#/#/#/#/ /#/#/#'
+' / / / / / /s/#/#/ / / / / / / /#/#/ / / / / / / '
+' /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ '
+' /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ '
+' /#/#/ / / / / / / / / /#/ / / / / / / / / /#/#/ '
+' / / /#/#/#/ /#/#/ /#/#/ /#/#/ /#/#/ /#/#/#/ / / '
+' /#/ /#/#/#/ /#/#/ /#/#/ /#/#/ /#/#/ /#/#/#/ /#/ '
+' / / / / / / /#/#/ / / / / / / /#/#/ / / / / / / '
+
+Puzzle82-21:
+ACRE
+ANTE
+AREA
+AURA
+BITE
+BOND
+BOSS
+CHAT
+CLUE
+COVE
+JERK
+LILY
+NERD
+OMEN
+PARA
+PATH
+RUST
+SITE
+TACT
+TEMP
+VASE
+ZEAL
+CALVE
+CIRCA
+CRIME
+INGOT
+JOIST
+OPIUM
+OUTRE
+PEAKY
+POSSE
+REMIT
+TRASH
+BANDIT
+ELICIT
+HECTOR
+LESSEN
+OFFEND
+POTATO
+RADIUM
+SPEECH
+STUPID
+TATTOO
+TENDER
+TENNIS
+TRENDY
+VANISH
+ADJUNCT
+ANALYSE
+AUSTERE
+CANTEEN
+CHATEAU
+ICEBERG
+JACUZZI
+MITTENS
+PARTAKE
+TAPROOM
+UNNERVE
+CHENILLE
+MACAROON
+TEXTURAL
+TRIBUNAL
+ASTRONAUT
+CAREERIST
+DALLIANCE
+PICNICKER
+
+Puzzle82-21_frame:
+'#/#/#/#/#/ / / / / / / /#/ /#/#/#/ / / / '
+'#/#/#/#/#/ /#/#/#/#/ /#/ / / / / /#/ /#/#'
+'#/#/#/#/#/ /#/ / / / / / / /#/#/#/#/ /#/ '
+'#/#/#/#/#/ /#/ /#/#/ /#/ / / / / / / /#/ '
+'#/#/#/#/#/ /#/ /#/ / / / /#/ /#/#/#/ /#/ '
+'m/ / / / / / / /#/ /#/#/ /#/ / / / / /#/ '
+'i/#/#/ /#/#/#/ /#/ /#/ /#/#/ /#/#/ / / / '
+'t/#/#/ /#/ /#/ / / / / / /#/ / / / /#/#/ '
+'t/ / / / / / / /#/ /#/ /#/#/ /#/#/ / / / '
+'e/#/#/ /#/ /#/ /#/#/ / / / / / / / / /#/#'
+'n/#/#/ / / / /#/#/ / / / /#/#/ /#/#/ /#/ '
+'s/ / / /#/ / / / / / /#/ / / / / / / / / '
+'#/#/ /#/ /#/ /#/#/ / / / /#/#/ /#/#/#/#/ '
+' / / / / /#/ /#/#/ /#/ /#/ /#/ /#/ / / / '
+' /#/ /#/ / / / / / /#/ / / / / / / /#/#/ '
+' /#/ /#/ /#/ /#/ / / / /#/ /#/ /#/ / / / '
+' /#/ /#/#/#/#/#/ /#/ /#/ / / / /#/ /#/ /#'
+' /#/ /#/ /#/ /#/ / / / / / /#/ / / / / / '
+' / / / / / / / / /#/ /#/ /#/#/#/#/ /#/ /#'
+'#/#/#/#/ /#/ /#/ /#/ / / / / / /#/#/#/ /#'
+' / / / / / / /#/ /#/ /#/#/#/#/#/ / / / / '
+
+Puzzle83-38:
+BAG
+BYE
+COS
+EBB
+FAT
+LEI
+OWE
+PAL
+PAR
+REX
+RUB
+TAX
+ALCOHOL
+ALLERGY
+BUCOLIC
+CASSATA
+COFFEES
+COURIER
+DAYWEAR
+DECIDER
+DERVISH
+DEWDROP
+DUTIFUL
+ENTRAIL
+EXPLORE
+GASTRIC
+GRANDAD
+HANDGUN
+HARPIST
+LENIENT
+OXIDISE
+PENSIVE
+PLIABLE
+PRIMULA
+PROSAIC
+RADDLED
+REGROUP
+RESPIRE
+RHUBARB
+SERIOUS
+SHAMPOO
+SHUTTLE
+SPINACH
+SPINNEY
+STELLAR
+STRATUS
+SUBDUED
+SURGEON
+DUODENAL
+GERANIUM
+NEWCOMER
+OPERATOR
+ADAPTABLE
+ANTIPASTO
+AVOIDABLE
+CANDYTUFT
+HYPHENATE
+LANDSCAPE
+UNSKILFUL
+TALLORDER
+
+Puzzle83-38_frame:
+' / / / / / / /#/#/ / /g/ / / / /#/#/ / / / / / / '
+' /#/ /#/#/#/ /#/#/ /#/#/ /#/#/ /#/#/ /#/#/#/ /#/ '
+' / / /#/#/#/ /#/#/ /#/#/ /#/#/ /#/#/ /#/#/#/ / / '
+' /#/#/ / / / / / / / / /#/ / / / / / / / / /#/#/ '
+' /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ '
+' /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ '
+' / / / / / / /#/#/ / / / / / / /#/#/ / / / / / / '
+'#/#/#/ /#/#/#/#/#/#/#/#/ /#/#/#/#/#/#/#/#/ /#/#/#'
+'#/#/#/ /#/#/#/#/#/#/#/#/ /#/#/#/#/#/#/#/#/ /#/#/#'
+' / / / / / / /#/#/g/ / / / / / /#/#/ / / / / / / '
+' /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ '
+' /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ '
+' / / /#/ / / / / / / / /#/ / / / / / / / /#/ / / '
+' /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ '
+' /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ '
+' / / / / / / /#/#/ / / / / / / /#/#/ / / / / / / '
+'#/#/#/ /#/#/#/#/#/#/#/#/ /#/#/#/#/#/#/#/#/ /#/#/#'
+'#/#/#/ /#/#/#/#/#/#/#/#/ /#/#/#/#/#/#/#/#/ /#/#/#'
+' / / / / / / /#/#/ / / / / / / /#/#/ / / / / / / '
+' /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ '
+' /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ '
+' /#/#/ / / / / / / / / /#/ / / / / / / / / /#/#/ '
+' / / /#/#/#/ /#/#/ /#/#/ /#/#/ /#/#/ /#/#/#/ / / '
+' /#/ /#/#/#/ /#/#/ /#/#/ /#/#/ /#/#/ /#/#/#/ /#/ '
+' / / / / / / /#/#/ / / / / / / /#/#/ / / / /g/ / '
+
+Puzzle84-150:
+EYE
+GYM
+LAB
+NIL
+RAW
+RIM
+SOW
+SUM
+TAG
+TEA
+VIE
+MAP
+CANDOUR
+CHAPATI
+COMPERE
+ELEGIAC
+ENVIOUS
+EXPLODE
+FICTION
+GANGWAY
+HOSANNA
+LAXNESS
+LAYETTE
+LEMMING
+MOLLUSC
+MORELLO
+MOVABLE
+NOVELLA
+OPTIMUM
+ORIGAMI
+OSSICLE
+OVERUSE
+PARSNIP
+PIQUANT
+PLATOON
+PONTIFF
+REGROUP
+REMOUNT
+REPTILE
+RESTFUL
+ROBOTIC
+SCRUMPY
+SHIMMER
+SORDINO
+STIRRER
+TRUMPET
+VAMPISH
+VITAMIN
+CATARACT
+COMPOSER
+MEGASTAR
+OUTWEIGH
+ADEPTNESS
+EXTRADITE
+GLAMOROUS
+GOLDFIELD
+MOUSETRAP
+PINEAPPLE
+REPRODUCE
+UNANIMOUS
+
+Puzzle84-150_frame:
+' / / / / / / /#/#/ / / / / / / /#/#/ / / / /r/ / '
+' /#/ /#/#/#/ /#/#/ /#/#/ /#/#/ /#/#/ /#/#/#/ /#/ '
+' / / /#/#/#/ /#/#/ /#/#/ /#/#/ /#/#/ /#/#/#/ / / '
+' /#/#/ / / / / / / / / /#/ / / / / / / / / /#/#/ '
+' /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ '
+' /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ '
+' / / / / / / /#/#/ / / / / / / /#/#/ / / / / / / '
+'#/#/#/ /#/#/#/#/#/#/#/#/ /#/#/#/#/#/#/#/#/ /#/#/#'
+'#/#/#/ /#/#/#/#/#/#/#/#/ /#/#/#/#/#/#/#/#/ /#/#/#'
+' / / / / / / /#/#/ / / / / / / /#/#/ / / / / / / '
+' /#/#/ /#/#/r/#/#/ /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ '
+' /#/#/ /#/#/ /#/#/ /#/#/r/#/#/ /#/#/ /#/#/ /#/#/ '
+' / / /#/ / / / / / / / /#/ / / / / / / / /#/ / / '
+' /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ '
+' /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ '
+' / / / / / / /#/#/ / / / / / / /#/#/ / / / / / / '
+'#/#/#/ /#/#/#/#/#/#/#/#/ /#/#/#/#/#/#/#/#/ /#/#/#'
+'#/#/#/ /#/#/#/#/#/#/#/#/ /#/#/#/#/#/#/#/#/ /#/#/#'
+' / / / / / / /#/#/ / / / / / / /#/#/ / / / / / / '
+' /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ '
+' /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ '
+' /#/#/ / / / / / / / / /#/ / / / / / / / / /#/#/ '
+' / / /#/#/#/ /#/#/ /#/#/ /#/#/ /#/#/ /#/#/#/ / / '
+' /#/ /#/#/#/ /#/#/ /#/#/ /#/#/ /#/#/ /#/#/#/ /#/ '
+' / / / / / / /#/#/ / / / / / / /#/#/ / / / / / / '
+
+Puzzle85-110:
+BOA
+CAN
+INK
+ION
+KIP
+MIL
+RED
+RIM
+RYE
+SUM
+TUN
+OHM
+ANTI
+AVER
+EDGE
+EURO
+FERN
+LAIR
+LIMA
+NEWT
+OINK
+ORFE
+RARE
+SLUR
+SORT
+THOU
+TOOT
+TUNA
+AIRDROP
+ANKLETS
+BREADTH
+CALLOUS
+CRUELTY
+DIALECT
+ELECTOR
+EMPOWER
+ESPOUSE
+FLORIST
+FLUTTER
+FLYLEAF
+KARAOKE
+KERATIN
+LAUNDER
+LIBERTY
+MARSHAL
+MASTERY
+MINIMUM
+NOTABLE
+OFFICER
+PELICAN
+PRETZEL
+PRIVATE
+READMIT
+REPAINT
+RESTIVE
+RISOTTO
+SANDMAN
+SELFISH
+SHIATSU
+SUCCUMB
+UNCOUTH
+WETLAND
+WRINGER
+YOBBISH
+ARTISTRY
+CANOODLE
+CARNIVAL
+INCUBATE
+ADMIRALTY
+APPORTION
+ARMADILLO
+BRASSERIE
+ELABORATE
+FRIVOLOUS
+PNEUMONIA
+SHORTNESS
+
+Puzzle85-110_frame:
+' / / / / / / /#/#/ / / / / / / /#/#/ / / / / / / '
+' /#/ /#/#/#/ /#/#/ /#/#/ /#/#/ /#/#/ /#/#/#/ /#/ '
+' / / /#/#/#/ /#/#/ /#/#/ /#/#/ /#/#/ /#/#/#/ / / '
+' /#/#/ / / / / / / / / /#/ / / / / / / / / /#/#/f'
+' /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ '
+' /#/#/ /#/#/ / / / /#/#/ /#/#/ / / / /#/#/ /#/#/ '
+' / / / / / / /#/#/f/ / / / / / /#/#/ / / / / / / '
+'#/#/#/ /#/ /#/#/#/#/ /#/ /#/ /#/#/#/#/ /#/ /#/#/#'
+'#/#/#/ /#/ /#/#/#/#/ /#/ /#/ /#/#/#/#/ /#/ /#/#/#'
+' / / / / / / /#/#/ / / / / / / /#/#/ / / / / / / '
+' /#/#/ /#/#/ / / / /#/#/ /#/#/ / / / /#/#/ /#/#/ '
+' /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ '
+' / / /#/ / / / / / / / /#/ / / / / / / / /#/ / / '
+' /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ '
+' /#/#/ /#/#/ / / / /#/#/ /#/#/ / / / /#/#/ /#/#/ '
+' / / / / / / /#/#/ / / / / / / /#/#/ / / / / / / '
+'#/#/#/ /#/ /#/#/#/#/ /#/ /#/ /#/#/#/#/ /#/ /#/#/#'
+'#/#/#/ /#/ /#/#/#/#/ /#/ /#/ /#/#/#/#/ /#/ /#/#/#'
+' / / / / / / /#/#/ / / / / / / /#/#/ / / / / / / '
+' /#/#/ /#/#/f/ / / /#/#/ /#/#/ / / / /#/#/ /#/#/ '
+' /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ '
+' /#/#/ / / / / / / / / /#/ / / / / / / / / /#/#/ '
+' / / /#/#/#/ /#/#/ /#/#/ /#/#/ /#/#/ /#/#/#/ / / '
+' /#/ /#/#/#/ /#/#/ /#/#/ /#/#/ /#/#/ /#/#/#/ /#/ '
+' / / / / / / /#/#/ / / / / / / /#/#/ / / / / / / '
+
+Puzzle86-62:
+AIT
+ARC
+ASS
+BAD
+COT
+HUG
+RAY
+TEA
+TEE
+TRY
+VAN
+ZIT
+ABRIDGE
+ANODYNE
+BAILIFF
+BATHTUB
+BEDROOM
+BEGUINE
+COMPASS
+CONDUIT
+CUSHION
+EQUABLE
+EXECUTE
+FULCRUM
+GALLANT
+GENETIC
+GRIZZLE
+GYMNAST
+HUNDRED
+PARVENU
+PITEOUS
+PUBLISH
+PURSUIT
+ROOFTOP
+SHUDDER
+SMOTHER
+SNOWCAP
+TAPIOCA
+TAVERNA
+TAXICAB
+TENABLE
+TETANUS
+TOASTER
+TOUGHEN
+TRIBUNE
+TUMBLER
+TWEETER
+UNNAMED
+BACKSIDE
+INDIGENT
+SQUADDIE
+SUITABLE
+CHALLENGE
+DEBATABLE
+EARTHLING
+GEOGRAPHY
+HANDBELLS
+HORSEPLAY
+STAGINESS
+STRAPLINE
+
+Puzzle86-62_frame:
+' / / / / / / /#/#/ / / / / / / /#/#/ / / / / / / '
+' /#/ /#/#/#/ /#/#/ /#/#/ /#/#/ /#/#/ /#/#/#/ /#/ '
+' / / /#/#/#/ /#/#/ /#/#/ /#/#/ /#/#/ /#/#/#/ / / '
+' /#/#/ / / / / / / / / /#/ / / / / / / / / /#/#/ '
+' /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ '
+' /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ '
+' / / / / / / /#/#/ / / / / / / /#/#/ / / / / / / '
+'#/#/#/ /#/#/#/#/#/#/#/#/ /#/#/#/#/#/#/#/#/ /#/#/#'
+'#/#/#/ /#/#/#/#/#/#/#/#/g/#/#/#/#/#/#/#/#/ /#/#/#'
+' / / / / / / /#/#/ / / / / / / /#/#/ / / / / / / '
+' /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ '
+' /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ '
+' / / /#/ / / / / / / / /#/ / / / / / / / /#/ / / '
+' /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ '
+' /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ '
+' / / / / / / /#/#/ / /g/ / / / /#/#/ / / / / / / '
+'#/#/#/ /#/#/#/#/#/#/#/#/ /#/#/#/#/#/#/#/#/ /#/#/#'
+'#/#/#/ /#/#/#/#/#/#/#/#/ /#/#/#/#/#/#/#/#/ /#/#/#'
+'g/ / / / / / /#/#/ / / / / / / /#/#/ / / / / / / '
+' /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ '
+' /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ '
+' /#/#/ / / / / / / / / /#/ / / / / / / / / /#/#/ '
+' / / /#/#/#/ /#/#/ /#/#/ /#/#/ /#/#/ /#/#/#/ / / '
+' /#/ /#/#/#/ /#/#/ /#/#/ /#/#/ /#/#/ /#/#/#/ /#/ '
+' / / / / / / /#/#/ / / / / / / /#/#/ / / / / / / '
+
+Puzzle87-5:
+APP
+EAU
+ELM
+ITS
+RAT
+REP
+VIA
+VIM
+BEER
+EDIT
+GROW
+LEAP
+MATS
+OATH
+SHIP
+SLOB
+CREED
+ELBOW
+EMOJI
+ETHER
+LOSER
+SILKY
+SILLY
+SPIRE
+THREE
+WAIVE
+ABJECT
+CLICHE
+DIKTAT
+EARNER
+EDUCED
+OBLIGE
+PUNISH
+TALCUM
+AUSTRIA
+DIVERSE
+FREEDOM
+IMMORAL
+KIBBUTZ
+KNOBBLY
+NANKEEN
+OMNIBUS
+REPLETE
+STILTED
+TRAWLER
+UNCLEAR
+YOBBISH
+letters
+CORONATE
+DESERTER
+NUMERACY
+PASTILLE
+SLYBOOTS
+BULLDOZER
+FLOWERPOT
+GENIALITY
+HAIRDRYER
+NOSTALGIA
+PROSCIUTTO
+EARTHENWARE
+INCOHERENCE
+MAGNANIMOUS
+
+Puzzle87-5_frame:
+'#/ /#/ /#/#/#/ /#/ / / / / / /#/ /#/#/#/ '
+' / / / / / / / /#/#/ /#/ /#/#/#/ / / / / '
+'#/ /#/ /#/ /#/ / / / / / / / / / /#/ /#/ '
+' / / / / / / /#/#/#/ /#/ /#/ /#/ / / / / '
+'#/ /#/ /#/ /#/#/ /#/ /#/ /#/ /#/ /#/ /#/ '
+' / / / / /#/#/ / / / / / / / / / / /#/#/ '
+' /#/#/ / / / / / /#/ /#/#/#/ /#/ /#/ / / '
+' /#/ /#/ /#/ / / / / / / /#/e/m/o/j/i/#/#'
+' /#/ /#/ /#/ /#/#/#/#/#/#/#/ / / /#/ / / '
+' / / / / / / / /#/#/#/#/#/ /#/ /#/#/#/ /#'
+' /#/ /#/ /#/ /#/#/#/#/#/#/ / / / / / / /#'
+' / / / / /#/ /#/#/#/#/#/#/ /#/ /#/#/#/ /#'
+' /#/ /#/#/ /#/ /#/#/#/#/#/ / / / / / / /#'
+'#/ / / / / / / / /#/#/#/#/ /#/ /#/ /#/ /#'
+'#/ /#/ /#/ /#/ / / / / /#/ / / /#/ /#/#/ '
+' / / / / / / /#/ /#/ /#/#/ /#/ / / / / / '
+'#/ /#/ /#/ /#/ / / / / /#/ /#/ /#/ /#/#/ '
+' / / / / / / / / /#/ /#/#/ /#/ / / / /#/ '
+' /#/#/ /#/ /#/ /#/ / / / / / /#/#/ /#/#/ '
+' / / / /#/ /#/ /#/#/ /#/#/ /#/#/#/ / / / '
+' /#/#/#/ / / / / / / / / /#/ / / / /#/#/ '
+
+Puzzle88-9:
+AIM
+COS
+LOG
+MAC
+NAB
+ONE
+PIT
+POP
+RIP
+SAG
+TIE
+TOG
+BAUXITE
+BESEECH
+BULBOUS
+COXCOMB
+CULPRIT
+EARRING
+ENDEMIC
+ENGAGED
+ERUDITE
+GODSEND
+GRANOLA
+GRAPHIC
+HARBOUR
+LEISURE
+LIMEADE
+NOTABLE
+NOVELLA
+OATMEAL
+OVERRUN
+PERSPEX
+RESTFUL
+SAVIOUR
+SHIATSU
+SHINDIG
+SHOEBOX
+SIZZLER
+SQUIDGE
+STOPGAP
+STRATUS
+TACTILE
+TOASTIE
+UTENSIL
+VALIANT
+VIRTUAL
+WEDDING
+WHEATEN
+ELEPHANT
+FIXATIVE
+HANDCART
+OUTMODED
+CANDIDACY
+ELECTRIFY
+EPISCOPAL
+PESSIMIST
+QUIBBLING
+QUIZZICAL
+REPORTAGE
+TELEGRAPH
+
+Puzzle88-9_frame:
+' / / /b/ / / /#/#/ / / / / / / /#/#/ / / / / / / '
+' /#/ /#/#/#/ /#/#/ /#/#/ /#/#/ /#/#/ /#/#/#/ /#/ '
+' / / /#/#/#/ /#/#/ /#/#/ /#/#/ /#/#/ /#/#/#/ / / '
+' /#/#/ / / / / / / / / /#/ / / / / / / / / /#/#/ '
+' /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ '
+' /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ '
+' / / / / / / /#/#/ / / / / / / /#/#/ / / / / / / '
+'#/#/#/ /#/#/#/#/#/#/#/#/ /#/#/#/#/#/#/#/#/ /#/#/#'
+'#/#/#/ /#/#/#/#/#/#/#/#/ /#/#/#/#/#/#/#/#/ /#/#/#'
+' / / / / / / /#/#/ / / / / / / /#/#/ / / / / / / '
+' /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ '
+' /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ '
+' / /b/#/ / / / / / / / /#/ / / / / / / / /#/ / / '
+' /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ '
+' /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ '
+' / / / / / / /#/#/ / / / / / / /#/#/ / / / / / / '
+'#/#/#/ /#/#/#/#/#/#/#/#/ /#/#/#/#/#/#/#/#/ /#/#/#'
+'#/#/#/ /#/#/#/#/#/#/#/#/ /#/#/#/#/#/#/#/#/ /#/#/#'
+' / / / / / / /#/#/ / / / / / / /#/#/ / / / / / / '
+' /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ '
+' /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ '
+' /#/#/ / / / / / / / / /#/ / / / / / / / / /#/#/ '
+' / / /#/#/#/ /#/#/ /#/#/ /#/#/b/#/#/ /#/#/#/ / / '
+' /#/ /#/#/#/ /#/#/ /#/#/ /#/#/ /#/#/ /#/#/#/ /#/ '
+' / / / / / / /#/#/ / / / / / / /#/#/ / / / / / / '
+
+Puzzle89-21:
+ACT
+ALE
+ANT
+APT
+ELF
+MOO
+NAG
+NED
+NIT
+SOP
+TAT
+UNE
+ABLE
+ACER
+ACNE
+ARID
+AXIS
+AXLE
+COST
+CUSS
+ESPY
+EXIT
+FLEE
+FOAL
+FOLD
+GRAN
+ITCH
+LOVE
+LUST
+NETT
+PLIE
+PROD
+REDO
+SCAM
+SLAY
+SNIP
+TERM
+TINY
+WISP
+YEAR
+ARGON
+BANAL
+BIRDS
+CAVIL
+CONGA
+EMAIL
+FRANC
+GREET
+INTRO
+LEECH
+LEMON
+LEVEL
+STARE
+VODKA
+ACCEDE
+CAJOLE
+CAREEN
+INRUSH
+KAOLIN
+LIQUOR
+PRINCE
+RECALL
+REPEAL
+SASHAY
+SLEEVE
+SOIREE
+SQUIRT
+URCHIN
+VERITY
+YELLOW
+BASTION
+PLYWOOD
+CAPABILITY
+CAPITALISM
+EFFERVESCE
+FUTURISTIC
+MARIONETTE
+MOUTHPIECE
+PACEMAKING
+POLITICIAN
+
+Puzzle89-21_frame:
+' / / / / / / / / / /#/ / / / / / / / / / '
+' /#/ /#/#/#/ /#/ / / / / /#/ /#/#/#/ /#/ '
+' / / / /#/ / / / / /#/ / / / / /#/ / / / '
+' /#/ /#/ /#/ /#/#/ / / /#/#/ /#/ /#/ /#/ '
+' /#/#/ / / / / / /#/ /#/ / / / / / /#/#/ '
+' /#/ /#/ /#/ /#/ /#/ /#/ /#/ /#/ /#/ /#/ '
+' / / / / / /#/ / / / / / / /#/ / / / / / '
+' /#/ /#/ /#/#/#/ /#/#/#/ /#/#/#/ /#/ /#/ '
+' / / /#/l/o/v/e/#/#/#/#/#/ /b/ / /#/ / / '
+' / / / /#/#/ /#/#/#/#/#/#/#/i/#/#/ / / / '
+'#/ /#/ / / / /#/#/#/#/#/#/#/r/ / / /#/ /#'
+' / / / /#/#/ /#/#/#/#/#/#/#/d/#/#/ / / / '
+' / / /#/ / / / /#/#/#/#/#/ /s/ / /#/ / / '
+' /#/ /#/ /#/#/#/ /#/#/#/ /#/#/#/ /#/ /#/ '
+' / / / / / /#/ / / / / / / /#/ / / / / / '
+' /#/ /#/ /#/ /#/ /#/ /#/ /#/ /#/ /#/ /#/ '
+' /#/#/ / / / / / /#/ /#/ / / / / / /#/#/ '
+' /#/ /#/ /#/ /#/#/ / / /#/#/ /#/ /#/ /#/ '
+' / / / /#/ / / / / /#/ / / / / /#/ / / / '
+' /#/ /#/#/#/ /#/ / / / / /#/ /#/#/#/ /#/ '
+' / / / / / / / / / /#/ / / / / / / / / / '
+
+Puzzle90-38:
+BEN
+BRA
+CEP
+COB
+ILK
+KEG
+KEN
+KIP
+LAC
+NIL
+PAW
+TUB
+ACETATE
+BASSOON
+CHAPATI
+COMICAL
+COMPOST
+COWSLIP
+DERVISH
+DESKJOB
+DEWDROP
+DUCHESS
+DUTIFUL
+EXIGENT
+EXPLORE
+FRISBEE
+GLITTER
+HAYWIRE
+HERSELF
+ICINESS
+LAGGARD
+LEXICON
+PASTERN
+PENANCE
+PROCESS
+RELIANT
+SATSUMA
+SEEDING
+SOLICIT
+SPLODGE
+STEWARD
+STINKER
+SUCCEED
+SUNTRAP
+SWALLOW
+THICKEN
+TOWPATH
+WHINGER
+CATHOLIC
+MANDRILL
+MICRODOT
+WATERWAY
+AGITATION
+BIOGRAPHY
+DIAGNOSIS
+DISCREDIT
+GASTROPUB
+OWNERSHIP
+PHYSICIAN
+REVULSION
+
+Puzzle90-38_frame:
+' / / / / / / /#/#/ / / /p/ / / /#/#/ / / / / / / '
+' /#/ /#/#/#/ /#/#/ /#/#/ /#/#/ /#/#/ /#/#/#/ /#/ '
+' / / /#/#/#/ /#/#/ /#/#/ /#/#/ /#/#/ /#/#/#/ / / '
+' /#/#/ / / / / / / / / /#/ / / / / / / / / /#/#/ '
+' /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ '
+' /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ '
+' / / / / / / /#/#/ / / / / / / /#/#/ / / / / / / '
+'#/#/#/ /#/#/#/#/#/#/#/#/ /#/#/#/#/#/#/#/#/ /#/#/#'
+'#/#/#/ /#/#/#/#/#/#/#/#/ /#/#/#/#/#/#/#/#/ /#/#/#'
+' / / / / / /p/#/#/ / / / / / / /#/#/ / / / / / / '
+' /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ '
+' /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ '
+' / / /#/ / / / / / / / /#/ / / / / / / / /#/ / / '
+' /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ '
+' /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ '
+' / / / / / / /#/#/ / / / / / / /#/#/ / / / / / / '
+'#/#/#/ /#/#/#/#/#/#/#/#/ /#/#/#/#/#/#/#/#/ /#/#/#'
+'#/#/#/ /#/#/#/#/#/#/#/#/ /#/#/#/#/#/#/#/#/ /#/#/#'
+' / / / / / / /#/#/ / / / / / / /#/#/ / / / / / / '
+' /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ '
+' /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ '
+' /#/#/ / / / / / / / / /#/ / / / / / / / / /#/#/ '
+' / / /#/#/#/ /#/#/ /#/#/ /#/#/ /#/#/ /#/#/#/ / / '
+' /#/ /#/#/#/ /#/#/ /#/#/ /#/#/ /#/#/ /#/#/#/ /#/ '
+' / / / / / / /#/#/ / / / / / / /#/#/p/ / / / / / '
+
+Puzzle91-63:
+BOA
+BUS
+DIG
+FUG
+GIG
+GUY
+LAD
+OPT
+RIB
+ROC
+SIT
+TOR
+ACIDITY
+ACTUATE
+CARDIAC
+CHOLERA
+CLUBBER
+COBBLER
+CRINKLE
+DEFAULT
+DOLEFUL
+FEDERAL
+FIGHTER
+FLORIST
+FORMULA
+HALIBUT
+LAYETTE
+LEGIBLE
+LOYALTY
+MACADAM
+MARITAL
+MASTIFF
+MIDRIFF
+MIRACLE
+MISSION
+MUDBATH
+MUGGINS
+PREFACE
+RAINBOW
+RETRACE
+RETRAIN
+REVENGE
+ROSEHIP
+SCRAPER
+TRANSOM
+TROOPER
+TRUCKLE
+WINSOME
+ASSEMBLY
+INFORMAL
+LENIENCY
+NOSINESS
+DEDUCIBLE
+EPICENTRE
+MANHANDLE
+MELATONIN
+MOUSTACHE
+PUISSANCE
+RIDERLESS
+SCRAMBLER
+
+Puzzle91-63_frame:
+' / / / / / / /#/#/ / / / / / / /#/#/ / / / / / / '
+' /#/ /#/#/#/ /#/#/ /#/#/ /#/#/ /#/#/ /#/#/#/ /#/ '
+' / / /#/#/#/ /#/#/ /#/#/ /#/#/ /#/#/ /#/#/#/ / / '
+' /#/#/ / / / / / / / / /#/m/ / / / / / / / /#/#/ '
+' /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ '
+' /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ '
+' / / / / / / /#/#/ / / / / / / /#/#/ / / / / / / '
+'#/#/#/ /#/#/#/#/#/#/#/#/ /#/#/#/#/#/#/#/#/ /#/#/#'
+'#/#/#/ /#/#/#/#/#/#/#/#/ /#/#/#/#/#/#/#/#/ /#/#/#'
+' / / / / / /m/#/#/ / / / / / / /#/#/ / / / / / / '
+' /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ '
+' /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ '
+' / / /#/ / / / / / / / /#/ / / / / / / / /#/ / / '
+' /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ '
+' /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ '
+' / / / / / / /#/#/ / / / / / / /#/#/ / / / / / / '
+'#/#/#/ /#/#/#/#/#/#/#/#/ /#/#/#/#/#/#/#/#/ /#/#/#'
+'#/#/#/ /#/#/#/#/#/#/#/#/ /#/#/#/#/#/#/#/#/ /#/#/#'
+' / / / / / / /#/#/ / / /m/ / / /#/#/ / / / / / / '
+' /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ '
+' /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ '
+' /#/#/ / / / / / / / / /#/ / / / / / / / / /#/#/ '
+' / / /#/#/#/ /#/#/ /#/#/ /#/#/ /#/#/ /#/#/#/ / / '
+' /#/ /#/#/#/ /#/#/ /#/#/ /#/#/ /#/#/ /#/#/#/ /#/ '
+' / / / / / / /#/#/ / / / / / / /#/#/ / / / / / / '
+
+Puzzle92-155:
+AUK
+BAN
+BOP
+DIP
+EGG
+FIB
+FOE
+GUN
+NUB
+OWL
+ROB
+SEA
+AEON
+ANTI
+AUNT
+CHIC
+COIR
+FINO
+IBEX
+KILO
+NEEP
+OINK
+RAGU
+REIN
+ROAR
+ROTA
+SALT
+UNIT
+ANIMATE
+AUSTERE
+CONCORD
+CONFESS
+CORACLE
+EPITHET
+ERRATIC
+ETHICAL
+EXCLUDE
+EXTREME
+HEELTAP
+KINSHIP
+LANYARD
+MADNESS
+MOBSTER
+NERVOUS
+NUCLEUS
+NURTURE
+OCEANIC
+OREGANO
+OSMOSIS
+PARTIAL
+RECTIFY
+REGROUP
+REREDOS
+SCALPEL
+SCANDAL
+SCEPTIC
+SKYLARK
+STAMINA
+STREAKY
+STRETCH
+SUNDIAL
+TENABLE
+VENISON
+VERANDA
+BACHELOR
+HANDRAIL
+RHYTHMIC
+TITANIUM
+INTERVIEW
+NOSTALGIC
+OUTRIGGER
+QUIESCENT
+QUOTIDIAN
+RACONTEUR
+SYMMETRIC
+WALLPAPER
+
+Puzzle92-155_frame:
+' / / / / / / /#/#/ / / / / / / /#/#/ / / / / / / '
+' /#/ /#/#/#/ /#/#/ /#/#/ /#/#/ /#/#/ /#/#/#/ /#/ '
+' / / /#/#/#/ /#/#/ /#/#/ /#/#/ /#/#/ /#/#/#/ / / '
+' /#/#/ / / / / /c/ / / /#/ / / / / / / / / /#/#/ '
+' /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ '
+' /#/#/ /#/#/ / / / /#/#/ /#/#/ / / / /#/#/ /#/#/ '
+' / / / / / / /#/#/ / / / / / / /#/#/ / / / / / / '
+'#/#/#/ /#/ /#/#/#/#/ /#/ /#/ /#/#/#/#/ /#/ /#/#/#'
+'#/#/#/ /#/ /#/#/#/#/ /#/ /#/ /#/#/#/#/ /#/ /#/#/#'
+' / / / / / / /#/#/ / / / / / / /#/#/ / / / / / / '
+' /#/#/ /#/#/ / / / /#/#/ /#/#/ / / / /#/#/ /#/#/ '
+' /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ '
+' / / /#/ / / / / / / / /#/ / / / / / / / /#/ / / '
+' /#/#/ /#/#/ /#/#/c/#/#/ /#/#/ /#/#/ /#/#/ /#/#/ '
+' /#/#/ /#/#/ / / / /#/#/ /#/#/ / / / /#/#/ /#/#/ '
+' / / / / / / /#/#/ / / / / / / /#/#/ / / / / / / '
+'#/#/#/ /#/ /#/#/#/#/ /#/ /#/ /#/#/#/#/ /#/ /#/#/#'
+'#/#/#/ /#/ /#/#/#/#/ /#/ /#/ /#/#/#/#/ /#/ /#/#/#'
+' / / / / / / /#/#/ / / / / / / /#/#/ / / / / / / '
+' /#/#/ /#/#/ / / / /#/#/ /#/#/ / / / /#/#/ /#/#/ '
+' /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ '
+' /#/#/ / / / / / / / / /#/ / / / / / / / / /#/#/ '
+' / / /#/#/#/ /#/#/ /#/#/ /#/#/ /#/#/ /#/#/#/ / / '
+' /#/ /#/#/#/ /#/#/ /#/#/ /#/#/ /#/#/ /#/#/#/ /#/ '
+' / / / / / / /#/#/c/ / / / / / /#/#/ / / / / / / '
+
+Puzzle93-121:
+AUK
+DEW
+DOC
+FAX
+FIB
+KEG
+PAW
+TIP
+VAN
+WRY
+YAK
+YEN
+BEGONIA
+CHAOTIC
+CITIZEN
+CONFORM
+COWSLIP
+CRUNCHY
+DIAGRAM
+EMPOWER
+EPITAPH
+FREESIA
+GRANDMA
+HAIRPIN
+HAWKISH
+HEADWAY
+IDYLLIC
+INVEIGH
+KNOCKER
+LEGROOM
+LEMMING
+MASCARA
+MIDSHIP
+MUDBANK
+NETWORK
+NIGHTIE
+NOSTRUM
+NOXIOUS
+ORCHARD
+OUTFLOW
+PEEVISH
+PLASTIC
+REPROOF
+RHUBARB
+SKYLARK
+VAMPISH
+VEHICLE
+WOLFRAM
+ЕРІТАРН
+BOGEYMAN
+ONCOMING
+SNOWDROP
+SUNSHINE
+DIFFERENT
+EPISCOPAL
+GALLIVANT
+INTERSECT
+RADICCHIO
+REFRESHER
+SACRIFICE
+TELEPATHY
+
+Puzzle93-121_frame:
+' / / / / / / /#/#/ / / / / / / /#/#/ / / / / / / '
+' /#/ /#/#/#/ /#/#/ /#/#/ /#/#/ /#/#/ /#/#/#/ /#/ '
+' / / /#/#/#/ /#/#/ /#/#/ /#/#/ /#/#/ /#/#/#/ / / '
+' /#/#/ / / / / / / / / /#/ / / / / / / / / /#/#/ '
+' /#/#/ /#/#/p/#/#/ /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ '
+' /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ '
+' / / / / / / /#/#/ / / / / / / /#/#/ / / / / / / '
+'#/#/#/ /#/#/#/#/#/#/#/#/ /#/#/#/#/#/#/#/#/ /#/#/#'
+'#/#/#/ /#/#/#/#/#/#/#/#/ /#/#/#/#/#/#/#/#/ /#/#/#'
+' / / / / / / /#/#/ / / / / / / /#/#/ / / / / / / '
+' /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ '
+' /#/#/ /#/#/p/#/#/ /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ '
+' / / /#/ / / / / / / / /#/ / / / / / / / /#/ / / '
+' /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ '
+' /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ '
+' / / / / / / /#/#/ / / / / / / /#/#/ / / / / / / '
+'#/#/#/ /#/#/#/#/#/#/#/#/ /#/#/#/#/#/#/#/#/ /#/#/#'
+'#/#/#/ /#/#/#/#/#/#/#/#/ /#/#/#/#/#/#/#/#/ /#/#/#'
+' / / / / / / /#/#/ / / / / / / /#/#/ / / / / / / '
+' /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ '
+' /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ '
+' /#/#/ / / / / / / / / /#/ / / / / / / / / /#/#/ '
+' / / /#/#/#/ /#/#/ /#/#/ /#/#/ /#/#/ /#/#/#/ / / '
+' /#/ /#/#/#/ /#/#/ /#/#/ /#/#/p/#/#/ /#/#/#/ /#/ '
+' / / / / / / /#/#/ / / / / / / /#/#/ / / / / / / '
+
+Puzzle94-26:
+ACE
+ADO
+AMP
+ASP
+BED
+BIG
+FOE
+GAD
+GUM
+ITS
+KEY
+LAD
+OAF
+OHM
+WAY
+ABET
+BASE
+DOOM
+EXAM
+HAIR
+KISS
+NERD
+OMEN
+ORCA
+ORYX
+OVAL
+POLO
+ROPE
+SEEK
+SPOT
+TIER
+TROY
+UPON
+WORD
+AMUSE
+BLURB
+DOGGO
+EPOXY
+GAMUT
+ISSUE
+MORAY
+OFFAL
+OUTER
+RELIC
+STARE
+XEROX
+YIELD
+AGOUTI
+COUGAR
+DABBLE
+IRONIC
+LITTER
+OILCAN
+PAELLA
+RELIEF
+SAMPAN
+SOCIAL
+SOFTEN
+BULLISH
+NEUTRAL
+NOTABLE
+STATERO
+TAPROOT
+ASSEMBLY
+BOOKCASE
+DIABETES
+EMIGRATE
+MONOXIDE
+MULTIPLEX
+SOPHOMORE
+STATEROOM
+
+Puzzle94-26_frame:
+' / / /#/ /#/ /#/#/#/#/ / / / / / / / /#/ '
+' /#/#/ / / / / / / / / /#/ /#/#/ /#/ /#/ '
+' /#/#/#/ /#/ /#/#/ /#/ /#/ / / / / / /#/ '
+'d/o/g/g/o/#/#/ /#/ /#/#/#/ /#/#/ /#/ / / '
+'#/ /#/ /#/ /#/ / / / / /#/#/ / / /#/ /#/#'
+' / / / /#/ /#/ /#/ /#/ /#/#/ /#/#/ / / / '
+'#/ /#/#/#/ / / / /#/ / / / / / / /#/ /#/ '
+'#/#/ / / / /#/ /#/#/#/ /#/ /#/#/#/#/ /#/ '
+'#/#/#/ /#/ /#/ /#/#/#/#/#/ / / /#/ /#/#/ '
+'#/ / / / / / / /#/#/#/#/#/ /#/ / / / / / '
+'#/#/#/ /#/#/#/ /#/#/#/#/#/ /#/ /#/ /#/ /#'
+'#/ / / / / / /#/#/#/#/#/#/ /#/ / / /#/ /#'
+'#/#/#/#/ /#/#/ /#/#/#/#/#/#/#/ /#/ /#/#/#'
+'#/ /#/#/ /#/ / / /#/ /#/ / / / / / / / / '
+' / / / / / /#/ / / / / /#/ /#/ /#/#/ /#/ '
+'#/ /#/#/ / / / / /#/ /#/#/ /#/ / / / / / '
+' / / /#/ / / / /#/ / / / / /#/#/#/#/ /#/ '
+' /#/ /#/ /#/ /#/#/#/ /#/ /#/ /#/#/ / / / '
+' / / / /#/ / / / / / /#/ / / / /#/ /#/#/ '
+' /#/ /#/#/#/ /#/#/ /#/#/ /#/ /#/#/ /#/#/ '
+'#/#/ /#/ / / / / / / / / /#/ / / / / / / '
+
+Puzzle95-78:
+APP
+COG
+EAU
+GAG
+GUM
+LEA
+PAY
+REF
+SAD
+TUG
+UNI
+YEN
+ABDOMEN
+ADVISER
+AMMONIA
+ANAEMIC
+ANTACID
+ARDUOUS
+ASSUAGE
+ATTEMPT
+CHATEAU
+CHERISH
+CHUFFED
+CRUSADE
+CUTBACK
+DISCERN
+ENGAGED
+EXPOUND
+FLYLEAF
+FREIGHT
+FUCHSIA
+HAUTBOY
+INTERIM
+JACUZZI
+JETFOIL
+KILLJOY
+LAUNDER
+LEGROOM
+NUNNERY
+PARTIAL
+PIONEER
+RESCIND
+ROISTER
+SORCERY
+STEROID
+TETANUS
+TOPSPIN
+UNAIDED
+BOOKABLE
+PUTATIVE
+SOLITUDE
+TRIMARAN
+CACOPHONY
+EPICUREAN
+FOODSTUFF
+FURNITURE
+INCAPABLE
+MORTALITY
+OFFERTORY
+OVERRATED
+
+Puzzle95-78_frame:
+' / / / / / / /#/#/ / / / / / / /#/#/ / / / / / / '
+' /#/ /#/#/#/ /#/#/ /#/#/ /#/#/ /#/#/ /#/#/#/ /#/ '
+' / / /#/#/#/ /#/#/ /#/#/ /#/#/ /#/#/ /#/#/#/ / / '
+' /#/#/ / / / / / / / / /#/ / / / / / / / / /#/#/ '
+' /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ '
+' /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ '
+' / / / / / / /#/#/ / / / / / / /#/#/ / / / /e/ / '
+'#/#/#/ /#/#/#/#/#/#/#/#/ /#/#/#/#/#/#/#/#/ /#/#/#'
+'#/#/#/ /#/#/#/#/#/#/#/#/ /#/#/#/#/#/#/#/#/ /#/#/#'
+' / / / /e/ / /#/#/ / / / / / / /#/#/ / / / / / / '
+' /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ '
+' /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ '
+' / / /#/ / / / / / / / /#/ / / / / / / / /#/ / / '
+' /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ '
+' /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ '
+' / / / / / / /#/#/ / / / / / / /#/#/ / / / / / / '
+'#/#/#/ /#/#/#/#/#/#/#/#/ /#/#/#/#/#/#/#/#/ /#/#/#'
+'#/#/#/ /#/#/#/#/#/#/#/#/ /#/#/#/#/#/#/#/#/ /#/#/#'
+' / / / / / / /#/#/ / / / / / / /#/#/ / / / / / / '
+' /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ '
+' /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ /#/#/ '
+' /#/#/ / / / / / / / / /#/ / / / / / / / / /#/#/ '
+' / / /#/#/#/ /#/#/ /#/#/ /#/#/ /#/#/ /#/#/#/ / / '
+' /#/ /#/#/#/ /#/#/ /#/#/e/#/#/ /#/#/ /#/#/#/ /#/ '
+' / / / / / / /#/#/ / / / / / / /#/#/ / / / / / / '
+
+Puzzle96-95:
+APE
+COT
+DAY
+DIP
+EMU
+JUS
+PLY
+REF
+RIP
+ROC
+STY
+TOR
+TUG
+TWO
+UNI
+BUOY
+DRUG
+FLUX
+GRAN
+KNOT
+LASS
+MEMO
+MISO
+NOUN
+PAPA
+SAND
+SOFA
+TAKE
+TEEN
+TOUR
+UNIT
+WEIR
+WHOM
+YEAR
+ADOPT
+AFFIX
+AGLOW
+DWELL
+GUSTO
+IDYLL
+OUTDO
+RIDGE
+ROSIN
+SONIC
+SPLIT
+WRING
+YOUTH
+ADMIRE
+ANGORA
+COTTON
+FITFUL
+GUFFAW
+HIJACK
+LESSEE
+LESSOR
+SEPTIC
+TOUPEE
+USEFUL
+ABSENCE
+BODHRAN
+SCOURGE
+THIRSTY
+DECORATE
+HEEDLESS
+REGROWTH
+STARLESS
+WAYFARER
+AFTERWORD
+LEYLANDII
+PLENTIFUL
+
+Puzzle96-95_frame:
+' / / /#/ /#/ /#/#/#/#/ / / / / / / / /#/ '
+' /#/#/ / / / / / / / / /#/ /#/#/ /#/ /#/ '
+' /#/#/#/ /#/ /#/#/ /#/ /#/ / / / / / /#/ '
+' / / / / /#/#/ /#/ /#/#/#/ /#/#/ /#/ / / '
+'#/ /#/ /#/ /#/ / / / / /#/#/ / / /#/ /#/#'
+' / / / /#/ /#/ /#/ /#/ /#/#/ /#/#/ / / / '
+'#/ /#/#/#/s/o/f/a/#/ / / / / / / /#/ /#/ '
+'#/#/ / / / /#/ /#/#/#/ /#/ /#/#/#/#/ /#/ '
+'#/#/#/ /#/ /#/ /#/#/#/#/#/ / / /#/ /#/#/ '
+'#/ / / / / / / /#/#/#/#/#/ /#/ / / / / / '
+'#/#/#/ /#/#/#/ /#/#/#/#/#/ /#/ /#/ /#/ /#'
+'#/ / / / / / /#/#/#/#/#/#/ /#/ / / /#/ /#'
+'#/#/#/#/ /#/#/ /#/#/#/#/#/#/#/ /#/ /#/#/#'
+'#/ /#/#/ /#/ / / /#/ /#/ / / / / / / / / '
+' / / / / / /#/ / / / / /#/ /#/ /#/#/ /#/ '
+'#/ /#/#/ / / / / /#/ /#/#/ /#/ / / / / / '
+' / / /#/ / / / /#/ / / / / /#/#/#/#/ /#/ '
+' /#/ /#/ /#/ /#/#/#/ /#/ /#/ /#/#/ / / / '
+' / / / /#/ / / / / / /#/ / / / /#/ /#/#/ '
+' /#/ /#/#/#/ /#/#/ /#/#/ /#/ /#/#/ /#/#/ '
+'#/#/ /#/ / / / / / / / / /#/ / / / / / / '

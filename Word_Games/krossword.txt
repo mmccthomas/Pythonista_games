@@ -3026,3 +3026,685 @@ Puzzle36_frame:
 ' / / / / / / / /f/ / /10/t'
 ' / / / / / / /11/ /a/ /e/ '
 ' / /12/ / / / / / / /13s/ / '
+
+Puzzle37:
+1
+GALA
+GIVER
+GLAMOUR
+GREYING
+2
+CARNAL
+CHORE
+CLIENTELE
+3
+PAR
+PEA
+PIE
+PIOUS
+PRY
+PUN
+4
+CALORIE
+CHARIOT
+COCKEREL
+COMPILE
+CUBICLE
+5
+SENTRY
+SET
+SIN
+SIR
+SOLAR
+SUN
+6
+FIERCE
+FLEETING
+FRIENDLY
+FRUGAL
+7
+SECOND
+SENNA
+STEAM
+8
+PAN
+PECAN
+PECULIAR
+PHARMACY
+POISE
+PRETENCE
+PRUNE 
+9
+GENERALLY
+GET
+GLACIER
+GLISTENED
+10
+ADO
+AGREE
+AND
+11
+EAR
+EMBARK
+EXCELLENT
+12
+GASPING
+GERM
+GLOBES
+GYMNAST
+
+Puzzle37_frame:
+' / / / / /1/ / / / / / / '
+' /2/ / / / / / / / / / / '
+' / / / / / / / / / /3/ / '
+' / / / / / /4c/o/m/p/i/l/e'
+' / /5/ / /u/ / / / / / / '
+' / / / /b/ / / / / / / /6'
+' / / /i/ /7/ / / / / / / '
+' / /c/ / / / / /8/ / / / '
+'9/l/ / / / / / / / / / / '
+'e/ / / / / / / / / / / / '
+' / / / / / / / / / / / / '
+' / /10/ / / / / / / / /11/ '
+' / / / / / /12/ / / / / / '
+
+Puzzle38:
+1
+DAY
+DONE
+DOUSE
+DOWNPOUR
+2
+NEBULA
+NEON
+NOTIONAL
+3
+WIN
+WOO
+WOW
+4
+LEAGUE
+LEER
+LOOP
+LUNCH
+5
+FELT
+FEW
+FINE
+FOB
+FOOTPLATE
+6
+ARCHANGEL
+ARGUE
+ATONE
+AUK
+7
+SIP
+SLEET
+SNOOTY
+SOB
+SOON
+8
+EGOIST
+ENAMOUR
+ENEMY
+9
+RAIL
+RANGE
+ROMP
+10
+HANDBELLS
+HER
+HIM
+HORNPIPE
+HOUSE
+11
+PIED
+PLECTRUM
+POLLARD
+POT
+12
+CANE
+CAR
+CLAIM
+CRY
+13
+BARITONE
+BILL
+BLARING
+BOAR
+BURETTE
+14
+ORRERY
+ORTHODOX
+OVER
+OVUM
+
+Puzzle38_frame:
+' / / / /1/ / / / / / / / '
+' / / / / / / / / /2/ / / '
+' / / / / /3/ / / / / / / '
+' / / / / / / / /4/ / / / '
+' / / /5/ / / / / / / / /6'
+' / / / / / / /7/ / / / / '
+'8/ / / / / / / / / / / / '
+' / / / / / / / / / /9/ / '
+' /10h/o/r/n/p/i/p/e/ / / / '
+' /o/ / / / / / / / / /11/ '
+' /u/ / /12/ / / / / / / / '
+' /s/ / / / /13/ / / / / / '
+' /e/ /14/ / / / / / / / / '
+
+Puzzle39:
+1
+FABLE
+FANTASY
+FARCE
+FICTION
+FOREWORD
+2
+BLUES
+BOA
+BOOR
+BUTTONHOLE
+BYE
+3
+PAL
+PEA
+PESO
+PIE
+POD
+POP
+PROCONSUL
+4
+SATSUMA
+SCAB
+SILAGE
+SNOW
+STODGE
+STOPGAP
+STYE
+5
+CASH
+CLIPPERS
+CRAVED
+CRU
+CYGNET
+6
+RAINDROPS
+RAP
+RESTORE
+RHODIUM
+7
+SELDOM
+SESAME
+SHEPHERD
+SIGH
+SPICY
+8
+BAG
+BEER
+BOOST
+9
+BEARD
+BEDROLLS
+BELIEF
+BETA
+BIN
+BURSAR
+10
+FLU
+FOE
+FOG
+FOOL
+11
+WAN
+WAPITI
+WEARY
+12
+SNEER
+SPA
+STEW
+SUMP
+13
+SIMPLE
+SMUGGLE
+SPOOL
+SUITE
+
+Puzzle39_frame:
+' / / / / /1/ / /e/ / / / '
+' / / / / / / /r/ / /2/ / '
+' / /3/ / / /o/ / / / / / '
+' / / / / /t/4/ / / / / / '
+' / / / /s/ / / / / / / / '
+' / / /e/ / / / / / / / /5'
+' / /6r/a/i/n/d/r/o/p/s/ / '
+'7/ / / / / / / /8/ / / / '
+' / / / / / / / / / / / / '
+' / / / / / / /9/ / / / / '
+' / /10/ / / / / / / / /11/ '
+' / / / / / / / /12/ / / / '
+' / / / / / /13/ / / / / / '
+
+Puzzle40:
+4
+13
+L
+4
+1
+CHIPOLATA
+CHIPS
+CHORIZO
+COCKTAIL
+COOK
+2
+RENEW
+RESIDUE
+RUT
+3
+PLEAD
+PLIE
+PSI
+4
+ACTOR
+AKIMBO
+ALARM
+AMAZING
+AMP
+ASH
+AVENUE
+AWL
+5
+SHADOWS
+STALK
+STEM
+SUET
+6
+BEZIQUE
+BIKE
+BIOLOGICAL
+BOO
+BOSS
+BREW
+BRIM
+7
+SILENT
+SLOWPOKE
+SMEARED
+SOZZLED
+SPLURGE
+SUM
+8
+FEZ
+FLECK
+FLEECE
+9
+FACE
+FAIR
+FED
+FIBRE
+10
+BALM
+BERET
+BOWL
+BREAD
+BULGE
+11
+BEAR
+BEE
+BELL
+BRAISE
+12
+PAL
+PEEL
+PET
+PEW
+13
+TALL
+TEA
+THREAD
+TRAILER
+TRIPOLI
+14
+SAGE
+SAMPLER
+SIZE
+SWAT
+
+Puzzle40_frame:
+' / / / / / / / /1/ / / / '
+'2/ / / / / / / / / / / /3'
+' / / / / /4/ / / / / / / '
+' /5/ / / / / / / /6b/ / / '
+' / / / / / / / /i/e/ / / '
+' / / / / / /7/o/ /z/ / / '
+' / / / / / /l/ / /i/ / / '
+' / / / / /o/ / / /q/ /8/ '
+' / /9/ /g/ / / /10/u/ / / '
+'11/ / /i/ / / / / /e/ / / '
+' / /c/ / / / / / / / / /12'
+' /a/ / / / / / / / / / / '
+'l/ / /13/ / / / / /14/ / / '
+
+Puzzle41:
+1
+FEATHER
+FLAPJACK
+FOR
+FROWNED
+2
+DELTA
+DEN
+DINE
+3
+PIER
+PILLOW
+PREJUDICE
+PROGRESS
+PUTT
+4
+SAGA
+SEE
+SIT
+STIRRUPS
+SURREAL
+5
+EDIT
+ELABORATE
+ELM
+EVEN
+6
+COAL
+COMA
+CRIED
+7
+MACADAMIA
+MAJOR
+MALARIA
+MIGRATE
+MUSIC
+8
+SET
+SKATING
+SUE
+9
+SCAMP
+SCORER
+SOFA
+10
+ACCEPTED
+ANTE
+APPEAR
+AUNT
+11
+BACKSTAGE
+BASIC
+BESPOKE
+BUN
+BYE
+12
+PECAN
+POTASSIUM
+PREVAILED
+13
+ADHERE
+ALTITUDE
+ASK
+ASTRONAUT
+
+Puzzle41_frame:
+' / / / / / /1/ /a/ / / / '
+' / /2/ / / / / /i/3/ / / '
+' / / / / / / / /r/ / /4/ '
+' / / / / / / / /a/ / / / '
+'5/ / / /6/ / / /l/ / / / '
+' / / / / / / / /a/ / / / '
+' / / / / / / / /7m/ / / / '
+' / / / / / / /i/ / / / / '
+' / / / / / /g/8/ / / / / '
+' / /9/ / /r/ / / / / / /10'
+' / / / /a/ / / / / /11/ / '
+' /12/ /t/ / / / / / / / / '
+' / /e/ / /13/ / / / / / / '
+
+Puzzle42:
+1
+DECEMBER
+DEER
+DOLLAR
+DUNE
+DYE
+2
+TALL
+TEAM
+TEAR
+TEE
+TENNIS
+THEIR
+TWITTER
+3
+CEDAR
+CHAMELEON
+CITE
+COMMIT
+4
+MAR
+MEDAL
+MENDACITY
+MID
+5
+WAN
+WARDEN
+WHALER
+6
+GAD
+GLITZY
+GLOWER
+7
+HABITAT
+HAIRDO
+HAREM
+HEROINE
+8
+FARRIER
+FRACAS
+FREEWAY
+9
+EARL
+EKE
+ELSEWHERE
+ESCAPADE
+ETCH
+10
+SAND
+SEA
+SEE
+SCAN
+SPEED
+11
+LAG
+LAP
+LICENCE
+LID
+LOAM
+LORE
+12
+AERATED
+ANECDOTE
+ANON
+13
+UNIT
+UPSTAGE
+USE
+
+Puzzle42_frame:
+' / / /1/ / / / / / / / / '
+' / / / / / / / / / / / / '
+' / / / / / / / / / / / / '
+' / / / / / / / /2/ / / / '
+'3/ / / / / / / / / /4/ / '
+' / / / / / / / / / / / /5'
+' / / / /6/ / / / / / / / '
+' /7/ / / / / / / / / /8/ '
+' / /e/d/a/p/a/c/s/9e/ / / '
+' / / / / / /10/ / / /t/ / '
+' / / /11/ / / / / / / /c/ '
+' / / / / / / /12/ / / / /h'
+' / / / / / / / / / /13/ / '
+
+Puzzle43:
+1
+PATRONAGE
+PIECE
+PLANK
+PRESCRIBE
+PRIESTESS
+2
+PIE
+PORTRAITS
+POSTCARD
+PUSH
+3
+BACON
+BARRISTER
+BETA
+BIT
+BOAR
+BUNGALOW
+BUS
+4
+LABOURED
+LEE
+LILY
+LOANS
+5
+CALMEST
+CARROT
+CHURN
+CIGAR
+CLOSURE
+6
+TESTED
+TOO
+TWELFTH
+7
+ACCURATE
+AIR
+ARDENT
+ASTERISK
+AWN
+8
+SAY
+SNIPERS
+SOLVE
+9
+HANG
+HEAD
+HERON
+HUMOROUS
+HYBRID
+10
+FAT
+FIR
+FLEDGE
+FOE
+11
+CASINO
+CLUE
+COME
+12
+MIST
+MODULAR
+MONITORED
+MOOD
+MULBERRY
+
+Puzzle43_frame:
+' / / / / / / / /1/ / / / '
+' / / /2/ / / / / / / / / '
+' / / / / / / / / / / / / '
+' / / / / / / / / / /3/ / '
+' / / / / / / / / / / / / '
+' /4/ / / / / / / / / /n/ '
+' / / / / /5/ / / / /o/ / '
+'6/ / / / / / / / /r/ / /7'
+' / /8/ / / / / /e/ / / / '
+'s/u/o/r/o/m/u/9h/ / / / / '
+' / / / / / / / / / /10/ / '
+' / / /11/ / / / / / / / / '
+' / / / / / / / / /12/ / / '
+
+Puzzle44:
+1
+CARP
+CONGEREEL
+CRAB
+CRYSTALLINE
+CUTTLEFISH
+2
+SHELLAC
+SIGNIFICANT
+SNITCH
+SPINACH
+STORAGE
+3
+PANACEA
+POMP
+PURIFY
+4
+CONCORDE
+CRY
+CYAN
+5
+EDAM
+ELI
+ERNE
+6
+CARNIVAL
+CICADA
+COPY
+7
+BAAED
+BESTIR
+BUCKLED
+BUFFALO
+8
+CEASE
+CHAFFINCH
+CLASSICAL
+CODES
+CUCURBIT
+9
+SAYS
+SIZE
+STEAKS
+10
+RATIONALE
+RELUCTANT
+ROSE
+RUN
+RYE
+11
+WANLY
+WEEDS
+WILTSHIRE
+12
+PEAL
+PEDAL
+PRETENCES
+
+Puzzle44_frame:
+' / / / / / / / / /1/ / / '
+' / / / / / /2/ / / / / / '
+' / /3/ / / / / / / /4/ / '
+' / / / / / / / / / / / / '
+' / / / / / / / /5/ / / / '
+' / / / / / / / / / / / /6'
+' / / / /7/ / / / / / / / '
+' / / / / / / / / / / / / '
+'8/ / / / / / / / / / / / '
+' / / /9s/ / / / / / / / / '
+' /10/a/ /i/ / / / / / / / '
+' /y/ / / /z/ / / / / /11/ '
+'s/ / / / / /e/ /12/ / / / '

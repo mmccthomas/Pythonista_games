@@ -245,12 +245,12 @@ G FER U S G ALT
 E O AWRESLOW.  
 LYG PO.  E ECLA
 
-394-16:
+394_16:
 ''
 7, 5
 2602040634201229132803230722171100300114050933150821161910312732252418
 
-394-16_frame:
+394_16_frame:
 TOROETT SPSYTEE
   UD. IDE E R V
 FAMEVED CKEFIDE
@@ -273,7 +273,7 @@ T PI EE BM IRCH
 RGECANIFLEPLE A
 E RT OR E L SAR
 
-394-16_text:
+394_16_text:
 1 Serve at a table • Expensive or
   inclined • Curved feature of a
   building
@@ -311,12 +311,12 @@ E RT OR E L SAR
 21 Antlered animals • Made a mistake •
    Have to have
 
-394-98:
+394_98:
 ''
 7, 5
 2116190126312005022906173018071003241204142511230034132815220832332709
 
-394-98_frame:
+394_98_frame:
 REDSTA O TEDONA
  F HE ART OUN Z
 AINENTI OINGADE
@@ -339,7 +339,7 @@ C AI FEAT A  E
 OWSABY GUNSHERU
 NAE R ION T L N
   
-394-98_text:
+394_98_text:
 1 Commonplace or obvious
   statement • Social rank
 2 Theatrical sense of style
@@ -1420,12 +1420,12 @@ a restaurant
 'a/g/o/o/#/e/s/t/i/n/#/e/#/w/#'
 'd/#/g/w/a/s/#/u/#/g/e/d/l/l/e'
 
-486-115:
+486_115:
 ''
 7, 5
 3204010009341920270725332823140510032213152917063108262124023011161218
 
-486-115_text:
+486_115_text:
 ACROSS
 1 Inflamed ulcer • Poisonous plant of
   the nightshade family
@@ -1458,7 +1458,7 @@ ACROSS
 21 Now at a lower price • Device worn
     to block out sound
     
-486-115_frame:
+486_115_frame:
 ENNS HNATEHACES
  O TOET R T  K 
 AREY RHAYYFOEEF
@@ -1481,12 +1481,12 @@ B GEINABSENTEVE
 E E. GC US ES D
 REDE. C BT LSKI
 
-486-4:
+486_4:
 ''
 7, 5
 1921180214251001172713340515242806030931263020070016112204123332082329
 
-486-4_text:
+486_4_text:
 1 Female tender of flocks?
 2 Parrot-fashion method of earning •
   Breathe heavily
@@ -1521,7 +1521,7 @@ REDE. C BT LSKI
    fluorescent lights
 21 In low spirits
 
-486-4_frame:
+486_4_frame:
  V  D DES E  PE
 SE BETR PT F L 
 ERBA EATE Y PUM
@@ -1544,12 +1544,12 @@ K C LUS EI. EON
 TON. RT AMARWAN
 E TRAGOWNE D. C
 
-486-74:
+486_74:
 ''
 7, 5
 1034301725141309112118331626061519082231242703280405000201321223202907
 
-486-74_text:
+486_74_text:
 1 Belly button
 2 Scald, scorch or singe • Eye droplet
 3 Burp
@@ -1577,7 +1577,7 @@ E TRAGOWNE D. C
 20 Inevitable destiny • Drove too fast
 21 Most devious
 
-486-74_frame:
+486_74_frame:
 CATPAM Y RIN. O
 HULEDEK C D BUT
 IKEVOR W ILDA O
@@ -1600,12 +1600,12 @@ ILIHENPER. GUMB
  I     L E UN U
 ELCRUMTEXV MF B
 
-486-84:
+486_84:
 ''
 7, 5
 123
 
-486-84_text:
+486_84_text:
 1 Strong, bright, deep red colour •
   With great speed
 2 Ostrich-like Australian bird
@@ -1643,7 +1643,7 @@ ELCRUMTEXV MF B
 21 Worked out, concluded •
    Fingerless gloves
    
-486-84_frame:
+486_84_frame:
  S EATI AANC. G
 LEA G L G I ASE
   BDOGA OUCE T 
@@ -1666,12 +1666,12 @@ E EAVENGRLEODER
 RE T N H A S WI
 M UENSITTVOTKED
 
-486-126:
+486_126:
 ''
 7, 5
 123
 
-486-126_text:
+486_126_text:
 1 Goes for a swim • Leisurely stroll
 2 Disconnect or loosen
 3 Sheet of canvas on a mast •
@@ -1705,7 +1705,7 @@ M UENSITTVOTKED
 21 Highly seasoned stew of meat and
    vegetables • Country house
 
-486-126_frame:
+486_126_frame:
  SI. ALESBLERAV
 WASTEDI. E N L 
  DIR ACOKT CUGU
@@ -1728,12 +1728,12 @@ A IL LALPG CBAT
 CONETAS IJOYE O
 T CD CSINA GL S
 
-486-140:
+486_140:
 ''
 7, 5
 123
 
-486-140_text:
+486_140_text:
 1 Normal, ordinary • Rib, taunt
 2 Noble rank • Mound of stones, built
   as a memorial • Clump (of fur)
@@ -1769,7 +1769,7 @@ T CD CSINA GL S
    Light toboggan
 21 Attempt again • Royal domain
 
-486-140_frame:
+486_140_frame:
 OMIAR UGLG B W 
 I NRATN AUN RED
 CHE V LINT T RU
@@ -2240,12 +2240,12 @@ D PU EL D.
 20 Taken away
 21 Pared • Lethal, fatal
 
-663-14:
+663_14:
 ''
 9, 4
 2118191320140828173012330722022932062624230427310903251110340501001615
 
-663-14_frame:
+663_14_frame:
 TISHRIVALD. 
 E A R E A SP
 R ITHENUNF I
@@ -2274,7 +2274,7 @@ L I. O. FSWI
 DLE G RCH.  
  A D ST E.  
 
-663-14_text:
+663_14_text:
 1 Walked in shallow water • Pole jumper
 3 Hot chocolate drink • Drew back
 5 Worship of an inanimate object • Ambience
@@ -2290,12 +2290,12 @@ DLE G RCH.
 21 Motorcyclist's clothing material • Naive young
    woman
 
-663-71:
+663_71:
 ''
 9, 4
 0234182117322508031231291607092015010005302433042827112619131023062214
 
-663-71_frame:
+663_71_frame:
 ARR G OPIEAD
 R. ARE O. GL
 GAL E BREYPE
@@ -2324,7 +2324,7 @@ A E WHE LP E
 QUEU XS S.  
  S NAPAM.   
             
-663-71_text:
+663_71_text:
 1 Drug of which laudanum is a derivative •
   Moreover
 2 More crafty
@@ -2350,12 +2350,12 @@ QUEU XS S.
 20 Large showy flower
 21 Did up (shoes) • Creature, animal
 
-663-91:
+663_91:
 ''
 9, 4
 1807161924081221132909173104222503301034202300330528111401062632271502
 
-663-91_text:
+663_91_text:
 2 Mirth • Small amount
 4 Buddhist temple • Less busy
 6 Self-analysing
@@ -2370,7 +2370,7 @@ QUEU XS S.
 18 Canny, astute • Wallet for papers
 20 Musical term meaning 'lively' • Reviling
 
-663-91_frame:
+663_91_frame:
  U ATE A U C
 ESTM LINGSIO
  U OLD T U D
@@ -2399,12 +2399,12 @@ S AT T O.
 EGRONEFUL.  
 R D.   N.   
 
-693-107:
+693_107:
 ''
 9, 4
 2613202411150132002833170518030408342931071602141019233009272221120625
 
-693-107_text:
+693_107_text:
 1 Fell down
 2 Angel's nimbus • Ongoing pain
 3 Person subject to local taxes
@@ -2430,7 +2430,7 @@ R D.   N.
    Branch of the military services
 21 Chief church of a diocese
 
-693-107_frame:
+693_107_frame:
 L KD HMASD R
 ED. RE I OSE
  AFTA GRIU N
@@ -2459,12 +2459,12 @@ OOTSTR I AFE
 SCUASLACK.  
 I NE E H.   
 
-641-107:
+641_107:
 ''
 9, 4
 2908272103153000061333201016311817142509040134022824321122261223190507
 
-641-107_text:
+641_107_text:
 1 Smallest in amount • Esoteric, mystic
 3 Informed • Rink sport
 5 Give in
@@ -2486,7 +2486,7 @@ I NE E H.
    used for hunting
 21 Mat, snarl • Dogged
 
-641-107_frame:
+641_107_frame:
  L.  HU. LT 
 RENARIDIV A 
  I   PE. ING
@@ -2736,173 +2736,12 @@ NCI C. D   N
 LDEEASR.    
  S. L N. NNN
  
-664-14:
-''
-9, 4
-0513042023180833031934122811022229000731270924162621301506321425100117
-
-664-14_text:
-2 Process that ends with giving birth
-4 Felines' favourite plant • Any of two
-6 Give one's attention to (a problem) •
-  Clergyman's square cap
-8 French diacritic • Toasted fruity bun
-10 Gin flavouring • Witch's magic
-   formula • Midge
-12 Joke • Hot but damp • Aspiring to be creative
-14 Variety of Indian bread •
-   Male deliverer of letters
-16 Complaining • Husky (voice)
-18 Person's entire assets, as mentioned in a will •
-   Double-breasted jacket
-20 Devoid of feelings
-
-664-14_frame:
-PEL Y  I ITH
- L LESAKE E 
-UMI D. K IRE
-D C. UHROL G
-REA. P V    
-I M. LEEFD A
-TNIO. D U I 
- M PATIONEAC
-RES G T T. O
- A. C.  TG T
-ILLROC. E.  
-R.  R   PE R
-  II.  CAER 
-OSTS.   NS. 
- U T. ADDTTA
- L GRISLOI. 
-TIO. N.  N. 
- S. ESJESF. 
-S N T  R  T 
-I PMOTMANCHA
-N U R. I  E 
-C EE SPINNAT
-A T.   T.   
-L ET HTATRTY
-ATYP E W    
-G.    CED.  
-ER S B L.   
-
-664-71:
-''
-9, 4
-1322251510053017342919270628113101320702201621120309001814230426083324
-
-664-71_text:
-1 Spanish wine store • Make a raised design
-3 Dyestuff • Disconnected from
-  a computer network
-5 Delineating
-6 Bloodsucking arachnid • Watched
-7 Map book
-8 Roman number XI • Assent
-9 Corkscrew-shaped tool for boring
-  holes in wood
-10 Chain of undersea rocks • Loud sound
-11 Company's emblem • Do as instructed
-12 Food-carrying board • Nobleman ranked
-   between a marquess and a viscount
-13 Bone encasing the brain
-14 Hot-tasting dish • Professional
-15 Serve food
-16 Tibetan Buddhist priest • Beach substance
-17 Small but powerful car
-19 Connection, collaboration •
-   Overturn (a boat)
-21 Oleaginous • Tax refund
-
-664-71_frame:
-A. F LANGR A
-SUPLOG. UERT
-P IY EARLN E
-LIA N TLAI B
- N. D  O BEY
- GRTICUGEB E
-N CLAMSS U E
-    I. E CUR
-Y R D INEC E
-L.  BO. SMBO
-EXP H INIU B
-R. PIGR EFFL
-  S E. U H R
-LLITCHERMELE
-  C O  E O P
-I XKULDEGAND
-CHI R A E O 
-A OATEMEN Z 
-IZEA EISO. A
- L    R UVEN
-TE T OEAS. A
-S.  A A IREE
-CON T SKEE. 
-R. YEDK. TRA
- Y APST I.  
-O OT TING.  
- N EBA. E.  
- 
-664-91:
-''
-9, 4
-3208021500180422090703272123102617251105060134133129192024141230283316
-
-664-91_text:
-2 Untaught
-3 Tidings • Wander at random
-4 Not called for
-5 Gather • Swaying gait
-6 Name for the heather genus of plants
-7 Washed • Royal household servant
-9 Pancake Day fruit • Tot up • Not at any time
-11 Sending a message by phone •
-   Mopped up with a swab
-13 Lost pet • Free, disencumber •
-   Each of a number
-15 Fine plaster used architecturally •
-   Disease, ailment
-16 Hooded and padded raincoat
-17 Social circle • Crackling sound on the radio
-18 Science of reasoned thinking
-19 Rudely stare at • Small toboggan
-20 Caretaker
-
-664-91_frame:
-   AY. D BAT
-   R. UIT C 
-OVECCO S LEM
-T UA USTR I 
-AINGED U DLE
-C EU DSTU L 
-P AE OMAN O 
-INTWAD G PON
-S TA RVER S 
-OGL EV O T A
-     ATICIVE
-   MAL N D R
-UGE O  M H P
-   TINOBTIEU
-    S. R T L
-ARK N NDUYEO
- O  E. A.  M
-OGIADDRIC NE
-A UN OO IHED
-STAG STEXI. 
-C BE EU EON 
- L  T E EERY
-CIEMILCON E 
- O. N T TADY
-   A LRID.  
-   RGE M    
-NEWA S B.   
-
-487-4:
+487_4:
 ''
 7, 5
 3300292611222101300210180532152306310917273419250703142024280412131608
 
-487-4_frame:
+487_4_frame:
 CALSAYC M N STA
  BIT EACELAYE R
 LIDAGL R O ERAN
@@ -2925,7 +2764,7 @@ EMBEMPCABE I P
 MBRVISE PU CC S
 E I C  SLSTOARE
 
-487-4_text:
+487_4_text:
 1 Relating to the Treasury •
   Promotional announcement
 2 Odd, unusual
@@ -2955,12 +2794,12 @@ E I C  SLSTOARE
 20 Gold bars
 21 Haphazard • Edict, judicial decision
 
-487-83:
+487_83:
 ''
 7, 5
 1824262708320729051134061621101320001525033014331223310904021719222801
 
-487-83_frame:
+487_83_frame:
 IREATOE EDRESE 
 D RN NASS Y L M
 EARTEDS PTEPAGU
@@ -2983,7 +2822,7 @@ AM  RER I LEDEN
  BEL SCAVIA  W 
 EE ARCE E TAREL
 
-487-83_text:
+487_83_text:
 1 Simmer angrily • Drank in
   small mouthfuls
 2 Reveal, bring to light
@@ -3015,12 +2854,12 @@ EE ARCE E TAREL
 21 Pendant containing a picture •
    Thawed
    
-487-117:
+487_117:
 ''
 7,5
 0614300521172013191504253308290028022231112632092718123407030123241610
 
-487-117_frame:
+487_117_frame:
 P IT IRIPULE. T
 OILE N N B XE. 
 U MRIGINGBAPSOF
@@ -3043,7 +2882,7 @@ G MN Y.   I  D
 AGOILLFOOWANCLI
 D BS I D.    Y 
 
-487-117_text:
+487_117_text:
 1 Meal's last course • Great event which
   cannot be explained
 2 Since
@@ -3080,12 +2919,12 @@ D BS I D.    Y
 21 Ropes and chains holding up a ship's
    sails • Skinny and gaunt
 
-487-164:
+487_164:
 ''
 7, 5
 2906052732082211332330003415170419262018030702121025281614132101240931
 
-487-164_frame:
+487_164_frame:
   GI GENGA. KUD
 S IU E E IDO.  
 N CMEAOSEN WTRI
@@ -3108,7 +2947,7 @@ N I T  C ISSRAI
 ALMDITBEXCUM C 
 C.  C  R ENAHOS
 
-487-164_text:
+487_164_text:
 1 Mathematical diagram with
   rectangular blocks
 2 Drill • Species of wild goat
@@ -3135,11 +2974,173 @@ C.  C  R ENAHOS
    (a journalist's work)
 21 Wound like a stream
 
-665_14''
+664_14:
+''
+9, 4
+0513042023180833031934122811022229000731270924162621301506321425100117
+
+664_14_text:
+2 Process that ends with giving birth
+4 Felines' favourite plant • Any of two
+6 Give one's attention to (a problem) •
+  Clergyman's square cap
+8 French diacritic • Toasted fruity bun
+10 Gin flavouring • Witch's magic
+   formula • Midge
+12 Joke • Hot but damp • Aspiring to be creative
+14 Variety of Indian bread •
+   Male deliverer of letters
+16 Complaining • Husky (voice)
+18 Person's entire assets, as mentioned in a will •
+   Double_breasted jacket
+20 Devoid of feelings
+
+664-14_frame:
+PEL Y  I ITH
+ L LESAKE E 
+UMI D. K IRE
+D C. UHROL G
+REA. P V    
+I M. LEEFD A
+TNIO. D U I 
+ M PATIONEAC
+RES G T T. O
+ A. C.  TG T
+ILLROC. E.  
+R.  R   PE R
+  II.  CAER 
+OSTS.   NS. 
+ U T. ADDTTA
+ L GRISLOI. 
+TIO. N.  N. 
+ S. ESJESF. 
+S N T  R  T 
+I PMOTMANCHA
+N U R. I  E 
+C EE SPINNAT
+A T.   T.   
+L ET HTATRTY
+ATYP E W    
+G.    CED.  
+ER S B L.   
+
+664_71:
+''
+9, 4
+1322251510053017342919270628113101320702201621120309001814230426083324
+
+664_71_text:
+1 Spanish wine store • Make a raised design
+3 Dyestuff • Disconnected from
+  a computer network
+5 Delineating
+6 Bloodsucking arachnid • Watched
+7 Map book
+8 Roman number XI • Assent
+9 Corkscrew-shaped tool for boring
+  holes in wood
+10 Chain of undersea rocks • Loud sound
+11 Company's emblem • Do as instructed
+12 Food-carrying board • Nobleman ranked
+   between a marquess and a viscount
+13 Bone encasing the brain
+14 Hot-tasting dish • Professional
+15 Serve food
+16 Tibetan Buddhist priest • Beach substance
+17 Small but powerful car
+19 Connection, collaboration •
+   Overturn (a boat)
+21 Oleaginous • Tax refund
+
+664_71_frame:
+A. F LANGR A
+SUPLOG. UERT
+P IY EARLN E
+LIA N TLAI B
+ N. D  O BEY
+ GRTICUGEB E
+N CLAMSS U E
+    I. E CUR
+Y R D INEC E
+L.  BO. SMBO
+EXP H INIU B
+R. PIGR EFFL
+  S E. U H R
+LLITCHERMELE
+  C O  E O P
+I XKULDEGAND
+CHI R A E O 
+A OATEMEN Z 
+IZEA EISO. A
+ L    R UVEN
+TE T OEAS. A
+S.  A A IREE
+CON T SKEE. 
+R. YEDK. TRA
+ Y APST I.  
+O OT TING.  
+ N EBA. E.  
+ 
+664_91:
+''
+9, 4
+3208021500180422090703272123102617251105060134133129192024141230283316
+
+664_91_text:
+2 Untaught
+3 Tidings • Wander at random
+4 Not called for
+5 Gather • Swaying gait
+6 Name for the heather genus of plants
+7 Washed • Royal household servant
+9 Pancake Day fruit • Tot up • Not at any time
+11 Sending a message by phone •
+   Mopped up with a swab
+13 Lost pet • Free, disencumber •
+   Each of a number
+15 Fine plaster used architecturally •
+   Disease, ailment
+16 Hooded and padded raincoat
+17 Social circle • Crackling sound on the radio
+18 Science of reasoned thinking
+19 Rudely stare at • Small toboggan
+20 Caretaker
+
+664_91_frame:
+   AY. D BAT
+   R. UIT C 
+OVECCO S LEM
+T UA USTR I 
+AINGED U DLE
+C EU DSTU L 
+P AE OMAN O 
+INTWAD G PON
+S TA RVER S 
+OGL EV O T A
+     ATICIVE
+   MAL N D R
+UGE O  M H P
+   TINOBTIEU
+    S. R T L
+ARK N NDUYEO
+ O  E. A.  M
+OGIADDRIC NE
+A UN OO IHED
+STAG STEXI. 
+C BE EU EON 
+ L  T E EERY
+CIEMILCON E 
+ O. N T TADY
+   A LRID.  
+   RGE M    
+NEWA S B.   
+
+665_14
+''
 9, 4
 123
 
-665-14_text:
+665_14_text:
 1 Protein-rich vegetarian foodstuff • Picture
   from a negative • Sweet teatime food
 3 Sensitively
@@ -3162,12 +3163,41 @@ C.  C  R ENAHOS
 21 Egg on • Before the expected time •
    Spun thread
    
-665-71:
+665_71:
 ''
 9, 4
-123
+1612281322301723031924041100020114212518072729093215063405203308102631
 
-665-71_text:
+665_71_frame:
+NAVSTEE TAN 
+ VE U RSEMAG
+TORPAS T E O
+ARKE FE H R 
+IE ESEDDEDYI
+CAPRN. UNI S
+OS ENTS I.  
+ TR CREKKL W
+TY VEIN AACI
+AT. ATER SOL
+ OUOR  REL A
+TA. ECTA I N
+SQU SPPUTO I
+C NPTI D O G
+HOSL CKEDKRA
+AVAM NOLLART
+T LPOSN IC I
+H UR OLATHUT
+E L IN OPINT
+RETED ER NG 
+ S  AS TETET
+A TERMO PERA
+TDOY EO OM T
+T M.  NAIASE
+ N KUDAST.  
+ATEE ER R.  
+N VDIRICO.  
+
+665_71_text:
 1 Stocky, short and thick • Coral formation
 2 Alfresco
 3 Popular ground-cover plant with pendulous
@@ -3194,12 +3224,41 @@ C.  C  R ENAHOS
 20 Footslogger
 21 Filthy • Poke fun at
 
-664-91:
+665_91:
 ''
 9, 4
-123
+3205311321220129141507263028233318100617000208093420271924041103162512
 
-664-91_text:
+665_91_frame:
+ R. I G AVER
+  CKE ONJ S 
+WOE DW. OATE
+M URESLARERA
+ECT S   N. N
+L EPPRNTA A 
+ I O DD C. O
+UNCTIO.    O
+ C C. O U SL
+E. RAP A S S
+S.  B  REIGN
+SH IOUED B U
+INDIFYBLEOUG
+E I T A.  R 
+D TXEDREMT E
+E SPE S LLUG
+POSO. TRIE. 
+T PS. Y G A 
+HT ULG. H DR
+ EL E ECESE 
+ L HRUM R T 
+X. D O O H F
+TAT G SSIO A
+O OARF S OBR
+ THFUM R    
+  O G N.    
+  OSUPAIL.  
+ 
+665_91_text:
 1 Beat out and separate grain from •
   Iced coffee, eg
 3 (Of language) expressing criticism
@@ -3219,12 +3278,12 @@ C.  C  R ENAHOS
 19 Mollycoddle
 21 Harshly criticised • Songbird
 
-664-107:
+665_107:
 ''
 9, 4
 1917232927280922260416342010321430031202130506071115240008182521333101
 
-664-107_frame:
+665_107_frame:
 I UECTI. A E
 CENS ETEDR A
 K ISED. EE R
@@ -3253,7 +3312,7 @@ ATEENTWER.
 U NT E D.   
 DUDS DE F.  
 
-664-107_text:
+665_107_text:
 1 Develop • Leader, saviour
 3 Onion _, South Asian snack •
   Holding as a prisoner
@@ -3270,3 +3329,718 @@ DUDS DE F.
    Creature with many legs
 19 Gadget, utensil • Jettison
 21 Brass-coloured mineral • Neglected
+
+468_4:
+''
+7, 5
+2014311609180115302126282510051324170402082234061127292307001932033312
+
+468_4_frame:
+FERS RTERCETCAN
+ L  SE. L R AL 
+IDEAL PLESTRTEM
+R HI.  INR A A 
+UMEVETST DOMILY
+S EED N TE E K 
+ED R A E BYRMIS
+VOLOEDUSEO. E P
+O. O E T ANGSTI
+ E ANT E LOS F 
+EDBR OAST M PUP
+L AING T SEP L 
+ B WAY. AR IOAD
+MER L AINRIE CO
+ C TIC ST N LER
+MIRN ORUR ADAL 
+ N OBL S IGE EE
+UTDW AMEW. OS L
+S ACREPEAIMELIB
+ED. O A NP R N 
+ ATPPLMIDEAMEEP
+
+468_4_text:
+1 Villain, wrongdoer
+2 Small lake, pool • Slippery
+  with grease
+3 Painting in small specks
+4 Defeat • (Playing) on the opponents'
+  ground
+5 Fertile soil
+6 Leaf-like part of a plant •
+  Uppermost storey
+7 Held in high regard
+8 Put yourself out for • One of
+  a set of books
+9 Eclipse, better
+10 Secondary traffic route • Horse's
+   pace between a trot and a gallop
+11 On the shore
+12 Person who fishes •
+   Religious building
+13 Courtroom plea of elsewhere
+14 Sphere of interest • Banned
+15 Marinated
+16 Concerning the countryside •
+   Deduce, conclude
+17 Most spooky
+18 Street or yard originally used for
+stabling • Movement of the sea
+19 Period of no war
+20 Chrysalis • Crafty trick
+21 Change horses in ___, make a
+   decision at an awkward moment
+
+468_74:
+''
+7, 5
+0011122203163233241004132730280534210717081815020123062529192014310926
+
+468_74_frame:
+DEPEONC NBOO. K
+E O. GO OL BS. 
+V LG. TRUE JCRA
+R DN OPHIPUTHRE
+ACE VI. GY.  O 
+P P. SSHI. SITR
+NAERESS BNEECHE
+D C M EWEU T I 
+ENTOUSE DM TLDE
+ N OWLC OT OURF
+HINI AOWNI RN I
+ N DICP IOOTNAN
+T AGRAUGASPUA. 
+L M T  N U RIA 
+YIENERRUPBANN V
+ G E A H R. T S
+LLAR LHEI. DIN 
+ Y ATE A SARS. 
+DEED T. T D EMO
+R RAPE MILITR. 
+O TD NE L S ART
+   
+468_74_text:
+1 Push down • Imagined object of
+  fear or alarm
+2 Lamb's mother
+3 Head-parasite • Any fleshy
+  stoned fruit
+4 Bird which symbolises wisdom •
+   ___ bother, Scottish slang
+5 Citizen army
+6 Chop into small pieces •
+  Heating aperture
+7 Middle leg joint • Hoofed ruminant
+8 Belonging to those people
+9 Stuff • Old Russian leader
+10 Relating to the study of population
+11 Genus of maple tree •
+   Academic vestment
+12 Collaboration
+13 Short golf stroke • Gaseous element
+14 Large African ungulate, in short
+   king
+15 Black powdery substance •
+   Garden basket
+16 Rotated • Ride the waves
+17 Film baddie
+18 Make illegal • Grandmother,
+   affectionately
+19 Had a prolonged pain • Number in
+   a trilogy
+20 Large simian
+21 Accepted defeat, gave way •
+   Chemical salt used in fertilisers
+
+468_115:
+''
+7, 5
+2624270221052013280308341606332919013210003018091104071531172225121423
+
+468_115_frame:
+G D A  TITAR WI
+ELEAGIRY  L  E 
+ O  E ER SP PRE
+BUNO IRE  E D. 
+ P VERU RSTIEMB
+ SPE. STOA NN L
+ANGR OMPA.  GE 
+V BARKI DOBEOE 
+UZO U X OB G PA
+O OINGMP DLEK A
+EVE.   E     FR
+   IBLNEDROWE R
+GEEMEDI ME AOP 
+R RA ON IA T OU
+IN L UTERRKA PS
+ RADROB ANECLAC
+ UNA VR CD HV L
+SE U EALT WAAGU
+  I VAR F H E D
+VENL ZLE BALFLE
+I GOPEA OR O. B
+
+468_115_text:
+1 Hang loosely • Measured by
+  stopwatch
+2 Belonging to us • __ wolf, give
+  a false alarm
+3 Book of sacred songs and poems
+4 Jump using a stretchy cord • Flower
+  liquid collected by bees
+5 Attired
+6 Biased presentation of news •
+  Stinging striped insect
+7 Australian wild dog
+8 Muffle, suppress • ___ agreement, 
+  unwritten pact
+9 Christians' holy book
+10 State of not having something •
+   Sharp tooth
+11 Flimsy
+12 Shivery fever • Aniseed-flavoured
+    spirit
+13 Did nothing
+14 Number of players in a football
+   team • Board a ship
+15 Adult
+16 Thin flexible thread of metal •
+   Improvise (music)
+17 Take great delight
+   Very quick, musically • Commenced
+19 Angry or destructive behaviour
+20 Professor's workplace, for short •
+   Female rabbit or hare
+21 Curt • Furry anorak with a hood
+
+468_146:
+''
+7, 5
+1913202131240502181532251714162300273433302810010322291208061109260704
+
+468_146_frame:
+SUR LO E W O T 
+ R D LT HEAPGET
+FETRUDIMIE S R 
+G EDLEATEA IELA
+HEA O GADIVELED
+T TAIDER N R DE
+    E EPI BAEVI
+REAMAIK DSINR T
+E C L  S INT TO
+OMPL HR DS P B 
+ B APEEFEALOCOU
+PEWN R.  D S D 
+RRACK GRECENBER
+ A RID E  R  G 
+ERLUDEAPSTAFOAS
+LVEBORE CRE W S
+E R F TIEE DHUS
+SP BATA PENIE U
+H O F P ETLEHOR
+OGRDLETID E  N 
+N G A I ATICLAS
+
+468_146_text:
+1 Jeer at
+2 Child of an uncle or aunt • Puzzling
+  question
+3 Break between performances
+4 Floating ice mass • Pageantry
+5 Great warmth • Angelic aura
+6 Kentish hop kiln • Easily frightened
+  • Disgorge (oil)
+7 Young eel • Malignant spirit
+8 Cyclic rise and fall of the sea •
+  Allude (to) • Adhesive strip
+9 Serpent which killed Cleopatra •
+  2240lb
+10 Castigate • Gurgling laugh
+11 Neckband
+12 Crisp rustling fabric • Synthetic material
+13 Mineral source • Downhearted
+14 Folklore giant • Extreme fear • Big jump
+15 Aladdin's spirit of the lamp • Unrefined
+16 Propagated • Brown-tinted (old photo)
+   • Inactive
+17 Dry covering of a seed •
+   Plunge (into water)
+18 Church feature • Hostile attack
+19 Complex
+20 Sent by post • Clever device
+21 Participant in a formal argument
+
+489_4:
+''
+7, 5
+1626171506103433120329182128220708313019021332142704010920001105242325
+
+489_4_frame:
+PICB AM IODEKER
+  OOUTAMN. LE. 
+VILD TR. GLETOA
+YLEIUM FLAWENGE
+  SN AMAP A  N 
+NETT D THORNOOT
+COLI KY N D  S 
+H. N IEBBESIEST
+LOTGANR OM.   E
+PODPOS S E. CH 
+R. U EDOUDINHOP
+ABUN L M  N OW 
+R EREV. IEUR B 
+EFTG AAINA. ALS
+H EENDN ETRU E 
+O AINGV P. LI. 
+I T. OYLEBSTNOD
+DGEIMB. R U E O
+NRID EEYEEERT L
+ P    A R O CUE
+EADY MRIGUNEH T
+
+489_4_text:
+1 Putting (a question) • Speaker's
+  stand
+2 Distinctive smell
+3 Arm or leg • Join on to
+4 Gun or horse • Suspicious,
+  cautious • Point on a plant where
+  a leaf is attached to a stem
+5 Rod used in playing billiards •
+  Abatement
+6 Reluctant • Adjuster •
+  Rudely stare at
+7 Race (an engine)
+8 Dozing (off) • Be teetotal
+9 Terminate
+10 Imperfect • Improve the quality of
+11 Section of an atlas • On the
+   off guard
+12 Awkward, prickly • Area of grassland
+13 Centre of a storm
+14 Condition causing loss of memory •
+   Makeover
+15 Fit with sails
+16 Edge of a pavement • Fury •
+   Film about heroic events
+17 In the open • Alternative name
+   for a newt
+18 Tailless short-legged amphibian •
+   Molar or incisor, for example •
+   Fiendish
+19 Narrow sea channel • Common
+   Continental money unit
+20 Spicy Mexican sauce
+21 Large white seabird • Walk wearily
+
+489_84:
+''
+7, 5
+1933050125280910043215301120233422021221130029061817261431030807241627
+
+489_84_frame:
+  SNES N RY TIL
+PLEE ED GR S A 
+E EABL G ION SP
+ISHE. ELIA DLER
+ O CRED LDEE C 
+UBTT GEMOE DCK 
+ E LIBE A U O U
+ORB R RIN MAEBB
+I OROOF DAPS L 
+SILATE SC P M P
+ MEI AS EPT ALO
+ L RATPENOLDY R
+I ACHED RNONBER
+MAN. EUSEGO  S 
+P. EALD S T NST
+S SAT D IBUTALV
+MIT A GEDE H U 
+E ACILE E DOREC
+O A GOLERRUDEYE
+TED O L KE OR. 
+  DFUSIT EDOAMI
+
+489_84_text:
+1 Quality of being easily Shocked
+  ___ vera, health juice • Discharge as
+  vapour or fumes
+3 Inspiring fear as an opponent
+4 Rhett ___ Clark Gable's character in
+  Gone with the Wind • Handle attached
+  to a rudder
+5 With the sceptre, a symbol of royalty
+6 Place where ships are loaded • Narrow
+  stretch of land running into the sea
+7 Underground chamber housing a
+  guided missile • Defendant's proof of
+  not being at the scene of a crime •
+  Immediately, at once
+8 Apportioned • Fleshy fruit with a large
+  flat stone
+9 Bend or hang downwards through
+  tiredness
+10 Observed suspiciously •
+   Dull persistent pain
+11 Pre-owned, second-hand •
+   Smile broadly showing the teeth
+12 Surrounded by • Distribute playing-cards
+13 Ointment for wounds or sores
+14 Tree whose leaf is depicted on the
+   Canadian flag • Moved slowly and
+   carefully
+15 Semicircular recess in a church •
+   Upright and rigid • Metallic element,
+   symbol Au
+16 Improvised jazz singing • Blood-stained
+17 Outward motion of the tide
+18 Writing or drawing implement •
+   Type of nuclear reaction
+19 Pondered, considered
+20 Legal document • Advanced in years
+21 Protest on the streets
+
+489_126:
+''
+7, 5
+2420320104110509171228001903023308101434291816060725222327133015213126 
+
+489_126_frame:
+ET SWAGIS AETHE
+ ORHE  R BC I N
+SPIATO R LEDMIC
+  IERS B H SFTA
+ALFDE  L ANOA S
+  F DUPEDR TLIT
+ G P FE AR IO O
+MALALFLESOUSOUS
+ T S LA EF PM E
+TALHERR. DITT R
+ IDO OETT LOE A
+ITSS TS. WL RAL
+SET O   STRABAS
+ GAYLLANCE TU N
+POR L   OLDESTU
+O BAGEP. SHE F 
+BALN LEDI O  I 
+E OETSR.  N SCO
+RENMIR P MOTMIT
+U GIC NAC R. T 
+POSTEN C TIEXAM
+
+489_126_text:
+1 Breed of hound • Envelop
+2 Whipped filling of chocolate
+  and cream
+3 Daze, trance • _ bomb,
+  nuclear explosive
+4 Ramadan sunset dinner
+5 Plant used as cattle fodder •
+  Pays (an account) in full
+6 Moves about jauntily
+7 Single piece of paper •
+  Patronage, protection
+8 Metal in an unprocessed state •
+  As easy as _, simple (inits)
+9 Twisted round and round
+10 Large-winged insect •
+   Exclude, leave out
+11 Inconsistent, irregular
+12 Row, level • Important school test
+13 Waverers
+14 The Ladies • Poem generally
+   addressed to a person
+15 Dirty look • Hoodwinked
+16 Bind up (an injury)
+17 Weighing device • Humdrum
+18 Senior
+19 Cost of hire • Optical illusion
+20 Charmingly simple and carefree
+21 Puts forward for argument's sake •
+   Opinions, doctrines
+
+489_140:
+''
+7, 5
+0124050803043029141912000715331109180632232031280217162526221027213413
+
+489_140_frame:
+ R SHA. OUMO K 
+LAS A PER A LUD
+ FLSIGU YDGY. O
+OTUDEMCOOS SSTA
+ O N. H TOAK. C
+AWKESCYLEY EEAK
+LAMSIEP ZBETAST
+ K I REYE A.  C
+MENSTRR. OTAACH
+ H CEN. S E  M 
+SARA. IDEUMIYAN
+AF MUS R  U O. 
+ DEREER. T. M L
+IDN E EEKECHAGO
+ L YLO X D ON G
+T SITAP PST N E
+I I. LETASURA Y
+E DARKD N N R N
+IROFROANDG MN A
+O. A UD AINAOIL
+CCUTOTORT. NN I
+                        
+489_140_text:
+1 Counterfeit, bogus • Exotic water
+  lily • Japanese wrestling
+2 In days gone by
+  • Acorn-bearing tree
+3 Placard • Awkward, clumsy
+  • Tense, nervous
+4 Smoothing device
+  • Compass direction
+5 Game played with counters
+  • Greenish-blue
+6 Take place • Tortilla chip topped
+  with cheese
+7 Dove's call
+8 Ciliary hair • Female Russian ruler
+9 Blank page in a book
+10 Afternoon nap popular in
+   Mediterranean countries •
+11 Necessitate
+   Ground spicy seeds used in
+   cooking
+12 Hair highlight • Accompany
+13 Remove ice from
+14 Egg-laying mammal also called the
+   spiny anteater • Person who takes
+   power by force
+15 Measure of rum
+16 Fragrance • Guitar-like Indian
+   instrument
+17 Suggestion, proposition
+   • Vegetable and symbol of Wales
+18 Be deep in thought • Night-time
+19 Artificial light source • Tidy and
+   clean feathers with the beak
+   • Assist in crime
+20 Seventh Greek character • Grease
+21 Fix • Tights fabric • Ninth letter of
+   the Greek alphabet
+
+666_14:
+''
+9, 4
+1708220211130427283207061926120133143016291521340531251824030920230010
+  
+666_14_text:
+2 Cataloguer of books
+4 Unruly child • Scale • Engrave by covering
+  drawn lines with acid
+6 Young herring • Instrument to test
+   straightness • Nudge
+8 Disallow, reject • Word which can replace
+  another in a sentence
+9 Plants of the heather genus, collectively
+
+10 Above • Imitated, mimicked
+11 Ninth letter of the Greek alphabet • Lizard-like
+   pond creature
+12 Sign of some future event • Object of adoration
+13 • Discarded metal
+14 Prudent • Clean (clothes)
+16 Middle of the leg • Show a response • Length of
+   fibre often made of coir or sisal
+18 One who consumes goods • Infuse •
+   Maple tree genus
+20 Lack of any good quality
+
+666_14_frame:
+I POVEJ SOPE
+SNEW. APH R 
+T XOMEM OCER
+T C. EO A T 
+  UDERCOTBOY
+D L M T EL. 
+A C A  S    
+BLI WOSS ER 
+U R.      E 
+ R BRAU AA S
+NYM R A NIFT
+  ESILN DR A
+PED.  EAC E 
+  D BI R T S
+DOL U MBURIC
+A GCRA.   L 
+RTHY LOGRLES
+E T W  R.   
+T RE RA RLIM
+H.   LYNO E 
+E AR IA BEVE
+B EU.   AKNE
+A. THREWT D 
+L P A   IUSE
+TCHR. P O.  
+ T IOTAUN.  
+RODN. N E.  
+
+666_71:
+''
+9, 4
+2127233316111922033207201306182601000214250408281731101205293430152409
+
+666_71_text:
+1 Lacking delicacy, rough • One who lends
+  money at a very high rate
+3 Lubricated • Official authority
+5 Cheer
+6 Pram passenger • Body dusting powder
+7 Boxing ring
+8 Period of a year • Reactive metallic element
+9 ___ book, novel that you can listen to
+10 Grandmother, affectionately • Too, as well
+11 Knitting stitch • Opposed to, against
+12 Singing of a melody to nonsense syllables •
+   Big jump
+13 Small savoury Indian cake
+14 Healthy breakfast food • Coypu
+15 Deep bell sound
+16 Point on a plant where a leaf is attached to
+   a stem • Old woman's nursery-rhyme home
+17 Old-fashioned touring coach
+19 Searched for food • Excellence, positive nature
+21 Turn round fast • Torment
+
+666_71_frame:
+ E A EU AT E
+L APURNTIESS
+ F T OD L. T
+  B. SA. U R
+SLIANCBARSEA
+  CB UO. I W
+HAJITYE.  N 
+ R  E CHA E 
+LANER L VBAB
+ W RENLSOD Q
+RAB A   N.  
+ Y UDIEAPE P
+ER A LX OT E
+ I RIAIUMHAP
+ATET CA MY. 
+  A CO L E U
+SON O PIN.  
+  AGRE M D M
+UALS MNANARS
+S PMUEE. P H
+ESTA NSCAASE
+I. HOEAGENOD
+NUT Y I R O 
+G.  S RAT L 
+ U SURFIR.  
+ A T U N.   
+ALCAND GY.  
+
+666_91:
+''
+9, 4
+0205163032342925082414212001261106221013272331191700332809031812070415
+
+666_91_text:
+1 Back of a sheet of printed paper • School
+  subject involving algebra and equations
+2 Parody
+3 Shoulder covering • Prominent
+4 Proper, right
+5 Unlucky accident • Small community
+6 Unprocessed
+7 Cape, headland • Work at afresh
+8 Killed in great numbers
+9 Form of the verb 'to be' • Allow
+10 Public notice of marriage • Denouement • Line-up
+11 Amount due • Talented
+12 Gleaming or glistening brightness •
+   Long clerical robe • Imposed a levy on
+13 Hip-hop feature • Complete nonsense
+14 Persecuted
+15 Perused • Eat dinner
+16 Contorted, hard to understand (handwriting)
+17 Carefree • River sport
+18 Transformed
+19 Circular coral island • Corn for grinding
+20 Weave
+21 Vote into power • Apprehension
+
+666_91_frame:
+I RP RVERV I
+BLIEREE EING
+B TLETSHAS H
+ GRSO NS U A
+NE  IMDEBTWI
+ DRWL EN U N
+CT ED. ARBAN
+HAMROWBLE T 
+AL ED. TASHE
+LL RAYNESIST
+ EN M T SV E
+CT XED L EAD
+L G L ATOROT
+ITAD WG NERE
+A LINEELEV D
+ G S QENDRAP
+GHTLAUT AELE
+ E AREALBD T
+A ARREEDO E 
+LET O D NC B
+L ITUR C REA
+ABB CO MA E 
+ L HAPTE AGU
+TER NA NO I 
+THS CRT S.  
+O ETHEMIS.  
+TED ALE E.  
+
+666_107:
+''
+9, 4
+0631120530002707241529262103090813011622231114333220342804021918171025
+
+666_107_text:
+1 Insultingly worded • Utter pleasure
+3 Attacked from the air • Tempt
+5 Reading the same forwards
+  and backwards
+7 Scarcely • Injured by a bull
+  • Worm-like larva
+9 Angrily • Expressed scorn
+11 Speak monotonously • Punitive
+13 Very sad event • Puzzle
+15 Bite the dust • Test with a vertical line • Infuse
+17 Unusual
+19 Order • Opening remark
+21 Kept from growing • Sold door-to-door
+
+666_107_frame:
+ Y     R D G
+  PE PL.    
+ I.    S NOR
+R LCSTABU.  
+ONAO A A NDR
+C BNTI BO A 
+ T RUBAMBGED
+  D L D E.  
+ B TEDEDDL P
+E EP IY M M 
+   RON P C. 
+D EI ELUM R 
+E EE GCRE DE
+ENA.  O D I 
+D CD PNTESTU
+ M ORE R TRA
+  E N L.  E 
+ E Y S A FAI
+C LIT Y GM W
+OMI Y    ALI
+R NLEDSSLR N
+ N ONLASYSIV
+PTI E  T U I
+   CROCE MBE
+IFYYSTE R.  
+ T.   XCE.  
+REWB BI C.  
