@@ -25,6 +25,7 @@ FINISHED = (-10, -10)
 NOTE = (-1, -1)
 HINT = (-2, -2)
 SIZE = 5  # fixed
+INITIAL = 2 # initial visible numbers
 
 
 class Player():
@@ -45,7 +46,7 @@ class Futoshiki(LetterGame):
   
     def __init__(self):
         self.debug = False
-        self.N = 5
+        self.N = SIZE
         self.sleep_time = 0.1
         self.hints = 0
         self.inequalities = ["\u2228", "\u2227", "<", ">"]
@@ -146,7 +147,8 @@ class Futoshiki(LetterGame):
                 self.board[i*2+1, 2*j] = "\u2227" if char>0 else "\u2228"
         #self.board[self.board == ''] = ' '
         self.number_locs = np.argwhere(np.char.isnumeric(self.board))
-            
+        number_loc_list = list(self.number_locs)
+        random.shuffle(number_loc_list)   
         # remove some inequalities
         random.shuffle(ineq_list)
         # these are number of inequalities to leave
@@ -161,9 +163,9 @@ class Futoshiki(LetterGame):
                               for loc in self.number_locs])
     
         self.solution_board = self.board.copy()
-        # clear all numbers     
-        [self.board_rc(loc, self.board, ' ') for loc in self.number_locs]
-  
+        # clear all numbers  bar two
+        [self.board_rc(loc, self.board, ' ') for loc in number_loc_list[INITIAL:]]
+        
         self.gui.update(self.board)
         
     #########################################################################
