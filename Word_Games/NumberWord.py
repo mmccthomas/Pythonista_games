@@ -53,25 +53,13 @@ BLOCK = '#'
 SPACE = ' '
 BLOCKS = '¥&€█'
 
-
-def board_rc(rc, board, value):
-    board[rc[0]][rc[1]] = value
-
-    
-def get_board_rc(rc, board):
-    return board[rc[0]][rc[1]]
-
-    
-def copy_board(board):
-    return list(map(list, board))
-  
   
 class CrossNumbers(LetterGame):
   
     def __init__(self, test=None):
         # test overrides manual selections
         self.test = test
-        self.debug = True
+        self.debug = False
         self.use_np = False
         # allows us to get a list of rc locations
         self.log_moves = True
@@ -224,13 +212,13 @@ class CrossNumbers(LetterGame):
     
         else:
             # clear wrong squares
-            [board_rc(loc, self.board, ' ') for loc in wrong]
+            [self.board_rc(loc, self.board, ' ') for loc in wrong]
             if not first_time:
               for loc in nonzero:
                   # fill other cells of same number. Dont do this initially
                   # to allow initial board to match given puzzle
                   k = self.known_dict[self.number_board[tuple(loc)]][0]
-                  board_rc(loc, self.board, k)
+                  self.board_rc(loc, self.board, k)
        
         # display the letters remaining to be placed
         known = [val[0] for val in self.known_dict.values() if val[0] != ' ']
@@ -423,7 +411,7 @@ class CrossNumbers(LetterGame):
         if result:
             self.solution_dict = solver.code_dict.copy()
             nonzero = np.argwhere(self.number_board > 0)
-            [board_rc(loc, self.solution_board, self.solution_dict[self.number_board[tuple(loc)]])
+            [self.board_rc(loc, self.solution_board, self.solution_dict[self.number_board[tuple(loc)]])
              for loc in nonzero]
         else:
             if self.debug:
@@ -482,7 +470,7 @@ class CrossNumbers(LetterGame):
                  cx.number_words_solve(max_iterations=30,
                                        max_possibles=None)
                  nonzero = np.argwhere(self.number_board > 0)
-                 [board_rc(loc, self.solution_board, self.solution_dict[self.number_board[tuple(loc)]])
+                 [self.board_rc(loc, self.solution_board, self.solution_dict[self.number_board[tuple(loc)]])
                       for loc in nonzero]
                  self.gui.set_prompt('Solution Complete')     
                except (Exception):
@@ -660,7 +648,7 @@ class CrossNumbers(LetterGame):
         if rc == (-10, -10):
           return (None, None), 'Finish'  # induce a finish
           
-        if get_board_rc(rc, board) != BLOCK:
+        if self.get_board_rc(rc, board) != BLOCK:
           # now got rc as move
           # now open list
           if board is None:
