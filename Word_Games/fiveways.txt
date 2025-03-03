@@ -645,3 +645,59 @@ Puzzle12_frame:
 ' / / / / /p/ / / / / /s/ '
 ' / /a/ / / /a/ /t/ / / / '
 ' / / / /d/e/ / / / / / /t'
+
+Puzzle13:
+ANTE
+AWHILE
+BAZAAR
+CAIRN
+COBALT
+COBBLER
+CONCH
+CONSULT
+FIZZY
+FLAY
+FOLIO
+FUNNEL
+GNU
+GRILL
+GYRATE
+HEDGEHOG
+HERALD
+HOLDALL
+HOLSTER
+LADDER
+LEASH
+LENGTHEN
+LIBEL
+LULL
+SCIENCE
+SLALOM
+SLY
+SNAG
+SNICKET
+SPAWN
+TALLOW
+TEETOTAL
+TINGE
+TRACT
+TYPESET
+TZATZIKI
+WAREHOUSE
+WIGEON
+WISHBONE
+
+Puzzle13_frame:
+' / / / /b/ /c/t/ / /c/t/ '
+' / / / / / / /g/f/l/ / / '
+' /c/ /t/ / / / / / / / /l'
+'h/ / / / / / / / /w/ / / '
+' / / / / / / / / / / /s/ '
+' / / /s/ /l/ / / /g/f/ /s'
+' / / / / /a/ / / / / /t/ '
+' / / / /w/ / / / / / / / '
+'h/ /f/ / / / /l/a/ / / / '
+'g/s/ / / / / / / /s/l/ / '
+' / / / / /h/ / / /c/ / / '
+' / /t/ / / / / /f/ / / / '
+'s/ / /w/ /c/ / / / / /t/h'

@@ -180,11 +180,8 @@ class ZipWord(LetterGame):
             break
         
         self.gui.set_message2('Game over')
-        self.gui.set_message('')
-        self.gui.set_prompt('')
-        sleep(4)
-        self.finished = True
-        self.gui.show_start_menu()
+        self.complete()
+        
       
   def game_over(self):
     """ check for finished game
@@ -229,6 +226,8 @@ class ZipWord(LetterGame):
         self.puzzle = self.test  
     self.all_words, self.board = word_lists[self.puzzle]
     self.all_words = [word.lower() for word in self.all_words]
+    self.check_for_ascii(self.all_words, self.puzzle)
+    
     # parse board to get word objects
     self.length_matrix()
                

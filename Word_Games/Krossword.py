@@ -595,7 +595,7 @@ class KrossWord(LetterGame):
       move = self.process_turn(move, self.board)
 
       if self.game_over():
-        break
+         break
     
     self.gui.set_message2('Game over')
     self.complete()

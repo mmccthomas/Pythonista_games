@@ -3708,3 +3708,241 @@ Puzzle44_frame:
 ' /10/a/ /i/ / / / / / / / '
 ' /y/ / / /z/ / / / / /11/ '
 's/ / / / / /e/ /12/ / / / '
+
+Puzzle45:
+1
+OAR
+OLIVE
+OTTER
+OVERDUE
+2
+RELATION
+RELIEVED
+RESCUE
+ROSETTE
+3
+PAIL
+PEER
+PETREL
+PINE
+PRELUDE
+4
+BEAU
+BEGUILING
+BIRETTA
+BOOR
+BUN
+5
+SEANCE
+SEEN
+SPREE
+STEM
+STRAYED
+6
+JINGLE
+JOLLITY
+JUGGLER
+7
+IGLOO
+ILEX
+INTRIGUE
+IRIS
+ITALIC
+ITSELF
+8
+VARY
+VENERATED
+VIGIL
+VIXEN
+9
+NAILS
+NEEDLE
+NOON
+NYLON
+10
+FIG
+FLAIR
+FLARE
+FLU
+FOE
+FOLATE
+11
+ADAGE
+AGITATED
+AIRED
+ANT
+12
+CLOY
+COL
+CONGRESS
+COY
+CUP
+
+Puzzle45_frame:
+' / / / /1/ / / / / / / /e'
+' / / / / / / /2/ / / /u/ '
+' / / / / / / / / / /g/ / '
+'3/ / / / / / / / /i/ / / '
+' / / / / / / / /r/ / /4/ '
+' / / / / / /5/t/ / / / / '
+' / / / / / /n/ / / / / /6'
+' / /s/i/r/7i/ / / / / / / '
+' / / / / / / / /8/ / / / '
+' /9/ / / / / / / / / / / '
+' / / /10/ / / / / / / / / '
+' / / / / / / / / / /11/ / '
+' / /12/ / / / / / / / / / '
+
+Puzzle46:
+1
+FAINTLY
+FAUNA
+FLUENT
+FRIENDS
+2
+DEVICE
+DREARY
+DURATION
+3
+CATER
+CONDUCIVE
+COT
+CUE
+CURIOUS
+4
+CAMERA
+CAMPAIGN
+CHERRY
+CIRCULATE
+5
+DART
+DELIVERY
+DIESEL
+DOCILE
+DRILL
+6
+ADORNMENT
+ADULATION
+AILED
+ASP
+ASTEROID
+7
+OBSERVANT
+OCELOT
+OFFAL
+8
+ADORABLE
+ANTENNA
+9
+ABSTRACT
+APOLOGISES
+ASSOCIATE
+10
+TELLING
+TIED
+TOSS
+11
+FAIR
+FALL
+FLEDGLING
+FOE
+FREEDOM
+
+Puzzle46_frame:
+' / /t/ / / /1/ / / /n/ / '
+' / /n/2/ / / / / /o/ / / '
+' / /e/ / / / / /i/ / /3/ '
+' / /m/ / / / /t/ / / / / '
+' / /n/ / / /a/ / / / / / '
+'4/ /r/ / /l/ / / / / / / '
+' / /o/ /u/ / / / / / / / '
+' / /d/d/ / / /5/ / / / / '
+' / /6a/ / / / / / / / / /7'
+' / / / / / / / / / /8/ / '
+' /9/ / / / / / / / / / / '
+' / / / / / /10/ / / / / / '
+' / / / / / / / / /11/ / / '
+
+Puzzle47:
+1
+HERB
+HIJACK
+HOLOGRAM
+HOTHEAD
+2
+WADI
+WHETHER
+WIGEON
+3
+PARK
+PEA
+PROP
+PRY
+4
+SALAMI
+SCREENED
+SHRINK
+SODA
+SOUL
+SPOT
+5
+KEEN
+KNEE
+KOHL
+6
+QUAKER
+QUART
+QUIRKY
+7
+BALCONY
+BASIN
+BIRDIE
+BRIE
+8
+GALE
+GEAR
+GLOBAL
+GRAINY
+GRECIAN
+GULLY
+9
+ALE
+ALLEGORIC
+AREA
+ARID
+10
+TANG
+TANTRUM
+TIDE
+TILL
+TREASON
+11
+DAM
+DANDELION
+DIM
+DIVA
+DON
+DRIED
+12
+LANE
+LEANING
+LINNET
+13
+REAR
+REGIMENT
+REV
+
+Puzzle47_frame:
+' / / / / /1/ / / / / / / '
+' /2/ / / / / / / / / / / '
+' / / / /n/ / / / / /3/ / '
+' / / / /o/ / /4/ / / / / '
+' / / / /i/ / / / / / / / '
+' / / /5/l/ / / / / / / /6'
+' / / / /e/ / / / / / / / '
+'7/ / / /d/ /8/ / / / / / '
+' / / / /n/ / / / /9/ / / '
+' / / / /a/ / / / / / /10/ '
+' / / / /11d/ / / / / / / / '
+' / / / / /a/ /12/ / / / / '
+' / / / / / /m/ / / /13/ / '

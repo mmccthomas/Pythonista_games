@@ -478,6 +478,15 @@ class LetterGame():
     self.wordset = set(word_list) # for fast search
     self.all_words = set(all_word_list) # fast seach for checking
   
+  def check_for_ascii(self, wordlist, source):
+      # check for unicode characters from ocr
+      for word in wordlist:
+          for letter in word:
+              if 32 <= ord(letter) <= 122:
+                  continue
+              else:
+                  raise RuntimeError(f'{source} {word} contains non-ascii {letter}')
+                  
   def length_matrix(self, search_directions=['down','across']):
     # process the board to establish starting points of words, its direction, and length
     self.word_locations = []
@@ -881,6 +890,7 @@ if __name__ == '__main__':
     quit = g.wait()
     if quit:
       break
+
 
 
 
