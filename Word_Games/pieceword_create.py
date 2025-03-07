@@ -1,0 +1,615 @@
+"""
+This is a new program to generate Pieceword games.
+The. Most interesting part is to create clues for a word
+Set up a series (10) of crossword templates, all 15 x 21
+All templates need word or words on each horizontal line 
+Use existing Pieceword solutions as templates
+Fill crossword, using random Words. 
+Visually inspect  grid and regenerate of and words in appropriate or acronyms
+For each complete across word, find an online definition or synonym
+Need this to be automatic
+May be https://www.merriam-webster.com/dictionary/word
+Pick the best.
+Random shuffle the grid split into 3x3 blocks
+Create text version of this shuffled grid using spaces for blanks
+Create puzzle data, name, name_text, name_frame
+
+add save state
+"""
+# Pieceword game
+# tiles are 3x3 squares, to fit into 15 x 35 grid
+# file for each puzzle has 3 sections , puzzleno, puzzleno_text, and puzzleno_frame
+
+from time import sleep, time
+from PIL import Image
+import ui
+import io
+import sys
+import pickle
+import numpy as np
+from urllib.request import urlopen
+import json
+import math
+import asyncio
+import console
+import dialogs
+import clipboard
+from random import shuffle
+import base_path
+base_path.add_paths(__file__)
+from types import SimpleNamespace
+from Letter_game import LetterGame
+import gui.gui_scene as gscene
+from gui.gui_scene import Tile
+from gui.gui_interface import Coord, BoxedLabel
+from scene import Texture, LabelNode
+from crossword_create import CrossWord
+PUZZLELIST = "pieceword_templates.txt"
+TILESIZE = 3
+CR = '\n'
+WordList = [#'wordlists/words_alpha.txt',
+            #  'wordlists/extra_words.txt',
+              'wordlists/5000-more-common.txt',
+              'wordlists/words_20000.txt']
+try:             
+    with open('keys.pkl', 'rb') as f:
+        thes_key = pickle.load(f)
+        dict_key = pickle.load(f)
+except IOError:
+  print('No such pickle file')
+  
+class PieceWord(LetterGame):
+  
+  def __init__(self):    
+    LetterGame.__init__(self, column_labels_one_based=True)
+    self.first_letter = False
+    self.tiles = None
+    self.debug = False
+    self.image_dims = [7, 5]
+    self.all_clues_done = False
+    self.load_words_from_file(PUZZLELIST, no_strip=True) 
+    self.selection = self.select_list()
+    if self.selection is False:
+       self.gui.gs.show_start_menu()
+       return 
+    self.gui.build_extra_grid(5, 7, grid_width_x=3, grid_width_y=3,
+                              color='red', line_width=5)
+    
+       
+    x, y, w, h = self.gui.grid.bbox
+    
+    self.gui.set_pause_menu({'Continue': self.gui.dismiss_menu,
+                             'New ....': self.restart,
+                             'Reveal': self.reveal,
+                             'Quit': self.quit})
+    self.span = self.sizex // TILESIZE
+    #self.rack = self.display()
+    
+    self.gui.clear_messages()
+    self.gui.set_enter('', stroke_color='black') # hide box
+    #self.gui.set_moves('\n'.join(self.wordlist), position=(w + 50, h / 2), font=('Avenir', 20))
+    self.gui.set_top(f'Pieceword no {self.selection.capitalize()}')
+    
+    self.finished = False
+  
+  def save_state(self):
+      """ save the state of play in pickle file """
+      sys.setrecursionlimit(1000)
+      with open('piecestate.pkl', 'wb') as f:
+         pickle.dump([self.empty_board, self.board, self.solution_board, self.word_defs, self.word_locations, self.selection], f)
+         
+         
+  def recall_state(self):
+      with open('piecestate.pkl', 'rb') as f:
+         self.empty_board, self.board, self.solution_board, self.word_defs, self.word_locations, selection = pickle.load(f)
+         if selection != self.selection:
+         	  console.hud_alert(f'Template does not match, select {selection} first')
+         	  return
+         self.gui.update(self.board)
+         self.update_buttons()         
+         self.gui.set_text(self.wordsbox, self.update_clue_text())
+         for i, word in enumerate(self.get_words().values()):
+             button = 'button_' + str(i+2)
+             color = 'lightblue' if 'def' in self.word_defs[word] else 'pink'
+             if 'clue' in self.word_defs[word]:
+             	  color = 'lightgreen'
+             self.gui.set_props(button, fill_color=color)
+             
+         
+  def get_words(self):
+      word_dict = {}
+      for loc in self.word_locations:
+        if loc.direction == 'across':
+           word_dict[loc.start] = loc.word
+      return word_dict
+      
+  def lookup_all(self):
+       wait = self.gui.set_waiting('Looking up words')                        
+       for i, word in enumerate(self.wordset):
+          # self.gui.set_prompt(f'looking up {word}')
+          wait.name = f'Finding {word}'
+          self.lookup(word)
+          # change button colour to show if definition found
+          button = 'button_' + str(i+2)
+          self.gui.set_props(button, fill_color='lightblue' if self.word_defs[word] else 'pink')
+          self.word_defs[word]['line_no'] = list(self.get_words().keys())[i][0] + 1
+       self.gui.reset_waiting(wait)  
+       tasks = []
+       #for word in self.wordset:
+       #   tasks.append(asyncio.create_task(self.lookup(word)))
+       #for task in tasks:
+       #     await task
+       if self.debug:
+          for word in self.wordset:
+              print()
+              print(word, self.word_defs[word])
+          
+  def lookup(self, word):
+      """ lookup word on merriam-webster dictionary """
+      self.word_defs[word] = {}     
+      with urlopen(f'https://www.dictionaryapi.com/api/v3/references/thesaurus/json/{word}?key={thes_key}') as f:    
+         data = json.load(f)  
+      try:
+         if isinstance(data, list):
+           data = data[0]
+         self.word_defs[word]['def']= data.get('shortdef', 'Not found')         
+         self.word_defs[word]['synonyms'] = data['meta'].get('syns', 'Not found')         
+      except (IndexError, AttributeError):
+        pass
+   
+  def run(self):
+    """
+    Main method that prompts the user for input
+    """ 
+    LetterGame.load_words(self, file_list=WordList) 
+    self.min_length=3
+    self.max_length=15
+    self.length_matrix()
+    self.partition_word_list()
+    self.compute_intersections()  
+    self.fill_board()
+    self.solution_board = self.board.copy()
+    self.wordset = self.get_words().values()
+    self.set_buttons()
+    while True:
+      move = self.get_player_move(self.board)
+      move = self.process_turn(move, self.board)
+      #if self.game_over():
+      #  break
+    self.gui.set_message2('')
+    self.complete()
+    
+  def set_buttons(self):
+        """ install set of active buttons
+        Note: **{**params,'min_size': (80, 32)} overrides parameter
+         """
+        x, y, w, h = self.gui.grid.bbox
+        off = 100
+        params = {'title': '', 'stroke_color': 'black', 
+                  'font': ('Avenir Next', 18), 'reg_touch': True, 
+                  'color': 'black', 'min_size': (80, 32)}
+        # Make x position be relative to previous box on same line
+        # need bbox of previous box
+        bbox =[0,0,0,0]
+        for k, v in self.get_words().items():
+            pos = int(w+ 20), int(h - (k[0]+1)*h/21)
+            if pos[1] == bbox[1]:
+            	pos = bbox[0]+bbox[2]+10, bbox[1]
+            button = self.gui.add_button(text=v, position=pos,
+                                fill_color='yellow', 
+                                **{**params,'min_size': (65, 38)})
+            # get bbox of just placed button as integers to allow comparison                   
+            bbox = [int(x) for x in getattr(self.gui.gs, button).l_box_name.bbox]
+        self.gui.set_enter('Fill', position=(w+off+135,h),
+                           fill_color='orange', **params)        
+        self.gui.add_button(text='Lookup', position=(w+off+275, h),
+                            fill_color='orange', **{**params,'min_size': (80, 32)})        
+        self.gui.add_button(text='Copy', position=(w+off+365, h),
+                            fill_color='orange', **{**params,'min_size': (80, 32)})       
+                            
+        self.randomise_button = self.gui.add_button(text='Randomise', position=(w+off+275, h-80),
+                            fill_color='red', **{**params,'min_size': (80, 32)})     
+        self.gui.add_button(text='Reload', position=(w+off+135, h-80),
+                            fill_color='orange', **{**params,'min_size': (80, 32)})     
+                                   
+        self.wordsbox = self.gui.add_button(text='', title='Clues', 
+                                            position=(w+off+180, 200),
+                                            min_size=(280, 500),
+                                            font=('Courier New', 14),
+                                             fill_color = 'black',
+                                             )                        
+        
+  def update_buttons(self):
+      """ change button text and reset colours """
+      self.wordset = self.get_words().values()
+      for i, word in enumerate(self.wordset):          
+          button = 'button_' + str(i+2)
+          self.gui.set_text(button, word)     
+          self.gui.set_props(button, fill_color='yellow')     
+                           
+  def fill_board(self):
+      """use  swordsmith to fill crossword
+      if it fails, then it can be run ahain from control 
+      """
+      def transfer_props(props):
+           return {k: getattr(self, k) for k in props}
+      cx = CrossWord(self.gui, self.word_locations, self.all_words)
+      cx.set_props(**transfer_props(['board', 'empty_board', 'all_word_dict',
+                                       'max_depth', 'debug']))
+      cx.max_cycles = 2000                                 
+      try:
+          wait = self.gui.set_waiting('Generating')
+          self.board = cx.populate_words_graph(max_iterations=100,
+                  length_first=False,
+                  max_possibles=100,
+                  swordsmith_strategy='dfs')
+      except (Exception):
+          print(traceback.format_exc())
+      finally:
+             self.gui.reset_waiting(wait)
+    
+  def select_list(self):
+      '''Choose which category'''
+      items = [s.capitalize() for s in self.word_dict.keys()]
+      items = [item.split('_')[0] for item in items
+               if  item.endswith('_frame')]
+      # return selection
+      self.gui.selection = ''
+      selection = ''
+      prompt = ' Select puzzle'
+      while self.gui.selection == '':
+        self.gui.input_text_list(prompt=prompt, items=items, position=(800, 0))
+        while self.gui.text_box.on_screen:
+          try:            
+            selection = self.gui.selection.lower()
+          except (Exception) as e:
+            print(e)
+        if selection == 'cancelled_':
+          return False 
+        if len(selection):
+          if self.debug:   
+            print(f'{selection=}')
+          # self.wordlist = self.word_dict[selection]
+          
+          if selection + '_text' in self.word_dict:
+             self.table = self.word_dict[selection + '_text']
+             self.image = self.wordlist[0]
+             self.image_dims = [int(st) for st in self.wordlist[1].split(',')]
+             self.solution = self.wordlist[2]
+             if len(self.solution) < 70:
+                 self.debug = True
+             
+          if selection.capitalize() + '_frame' in self.word_dict:
+            # rearrange frame text into N 3x3 tiles
+            frame = self.word_dict[selection.capitalize() + '_frame']
+            if self.debug:   
+               [print(row, len(row)) for row in frame] # for debug
+            assert all([len(row) == len(frame[0]) for row in frame]), 'Error in string lengths'
+            # convert to numpy
+            frame = np.array([np.array(row.lower(), dtype=str) for row in frame])
+            frame = np.char.replace(frame, "'", '')
+            frame = np.char.replace(frame, '/', '')
+            frame = frame.view('U1').reshape((-1, self.image_dims[1] * TILESIZE))
+            # replace spaces and dot by hash for display
+            #frame[frame == ' '] = '#'
+            #frame[frame == '.'] = '#'
+            # divide into rows of 3
+            rowsplit = np.split(frame, self.image_dims[0], axis=0)
+            # divide each row into blocks of 3x3
+            colsplit = [np.split(rowsplit[i], self.image_dims[1], axis=1) for i in range(len(rowsplit))]
+            # add all together to get N 3x3 blocks
+            self.tiles = np.concatenate(colsplit)
+            self.board = frame
+            self.empty_board = frame.copy()
+            
+          #self.wordlist = [word for word in self.table if word]
+          self.gui.selection = ''
+          return selection
+        elif selection == "Cancelled_":
+          return False
+        else:
+            return False
+  
+  def display(self):
+    """ display tiles on board
+    """
+    rack = {}
+    if self.tiles is not None:
+      self.board = np.array(self.board)
+      for n in range(self.span * self.sizey//TILESIZE):
+        coord = divmod(n, self.span)       
+        rack[coord] = n
+        self.place_tile(coord, n)
+         
+      self.gui.update(self.board)
+      
+    else:
+      parent = self.gui.game_field
+      
+      sqsize = self.gui.gs.SQ_SIZE*TILESIZE
+      for n, tile in enumerate(self.images.values()):
+        if n == self.span * self.sizey//TILESIZE:
+          break
+        r, c = divmod(n, self.span)         
+        t = Tile(Texture(self.pil2ui(tile)), r,  c, sq_size=sqsize,
+                 dims=(self.gui.gs.DIMENSION_Y // TILESIZE, self.gui.gs.DIMENSION_X // TILESIZE))
+        t.row, t.col = r, c
+        t.number = n
+        rack[(r, c)] = t
+        parent.add_child(t)
+              
+    return rack
+          
+  def get_size(self):
+    LetterGame.get_size(self, '15, 21')
+    
+  def load_words(self, word_length, file_list=PUZZLELIST):
+    return
+     
+  def initialise_board(self):
+    pass
+        
+  
+  def get_player_move(self, board=None):
+    """Takes in the user's input and performs that move on the board,
+    returns the coordinates of the move
+    Allows for movement over board"""
+    
+    move = LetterGame.get_player_move(self, self.board)[0]
+    if self.debug:
+        print(move)
+    # deal with buttons. each returns the button text
+    if move[0] < 0 and move[1] < 0:
+            if self.debug:
+                print(self.gui.gs.buttons[-move[0]].text)
+            return (None, None), self.gui.gs.buttons[-move[0]].text, None
+    
+      
+    point = self.gui.gs.start_touch - gscene.GRID_POS
+    # touch on board
+    # Coord is a tuple that can support arithmetic
+    try:
+        rc_start = Coord(self.gui.gs.grid_to_rc(point)) // TILESIZE
+        
+        # if self.check_in_board(rc_start):
+        #    rc = Coord(move[-2]) // TILESIZE
+        #    if self.tiles is None:
+        #       return rc, self.rack[rc_start].number, rc_start
+        #    else:
+        #      return rc, self.rack[rc], rc_start
+    except (KeyError):
+      pass
+                           
+    return (None, None), None, None
+  
+  def place_tile(self, coord, tile_index):
+      r, c = coord
+      self.board[r * TILESIZE:r * TILESIZE + TILESIZE,
+                 c * TILESIZE:c * TILESIZE + TILESIZE] = self.tiles[tile_index]
+                 
+  def update_clue_text(self): 
+      """ prepare block of clue text """
+      # get unique line_no
+      lines = sorted(set([word.start[0]+1 for word in self.word_locations]))
+      clue_text = ''
+      for line in lines:
+          clue_text += f'{line} '
+          for word in self.word_defs.values():
+             if word['line_no'] == line:
+              clue_text += f'{word.get("clue", "")} • '
+           # remove last dotand add CR
+          clue_text = clue_text[:-3] + CR
+      return clue_text
+                                          
+  #@ui.in_background
+  def select_definition(self, word):
+      """ word button pressed.
+      if word has definitions, open a list_dialog to select
+      if not, open a text dialog to enter clue
+      """
+      clue = None
+      self.gui.selection = ''
+      selection = ''
+      # find button
+      for k, button in self.gui.gs.buttons.items():
+        if button.text == word:
+           button_str = 'button_' + str(k)
+           break
+      if 'def' in self.word_defs[word] and 'clue' not in self.word_defs[word]:
+          try:
+              if self.debug:
+                  print(word, self.word_defs[word]) 
+              # flatten and append contents of word_defs
+              flat_list = self.word_defs[word]['def']
+              flat_list.extend([x for  xs in self.word_defs[word]['synonyms'] for x in xs])
+              if self.debug: print(flat_list)
+              while self.gui.selection == '':
+                  self.gui.input_text_list(prompt=f'Select definition for {word}', items=flat_list, width=400, position=(800, 0))
+                  while self.gui.text_box.on_screen:
+                      try:            
+                          selection = self.gui.selection.lower()
+                      except (Exception) as e:
+                          print(e)
+                      if selection == 'cancelled_':
+                         return False 
+                      if len(selection):
+                        if self.debug:   
+                            print(f'{selection=}')
+                      # self.wordlist = self.word_dict[selection]
+              clue = selection # dialogs.list_dialog(f'Select definition for {word}', items=flat_list)  
+              
+          except Exception as e:
+              print(e)
+      else:
+           clue = dialogs.text_dialog(f'Enter clue for {word}', text=self.word_defs[word].get('clue', ''))
+      
+      if clue is not None and clue != '':
+          self.word_defs[word]['clue'] =clue
+          if self.debug: print(self.word_defs[word]['clue'])
+          self.gui.set_props(button_str, fill_color='lightgreen')
+      else:
+          self.word_defs[word].pop('clue', None)
+          self.gui.set_props(button_str, fill_color='lightblue' if self.word_defs[word] else 'pink')
+      # check if all clues complete
+      self.all_clues_done = all([v.get('clue', '') != '' for v in self.word_defs.values()])
+      if self.all_clues_done:
+          self.gui.set_props(self.randomise_button , fill_color='orange')
+      self.save_state()  
+             
+  def randomise_grid(self):  
+      """ shuffle the tiles """
+      rowsplit = np.split(self.solution_board, self.image_dims[0], axis=0)
+      # divide each row into blocks of 3x3
+      colsplit = [np.split(rowsplit[i], self.image_dims[1], axis=1) for i in range(len(rowsplit))]
+      # add all together to get N 3x3 blocks
+      self.tiles = np.concatenate(colsplit)
+      # shuffle the indexes 0-34
+      indexes = list(range(0, math.prod(self.image_dims)))
+      shuffle(indexes)
+      self.soln_str = ''.join([f'{index:02}' for index in indexes])
+      # now place shuffled tiles
+      for i, index in enumerate(indexes):
+          coord = divmod(i, self.image_dims[1])     
+          self.place_tile(coord, index)      
+      self.gui.update(self.board) 
+       
+  def compute_puzzle_text(self, name='puzzle'):
+      """produce all text """      
+      all_text = CR.join([f'{name}:', 
+                          f"''{CR}7, 5",
+                          self.soln_str,
+                          CR,
+                          f'{name}_text:',
+                          self.update_clue_text(),
+                          f'{name}_frame:',
+                          CR.join([''.join(row) for row in self.board]).replace('#', ' ').upper(),
+                         ])
+      return all_text
+                       
+  def process_turn(self, move, board):
+    """ process the turn
+    move is coord, new letter, selection_row
+    """
+    def check_clipboard():
+            data = clipboard.get()
+            if data == '':
+                print('clipboard fail')
+            else:
+                print('clipboard', data)
+    if move:
+      coord, letter, origin = move
+     
+      if letter == 'Fill':
+          # new solution and buttons
+          self.fill_board()
+          self.solution_board = self.board.copy()
+          self.gui.update(self.board)
+          self.update_buttons()
+          
+      elif letter == 'Lookup':
+          self.word_defs = {}
+          t = time()
+          # asyncio.run(self.lookup_all())
+          self.lookup_all()
+          self.gui.set_prompt(f'lookup complete in {(time()-t):.3f} secs')
+      elif letter == 'Copy':
+          print('Copy selected') 
+          name = dialogs.text_dialog('Enter name for puzzle', text='puzzle')   
+          msg = self.compute_puzzle_text(name)
+          clipboard.set(msg)
+          check_clipboard()
+          self.gui.set_message('Data copied')
+      elif letter == 'Randomise':
+          if self.all_clues_done:
+              self.randomise_grid()
+      elif letter == 'Reload':           
+            self.recall_state()
+      elif letter in list(self.wordset) and hasattr(self, 'word_defs'):
+          
+          self.select_definition(letter)     
+          
+          msg = self.update_clue_text()
+          self.gui.set_text(self.wordsbox, msg)
+            
+              
+    return 0
+    
+  def get_tile_no(self, n):
+    for t in self.gui.gs.get_tiles():
+        if t.number == n:
+            return t
+                        
+  def reveal(self): 
+    """ place all tiles in their correct location """
+    for n in range(self.span * self.sizey//TILESIZE):
+        val = int(self.solution[n * 2: n * 2 + 2])
+        coord = Coord(divmod(n, self.span))
+        if self.tiles is not None:
+          self.place_tile(coord,  val)
+          self.rack[coord] = val
+          self.gui.update(self.board)
+        else:
+          try:
+            t = self.get_tile_no(val)
+            t.set_pos(coord)
+            self.rack[coord] = t
+          except (AttributeError):
+            pass        
+    sleep(2)
+    self.game_over()
+    self.gui.gs.show_start_menu()
+      
+  def game_over(self):
+    # compare placement with solution
+    state = ''
+    for r in range(self.sizey // TILESIZE):
+      for c in range(self.span):
+        if self.tiles is None:
+          no = f'{self.rack[(r, c)].number:02d}'
+        else:
+          no = f'{self.rack[(r, c)]:02d}'
+        state += no 
+    if self.debug:   
+        print(state)
+    if state == self.solution:
+      self.gui.set_message('Game over')
+      return True
+    return False
+      
+  def restart(self):
+    self.gui.gs.close()
+    g = PieceWord().run()
+       
+    
+if __name__ == '__main__':
+  g = PieceWord()
+  g.run()
+  while (True):
+    quit = g.wait()
+    if quit:
+      break
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
