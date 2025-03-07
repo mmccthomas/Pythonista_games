@@ -34,6 +34,7 @@ import asyncio
 import console
 import dialogs
 import clipboard
+from textwrap import wrap, fill
 from random import shuffle
 import base_path
 base_path.add_paths(__file__)
@@ -47,10 +48,11 @@ from crossword_create import CrossWord
 PUZZLELIST = "pieceword_templates.txt"
 TILESIZE = 3
 CR = '\n'
-WordList = [#'wordlists/words_alpha.txt',
+WordList = ['wordlists/letters3_common.txt',
+             #'wordlists/words_alpha.txt',
             #  'wordlists/extra_words.txt',
               'wordlists/5000-more-common.txt',
-              'wordlists/words_20000.txt']
+              'wordlists/words_10000.txt']
 try:             
     with open('keys.pkl', 'rb') as f:
         thes_key = pickle.load(f)
@@ -67,6 +69,7 @@ class PieceWord(LetterGame):
     self.debug = False
     self.image_dims = [7, 5]
     self.all_clues_done = False
+    self.soln_str = '123'
     self.load_words_from_file(PUZZLELIST, no_strip=True) 
     self.selection = self.select_list()
     if self.selection is False:
@@ -103,8 +106,8 @@ class PieceWord(LetterGame):
       with open('piecestate.pkl', 'rb') as f:
          self.empty_board, self.board, self.solution_board, self.word_defs, self.word_locations, selection = pickle.load(f)
          if selection != self.selection:
-         	  console.hud_alert(f'Template does not match, select {selection} first')
-         	  return
+            console.hud_alert(f'Template does not match, select {selection} first')
+            return
          self.gui.update(self.board)
          self.update_buttons()         
          self.gui.set_text(self.wordsbox, self.update_clue_text())
@@ -112,7 +115,7 @@ class PieceWord(LetterGame):
              button = 'button_' + str(i+2)
              color = 'lightblue' if 'def' in self.word_defs[word] else 'pink'
              if 'clue' in self.word_defs[word]:
-             	  color = 'lightgreen'
+                color = 'lightgreen'
              self.gui.set_props(button, fill_color=color)
              
          
@@ -194,7 +197,7 @@ class PieceWord(LetterGame):
         for k, v in self.get_words().items():
             pos = int(w+ 20), int(h - (k[0]+1)*h/21)
             if pos[1] == bbox[1]:
-            	pos = bbox[0]+bbox[2]+10, bbox[1]
+              pos = bbox[0]+bbox[2]+10, bbox[1]
             button = self.gui.add_button(text=v, position=pos,
                                 fill_color='yellow', 
                                 **{**params,'min_size': (65, 38)})
@@ -214,7 +217,7 @@ class PieceWord(LetterGame):
                                    
         self.wordsbox = self.gui.add_button(text='', title='Clues', 
                                             position=(w+off+180, 200),
-                                            min_size=(280, 500),
+                                            min_size=(250, 500),
                                             font=('Courier New', 14),
                                              fill_color = 'black',
                                              )                        
@@ -236,7 +239,7 @@ class PieceWord(LetterGame):
       cx = CrossWord(self.gui, self.word_locations, self.all_words)
       cx.set_props(**transfer_props(['board', 'empty_board', 'all_word_dict',
                                        'max_depth', 'debug']))
-      cx.max_cycles = 2000                                 
+      cx.max_cycles = 5000                                 
       try:
           wait = self.gui.set_waiting('Generating')
           self.board = cx.populate_words_graph(max_iterations=100,
@@ -371,12 +374,7 @@ class PieceWord(LetterGame):
     try:
         rc_start = Coord(self.gui.gs.grid_to_rc(point)) // TILESIZE
         
-        # if self.check_in_board(rc_start):
-        #    rc = Coord(move[-2]) // TILESIZE
-        #    if self.tiles is None:
-        #       return rc, self.rack[rc_start].number, rc_start
-        #    else:
-        #      return rc, self.rack[rc], rc_start
+        
     except (KeyError):
       pass
                            
@@ -391,14 +389,24 @@ class PieceWord(LetterGame):
       """ prepare block of clue text """
       # get unique line_no
       lines = sorted(set([word.start[0]+1 for word in self.word_locations]))
-      clue_text = ''
+      
+      clues = []
       for line in lines:
-          clue_text += f'{line} '
+          clue_text = f'{line} '
           for word in self.word_defs.values():
-             if word['line_no'] == line:
+             if word['line_no'] == line:              
               clue_text += f'{word.get("clue", "")} • '
-           # remove last dotand add CR
-          clue_text = clue_text[:-3] + CR
+           # remove last dotand
+          clue_text = clue_text[:-3]
+          clue_list = wrap(clue_text, width=40, 
+                           initial_indent='', subsequent_indent='   ', 
+                           replace_whitespace=False)
+          clues.extend(clue_list)
+          
+      print(clues)
+      clue_text = CR.join(clues)
+      print('wrapped')
+      print(clue_text)
       return clue_text
                                           
   #@ui.in_background
@@ -465,10 +473,17 @@ class PieceWord(LetterGame):
       self.tiles = np.concatenate(colsplit)
       # shuffle the indexes 0-34
       indexes = list(range(0, math.prod(self.image_dims)))
+      origin = indexes.copy()
       shuffle(indexes)
-      self.soln_str = ''.join([f'{index:02}' for index in indexes])
+      
+      index_dict = dict(zip(origin, indexes))
+      inv_dict = {v:k for k,v in index_dict.items()}
+      sol_list = [inv_dict[i] for i in origin]
+      self.soln_str = ''.join([str(index).zfill(2) for index in indexes])
+      self.soln_str1 = ''.join([str(index).zfill(2) for index in sol_list])
+         
       # now place shuffled tiles
-      for i, index in enumerate(indexes):
+      for i, index in enumerate(sol_list):
           coord = divmod(i, self.image_dims[1])     
           self.place_tile(coord, index)      
       self.gui.update(self.board) 
@@ -478,9 +493,10 @@ class PieceWord(LetterGame):
       all_text = CR.join([f'{name}:', 
                           f"''{CR}7, 5",
                           self.soln_str,
-                          CR,
+                          '',
                           f'{name}_text:',
                           self.update_clue_text(),
+                          '',
                           f'{name}_frame:',
                           CR.join([''.join(row) for row in self.board]).replace('#', ' ').upper(),
                          ])
@@ -588,6 +604,7 @@ if __name__ == '__main__':
     quit = g.wait()
     if quit:
       break
+
 
 
 
