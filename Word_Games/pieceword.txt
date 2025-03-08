@@ -4283,52 +4283,10 @@ ACTMPAIC V UAME
 STUTTEAS I I I 
 A N R MEROULIRD
 
-puzzle1:
-''
-7, 5
-0915022933011408200031180316281704233222060730051125133412272624211910
-
-puzzle1_text:
-1 Price of travel • easily irritated or annoyed
-3 cacophony • Soldiers to the fore
-5 Period of life • First man?
-7 Mermaid • block to progress
-9 above • Small tree • Excluding
-11 Mrs Lipman perhaps • times that are to come
-13 Short(!) tape recording •
-   as in presidency, governorship
-15 the power to produce a desired result • cram
-17 End of prayer • adviser
-19 Full of germs • Masked fighter
-21 Self-satisfied cup • Small Mel
-
-puzzle1_frame:
-O ER  E DO A RE
-NT KELM IRKS L 
-  H  EPROR CUDI
-UGERES C SRIREF
- U A B HUE CE A
-HE IDC E ROANIC
-UMO O ISA C  R 
- I IMP A LOGEWO
-ICE P GNO O  O 
-R ABLECUTNIARSE
-G SI A T E D  S
-E TSISREAD ADE 
- S L CPNEA UONA
-ESTONEI RMIL G 
- I Y SNOTE TT S
-V  IZUESE SEE A
- DEI  C NB  FIR
-S XIC TEDEPTI M
- E ION PEN   FI
-MI N E  MSONB E
- S CT DSI  OAES
- 
 puzzle2:
 ''
 7, 5
-2703152123331101260531200719251604102413282212173032001829090614020834
+2607320116093012332917062219310215232713110321041814080020282410250534
 
 puzzle2_text:
 1 average • gem
@@ -4341,10 +4299,10 @@ puzzle2_text:
    lack of depth of understanding or character
 15 memorial • to bring (as an action or 
    operation) to an immediate end
-17 lean • cards
-19 Data rate • A cross
-21 evenly • a person appointed by a court
-   to prepare an account of financial matters in a civil case
+17 lean • sent from holiday
+19 Data rate • Across
+21 evenly • a person who
+   prepares an account of financial matters 
 
 puzzle2_frame:
 A AIAME   SUFIC
@@ -4372,7 +4330,7 @@ RWHN IU Y YAN T
 puzzle3:
 ''
 7, 5
-2001221703150509282630233306020727291024040025131412323116191108213418
+2101140420061315310718302523240528033429003202111922091608171027261233
 
 puzzle3_text:
 1 czar • moving with the wind
@@ -4765,3 +4723,281 @@ E    ABREE TN T
 TRE I HINEPO DA
  ED O  M N AHO 
 IF END I SIDACK
+
+puzzle11:
+''
+7, 5
+0032180926330416062524221113170327053408280110143121150223071219293020
+
+puzzle11_text:
+ 1 Portable computer • 11th letter of
+   Greek alphabet
+ 2 as in paper
+ 3 Betting place • tending to adhere to
+   objects upon contact
+ 4 graciousness
+ 5 One of a pair • Computer connection
+ 6 Holds assets for another
+ 7 the quality or state of being
+   demanding or unyielding (as in
+   discipline or criticism) • setting
+ 8 antediluvian
+ 9 something or someone that is
+   unusually large and powerful •
+   cognizant
+10 Known as
+11 an effort to do or accomplish
+   something • speaking
+12 Institute of Mathematics and
+   Applications
+13 value • hardy
+14 blemish
+15 result • accurate
+16 given
+17 binds • car
+18 Workmen
+19 Name of various regions in Africa •
+   Consuming
+20 apparent
+21 dwell • danger
+
+puzzle11_frame:
+LAPIT NATL NOSP
+O U TA M ATTN E
+CASUE RACR E TR
+AKALITB HM ILAM
+T TI SUTOINGEN 
+IMAEE S UN HSTI
+ I S HGUI SC ST
+RNICIEE ENT SH 
+U C C RES AW EX
+ DOITAENE S NEA
+S C E  O ITT EV
+ONTUSTARE A IDE
+INGN POR ED RIG
+V HTIE ANX A F 
+EATE CAN TORASI
+Y TBDA S MER N 
+CSII NEMP S IDE
+L MCKY I ISS A 
+EATOUTTOPA H B 
+NT  T  WRTWIALK
+THRACTINOO N I 
+
+puzzle13:
+''
+7, 5
+2625151921161432243127130828032011223406040717093305012912231030001802
+
+puzzle13_text:
+ 1 archpriest • researcher
+ 2 authors
+ 3 Former members of college • Consort
+   of Queen Victoria
+ 4 waivers
+ 5 acclaim • Inverse trig function
+ 6 fairly small areas of land completely
+   surrounded by water
+ 7 Suzy’s formal name • a collection or
+   system of rules of conduct
+ 8 stifle
+ 9 to arrange something in a certain
+   spot or position • the entrance room
+   of a building
+10 Large goldfish
+11 composition • energetic
+12 System for informing position
+13 Capital of India • the capacity for
+   feeling for another's misfortune
+14 Large city in Florida
+15 _ Ferry, Roxy Music • highly
+   populated areas
+16 darkness
+17 blasting • blueprint
+18 nourishing
+19 frayed • depositing
+20 loosen
+21 bond • commonplace
+
+puzzle13_frame:
+ E  SHINGDESDEL
+ACKD AA A A  U 
+ T UTRMALTRYBRY
+E OA AHI E T HE
+LOUMIC OROTHDO 
+A NP HAN  A  TO
+RAG E WS AN ISC
+U EICLO P SML E
+SUR T ONAUP  IS
+ O C D E LAYFIN
+ITEHAILANEN RS 
+ T E OE ONORALB
+T ODERKOII EMER
+ARTR AE DLANE A
+N AERTGPSL EDS 
+HOPBISSUS COADO
+ WRE T S ER  E 
+MNIALUSET ENITI
+GEDS ILAIART E 
+ SLSIN W  U YNA
+ETYE GLANWNS S 
+
+puzzle14:
+''
+7, 5
+3322040911213120080626181017032713160015341428240102251223071932302905
+
+puzzle14_text:
+ 1 African country • tried
+ 2 straight up
+ 3 Drawing on body • a short trip for
+   pleasure
+ 4 Javelin
+ 5 Mr T Davies • marines
+ 6 as in retained, possessed
+ 7 nightspot • haven
+ 8 coming before all others in
+   importance • Legal standard
+ 9 the stopping of a process or activity
+10 Petrified tree • 2nd female singing
+   voice
+11 comforts
+12 a long deep cut • Small blue birds
+13 accoutrement
+14 info • as in garland, almanac
+15 Arabia • Performing
+16 Yellow gemstone
+17 heard or able to be heard • brighten
+18 Pink group
+19 Tooth plaque • gulps
+20 something used to carry goods or
+   passengers
+21 established • being over what is
+   needed
+
+puzzle14_frame:
+L A I T NSIS T 
+IES O AUD M RIG
+C TINGR E I  O 
+NKSL SN EE  TES
+S IERSTENANGHT 
+ESST EE ED  RAM
+A DTEDMBEL SACC
+Y IA RE LAME GE
+SATBLELOYR NDI 
+LTO L  OACO TAR
+ A NITSO  KEU G
+ITS A IONCESPRO
+ANCI INDAR  ORY
+L RRUS UPIGHNA 
+WNEE TTOOD   DO
+  ADISCOAESSDRI
+IBL N  N N ALE 
+  F D TEAA FEXC
+ H   LTARRWA S 
+HICSEL VEE R I 
+ O   OVEDTATSAU
+ 
+puzzle15:
+''
+7, 5
+0118032714042331281530120613102109072520292402083400173233191626051122
+
+puzzle15_text:
+ 1 a part taken from a longer work •
+   seminude
+ 3 Go back to the beginning • Chemical
+   found in plants
+ 5 miracles • Michael __ , footballer
+ 7 Spreads rapidly • image
+ 9 to throw or give off • cloth •
+   Location system
+11 blow up • to declare to be morally
+   wrong or evil
+13 million cycles • Compound of element
+   N
+15 line drawing • Eastern UK county
+17 Lottery gambling game • actuality
+19 Record lodgers • to be under
+   necessity or obligation to
+21 Malicious computer programs • Working
+   surface
+
+puzzle15_frame:
+K  EXCTROT TO M
+ KEU O  NA SPHE
+A NRESAL GLUE T
+OOK LIT EGEN S 
+M EL  E C R LOD
+E DABRS KESS O 
+ESS OURALKENESS
+A K N  L A  L E
+GPSESKT FIC IDE
+T MGUE R ERPR M
+EN E MNO  A NCE
+  ASPY A ET I E
+L  R  GHT I  NI
+EMNEXPH UNOM  S
+  O  ITOP N RCO
+ O STBOPL V MHZ
+OND I  R  OWO Z
+ V WARCOS K CHA
+ VIG NW W A OUS
+A CENAEXISTEV E
+CASD MS C I EX 
+
+puzzle16:
+""
+7, 5
+2226251333110110183208001417120204340306091623270720192915302105312428
+
+puzzle16_text:
+ 1 African country • Gaps between words
+ 2 People  that accompanies another for
+   protection
+ 3 Short Message String • very small in
+   size
+ 4 having to do with
+ 5 not having anything to do with the
+   matter at hand • bags and suitcases
+ 6 records of a series of items
+ 7 Greek letter S • adipose
+ 8 Short for smoke • _ Maria
+ 9 adjudicate
+10 sage • defy
+11 Owned by
+12 South American country • as in duke,
+   baron
+13 excursionists
+14 College • Programmers development
+15 convalescence • skeleton
+16 a long narrow piece of material
+17 AI brand • blemish
+18 lacking in refinement or good taste
+19 Formosa • Japanese car brand
+20 inhabitants
+21 Held in esteem • Person of high
+   standard of morality or virtue
+
+puzzle16_frame:
+MA   AWISS DE A
+ CITHE D INGBEL
+DET  LPERT EU I
+WANARE I SIG N 
+ PE O  S  N  C 
+ARDARLAME C REH
+BOUE GTTYSPAD R
+R LNEI E TS G A
+ISTT N R ATOERM
+P  TRA FAT    S
+ARN UNVE UGGONI
+S  AB INES    G
+E ITAIMALVELSUB
+ANTO NO OI IES 
+L TREGMSGC MDEC
+ G AWIERSARUTRI
+COR ESDE T SO T
+ T STR FRENTROS
+N X O P RCES A 
+ISHOPLAGEO EONG
+M A S C CMIC G 
