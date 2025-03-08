@@ -4282,3 +4282,486 @@ ACTMPAIC V UAME
  N S TCICDERTUS
 STUTTEAS I I I 
 A N R MEROULIRD
+
+puzzle1:
+''
+7, 5
+0915022933011408200031180316281704233222060730051125133412272624211910
+
+puzzle1_text:
+1 Price of travel • easily irritated or annoyed
+3 cacophony • Soldiers to the fore
+5 Period of life • First man?
+7 Mermaid • block to progress
+9 above • Small tree • Excluding
+11 Mrs Lipman perhaps • times that are to come
+13 Short(!) tape recording •
+   as in presidency, governorship
+15 the power to produce a desired result • cram
+17 End of prayer • adviser
+19 Full of germs • Masked fighter
+21 Self-satisfied cup • Small Mel
+
+puzzle1_frame:
+O ER  E DO A RE
+NT KELM IRKS L 
+  H  EPROR CUDI
+UGERES C SRIREF
+ U A B HUE CE A
+HE IDC E ROANIC
+UMO O ISA C  R 
+ I IMP A LOGEWO
+ICE P GNO O  O 
+R ABLECUTNIARSE
+G SI A T E D  S
+E TSISREAD ADE 
+ S L CPNEA UONA
+ESTONEI RMIL G 
+ I Y SNOTE TT S
+V  IZUESE SEE A
+ DEI  C NB  FIR
+S XIC TEDEPTI M
+ E ION PEN   FI
+MI N E  MSONB E
+ S CT DSI  OAES
+ 
+puzzle2:
+''
+7, 5
+2703152123331101260531200719251604102413282212173032001829090614020834
+
+puzzle2_text:
+1 average • gem
+3 autocrat • feeling
+5 devastate • Opposite of yin
+7 strut • Caledonian
+9 average • cuties • tellies
+11 conjugality • Chest features
+13 as in arm, wing • having or showing a
+   lack of depth of understanding or character
+15 memorial • to bring (as an action or 
+   operation) to an immediate end
+17 lean • cards
+19 Data rate • A cross
+21 evenly • a person appointed by a court
+   to prepare an account of financial matters in a civil case
+
+puzzle2_frame:
+A AIAME   SUFIC
+POS N WED  N S 
+I TSAT  YORASTO
+ TRALKICA E R Y
+ E  L  O IN OVE
+UDIM DER  E R S
+DWIELLT AE  O  
+ A C AELMLES TH
+ALLHONR I  EA I
+ J OND STIALOTT
+LOCN OA EM LN  
+ B IONNORPS ES 
+ I PER SCC OBAN
+TCA  SP  K NL D
+ A RY ISHU OEQU
+DTHTYP O O MO T
+L ME OIPPRDSNG 
+Y ARUL H T G  T
+ N ISHL D L ANS
+RWHN IU Y YAN T
+ A TVSSEN S TOR
+
+puzzle3:
+''
+7, 5
+2001221703150509282630233306020727291024040025131412323116191108213418
+
+puzzle3_text:
+1 czar • moving with the wind
+3 apparition • View intelligently?
+5 showing feeling freely • fall
+7 very thin and easy to see through •
+   Heat ray
+9 hints • ban • Method to hide computer
+   location
+11 the place where a plant or animal is
+   usually or naturally found •
+   sheltered
+13 __ Lovelace • the placing of
+   something out of sight
+15 get back • blotches
+17 damage • mouthpiece
+19 genetically passed on, or capable of
+   being passed from parent to offspring
+   • appellation
+21 as a substitute • Small Mel?
+
+puzzle3_frame:
+ADAERONCES AAIL
+I S E   DT C N 
+RETST VE O KKSM
+A  L TH O M  M 
+HABEMOOP KESRM 
+  LS S  E N  E 
+INHALM TI A R S
+N E O  A TIOU W
+INSSPOELI N LOO
+I LI HI A SHENT
+NALSPOMANU OS A
+G EI LA GTIPTS 
+INGEMPY  FRARED
+D OA H HAB  O E
+ARTGHOM SID VPN
+ INTEDERI N E  
+B  E E S ITARED
+ORBD MTEA S   A
+EER I  COTLE E 
+ D  DR  RE LOVE
+S F E RIESSA E 
+
+puzzle4:
+''
+7, 5
+1801033411311727131610002025210228302319220408320906122405262914153307
+
+puzzle4_text:
+1 unbind • classes
+2 enumeration
+3 roll call • More please
+4 __ family
+5 Central American country • the central
+   part of something
+6 devoid
+7 cordial • eyeglasses
+8 pouch • night be fore
+9 Making a tentative judgment
+10 apparatus • Web addresses
+11 complicated
+12 Continent • box
+13 Knowledge seeker
+14 All Colour Modes • Insect
+15 Tadpole • autocrat
+16 clues
+17 nonprofessional • Close to SF
+18 a building for storing goods
+19 appellations • African country
+20 to describe as similar
+21 to have as an opinion • hypodermic
+
+puzzle4_frame:
+IC RAPGEA M SCI
+ BA PA R YRO AC
+ASSTERASI N RM 
+S  C LNDAENT G 
+AKLAMAE TM A U 
+T  T SDLEP TLER
+TONRES  HS  LES
+ W E CTEUSSE CO
+ N VER  DY  KON
+ O E E  AUNWRLS
+MPANCENADP E E 
+ E G N  EROSPAR
+A RECS H T UINT
+G E O  I ATER O
+ESS L SPEM SEPO
+ SPE ADAMR ITIT
+VE ANDA EELAE I
+INGR IMPTA TREC
+ C I TISTUGAGEN
+BORGRENT RE LL 
+ R H R RUNEEOLI
+ 
+puzzle5:
+''
+7, 5
+2911052421251418220006320926332702102817203112150423013019341307031608
+
+puzzle5_text:
+1 measures • no-nonsense
+3 Wolverine • alterations
+5 astonishing • Lawn implement
+7 apart • to come into existence
+9 Course 270 • manufactories • Gourd
+11 Python code files • Saturday, Sunday
+13 Web language • share
+15 counterculturist • Greek for S
+17 Middle East country • warrant
+19 collected • idols
+21 an upright shaft that supports an
+   overhead structure • administrator
+
+puzzle5_frame:
+O T I  S LEDATE
+KE AN ULEE OR R
+  A I  I S MMA 
+S E ASEMBONS AP
+T NS M U N EC  
+REVEASUMNGERLAN
+O EUNTRTIASS T 
+S W I   ER QDER
+E BAN AN COL N 
+CIP ICM  I E C 
+ F  O ENDFULRAN
+SIGANA  EE O T 
+PHPEST E S  ARN
+U TB E RA OM E 
+BOHONS V M YISI
+O APEAE   P AMO
+WONC  MODEEKL R
+S ITS   E C LOG
+N R PAIDEREDS L
+GUA  T O H ATEE
+E NEMIT PYAMR S
+
+puzzle6:
+''
+7, 5
+1030250532062400161915092927022107031308182801223114233317111226200434
+
+puzzle6_text:
+1 crush • observes
+3 being clean and in good order •
+   Japanese electronics co
+5 inaccurate • Italian this one
+7 abides • NY theatre district
+9 Book ident • awesome • Coke
+11 Hebrew • Southern state
+13 a handled container for holding and
+   pouring liquids that usually has a
+   lip or a spout • feathery
+15 __ Ford • of low quality
+17 bard • complicated
+19 incorporate • exterior
+21 a mechanism for adjusting the
+   operation of a device, machine, or
+   system • compensation
+
+puzzle6_frame:
+L DGHTWAYF I OU
+OUS  HR TI G G 
+Y OON OKEN HAYM
+ATCR P V N  AYS
+ O ERRAELGIA S 
+ASOD O I   NN S
+SQUR RINT I N  
+A NATES EEOR PO
+CRIN GCON T M F
+ ST H  N JUGD K
+W K ITBORO OSA 
+ISB B  L HAR  B
+ATEF  WEI N  A 
+L UISR C ET ONE
+L P  ICHE E  S 
+E WEGROAD LI BR
+M I E A    DB  
+PANTRORB RISUPE
+EEZGHTHESV MTER
+ X U IA AELAE E
+SP AP NICR KENT
+ 
+puzzle7:
+''
+7, 5
+2728260824020312231920151710303407183331131116250901290032050406212214
+
+puzzle7_text:
+1 armed forces • Devices to listen to
+   broadcast
+2 convention
+3 picket • fashions
+4 affirmation
+5 composed • 2nd letter Greek alphabet
+6 to make ready in advance
+7 young wormlike form • Suzi
+8 Portable computers
+9 Living barrier • tests
+10 Plastic for windows
+11 Dictionary • completely
+12 software application for programmers
+13 Eye-watering vegetable • Little
+   orphan
+14 illicit
+15 beginning • __s Bank
+16 small useful items
+17 canopy • US TV system
+18 measurement
+19 Not digital • __ Geller in Friends
+20 DC3 maker
+21 German boobies! • austere
+
+puzzle7_frame:
+VELT EI DECLANA
+ N TENCOOL EC N
+NSIR DA O PRTIT
+U ELOG S RADNIE
+TSC DOSTEON  V 
+L LTEN I STYOYD
+ SUON ARAONIICA
+PS  IL A  F N R
+ EXHA EPAALPERE
+VA  Y R DUPCN T
+ LALEGPTOR UETA
+GE E E O IDES I
+LAR I MONTIOIOS
+ W UGLAS E BL U
+HED N SEVRE LES
+ AN U TROOPS NO
+AL UNIY U RET R
+ LL W PATROLIME
+SANA KTY  N O U
+ R RLYH NTTEWEB
+AMSO PONA I T A
+
+puzzle8:
+''
+7, 5
+2414342820041608171505310210300103330911261312000629272223192518210732
+
+puzzle8_text:
+1 delighted (in) • projectile
+3 2nd odd number • chickenhearted
+5 inhabitants • to point or turn
+   (something) toward a target
+7 designs • accomplished
+9 appellation • Gathering • as in sight
+11 Producing electricity  • lasting
+   forever
+13 arouse • convey
+15 All animals • coming before all
+   others in time or order
+17 story • Silvery brittle metal
+19 Collection of work • In dependent
+   production
+21 excess • fewest
+
+puzzle8_frame:
+NICI   TA M I U
+ P VOLW  TAIRES
+FIR  EEET R E A
+ PLATE INI I R 
+U EM S O NTSTER
+NAMST INIG S C 
+LENE  MMU COOYE
+O  NAL  N  B I 
+UP   IFE DLIEE 
+O O L  R TFOT R
+MS IDE AI U ESE
+  E I  G PLUR V
+ILELIOE I T ENJ
+D CE RMANGANN E
+ISHS MA F T THR
+PORREV U ISSS  
+P OO EWS  T  NE
+SURWIL T LOWA R
+TEDANSDIEB HD M
+O E G A AC ER E
+KENE MMALA HYEL
+
+puzzle9:
+''
+7, 5
+0503180813323006042223211227311725150914110229002033242801192610340716
+
+puzzle9_text:
+ 1 to make a part of a body or system •
+   a mark of guilt or disgrace
+ 2 a state of overwhelming usually
+   pleasurable emotion
+ 3 positive regard for something •
+   dignified
+ 4 embrace
+ 5 conveyance • alfresco
+ 6 to move in a stream
+ 7 poem • argue
+ 8 as in barbecue, roast • Flightless
+   bird
+ 9 lying with the face downwards
+10 Italian description? • routines
+11 connoisseur
+12  the Viking • skim
+13 asylum
+14 used to express disgust • UK company
+15 Number of digital words • regions
+16 sea
+17 mesh • News agency
+18 apart
+19 as in braid, lace • amount of a
+   medicine that should be taken
+20 Sun’s outline
+21 Miss Swift • consequence
+
+puzzle9_frame:
+ARYN  SANORBT  
+LC EUT UG SEUTD
+ ARE  ES ISHS  
+ABSDOPDOSSTIR A
+R UE OLA TH TOR
+RELLOWEFFAUGI L
+LET D A DGMACTS
+ CO A Y EL L R 
+LORBYTSTRUSTEAF
+ R AGEITS Z L U
+LECT C E VENERS
+ A ECTERI R V P
+ L IC C ELYR  O
+ I  FROOR E WOR
+EASPROS E S   A
+A LFIL PLCEACTU
+COLI LMU K RH P
+K ITAYATESIDI W
+  AEADI PE O C 
+ICL U VEHNETROL
+  F S A UE A N 
+
+puzzle10:
+''
+7, 5
+2723050919000624202832180134042129081403313022130210263325110716121517
+
+puzzle10_text:
+ 1 ranking • newsreader
+ 2 superheated
+ 3 bosom • prunes
+ 4 steed
+ 5 Anti diabetic drug • an article
+   intended for use in work
+ 6 trims off
+ 7 Indian religion m ember •
+   appointments
+ 8 cloistress • 17th letter of Greek
+   alphabet
+ 9 softback
+10 Web page • elysium
+11 accessible
+12 and Ollie • deposits
+13 jewels
+14 US timezone  • Web language
+15 End of conditional programming
+   statement  • concur
+16 a building for storing goods
+17 brighten • adepts
+18 apart
+19 clergyperson • to come into view
+20 menaces
+21 attorneys-at-law • submits
+
+puzzle10_frame:
+B AI E I DENTES
+INSN R V  C  F 
+S OERBREEUTS F 
+ S   HPRI U ANC
+TTEULIS NILAST 
+ I   CEAG E SHE
+L IU N T RESM E
+LIGSTSREAGP BLE
+I GS U M  AGU P
+APPESTEARDU HOR
+TS  THL E NUE E
+YIELESLDSPAPARS
+E  HTMASUINGORS
+TEN A T P HON U
+S  STAH LASTLIP
+T    DRATD UL D
+RTIHTEU RSILAVA
+E    ABREE TN T
+TRE I HINEPO DA
+ ED O  M N AHO 
+IF END I SIDACK

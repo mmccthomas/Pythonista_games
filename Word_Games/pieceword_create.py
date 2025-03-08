@@ -45,6 +45,7 @@ from gui.gui_scene import Tile
 from gui.gui_interface import Coord, BoxedLabel
 from scene import Texture, LabelNode
 from crossword_create import CrossWord
+
 PUZZLELIST = "pieceword_templates.txt"
 TILESIZE = 3
 CR = '\n'
@@ -91,7 +92,7 @@ class PieceWord(LetterGame):
     self.gui.clear_messages()
     self.gui.set_enter('', stroke_color='black') # hide box
     #self.gui.set_moves('\n'.join(self.wordlist), position=(w + 50, h / 2), font=('Avenir', 20))
-    self.gui.set_top(f'Pieceword no {self.selection.capitalize()}')
+    self.gui.set_top(f'Pieceword frame {self.selection.capitalize()}')
     
     self.finished = False
   
@@ -105,19 +106,19 @@ class PieceWord(LetterGame):
   def recall_state(self):
       with open('piecestate.pkl', 'rb') as f:
          self.empty_board, self.board, self.solution_board, self.word_defs, self.word_locations, selection = pickle.load(f)
-         if selection != self.selection:
+      if selection != self.selection:
             console.hud_alert(f'Template does not match, select {selection} first')
             return
-         self.gui.update(self.board)
-         self.update_buttons()         
-         self.gui.set_text(self.wordsbox, self.update_clue_text())
-         for i, word in enumerate(self.get_words().values()):
+      self.gui.update(self.board)
+      self.update_buttons()         
+      self.gui.set_text(self.wordsbox, self.update_clue_text())
+      for i, word in enumerate(self.get_words().values()):
              button = 'button_' + str(i+2)
              color = 'lightblue' if 'def' in self.word_defs[word] else 'pink'
              if 'clue' in self.word_defs[word]:
                 color = 'lightgreen'
              self.gui.set_props(button, fill_color=color)
-             
+      self.check_all_clues()   
          
   def get_words(self):
       word_dict = {}
@@ -392,7 +393,7 @@ class PieceWord(LetterGame):
       
       clues = []
       for line in lines:
-          clue_text = f'{line} '
+          clue_text = f'{str(line):>2} '
           for word in self.word_defs.values():
              if word['line_no'] == line:              
               clue_text += f'{word.get("clue", "")} • '
@@ -429,6 +430,8 @@ class PieceWord(LetterGame):
                   print(word, self.word_defs[word]) 
               # flatten and append contents of word_defs
               flat_list = self.word_defs[word]['def']
+              #for i, item in enumerate(flat_list):
+              #	 flat_list[i] = fill(item, width = 20)
               flat_list.extend([x for  xs in self.word_defs[word]['synonyms'] for x in xs])
               if self.debug: print(flat_list)
               while self.gui.selection == '':
@@ -443,6 +446,7 @@ class PieceWord(LetterGame):
                       if len(selection):
                         if self.debug:   
                             print(f'{selection=}')
+                      sleep(0.2)
                       # self.wordlist = self.word_dict[selection]
               clue = selection # dialogs.list_dialog(f'Select definition for {word}', items=flat_list)  
               
@@ -458,12 +462,15 @@ class PieceWord(LetterGame):
       else:
           self.word_defs[word].pop('clue', None)
           self.gui.set_props(button_str, fill_color='lightblue' if self.word_defs[word] else 'pink')
-      # check if all clues complete
+      self.check_all_clues()
+      self.save_state()  
+      
+  def check_all_clues(self):
+  	  # check if all clues complete
       self.all_clues_done = all([v.get('clue', '') != '' for v in self.word_defs.values()])
       if self.all_clues_done:
           self.gui.set_props(self.randomise_button , fill_color='orange')
-      self.save_state()  
-             
+                     
   def randomise_grid(self):  
       """ shuffle the tiles """
       rowsplit = np.split(self.solution_board, self.image_dims[0], axis=0)
