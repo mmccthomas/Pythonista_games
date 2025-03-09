@@ -79,6 +79,7 @@ class Gui():
             x, y, w, h = self.gs.game_field.bbox
             position = (x + w + 100, 40)
         self.font = ('Avenir Next', 32)
+        self.width = 200
         self.allows_multiple_selection = False
 
         for k, v in kwargs.items():
@@ -86,7 +87,7 @@ class Gui():
 
         # allow for 2 lines of prompt
         self.text_box = ui.View(bg_color='lightgrey',
-                                frame=(position[0], position[1], 200, 550))
+                                frame=(position[0], position[1], self.width, 550))
         lb = ui.ButtonItem(image=ui.Image.named('iob:close_32'),
                            enabled=True,
                            action=self.cancel)
@@ -101,17 +102,17 @@ class Gui():
         req_height = no_items * self.font[1] * 1.40
         height = min(req_height, 400)
         self.t = ui.TableView(name='text',
-                              frame=(10, 45, 170, height),
+                              frame=(10, 45, self.width - 30, height),
                               font=self.font,
                               text_color='black',
                               bordered=True)
         # change frame size to fit list
-        self.text_box.frame = (0, 0, 200, height + 55)
+        self.text_box.frame = (0, 0, self.width, height + 55)
         self.t.data_source = self.t.delegate = self.data
         self.t.allows_multiple_selection = self.allows_multiple_selection
         self.text_box.add_subview(self.t)
 
-        label = ui.Label(frame=(5, 5, 180, 40),
+        label = ui.Label(frame=(5, 5, self.width - 20, 40),
                          font=('Avenir Next', 18),
                          text=prompt,
                          number_of_lines=0,
