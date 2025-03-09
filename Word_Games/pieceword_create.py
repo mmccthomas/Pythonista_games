@@ -89,7 +89,7 @@ class PieceWord(LetterGame):
         self.first_letter = False
         self.tiles = None
         self.debug = False
-        self.lookup_method = 'free' # merriam
+        self.lookup_free = True
         self.image_dims = [7, 5]
         self.all_clues_done = False
         self.soln_str = '123'
@@ -156,14 +156,17 @@ class PieceWord(LetterGame):
 
     def lookup_all(self):
         wait = self.gui.set_waiting('Looking up words')
+        missing_words = []
         for i, word in enumerate(self.wordset):
             # self.gui.set_prompt(f'looking up {word}')
             wait.name = f'Finding {word}'
-            if self.lookup_method == 'free':
-                self.lookup_free_dictionary(word)
-            else:
-                self.lookup_merriam_webster(word)
-            
+            # lookup using free dictionary,merriam_webster if fail
+            self.lookup(word, self.lookup_free)
+            if not self.word_defs[word]:
+                self.lookup(word, not self.lookup_free)       
+                if self.word_defs[word]:
+                    missing_words.append(word)
+               
             # change button colour to show if definition found
             button = 'button_' + str(i + 2)
             self.gui.set_props(
@@ -172,16 +175,27 @@ class PieceWord(LetterGame):
             self.word_defs[word]['line_no'] = list(
                 self.get_words().keys())[i][0] + 1
         self.gui.reset_waiting(wait)
+        if missing_words:
+           dialogs.hud_alert(f'Found {missing_words} in 2nd dictionary')
 
         if self.debug:
             for word in self.wordset:
                 print()
                 print(word, self.word_defs[word])
                 
+    def lookup(self, word, method): 
+        if method:
+            self.lookup_free_dictionary(word)
+        else:
+            self.lookup_merriam_webster(word)  
+            
     def lookup_free_dictionary(self, word):
         """ free dictionary lookup """
         self.word_defs[word] = {}
-        data = requests.get(f'https://api.dictionaryapi.dev/api/v2/entries/en/{word}').json()
+        try:
+            data = requests.get(f'https://api.dictionaryapi.dev/api/v2/entries/en/{word}').json()
+        except json.JSONDecodeError:
+            return
         if isinstance(data, list):
             data = data[0]
             try:                        
@@ -260,7 +274,7 @@ class PieceWord(LetterGame):
                                          position=pos,
                                          fill_color='yellow',
                                          **{
-                                             **params, 'min_size': (65, 38)
+                                             **params, 'min_size': (65, h/21 - 2)
                                          })
             # get bbox of just placed button as integers to allow comparison
             bbox = [
@@ -301,8 +315,8 @@ class PieceWord(LetterGame):
         self.wordsbox = self.gui.add_button(
             text='',
             title='Clues',
-            position=(w + off + 180, y+100),
-            min_size=(250, 500),
+            position=(w + off + 150, y+50),
+            min_size=(250, 300),
             font=('Courier New', 14),
             fill_color='black',
         )
@@ -495,7 +509,7 @@ class PieceWord(LetterGame):
                     self.gui.input_text_list(
                         prompt=f'Select definition for {word}',
                         items=flat_list,
-                        width=400,
+                        width=600,
                         position=(800, 0))
                     while self.gui.text_box.on_screen:
                         try:
@@ -670,6 +684,7 @@ if __name__ == '__main__':
         quit = g.wait()
         if quit:
             break
+
 
 
 
