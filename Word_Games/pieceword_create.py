@@ -9,6 +9,8 @@ Visually inspect  grid and regenerate of and words in appropriate or acronyms
 For each complete across word, find an online definition or synonym
 Need this to be automatic
 May be https://www.merriam-webster.com/dictionary/word
+or https://www.thefreedictionary.com
+
 Pick the best.
 Random shuffle the grid split into 3x3 blocks
 Create text version of this shuffled grid using spaces for blanks
@@ -17,23 +19,23 @@ Create puzzle data, name, name_text, name_frame
 add save state
 
 To operate:
-	1. select template
-	2. if filled grid is not okay, or contains too many 
-	   odd words, press Fill again
-	3. Press Lookup to get definitions of words. this will only work
-	   if you have 2 keys in file keys.pkl for https://dictionaryapi.com
-	   as strings thes_key and dict_key.
-	   Successful lookups will turn button blue, unsuccessful ones
-	   will turn pink. if all buttons are pink, key was invalid
-	3. press each blue button to select appropriate definition or synonym
-	   button wil turn green
-	4. press each pink button and try to enter a suitable clue - be creative!
-	5. pressing green button again allows editing of clue
-	6. press Randomise to shuffle tiles. this can be repeated as necessary.
-	7. press Copy and puzzle nane or number, e.g. puzzle18
-	8. open pieceword.txt and paste text to end of file
-	
-	
+  1. select template
+  2. if filled grid is not okay, or contains too many 
+     odd words, press Fill again
+  3. Press Lookup to get definitions of words. this will only work
+     if you have 2 keys in file keys.pkl for https://dictionaryapi.com
+     as strings thes_key and dict_key.
+     Successful lookups will turn button blue, unsuccessful ones
+     will turn pink. if all buttons are pink, key was invalid
+  3. press each blue button to select appropriate definition or synonym
+     button wil turn green
+  4. press each pink button and try to enter a suitable clue - be creative!
+  5. pressing green button again allows editing of clue
+  6. press Randomise to shuffle tiles. this can be repeated as necessary.
+  7. press Copy and puzzle nane or number, e.g. puzzle18
+  8. open pieceword.txt and paste text to end of file
+  
+  
 """
 # Pieceword game
 # tiles are 3x3 squares, to fit into 15 x 35 grid
@@ -45,6 +47,7 @@ import traceback
 import pickle
 import numpy as np
 from urllib.request import urlopen
+import requests
 import json
 import math
 import console
@@ -86,6 +89,7 @@ class PieceWord(LetterGame):
         self.first_letter = False
         self.tiles = None
         self.debug = False
+        self.lookup_method = 'free' # merriam
         self.image_dims = [7, 5]
         self.all_clues_done = False
         self.soln_str = '123'
@@ -155,7 +159,11 @@ class PieceWord(LetterGame):
         for i, word in enumerate(self.wordset):
             # self.gui.set_prompt(f'looking up {word}')
             wait.name = f'Finding {word}'
-            self.lookup_merriam_webster(word)
+            if self.lookup_method == 'free':
+                self.lookup_free_dictionary(word)
+            else:
+                self.lookup_merriam_webster(word)
+            
             # change button colour to show if definition found
             button = 'button_' + str(i + 2)
             self.gui.set_props(
@@ -169,19 +177,33 @@ class PieceWord(LetterGame):
             for word in self.wordset:
                 print()
                 print(word, self.word_defs[word])
-
+                
+    def lookup_free_dictionary(self, word):
+        """ free dictionary lookup """
+        self.word_defs[word] = {}
+        data = requests.get(f'https://api.dictionaryapi.dev/api/v2/entries/en/{word}').json()
+        if isinstance(data, list):
+            data = data[0]
+            try:                        
+                defs = [c['definition'] for c in data['meanings'][0]['definitions']]    
+                self.word_defs[word]['def'] = defs                                  
+                syns = [c['synonyms'] for c in data['meanings']]    
+                self.word_defs[word]['synonyms'] = syns    
+            except KeyError as e:
+              print(e)                  
+        
     def lookup_merriam_webster(self, word):
         """ lookup word on merriam-webster dictionary
         cab be modified for any other dictionary lookup
         requires api-key in variable thes_key """
         self.word_defs[word] = {}
         try:
-		        with urlopen(
-		                f'https://www.dictionaryapi.com/api/v3/references/thesaurus/json/{word}?key={thes_key}'
-		        ) as f:
-		            data = json.load(f)
+            with urlopen(
+                    f'https://www.dictionaryapi.com/api/v3/references/thesaurus/json/{word}?key={thes_key}'
+            ) as f:
+                data = json.load(f)
         except json.JSONDecodeError:
-        	  return
+            return
         try:
             if isinstance(data, list):
                 data = data[0]
@@ -438,10 +460,7 @@ class PieceWord(LetterGame):
                              replace_whitespace=False)
             clues.extend(clue_list)
 
-        print(clues)
         clue_text = CR.join(clues)
-        print('wrapped')
-        print(clue_text)
         return clue_text
 
     #@ui.in_background
@@ -463,9 +482,12 @@ class PieceWord(LetterGame):
                 if self.debug:
                     print(word, self.word_defs[word])
                 # flatten and append contents of word_defs
-                flat_list = self.word_defs[word]['def']
+                flat_list = ['DEFINITIONS']
+                flat_list.extend(self.word_defs[word]['def'])
+                
                 #for i, item in enumerate(flat_list):
-                #	 flat_list[i] = fill(item, width = 20)
+                #  flat_list[i] = fill(item, width = 20)
+                flat_list.extend(['SYNONYMS'])
                 flat_list.extend(
                     [x for xs in self.word_defs[word]['synonyms'] for x in xs])
                 if self.debug: print(flat_list)
@@ -481,6 +503,8 @@ class PieceWord(LetterGame):
                         except (Exception) as e:
                             print(e)
                         if selection == 'cancelled_':
+                            return False
+                        if selection in ['definitions', 'synonyms']:
                             return False
                         if len(selection):
                             if self.debug:
@@ -646,4 +670,7 @@ if __name__ == '__main__':
         quit = g.wait()
         if quit:
             break
+
+
+
 
