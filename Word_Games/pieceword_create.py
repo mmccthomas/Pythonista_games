@@ -15,6 +15,25 @@ Create text version of this shuffled grid using spaces for blanks
 Create puzzle data, name, name_text, name_frame
 
 add save state
+
+To operate:
+	1. select template
+	2. if filled grid is not okay, or contains too many 
+	   odd words, press Fill again
+	3. Press Lookup to get definitions of words. this will only work
+	   if you have 2 keys in file keys.pkl for https://dictionaryapi.com
+	   as strings thes_key and dict_key.
+	   Successful lookups will turn button blue, unsuccessful ones
+	   will turn pink. if all buttons are pink, key was invalid
+	3. press each blue button to select appropriate definition or synonym
+	   button wil turn green
+	4. press each pink button and try to enter a suitable clue - be creative!
+	5. pressing green button again allows editing of clue
+	6. press Randomise to shuffle tiles. this can be repeated as necessary.
+	7. press Copy and puzzle nane or number, e.g. puzzle18
+	8. open pieceword.txt and paste text to end of file
+	
+	
 """
 # Pieceword game
 # tiles are 3x3 squares, to fit into 15 x 35 grid
@@ -57,6 +76,7 @@ try:
         dict_key = pickle.load(f)
 except IOError:
     print('No such pickle file')
+    thes_key = 'ABC'
 
 
 class PieceWord(LetterGame):
@@ -135,7 +155,7 @@ class PieceWord(LetterGame):
         for i, word in enumerate(self.wordset):
             # self.gui.set_prompt(f'looking up {word}')
             wait.name = f'Finding {word}'
-            self.lookup(word)
+            self.lookup_merriam_webster(word)
             # change button colour to show if definition found
             button = 'button_' + str(i + 2)
             self.gui.set_props(
@@ -150,13 +170,18 @@ class PieceWord(LetterGame):
                 print()
                 print(word, self.word_defs[word])
 
-    def lookup(self, word):
-        """ lookup word on merriam-webster dictionary """
+    def lookup_merriam_webster(self, word):
+        """ lookup word on merriam-webster dictionary
+        cab be modified for any other dictionary lookup
+        requires api-key in variable thes_key """
         self.word_defs[word] = {}
-        with urlopen(
-                f'https://www.dictionaryapi.com/api/v3/references/thesaurus/json/{word}?key={thes_key}'
-        ) as f:
-            data = json.load(f)
+        try:
+		        with urlopen(
+		                f'https://www.dictionaryapi.com/api/v3/references/thesaurus/json/{word}?key={thes_key}'
+		        ) as f:
+		            data = json.load(f)
+        except json.JSONDecodeError:
+        	  return
         try:
             if isinstance(data, list):
                 data = data[0]
@@ -164,7 +189,7 @@ class PieceWord(LetterGame):
             self.word_defs[word]['synonyms'] = data['meta'].get(
                 'syns', 'Not found')
         except (IndexError, AttributeError):
-            pass
+            return
 
     def run(self):
         """
@@ -254,7 +279,7 @@ class PieceWord(LetterGame):
         self.wordsbox = self.gui.add_button(
             text='',
             title='Clues',
-            position=(w + off + 180, 200),
+            position=(w + off + 180, y+100),
             min_size=(250, 500),
             font=('Courier New', 14),
             fill_color='black',
