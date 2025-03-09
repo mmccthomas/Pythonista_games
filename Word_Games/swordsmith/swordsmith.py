@@ -559,6 +559,8 @@ class DFSFiller(Filler):
         shuffle(matches)
         if animate:
            print(matches)
+        if crossword.index > crossword.max_cycles:
+        	 return False
         for match in matches:
             if not Filler.is_valid_match(crossword, wordlist, slot, match):
                 continue
