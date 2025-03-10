@@ -54,7 +54,7 @@ import console
 import dialogs
 import clipboard
 from textwrap import wrap
-from random import shuffle
+from random import shuffle, choice
 import base_path
 
 base_path.add_paths(__file__)
@@ -372,7 +372,7 @@ class PieceWord(LetterGame):
                 except (Exception) as e:
                     print(e)
             if selection == 'cancelled_':
-                return False
+                selection = choice(items).lower()
             if len(selection):
                 if self.debug:
                     print(f'{selection=}')

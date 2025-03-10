@@ -14,7 +14,7 @@ DICALA YO. SHAL
 SMAW UGLINSLS E
   SACIE OD. TED
  I EAKTARLTOABA
- S  RE SE HBSE 
+ S  RE SE H SE 
 UTHNEDSS VENCEN
  T PAUI ASTRL. 
  O E RTEDE UEGA
@@ -435,7 +435,7 @@ M WE W TEP M E
 437_76:
 ''
 7, 5
-1727093314081110342216030123183221293100203013152412020705042606281925
+1727093314081110342216180301233221293100203013152412020705042606281925
 
 437_76_text:
 1 Treat with gamma rays
@@ -800,7 +800,7 @@ ISOER NOT O LED
 CWMOISHAGT MI G
 O ED OUL EMBOME
 IVAAWNMEN A. U 
- EV T VIRADEEND
+ E  T VIRADEEND
 RDSPED D L C TA
 I HL UMETISTION
  A PERAL FACDIO
@@ -2537,7 +2537,7 @@ O ED AULS.
    Stare hard and angrily
 20 Letter puzzle. Unbinding
 
-659_14._frame:
+659_14_frame:
 ATHONA DIODE
    G L I N C
  H LOW THOLH
@@ -2995,7 +2995,7 @@ C.  C  R ENAHOS
    Double_breasted jacket
 20 Devoid of feelings
 
-664-14_frame:
+664_14_frame:
 PEL Y  I ITH
  L LESAKE E 
 UMI D. K IRE
@@ -3134,34 +3134,6 @@ CIEMILCON E
    A LRID.  
    RGE M    
 NEWA S B.   
-
-665_14
-''
-9, 4
-123
-
-665_14_text:
-1 Protein-rich vegetarian foodstuff • Picture
-  from a negative • Sweet teatime food
-3 Sensitively
-5 Old tourist coach
-6 Foot covering • Heroic work
-7 Using oxygen for metabolic purposes
-8 Surpass • Garnish
-9 Typically English drink • Hole-piercing tool
-10 Large percussion instrument • Seam, stratum
-11 Dark brown pigment
-12 Blackboard support, perhaps • 1940s jazz style
-13 Partake of food • Road-surfacing material
-   or sailor
-14 Inert gas • Subside
-15 Completely, entirely
-16 Low-carb, high-fat diet • Conifer
-17 Part of a musical instrument which
-   enhances sounds
-19 Counsellor
-21 Egg on • Before the expected time •
-   Spun thread
    
 665_71:
 ''
@@ -4107,7 +4079,7 @@ LNAC STEDEIGEAS
 490_83:
 ''
 7, 5
-1517342905300125041807021224061928163332272108311113232220140326001009
+1517342905300125041807021224061928163332270831211113232220140326001009
 
 490_83_text:
 1 Unpleasant pressure •
@@ -5001,3 +4973,389 @@ COR ESDE T SO T
 N X O P RCES A 
 ISHOPLAGEO EONG
 M A S C CMIC G 
+
+puzzle17:
+""
+7, 5
+0128253122041013151605200219212900171227323008071134243306181426032309
+
+puzzle17_text:
+ 1 more than two but not very many •
+   whole number
+ 3 Industrial shelves • Odin’s day
+ 5 cape • articulates
+ 7 Operating system • festival
+ 9 Italian says this is • Chickens neck
+   scarf • Start of web address
+11 Italian sports car • newness
+13 Old unit of energy (abbr) •
+   compaction
+15 ministerial • foremost
+17 US post • Medical care to do with
+   children
+19 avenue • possessor
+21 to make known an idea • siblings
+
+puzzle17_frame:
+ M SEV CAARDI A
+RARC AM  R APEN
+ R RACENTS ST C
+ LI G ESSMPRNER
+D EIAT T   EC E
+ITS T FIRAL ERS
+ I ION N F IBOU
+INSN GOVEULAL M
+ O ST  E L NEXP
+ A D SD EU SRNI
+ SAYS I NRICN  
+ O   SU UA OAI 
+NUXVALGER OW B 
+ S O OI A R PS 
+A HWWWDAYIST C 
+L ILEVE  ERAF  
+A N N LTY E FER
+WEDRES  AKS   O
+ CONTECALP AE  
+  U R O EPED US
+TORNESPASE IA T
+
+puzzle18:
+""
+7, 5
+1112230414032601211910171529062409053022183202283407250013333127081620
+
+puzzle18_text:
+ 1 Trouser receptacles! • at or within a
+   short time
+ 3 almighty • lingering
+ 5 feeling unhappiness • a separate part
+   in a list
+ 7 an evil spirit • introduced
+ 9 Wired data transmission • textile •
+   Basketball authority
+11 having undergone organic breakdown •
+   calculate
+13 Thou • fabricated
+15 US citizen • Home of Gavin and Stacey
+17 Consumer • gummy
+19 Of the backbone • cacophony
+21 Mrs Caine • upright shafts that
+   supports an overhead structure
+
+puzzle18_frame:
+L PI ANSTI OOON
+GLUFUL  ESOR P 
+E BE IAN E LAIN
+R EHEDH  RAL S 
+D CI E USI IAYE
+E INBAD YA C N 
+ DEPOCKET T EST
+H SR O T TINL A
+ADSALLAH  O ING
+ LA NOVILYOUT S
+H   A  A E DEM 
+ABROLUL FAME  I
+ISE N D  S SR  
+S T ITUTET ODEC
+MNS O   NREM  R
+ S  I TEBRUCUNC
+ER ROW L  T N  
+ A  P KIRBARIC 
+ O VER COR ATED
+OMPD I  ROUSE S
+ P SHARICR SRY 
+
+puzzle19:
+""
+7, 5
+1820320410061619052413310815231725140734092630282712220233000103291121
+
+puzzle19_text:
+ 1 Department • balls • Shrub
+ 2 Direction indicator • Culinary cover
+ 3 front • up to (a particular time) •
+   to move with a light springing step
+ 4 chronicles • Southern UK country
+ 5 Opposite of pros • undercover
+ 6 After second
+ 7 hazard • Early online shop
+ 8 faker
+ 9 Mary Poppins actress • concur
+10 discover • concurs
+11 as in loot, sack
+12 capsule • logo
+13 worth • less
+14 Bob’s boy
+15 Austrian capital • means
+16 paste
+17 degree of excellence • Ollies friend
+18 Son of Moses • Many
+19 routines • Middle East country • A
+   unit of land
+20 very hard or unpleasant work • viper
+21 Pointing at them • feel • the line
+   that marks the outer limit
+
+puzzle19_frame:
+O IACTESIS DS B
+TANN L A ABOPRO
+I CTHEC MY SL S
+EVOI TGRE C VAL
+N MCONY  TEN X 
+D  I EMBLH EVIE
+USHI AA NTHRE A
+N ANAKRAT A ARR
+KIPE EI IJULT E
+ITUELL LODEPS D
+DERS E  CE A D 
+ AG  T TAFORHIR
+T RCRE  RNESN P
+RROE RE B Y OLE
+E UDGESAAREEW N
+CATUE WER LOUBA
+  HROB A SONR S
+BLENNANTSAGEENS
+R SEATOLLN  ES 
+ERTPREW AG SN  
+ O IE NTIULTEM 
+ 
+puzzle20:
+""
+7, 5
+2415233225302212031128261619071034172901132127182031140902040506083300
+
+puzzle20_text:
+ 1 couch • movies • on top of
+ 2 Allen Poe • breadth
+ 3 shallow road across river •
+   Antoinette • to take a photograph of
+ 4 epoxy • completed
+ 5 highway • cultivate
+ 6 bury
+ 7 Large tech company • pictures
+ 8 inaccurate
+ 9 campaign • to a great degree
+10 as in gold, silver • Holmes partner
+11 metropolitan
+12 Big Canal • from Friends
+13 dirty laundry • as in beeline
+14 all-embracing
+15 Mike __ , Sports Direct • to mark the
+   limits of
+16 lawful
+17 crew • Definition of
+18 Annie Hall actress first name •
+   Supernatural guardian
+19 Avian • ball • category
+20 the line that marks the outer limit
+   of something • upshot
+21 Mr Warhol • pores (over) book • Early
+   tech gadget
+
+puzzle20_frame:
+IERON L  NDEM S
+E TK  E SA TPEC
+DASEL NGER  L O
+BIRD DGESANCEGA
+R EDGE D S I S 
+ANDY RPEREADE A
+ BRD PN ELIN  L
+  GILL S  C G I
+ PAN ENTEASHIAN
+A F A E W ARIMA
+DGAONERBAIVEOUS
+D MV DA RDEF SU
+ROWEN ESIILMSOF
+ A INCD LR SA E
+INELEY  IARIFOR
+PONDIAL DNVIATS
+E IERRLUS E N  
+NAPMO  S PROACH
+F RL US UE TONZ
+ROAGANCOPSSU  U
+O RE DE SS PNAM
+
+puzzle21:
+""
+7, 5
+3119340133133014260706040312021832280527252215290821232016241109100017
+
+puzzle21_text:
+ 1 a bound book. • to settle into a
+   home.
+ 2 enthusiastic
+ 3 a range of values or locations. •
+   womb
+ 4 keen
+ 5 breastfeeding • performing the steps
+   to.
+ 6 an evil creature.
+ 7 Island in the Mediterranean • the
+   boundary line of a surface.
+ 8 obtain • epoch
+ 9 take into account
+10 Equal collaborator • Operator of
+11 teachers
+12 Lazy • car
+13 china
+14 the visual sense. • a tree of the
+   genus ulmus
+15 Water vapor • an organism that is not
+   an animal
+16 something of the smallest possible
+   extent
+17 part of a song that is repeated •
+   Sexy stuff
+18 Hard mineral
+19 allow • sovereignty
+20 bounties
+21 Nordic country • canny
+
+puzzle21_frame:
+NATNESGESN TTA 
+DS ED  X T E GE
+SHRUTE C SIDCON
+M UMALN I I MIT
+ORS T ING O  RE
+V A T N NANTDEN
+ V PER EDT EAGE
+WARE CRA NURG D
+ L SWEERSA AEVI
+CELT  IONPEEUME
+E EROTN E N  EX
+M SE  EWDIDLENT
+EAST NPOR  LN R
+N EREF EYRAIICA
+TONI OAM   SL I
+ A R  SER M AIN
+ N ANC P CATLM 
+STEL  UTO G  PL
+  EVOLR QTED S 
+SINI IEDUU ECIT
+  DEXTE IRUS N 
+
+puzzle22:
+""
+7, 5
+0122311128143317153003271925072000023210082613050412232434092118291606
+
+puzzle22_text:
+ 1 spoil • idle conversation in general.
+ 2 hurt
+ 3 Immediate relative. • recently
+   arrived or appeared.
+ 4 an occurrence; something that
+   happens.
+ 5 Mrs Caine • occur in egg white
+ 6 a record of money owed.
+ 7 Buck Rogers robot • an organized
+   group of people united by a common
+   purpose.
+ 8 Bud Abbot and _ Costello • the
+   egyptian cobra
+ 9 a light, silvery metal extracted from
+   bauxite
+10 play hookie • trees proving acorns
+11 the act of coming to or reaching a
+   throne, an office, or dignity.
+12 (by extension) any cocktail
+   containing lemon or lime juice. •
+   small labels
+13 moderate (climate)
+14 king of insects • the aurochs.
+15 Place to treat the use of
+   recreational drugs. • big
+16 raw
+17 influence or authority over
+   something. • to give rightful
+   ownership.
+18 Michael _, Halloween baddie
+19 Prince _, late Queens husband •
+   imperative
+20 quantify
+21 an object intended to give public
+   notice or warning • revised
+
+puzzle22_frame:
+P TDEF S TWI I 
+ACCE EESS O  N 
+R OPAR U  R RGE
+ATEENTRPS R E L
+RI A E A  C TLE
+ LATED C REHR C
+AKSGOSE UPERO R
+ A ED CONE USHA
+AGSNEWI TA DI R
+T  URGVENLIPI H
+LBURE A A MEU A
+E  EDILATNALMIN
+SKIPHIILE  CRUD
+ F E N INTROL E
+SOUSIGENT  MYER
+ COTEMKI SIP L 
+SP  BE LOT AASU
+IUMAB ALUEST E 
+A E R M O  EE  
+MINJURIONKIRNTI
+E T D L T  SS  
+
+puzzle23:
+""
+7, 5
+0522153023081806331612342920253224112807000301260913312714101721041902
+
+puzzle23_text:
+ 1 to exchange gases with the
+   environment.
+ 2 Layer • Online auction platform
+ 3 conspires
+ 4 a movie theatre • a double-bladed oar
+   used for kayaking.
+ 5 penny • Stinky _ , Toy Story 2
+ 6 sources of illumination. • looking
+   after or looking out for.
+ 7 contribution of work or information
+ 8 diverse • Indonesian holiday island
+ 9 West African country
+10 a defensive position or effort. •
+   becoming old
+11 the interval comprising two octaves.
+12 feeling honoured • conception in the
+   mind of things to be done
+13 a young person.
+14 the measured duration of events  •
+   floor model
+15 the period during which a monarch
+   rules.
+16 an irregular line left from smearing
+   or motion. • Tenderly
+17 to go up; to ascend; to climb. •
+   coffee in general.
+18 Quarter • to let go from office,
+   service, or employment
+19 Person from Iraq
+20 couple • Underwater hazard
+21 Daughter of Princess Grace of Monaco
+
+puzzle23_frame:
+A  OUT G S YRAQ
+TIM N EEFE O T 
+H AEIG R   RPHA
+ K  N INGCIN  M
+TIET P    J EMO
+ J  M EASLIGS K
+TLYN LA ASTRGEN
+ A TEEMIS H AVA
+IRER CP  FOURET
+ATHDLE M EMAI U
+ I  E PAICENA R
+LOTING S HTSNIE
+T  O IBRE F ND 
+O BR RR XBAYFIF
+R ASTEE P L UD 
+R OH A X  AGNPU
+ALIU DE JNTH E 
+  NN   O  IDIGE
+INGEAKSTAPAD  I
+N ERIS   ETEC O
+S NRTHPROCARO N
