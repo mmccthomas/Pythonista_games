@@ -21,13 +21,14 @@ TILESIZE = 3
 
 class PieceWord(LetterGame):
   
-  def __init__(self):    
+  def __init__(self, test=None):    
     LetterGame.__init__(self, column_labels_one_based=True)
     self.first_letter = False
     self.tiles = None
-    self.debug = True
+    self.debug = False
+    self.test = test
     self.load_words_from_file(PUZZLELIST, no_strip=True) 
-    self.selection = self.select_list()
+    self.selection = self.select_list(self.test)
     if self.selection is False:
        self.gui.gs.show_start_menu()
        return 
@@ -68,7 +69,7 @@ class PieceWord(LetterGame):
     self.complete()
     
     
-  def select_list(self):
+  def select_list(self, test, select=None):
       '''Choose which category'''
       items = [s.capitalize() for s in self.word_dict.keys()]
       items = [item for item in items
@@ -77,56 +78,60 @@ class PieceWord(LetterGame):
       self.gui.selection = ''
       selection = ''
       prompt = ' Select puzzle'
-      while self.gui.selection == '':
-        self.gui.input_text_list(prompt=prompt, items=items, position=(800, 0))
-        while self.gui.text_box.on_screen:
-          try:            
-            selection = self.gui.selection.lower()
-          except (Exception) as e:
-            print(e)
-        if selection == 'cancelled_':
-          return False 
-        if len(selection):
-          if self.debug:   
-            print(f'{selection=}')
-          self.wordlist = self.word_dict[selection]
-          
-          if selection + '_text' in self.word_dict:
-             self.table = self.word_dict[selection + '_text']
-             self.image = self.wordlist[0]
-             self.image_dims = [int(st) for st in self.wordlist[1].split(',')]
-             self.solution = self.wordlist[2]
-             if len(self.solution) < 70:
-             	   self.debug = True
-             
-          if selection + '_frame' in self.word_dict:
-            # rearrange frame text into N 3x3 tiles
-            frame = self.word_dict[selection + '_frame']
-            if self.debug:   
-               [print(row, len(row)) for row in frame] # for debug
-            assert all([len(row) == len(frame[0]) for row in frame]), 'Error in string lengths, check for empty line'
-            # convert to numpy
-            frame = np.array([np.array(row.lower(), dtype=str) for row in frame])
-            frame = np.char.replace(frame, "'", '')
-            frame = np.char.replace(frame, '/', '')
-            frame = frame.view('U1').reshape((-1, self.image_dims[1] * TILESIZE))
-            # replace spaces and dot by hash for display
-            frame[frame == ' '] = '#'
-            frame[frame == '.'] = '#'
-            # divide into rows of 3
-            rowsplit = np.split(frame, self.image_dims[0], axis=0)
-            # divide each row into blocks of 3x3
-            colsplit = [np.split(rowsplit[i], self.image_dims[1], axis=1) for i in range(len(rowsplit))]
-            # add all together to get N 3x3 blocks
-            self.tiles = np.concatenate(colsplit)
-            
-          self.wordlist = [word for word in self.table if word]
-          self.gui.selection = ''
-          return selection
-        elif selection == "Cancelled_":
-          return False
-        else:
-            return False
+      if not test:
+          while self.gui.selection == '':
+            self.gui.input_text_list(prompt=prompt, items=items, position=(800, 0))
+            while self.gui.text_box.on_screen:
+              try:            
+                selection = self.gui.selection.lower()
+              except (Exception) as e:
+                print(e)
+            if selection == 'cancelled_':
+              return False 
+            if len(selection):
+              if self.debug:   
+                print(f'{selection=}')
+      else:
+           selection = select if select else items[0]
+      
+      self.wordlist = self.word_dict[selection]
+              
+      if selection + '_text' in self.word_dict:
+                 self.table = self.word_dict[selection + '_text']
+                 self.image = self.wordlist[0]
+                 self.image_dims = [int(st) for st in self.wordlist[1].split(',')]
+                 self.solution = self.wordlist[2]
+                 if len(self.solution) < 70:
+                     self.debug = True
+                 
+      if selection + '_frame' in self.word_dict:
+                # rearrange frame text into N 3x3 tiles
+                frame = self.word_dict[selection + '_frame']
+                if self.debug:   
+                   [print(row, len(row)) for row in frame] # for debug
+                assert all([len(row) == len(frame[0]) for row in frame]), 'Error in string lengths, check for empty line'
+                # convert to numpy
+                frame = np.array([np.array(row.lower(), dtype=str) for row in frame])
+                frame = np.char.replace(frame, "'", '')
+                frame = np.char.replace(frame, '/', '')
+                frame = frame.view('U1').reshape((-1, self.image_dims[1] * TILESIZE))
+                # replace spaces and dot by hash for display
+                frame[frame == ' '] = '#'
+                frame[frame == '.'] = '#'
+                # divide into rows of 3
+                rowsplit = np.split(frame, self.image_dims[0], axis=0)
+                # divide each row into blocks of 3x3
+                colsplit = [np.split(rowsplit[i], self.image_dims[1], axis=1) for i in range(len(rowsplit))]
+                # add all together to get N 3x3 blocks
+                self.tiles = np.concatenate(colsplit)
+                
+                self.wordlist = [word for word in self.table if word]
+                self.gui.selection = ''
+                return selection
+      elif selection == "Cancelled_":
+              return False
+      else:
+                return False
   
   def display(self):
     """ display tiles on board
@@ -282,3 +287,4 @@ if __name__ == '__main__':
     quit = g.wait()
     if quit:
       break
+
