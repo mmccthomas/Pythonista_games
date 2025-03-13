@@ -969,44 +969,40 @@ class CrossWord():
         
         # split empty rows
         if self.debug: print('FILLING ROWS')
-        last = []
-        #fn = {0:(ceil, ceil), 1:(ceil, ceil), 2:(ceil, ceil), 3:(ceil, ceil)}
         try:
             for r in range(self.start[0]^1, ceil(self.sizey/2), 2):
-                loc = self.split_row(r, last, row=True)                
-                last.append(loc)
-                #self.board[self.sizey-1-r] = self.board[r, ::-1]      
+                self.split_row(r,row=True)                
             #print('filled rows')  
             if self.debug: self.print_board(None, 'final rows')
             if self.debug: print('FILLING COLUMNS') 
-            last = []
             for c in range(self.start[1]^1, ceil(self.sizex/2), 2):   
-                last.append(self.split_row(c, last, row=False))
-                # not correct
-                #self.board[:, self.sizex-1-c] = self.board[::-1, c]    
-                #self.print_board(self.board, 'flipped')
+                self.split_row(c, row=False)
+                
         except ValueError as e:
             print(e)           
             return None
         return self.board
         
     def lengths(self, index, row):
+        # return array of lengths of words in selected axis
+        # get row or column as string
         index_str = ''.join(np.take(self.board, index, axis=int(not row)))        
+        # split the string to get word lengths
         lengths = [len(word) for word in index_str.split(BLOCK) if len(word)!=0]
         return lengths
         
     def is_x_design(self, loc):
         """ loc is at centre of x shape """
         r, c = loc
-        return self.board[r-1: r+1][c-1: c+1] == np.array([[BLOCK, SPACE, BLOCK],
-                                                           [SPACE, SPACE, SPACE],
-                                                           [BLOCK, SPACE, BLOCK]])
+        return self.board[r-1: r+1][c-1: c+1] == np.array(
+          [['#',' ','#'], [' ',' ',' '], ['#',' ','#']])
                                                         
     def next_to_x(self, loc):
-        """ loc is next to x shape """
-        x = np.array([[BLOCK, SPACE, BLOCK],
-                      [SPACE, BLOCK, SPACE],
-                      [BLOCK, SPACE, BLOCK]])
+        """ loc is next to x shape
+        # #
+         # 
+        # # """
+        x = np.array([['#',' ','#'], [' ','#',' '], ['#',' ','#']])
         r, c = loc
         locs = [(r+1, c+2), (r-1, c+2),
                 (r+1, c-2), (r-1, c-2),
@@ -1030,12 +1026,12 @@ class CrossWord():
           if any([(l>self.max_length or l<3) for l in self.lengths(index, row)]):
                 return False
           # check other cols/rows
-          start = self.start[row]^1
+          start = self.start[row]^1 # invert 0-1, 1-0
           if self.debug: print(f'dealing with {"Rows" if not row else "Columns"}')
-          size = self.sizex if row else self.sizex
+          size = self.sizex if row else self.sizey
           lengths = [self.lengths(index, not row) for index in range(start, size, 2)]
           if self.debug: print(f'Lengths are {lengths}')
-          # if any column lengths < 3          
+          # if any column lengths < 3 in flattened set of lengths
           if set([1,2]).intersection(set(sum(lengths, []))):
               return False
           return True 
@@ -1043,68 +1039,65 @@ class CrossWord():
     def print_board(self, board=None, msg=None):
         if board is None:
           board = self.board
-        print(msg)
+        if msg:
+            print(msg)
         print('\n'.join([''.join(row) for row in board]))
         
-    def mirror(self, rc):  
-        r,c = rc
-        r_, c_ = (self.sizey-1-r, self.sizex-1-c)            
-        self.board[r_,c_] = self.board[r,c]
+    def mirror(self, rc): 
+        # copy the element at loc to its mirror image (x &y)          
+        r, c = rc  
+        self.board[(self.sizey-1-r, self.sizex-1-c)] = self.board[rc]
         
-    def split_row(self, index, last, row=True):
-      '''placing a block to make words on row min3, max max_length'''                   
-      loc = 0     
-      size = self.sizex if row else self.sizey   
-      if True: #len(self.lengths(index, row)) ==  1:
-          possibles = list(range(0,size))
-          random.shuffle(possibles)
-          for i, possible in enumerate(possibles):
-               loc = (index, possible) if row else (possible, index)
-               existing_val = self.board[loc]                              
-               self.board[loc] = BLOCK     
-               # now set opposite side
-               self.mirror(loc)         
-               if self.debug: print(f'trying row {index} position {loc}')
-               if self.check_lengths(index, row):                 
-                   if self.debug: 
+    def split_row(self, index, row=True):
+        '''placing a block to make words on row min3, max max_length'''                      
+        size = self.sizex if row else self.sizey   
+        possibles = list(range(0,size))
+        random.shuffle(possibles)          
+        for i, possible in enumerate(possibles):
+            loc = (index, possible) if row else (possible, index)
+            existing_val = self.board[loc]                              
+            self.board[loc] = BLOCK     
+            self.mirror(loc)         
+            if self.debug: print(f'trying row {index} position {loc}')
+            if self.check_lengths(index, row):                 
+                if self.debug: 
                     print(f'row {index} position {loc} is valid')
                     self.print_board(None, index)
-                   return possible
-               self.board[loc]=existing_val
-               self.mirror(loc)
-          raise ValueError('Grid is not possible')
+                return possible
+            self.board[loc]= existing_val
+            self.mirror(loc)
+        raise ValueError('Grid is not possible')
 
-WordList = [
-    'wordlists/letters3_common.txt',
-    #'wordlists/words_alpha.txt',
-    #  'wordlists/extra_words.txt',
-    'wordlists/5000-more-common.txt',
-    'wordlists/words_10000.txt'
-]          
+WordList = ['wordlists/letters3_common.txt',
+            'wordlists/5000-more-common.txt',
+            'wordlists/words_10000.txt']          
           
 if __name__ == '__main__':
   console.clear()
-  random.seed(1)
+  #random.seed(1)
   g = CrossWord(None, None, None)
   g.debug = False
   g.get_words(WordList)
   for type in range(4):
-    for i in range(10):
+    wordlengths = Counter()
+    for i in range(50):
         print(f'\nType {type} Iteration {i} ')
-        board = g.create_grid(type=type, size=13,max_length=9)
+        board = g.create_grid(type=type, size=13,max_length=10)
         if board is not None:
-          # print(f'Type={type}, iteration={i} filled both')
-          g.print_board(board, 'Final')
+          #g.print_board(board, 'Final')
           g.length_matrix()
           print(f'Type={type} {g.wordlengths}')
-          # print('rotation', np.all(g.board == np.rot90(g.board, 2)))
+          wordlengths = wordlengths + Counter(g.wordlengths)
           g.empty_board = g.board.copy()
   
-  g.solve_swordsmith('dfs')
-  g.print_board(g.board)
-        
-      
-  
+          g.solve_swordsmith('dfs')
+          g.print_board(g.board, 'Filled')
+    wordlengths = dict(sorted(wordlengths.items()))
+    tot = sum(wordlengths.values())
+    print({k:int(v*100/tot) for k,v in wordlengths.items()})
+    print(wordlengths)
+
+
 
 
 
