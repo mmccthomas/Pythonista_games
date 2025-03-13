@@ -931,7 +931,7 @@ class CrossWord():
           # self.delta_t('len matrix')
         return self.min_length, self.max_length
     
-    def create_grid(self, type=3, size=15, max_length=9):
+    def create_grid(self, type=3, size=15, min_length= 3, max_length=9):
         """ create a british style crossword grid of defined odd numbered size
         1.starts with alternating black white squares
           black starts in  1 of 4 start positions 0:(0,0), 1:(0,1), 2:(1,0) or 3:(1,1)
@@ -956,6 +956,7 @@ class CrossWord():
         """
         types = {k:divmod(k,2) for k in range(4)}  # for position of starting block
         self.max_length = max_length
+        self.min_length = min_length
         if isinstance(size, tuple):
           self.sizey, self.sizex = size
         else:
@@ -969,13 +970,13 @@ class CrossWord():
         
         # split empty rows
         if self.debug: 
-        	  print('FILLING ROWS')
+            print('FILLING ROWS')
         try:
             for r in range(self.start[0] ^ 1, ceil(self.sizey / 2), 2):
                 self.split_row(r, row=True)
             # print('filled rows')
             if self.debug: 
-            	  self.print_board(None, 'FINAL ROWS')
+                self.print_board(None, 'FINAL ROWS')
             
             for c in range(self.start[1] ^ 1, ceil(self.sizex / 2), 2):
                 self.split_row(c, row=False)
@@ -1022,28 +1023,56 @@ class CrossWord():
           """
           # check current row/col
           if self.debug: 
-          	  print(f'Index {index}, {"Row" if row else "Column"}, lengths {self.lengths(index, row)}')
+              print(f'Index {index}, {"Row" if row else "Column"}, lengths {self.lengths(index, row)}')
           if any([(l>self.max_length or l<3) for l in self.lengths(index, row)]):
               return False
           # check other cols/rows
           start = self.start[row] ^ 1  # invert 0-1, 1-0
           if self.debug: 
-          	  print(f'dealing with {"Rows" if not row else "Columns"}')
+              print(f'dealing with {"Rows" if not row else "Columns"}')
           size = self.sizex if row else self.sizey
           lengths = [self.lengths(index, not row) for index in range(start, size, 2)]
           if self.debug: 
-          	  print(f'Lengths are {lengths}')
+              print(f'Lengths are {lengths}')
           # if any column lengths < 3 in flattened set of lengths
-          if set([1, 2]).intersection(set(sum(lengths, []))):
+          if set(list(range(1,self.min_length))).intersection(set(sum(lengths, []))):
               return False
           return True
-           
-    def print_board(self, board=None, msg=None):
+    
+    def final_lengths(self):
+        """report the number of words in each row and column """
+        all_lengths = {}
+        for row in [True, False]:
+          rowstr = 'row' if row else 'col'
+          all_lengths[rowstr] = {}
+          size = self.sizey if row else self.sizex
+          for i in range(size):
+            lengths_ = self.lengths(i, row)
+            if all([x == 1 for x in lengths_]):
+              continue
+            all_lengths[rowstr][i] = lengths_
+        return all_lengths
+          
+    def print_board(self, board=None, msg=None, show_lengths=False):
         if board is None:
           board = self.board
         if msg:
             print(msg)
-        print('\n'.join([''.join(row) for row in board]))
+        if show_lengths:
+        	  # print no words against each row/col
+            lengths_ = self.final_lengths()
+            str_= '  '
+            for i, _ in enumerate(board[0]):
+               ix = len(lengths_['col'].get(i, []))
+               s = str(ix) if ix else ' '
+               str_ += s
+            print(str_)
+            for i, row in enumerate(board):
+              ix = len(lengths_['row'].get(i, []))
+              print(str(ix) if ix else ' ', ''.join(row))
+            
+        else:
+            print('\n'.join([''.join(row) for row in board]))
         
     def mirror(self, rc):
         # copy the element at loc to its mirror image (x &y)
@@ -1055,13 +1084,14 @@ class CrossWord():
         size = self.sizex if row else self.sizey
         possibles = list(range(0, size))
         random.shuffle(possibles)
+        # TODO Can this be modified to do multiple blocks?
         for i, possible in enumerate(possibles):
             loc = (index, possible) if row else (possible, index)
             existing_val = self.board[loc]
             self.board[loc] = BLOCK
             self.mirror(loc)
             if self.debug: 
-            	  print(f'trying row {index} position {loc}')
+                print(f'trying row {index} position {loc}')
             if self.check_lengths(index, row):
                 if self.debug:
                     print(f'row {index} position {loc} is valid')
@@ -1078,7 +1108,7 @@ WordList = ['wordlists/letters3_common.txt',
 
                     
 if __name__ == '__main__':
-	# test of grid creation and fill
+  # test of grid creation and fill
   console.clear()
   # random.seed(1)
   g = CrossWord(None, None, None)
@@ -1086,19 +1116,21 @@ if __name__ == '__main__':
   g.get_words(WordList)
   for type in range(4):
     wordlengths = Counter()
-    for i in range(10):
+    for i in range(1):
         print(f'\nType {type} Iteration {i} ')
-        board = g.create_grid(type=type, size=15, max_length=11)
+        board = g.create_grid(type=type, size=17, min_length=4, max_length=11)
         if board is not None:
           # g.print_board(board, 'Final')
           g.length_matrix()
           print(f'Type={type} {g.wordlengths}')
           wordlengths = wordlengths + Counter(g.wordlengths)
           g.empty_board = g.board.copy()
-  
+          print(g.final_lengths())
+      
           g.solve_swordsmith('dfs')
-          g.print_board(np.char.upper(g.board), 'Filled')
+          g.print_board(np.char.upper(g.board), 'Filled', show_lengths=True)
     wordlengths = dict(sorted(wordlengths.items()))
     tot = sum(wordlengths.values())
     print('Overall Percentages ', {k: int(v * 100 / tot) for k, v in wordlengths.items()})
     print('Overall Actual wordlengths ', wordlengths)
+
