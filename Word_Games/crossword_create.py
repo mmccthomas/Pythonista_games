@@ -10,6 +10,7 @@ import re
 from math import floor, ceil
 import numpy as np
 import traceback
+import itertools
 from collections import Counter
 import matplotlib.colors as mcolors
 from collections import defaultdict
@@ -1059,7 +1060,7 @@ class CrossWord():
         if msg:
             print(msg)
         if show_lengths:
-        	  # print no words against each row/col
+            # print no words against each row/col
             lengths_ = self.final_lengths()
             str_= '  '
             for i, _ in enumerate(board[0]):
@@ -1079,26 +1080,71 @@ class CrossWord():
         r, c = rc
         self.board[(self.sizey-1-r, self.sizex-1-c)] = self.board[rc]
         
-    def split_row(self, index, row=True):
-        '''placing a block to make words on row min3, max max_length'''
+    def permutate(self,n, size):
+       """ split an line of length size into n pieces 
+       returns list of list of block locations"""       
+       possible_numbers = range(self.min_length, self.max_length+1)
+       # list of n lists of possible_numbers
+       group = [possible_numbers] *  n         
+       # list of all combinations of lengths allowing for positions
+       # occupied by blocks
+       possibles = [x for x in itertools.product(*group) if sum(x) == (size-n+1)]  
+       
+       # now find locations of blocks
+       indices = [[x+i for i, x in enumerate(itertools.accumulate(poss)) if i<n-1] for poss in possibles]
+       if self.debug:
+           print()
+           print(f'possibles for {n} splits of {size} min {self.min_length}, max {self.max_length} {possibles}')
+           print(f'indices for {n} splits of {size} min {self.min_length}, max {self.max_length}  {indices}')       
+       return indices
+    
+    def mix_possibles(self, row):
+        """ mix possible splits from 2 or 3 splits """
+        # split slice into minimum 2 parts, randomly 3 parts
+        # no 3 parts is same as 2parts(if any)
+        # giving 50% chance
         size = self.sizex if row else self.sizey
-        possibles = list(range(0, size))
-        random.shuffle(possibles)
-        # TODO Can this be modified to do multiple blocks?
+        possibles = []
+        poss2 = g.permutate(2, size)
+        poss3 = g.permutate(3, size)
+        poss4 = g.permutate(4, size)
+        random.shuffle(poss3)
+        # produce all possibilities
+        possibles.extend(poss2)
+        if poss2:
+            possibles.extend(poss3[:len(poss2)])
+        else:
+            possibles.extend(poss3)        
+            possibles.extend(poss4[:len(poss3)])
+        random.shuffle(possibles) 
+        
+        return possibles
+        
+    def split_row(self, index, row=True):
+        '''placing a block to make words on row min3, max max_length'''                
+        possibles = self.mix_possibles(row)
+        # try each possible 
         for i, possible in enumerate(possibles):
-            loc = (index, possible) if row else (possible, index)
-            existing_val = self.board[loc]
-            self.board[loc] = BLOCK
-            self.mirror(loc)
+            placed = []
+            # place each block
+            for location in possible:
+                loc = (index, location) if row else (location, index)
+                placed.append((loc, self.board[loc]))
+                self.board[loc] = BLOCK
+                self.mirror(loc)
             if self.debug: 
-                print(f'trying row {index} position {loc}')
+                print(f'trying row {index} positions {possible}')
             if self.check_lengths(index, row):
                 if self.debug:
-                    print(f'row {index} position {loc} is valid')
+                    print(f'row {index} positions {possible} is valid')
                     self.print_board(None, index)
-                return possible
-            self.board[loc] = existing_val
-            self.mirror(loc)
+                return
+            # reset blocks   
+            for item in placed:
+                loc, value = item                   
+                self.board[loc] = value
+                self.mirror(loc)
+            
         raise ValueError('Grid is not possible')
 
 
@@ -1108,29 +1154,34 @@ WordList = ['wordlists/letters3_common.txt',
 
                     
 if __name__ == '__main__':
-  # test of grid creation and fill
-  console.clear()
-  # random.seed(1)
-  g = CrossWord(None, None, None)
-  g.debug = False
-  g.get_words(WordList)
-  for type in range(4):
-    wordlengths = Counter()
-    for i in range(1):
+   # test of grid creation and fill
+   console.clear()
+   # random.seed(1)
+   g = CrossWord(None, None, None)
+   g.debug = False
+  
+   g.get_words(WordList)
+   type = random.randint(0,3)
+   wordlengths = Counter()
+   for i in range(10):
         print(f'\nType {type} Iteration {i} ')
-        board = g.create_grid(type=type, size=17, min_length=4, max_length=11)
+        board = g.create_grid(type=type, size=(15,21), min_length=4, max_length=11)
         if board is not None:
           # g.print_board(board, 'Final')
           g.length_matrix()
           print(f'Type={type} {g.wordlengths}')
           wordlengths = wordlengths + Counter(g.wordlengths)
           g.empty_board = g.board.copy()
-          print(g.final_lengths())
-      
+          # print(g.final_lengths())
           g.solve_swordsmith('dfs')
           g.print_board(np.char.upper(g.board), 'Filled', show_lengths=True)
-    wordlengths = dict(sorted(wordlengths.items()))
-    tot = sum(wordlengths.values())
-    print('Overall Percentages ', {k: int(v * 100 / tot) for k, v in wordlengths.items()})
-    print('Overall Actual wordlengths ', wordlengths)
+          break
+   wordlengths = dict(sorted(wordlengths.items()))
+   tot = sum(wordlengths.values())
+   print('Overall Percentages ', {k: int(v * 100 / tot) for k, v in wordlengths.items()})
+   print('Overall Actual wordlengths ', wordlengths)
+
+
+
+
 
