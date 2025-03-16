@@ -155,7 +155,10 @@ class Word():
   
   def set_fixed(self,value):
     self.fixed = value
-      
+  
+  def set_index(self, value):
+  	self.index = value
+  	
   def intersects(self, rc, direction=None):
     if direction:
      return direction == self.direction and rc in self.coords
@@ -165,7 +168,7 @@ class Word():
   def other_inter(self, coord):
     """ return intersections except for specified one"""
     return [i for i in self.intersections if i != coord]
-     
+  	      
   def set_length(self, rc, direction, board):
      pass
      """ 
@@ -517,9 +520,12 @@ class LetterGame():
     if self.word_locations:
       for word in self.word_locations:
         word.match_pattern = '.' * word.length
-                  
-      self.min_length = min([t.length for t in self.word_locations])         
-      self.max_length = max([t.length for t in self.word_locations])
+      # find length of all words
+      lengths = Counter([word.length for word in self.word_locations])      
+      self.wordlengths = dict(sorted(lengths.items()))                      
+      self.min_length = min(self.wordlengths)         
+      self.max_length = max(self.wordlengths)            
+      
       #self.delta_t('len matrix')       
     return self.min_length, self.max_length
     

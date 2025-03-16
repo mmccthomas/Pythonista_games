@@ -173,42 +173,48 @@ class GameBoard(Scene):
         case _:
           device = None
       return device
-   
-  def setup_gui(self, **kwargs):
+      
+  def grid_sizes(self, device, dimx, dimy):
     w, h = get_screen_size()
-    global GRID_POS
-    match self.device:
+    match device:
       case 'ipad_landscape':
          GRID_POS = (50, 85)
          grid_size = h - 150
-         self.font_size = 24
-         self.SQ_SIZE = grid_size // max(self.DIMENSION_X, self.DIMENSION_Y)
+         font_size = 24
+         
       case 'ipad_portrait':
          GRID_POS = (35, 85)
          grid_size = w - 50
-         self.font_size = 24
-         self.SQ_SIZE = grid_size // max(self.DIMENSION_X, self.DIMENSION_Y)
+         font_size = 24
+         
       case 'iphone_landscape':
          GRID_POS = (30, 40)
          grid_size = h - 80
-         self.font_size = 16
-         self.SQ_SIZE = grid_size // max(self.DIMENSION_X, self.DIMENSION_Y)
+         font_size = 16
+         
       case 'iphone_portrait':
          GRID_POS = (30, 60)
          grid_size = w - 50
-         self.font_size = 12
-         self.SQ_SIZE = grid_size // max(self.DIMENSION_X, self.DIMENSION_Y)
+         font_size = 12
+         
       case 'ipad13_landscape':
          GRID_POS = (100, 85)
          grid_size = h - 150
-         self.font_size = 24
-         self.SQ_SIZE = grid_size // max(self.DIMENSION_X, self.DIMENSION_Y)
+         font_size = 24
+         
       case 'ipad13_portrait':
          GRID_POS = (30, 85)
          grid_size = w - 50
-         self.font_size = 24
-         self.SQ_SIZE = grid_size // max(self.DIMENSION_X, self.DIMENSION_Y)
+         font_size = 24
          
+    SQ_SIZE = grid_size // max(dimx, dimy)
+         
+    return GRID_POS, SQ_SIZE, font_size
+         
+  def setup_gui(self, **kwargs):
+    global GRID_POS
+    GRID_POS, self.SQ_SIZE, self.font_size = self.grid_sizes(self.device, self.DIMENSION_X, self.DIMENSION_Y)
+    
     for k, v in kwargs.items():
       setattr(self, k, v)
       
@@ -566,7 +572,7 @@ class GameBoard(Scene):
     """ get color and text of number square objects for temporary storage
     (coords): {shape:shapeNode, label:LabelNode}"""
     if isinstance(coords, tuple):
-    	  coords = [coords]
+        coords = [coords]
     if isinstance(coords, list):
       items = {}
       for coord in coords:
@@ -1123,6 +1129,8 @@ if __name__ == "__main__":
                       level=logging.WARNING)
   run(GameBoard(), LANDSCAPE, show_fps=True)
     
+
+
 
 
 

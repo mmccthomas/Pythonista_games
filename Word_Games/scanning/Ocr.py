@@ -15,6 +15,7 @@ import objc_util
 import os
 import sys
 import clipboard
+from objc_util import on_main_thread
 import dialogs
 import console
 import traceback
@@ -360,12 +361,20 @@ class OcrCrossword(LetterGame):
         """ process the turn
         move is coord, new letter, selection_row
         """
+        @on_main_thread
+        def clipboard_set(msg):
+             clipboard.set(msg) 
+             
+        @on_main_thread
+        def clipboard_get():
+            return  clipboard.get()              
+            
         def check_clipboard():
-            data = clipboard.get()
+            data = clipboard_get()
             if data == '':
                 print('clipboard fail')
             else:
-                print('clipboard', data)
+                print('clipboard', data)        
 
         if move:
             coord, letter, origin = move
@@ -381,7 +390,7 @@ class OcrCrossword(LetterGame):
                     self.gui.update(self.board)
 
                 case 'Copy Text':
-                    clipboard.set('Puzzle:\n' + '\n'.join(self.words))
+                    clipboard_set('Puzzle:\n' + '\n'.join(self.words))
                     check_clipboard()
                     self.gui.set_message('Data copied')
 
@@ -403,10 +412,10 @@ class OcrCrossword(LetterGame):
                     #text = None
 
                     if text:
-                        clipboard.set('Puzzle_frame:\n' + text)
+                        clipboard_set('Puzzle_frame:\n' + text)
                     else:
                         self.create_grid(self.board)
-                        clipboard.set('Puzzle_frame:\n' + ''.join(self.lines))
+                        clipboard_set('Puzzle_frame:\n' + ''.join(self.lines))
 
                     check_clipboard()
                     self.gui.set_message('Data copied')
@@ -417,11 +426,11 @@ class OcrCrossword(LetterGame):
                         return
                     text = self.gui.get_text(self.gridbox)
                     if text:
-                        clipboard.set( 'Puzzle:\n' + '\n'.join(self.words) + '\nPuzzle_frame:\n' + text)
+                        clipboard_set( 'Puzzle:\n' + '\n'.join(self.words) + '\nPuzzle_frame:\n' + text)
                     else:
                         self.create_grid(self.board)
                         msg = 'Puzzle:\n' + '\n'.join(self.words) + '\nPuzzle_frame:\n' + ''.join(self.lines)
-                        clipboard.set(msg)
+                        clipboard_set(msg)
                     check_clipboard()
                     self.gui.set_message('Data copied')
 

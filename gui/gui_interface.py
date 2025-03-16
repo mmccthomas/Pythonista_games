@@ -327,7 +327,17 @@ class Gui():
         self.gs.setup_gui(**kwargs)
         self.game_field = self.gs.game_field
         self.grid = self.gs.grid
-
+        
+    def replace_grid(self, dimx, dimy):
+        """remove and replace grid with different of squares"""
+        self.gs.DIMENSION_X, self.gs.DIMENSION_Y = dimx, dimy
+        GRID_POS, self.gs.SQ_SIZE, self.gs.font_size = self.gs.grid_sizes(self.gs.device, dimx, dimy)
+        self.grid.remove_from_parent()                        
+        self.gs.grid = self.gs.build_background_grid()
+        self.gs.game_field.add_child(self.gs.grid)
+        self.game_field = self.gs.game_field
+        self.grid = self.gs.grid
+        
     def require_touch_move(self, require=True):
         self.gs.require_touch_move = require
 
@@ -593,6 +603,23 @@ class Gui():
     def rc_to_pos(self, coord):
         return self.gs.rc_to_pos(coord[0], coord[1])
 
+    def remove_labels(self):
+        """remove all labels"""
+        labels = [
+            label for label in self.game_field.children
+            if isinstance(label, LabelNode)
+        ]
+        x, y, w, h = self.grid.bbox
+        labels_ = [
+                label for label in labels if x - 25 < label.position[0] < x
+            ]
+        labels_.extend([
+                label for label in labels if h < label.position[1] < (h + 25) and label.position[0] < w
+            ])
+
+        for label in labels_:
+            label.text = ''
+            
     def replace_labels(self,
                        which='row',
                        label_list=None,
@@ -794,4 +821,6 @@ class dotdict(dict):
     __getattr__ = dict.get
     __setattr__ = dict.__setitem__
     __delattr__ = dict.__delitem__
+
+
 

@@ -53,6 +53,7 @@ import math
 import console
 import dialogs
 import clipboard
+from objc_util import on_main_thread
 from textwrap import wrap
 from random import shuffle, choice
 import base_path
@@ -62,6 +63,7 @@ from Letter_game import LetterGame
 import gui.gui_scene as gscene
 from gui.gui_interface import Coord, BoxedLabel
 from crossword_create import CrossWord
+
 
 PUZZLELIST = "pieceword_templates.txt"
 TILESIZE = 3
@@ -89,7 +91,7 @@ class PieceWord(LetterGame):
         self.first_letter = False
         self.tiles = None
         self.debug = False
-        self.lookup_free = True
+        self.lookup_free = False
         self.image_dims = [7, 5]
         self.all_clues_done = False
         self.soln_str = '123'
@@ -161,29 +163,30 @@ class PieceWord(LetterGame):
             # self.gui.set_prompt(f'looking up {word}')
             wait.name = f'Finding {word}'
             # lookup using free dictionary,merriam_webster if fail
+            self.word_defs[word] = {'def': [], 'synonyms': []}
             self.lookup(word, self.lookup_free)
-            if not self.word_defs[word]:
-                self.lookup(word, not self.lookup_free)       
-                if self.word_defs[word]:
-                    missing_words.append(word)
+            no_defs = len(self.word_defs[word]['def'])
+            self.lookup(word, not self.lookup_free)       
+            if self.word_defs[word]['def'] and no_defs == 0:
+                  missing_words.append(word)
                
             # change button colour to show if definition found
             button = 'button_' + str(i + 2)
             self.gui.set_props(
                 button,
-                fill_color='lightblue' if self.word_defs[word] else 'pink')
+                fill_color='lightblue' if self.word_defs[word]['def'] else 'pink')
             self.word_defs[word]['line_no'] = list(
                 self.get_words().keys())[i][0] + 1
         self.gui.reset_waiting(wait)
         if missing_words:
-           dialogs.hud_alert(f'Found {missing_words} in 2nd dictionary')
+           dialogs.hud_alert(f'Found {missing_words} in 2nd dictionary', duration=4)
 
         if self.debug:
             for word in self.wordset:
                 print()
                 print(word, self.word_defs[word])
                 
-    def lookup(self, word, method): 
+    def lookup(self, word, method):         
         if method:
             self.lookup_free_dictionary(word)
         else:
@@ -191,7 +194,6 @@ class PieceWord(LetterGame):
             
     def lookup_free_dictionary(self, word):
         """ free dictionary lookup """
-        self.word_defs[word] = {}
         try:
             data = requests.get(f'https://api.dictionaryapi.dev/api/v2/entries/en/{word}').json()
         except json.JSONDecodeError:
@@ -199,18 +201,16 @@ class PieceWord(LetterGame):
         if isinstance(data, list):
             data = data[0]
             try:                        
-                defs = [c['definition'] for c in data['meanings'][0]['definitions']]    
-                self.word_defs[word]['def'] = defs                                  
-                syns = [c['synonyms'] for c in data['meanings']]    
-                self.word_defs[word]['synonyms'] = syns    
+                self.word_defs[word]['def'].extend([c['definition'] for c in data['meanings'][0]['definitions']])                                  
+                self.word_defs[word]['synonyms'].extend([c['synonyms'] for c in data['meanings']])    
             except KeyError as e:
-              print(e)                  
+              print(e)  
         
+            
     def lookup_merriam_webster(self, word):
         """ lookup word on merriam-webster dictionary
         cab be modified for any other dictionary lookup
         requires api-key in variable thes_key """
-        self.word_defs[word] = {}
         try:
             with urlopen(
                     f'https://www.dictionaryapi.com/api/v3/references/thesaurus/json/{word}?key={thes_key}'
@@ -221,9 +221,8 @@ class PieceWord(LetterGame):
         try:
             if isinstance(data, list):
                 data = data[0]
-            self.word_defs[word]['def'] = data.get('shortdef', 'Not found')
-            self.word_defs[word]['synonyms'] = data['meta'].get(
-                'syns', 'Not found')
+            self.word_defs[word]['def'].extend(data.get('shortdef', 'Not found'))
+            self.word_defs[word]['synonyms'].extend(data['meta'].get('syns', 'Not found'))
         except (IndexError, AttributeError):
             return
 
@@ -323,7 +322,7 @@ class PieceWord(LetterGame):
 
     def update_buttons(self):
         """ change button text and reset colours """
-        self.wordset = self.get_words().values()
+        
         for i, word in enumerate(self.wordset):
             button = 'button_' + str(i + 2)
             self.gui.set_text(button, word)
@@ -361,7 +360,7 @@ class PieceWord(LetterGame):
         # return selection
         self.gui.selection = ''
         selection = ''
-        prompt = ' Select puzzle'
+        prompt = 'Select grid'
         while self.gui.selection == '':
             self.gui.input_text_list(prompt=prompt,
                                      items=items,
@@ -445,7 +444,15 @@ class PieceWord(LetterGame):
             if self.debug:
                 print(self.gui.gs.buttons[-move[0]].text)
             return (None, None), self.gui.gs.buttons[-move[0]].text, None
-        # no touch on board
+        # Coord is a tuple that can support arithmetic
+        point = self.gui.gs.start_touch - gscene.GRID_POS
+        try:
+            rc_start = Coord(self.gui.gs.grid_to_rc(point))
+            if self.check_in_board(rc_start):
+                rc = Coord(move)
+                return rc_start, None, rc
+        except (KeyError):
+             pass
         return (None, None), None, None
 
     def place_tile(self, coord, tile_index):
@@ -491,7 +498,7 @@ class PieceWord(LetterGame):
             if button.text == word:
                 button_str = 'button_' + str(k)
                 break
-        if 'def' in self.word_defs[word] and 'clue' not in self.word_defs[word]:
+        if self.word_defs[word]['def'] and 'clue' not in self.word_defs[word]:
             try:
                 if self.debug:
                     print(word, self.word_defs[word])
@@ -537,12 +544,18 @@ class PieceWord(LetterGame):
         if clue is not None and clue != '':
             self.word_defs[word]['clue'] = clue
             if self.debug: print(self.word_defs[word]['clue'])
-            self.gui.set_props(button_str, fill_color='lightgreen')
+            try:
+               self.gui.set_props(button_str, fill_color='lightgreen')
+            except Exception as e:
+               pass
         else:
             self.word_defs[word].pop('clue', None)
-            self.gui.set_props(
+            try:
+               self.gui.set_props(
                 button_str,
                 fill_color='lightblue' if self.word_defs[word] else 'pink')
+            except Exception as e:
+               pass
         self.check_all_clues()
         self.save_state()
 
@@ -596,19 +609,27 @@ class PieceWord(LetterGame):
                                                                   ' ').upper(),
         ])
         return all_text
-
+        
     def process_turn(self, move, board):
         """ process the turn
     move is coord, new letter, selection_row
     """
-
+        @on_main_thread
+        def clipboard_set(msg):
+            '''clipboard seems to need @on_main_thread '''
+            clipboard.set(msg) 
+             
+        @on_main_thread
+        def clipboard_get():
+            return  clipboard.get()              
+            
         def check_clipboard():
-            data = clipboard.get()
+            data = clipboard_get()
             if data == '':
                 print('clipboard fail')
             else:
-                print('clipboard', data)
-
+                print('clipboard', data)        
+        
         if move:
             coord, letter, origin = move
 
@@ -628,7 +649,7 @@ class PieceWord(LetterGame):
                 name = dialogs.text_dialog('Enter name for puzzle',
                                            text='puzzle')
                 msg = self.compute_puzzle_text(name)
-                clipboard.set(msg)
+                clipboard_set(msg)
                 check_clipboard()
                 self.gui.set_message('Data copied')
             elif letter == 'Randomise':
@@ -684,6 +705,9 @@ if __name__ == '__main__':
         quit = g.wait()
         if quit:
             break
+
+
+
 
 
 
