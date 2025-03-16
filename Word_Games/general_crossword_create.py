@@ -1,4 +1,4 @@
-# utility to create crosswword puzzles
+# utility to create square crossword puzzles
 # similar to pieceword creator
 
 import numpy as np
@@ -44,7 +44,7 @@ class Cross(PieceWord):
         self.tiles = None
         self.debug = False
         self.lookup_free = False
-        self.image_dims = (self.selection, self.selection)
+        self.image_dims = (self.selection[1], self.selection[0])
         self.all_clues_done = False
         self.soln_str = '123'
         # self.load_words_from_file(PUZZLELIST, no_strip=True)
@@ -69,16 +69,17 @@ class Cross(PieceWord):
         self.gui.remove_labels()                
 
     def get_size(self):
-        LetterGame.get_size(self, f'{self.selection},{self.selection}')
+        LetterGame.get_size(self, f'{self.selection[0]},{self.selection[1]}')
 
     def select_list(self):
         '''Choose which category'''
-        items = [f'{i}x{i}' for i in range(13, 23, 2)]
+        items = [f'{i}x{j}' for i,j in zip([13,15,17,19,21,23,15,17],
+                                           [13,15,17,19,21,23,21,27])]
         selection = dialogs.list_dialog('select grid', items)
         if selection:
-            return int(selection[:2])
+            return int(selection[:2]), int(selection[-2:])
         else:
-            return 15
+            return 15, 15
 
     def fill_board(self):
         """use  swordsmith to fill crossword
@@ -121,7 +122,7 @@ class Cross(PieceWord):
         W, H = get_screen_size()
         x, y, w, h = self.gui.grid.bbox
         off = 50
-        t = h / self.selection
+        t = h / self.selection[1]
         params = {
             'title': '',
             'stroke_color': 'black',
@@ -336,9 +337,9 @@ class Cross(PieceWord):
         with open('piecestate.pkl', 'rb') as f:
             (self.empty_board, self.board, self.solution_board,
              self.word_defs, self.word_locations, self.selection) = pickle.load(f)     
-        self.sizex = self.sizey = self.selection           
-        self.image_dims = (self.selection, self.selection)
-        self.gui.replace_grid(self.selection, self.selection)
+        self.sizex, self.sizey = self.selection           
+        self.image_dims = self.selection
+        self.gui.replace_grid(*self.selection)
         self.gui.remove_labels()     
         self.wordset = self.get_words()
         self.gui.set_top(f'Crossword frame {self.selection}')
