@@ -6,6 +6,8 @@ This is a series of python word and board games to operate on the iPad using the
 In general, the games do not work well on iPhone due to smaller screen area and the restrictions of touch interface.
 Some optimisation has been made to operate in iPad Portrait mode, but Landscape is generally preferred.
 The games do not autodetect orientation change.
+All games were developed using a 13" Ipad. Most games have automatic detection od device size and orientation
+but there is a backlog of improvements.
 
 The games all use the Scene module, which is a thin wrapper around the Apple UiKit framework.
 
@@ -15,6 +17,7 @@ Style note:
 Due to the limited debugging in Pythonista, I frequently used a non-preferred way to use list comprehensions
 e.g. [print(x) for x in iterable]
 This is to allow stepping over an iteration loop during debug.
+Hint: a conditional breakpoint mode would be nice!
 
 Games are:
 
@@ -86,7 +89,9 @@ Entry point : Word_Games/anagram_word.py
 
 Pieceword
 ---------
-3x3 word tiles jumbled on a grid. Use the clues to rearrange them.
+A personal favourite.
+3x3 word tiles are jumbled on a 15x21 grid. Use the clues to rearrange them.
+Touch and dragging tile causes the tiles to swap position
 
 Entry point : Word_Games/PieceWord.py
 
@@ -127,6 +132,15 @@ Operations are computed L-R and T-B
 Choose from 3x3 (nos 1-9), 4x4 (nos 1-16) or 5x5 (nos 1-25) if you dare
 
 Entry point: Word_Games/Number_grid.py
+
+Inequalities
+------------
+A simple modification to Number Grid.
+Presents a grid with spaces and comparison between some values
+Fill the spaces with unique numbers to satisfy the inequalities.
+
+Entry point: Word_Games/Inequalities.py
+
 
 TrainTracks
 -----------
@@ -243,6 +257,36 @@ experiences crashes sometimes, hence each move is stored in numpy array for inst
 
 Entry point : Word_Games/scanning/Ocr.py
 
+Pieceword Creator
+-----------------
+A utility to produce custom PieceWord puzzles.
+This is a fixed size 21x15 crossword which is scrambled before storing.
+The utility allows looking up definitions and synonyms for each of the
+'Across' words using both https://www.merriam-webster.com/dictionary/word
+(need user key)
+and  https://www.thefreedictionary.com
+Clues can be selected from returned lists and subsequently edited.
+Resulting puzzle data can be copy/pasted into file piecewords.txt
+
+Entry point : Word_Games/pieceword_create.py
+
+Crossword Creator
+-----------------
+A utility to produce custom crossword puzzles (British or Cryptic style)
+This is a fixed size 21x15 crossword which is scrambled before storing.
+The utility constructs a grid of defined size using random words.
+It allows looking up definitions and synonyms for each of the
+words using both https://www.merriam-webster.com/dictionary/word (need user key)
+and  https://www.thefreedictionary.com
+Clues can be selected from returned lists and subsequently edited.
+Resulting puzzle data can be copy/pasted into file crossword_templates.txt
+No app created yet for solving the crossword as I am more interested in creating
+them than solving!
+
+Crossword generation and word filling  is contained in Word_Games/crossword_create.py
+
+Entry point : Word_Games/general_crossword_create.py
+
 
 Notes
 -----
@@ -254,6 +298,7 @@ All games have a Pause Menu button in top left corner with various options
 
 Crossword filling with random words proved particularly challenging, but was mostly successful. 
 I would be very interested in any improvements.
+Now using a modification of swordsmith (https://github.com/adamaaronson/swordsmith) with good results.
 
 Some games, e.g. wordsearch, rely upon touch dragging to select direction and length. 
 
