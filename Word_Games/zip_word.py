@@ -260,7 +260,7 @@ class ZipWord(LetterGame):
       elif letter == 'Finish':
         return True
       elif letter != '':
-        # select from list whether accross or down based upon selection row.
+        # select from list whether across or down based upon selection row.
         # selection items is a directory, dont know which order.
         possibles = self.selection_items
         # get keys to establish down/across

@@ -262,7 +262,7 @@ class Scrabble(LetterGame):
     return self.gamestate.game_ended  
     
   def sync_board(self):
-    """ constuct board from gamestate"""
+    """ construct board from gamestate"""
     return [[cell.tile.letter.lower() if cell.tile else '-' for cell in row] for row in self.gamestate.board.board]
     
   def process_turn(self, move, board):

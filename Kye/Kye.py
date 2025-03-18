@@ -16,7 +16,7 @@
 #    along with this program; if not, write to the Free Software
 #    Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #
-# completely modified bu Chris Thomas for ipad using Pythonista
+# completely modified by Chris Thomas for ipad using Pythonista
 # Drawing surfaces are using scene module
 # Menu uses ui module buttons
 import ui

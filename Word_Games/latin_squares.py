@@ -141,7 +141,7 @@ def operators(N, square, add_only=True):
    return square, totals
    
 def add_result(N,square, results):    
-    # create larger array for disply thay include equals signs
+    # create larger array for display that includes equals signs
     # and totals 
     display = np.zeros((2*N+1, 2*N+1), dtype='U3')
     display[:2*N-1, :2*N-1]=square

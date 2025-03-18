@@ -34,7 +34,7 @@ try:
     has_cython = True
 except (ModuleNotFoundError, ImportError):
     print(
-        "WARNING: You do not have Cython installed. Installation preceeding without Cython."
+        "WARNING: You do not have Cython installed. Installation preceding without Cython."
     )
     cmdclass = {"install": install}
     has_cython = False
@@ -43,7 +43,7 @@ try:
     import numpy as np
 except (ModuleNotFoundError, ImportError):
     print(
-        "WARNING: You do not have NumPy installed. Installation preceeding without NumPy."
+        "WARNING: You do not have NumPy installed. Installation preceding without NumPy."
     )
     has_cython = False
 

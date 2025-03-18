@@ -202,7 +202,7 @@ class FreeCellFull(FreeCell):
         an error occurs, all moved cards glide back to original locations.
         '''
         
-        # No move occured, not even worth raising an exception because user
+        # No move occurred, not even worth raising an exception because user
         # can clearly see no cards were being dragged.
         if not self.cardsToDrag:
             return None
@@ -266,7 +266,7 @@ class FreeCellFull(FreeCell):
         together while updating their position.
         '''
         
-        # No move occured, not even worth raising an exception because user
+        # No move occurred, not even worth raising an exception because user
         # can clearly see no cards were being dragged.
         if not self.cardsToDrag:
             return None

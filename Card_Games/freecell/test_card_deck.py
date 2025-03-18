@@ -15,7 +15,7 @@ from deck import Deck
 '''
 
 my_deck = Deck(1, 13, 4)
-print("======Basic Sring Representation=====")
+print("======Basic String Representation=====")
 print(my_deck)
 
 print("======In Column Format=====")

@@ -179,7 +179,7 @@ class CodewordSolverDFS():
             return int(100 * alpha / total_len)
             
         def _capitalise(word, letter, cap=True):
-            """ underscore all occurences of letter in given word
+            """ underscore all occurrences of letter in given word
             optionally capitalise also"""
             if cap:
                 return ''.join([l.upper()+ '\u0333' if l == letter else l for l in word])

@@ -139,7 +139,7 @@ class Ship():
 class Ships(Ship):
    """ class to hold set of ships for each player """
    def __init__(self, size, remaining_ships):
-     # initiall load with remaing
+     # initial load with remaining
      self.ships =[] # a list of Ship
      self.remaining_ships = remaining_ships
      self.all = []

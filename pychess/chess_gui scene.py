@@ -119,7 +119,7 @@ class ChessGame(gscene.GameBoard):
       
       if (turn and p.is_player(self.Player.PLAYER_1)) or \
         (not turn and p.is_player(self.Player.PLAYER_2)):
-        # hightlight selected square
+        # highlight selected square
         self.highlight_squares(valid_moves)
   
   
@@ -292,7 +292,7 @@ class ChessGame(gscene.GameBoard):
       end_col = str(8 - finish.r)          
             
       if self.gs.get_piece(finish) == self.Player.EMPTY:
-          # normnal move          
+          # normal move          
           start_row = 'abcdefgh'[start.c]
           if piece == 'P':
              piece = ''   

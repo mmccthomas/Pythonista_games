@@ -106,7 +106,7 @@ class OcrCrossword(LetterGame):
         if loaded board, board is an np array
         board_size is a default 25x25
         for Lettergame.set_size()
-          if board_size is spefied use it
+          if board_size is specified use it
           else if self.board is specified, use that
           else prompt for size
         """
@@ -241,7 +241,7 @@ class OcrCrossword(LetterGame):
                             fill_color='cyan', **params)
 
     def create_grid(self, board):
-        """ create string represention of board
+        """ create string representation of board
             slashes separate each character
             check shape if board and indexes as board can resize
         """
@@ -822,7 +822,7 @@ class OcrCrossword(LetterGame):
         """ find all rectangles in smaller area
         then filter those rectangles to remove outsize or undersize items
         returns pandas dataframe
-        #TODO. this deletes some rectangles that it shouldnt. investigate
+        #TODO. this deletes some rectangles that it shouldn't. investigate
         """
         full = Rect(0.0, 0.0, 1.0, 1.0)
         if isinstance(subrect, pd.Series):
@@ -905,7 +905,7 @@ class OcrCrossword(LetterGame):
         locs = np.array(total_rects[['r', 'c']])
         #print(total_rects.to_string())
         [self.board_rc(tuple(loc), board, False) for loc in locs]
-        # missing is  whats left
+        # missing is  what's left
         missing = np.argwhere(board==True)
         # make a new datafram from missing r,c
         missing_df = pd.DataFrame(missing, columns=['r', 'c'])

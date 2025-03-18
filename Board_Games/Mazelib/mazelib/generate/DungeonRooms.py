@@ -335,7 +335,7 @@ class DungeonRooms(MazeGenAlgo):
         """combine sets that have non-zero intersections
 
         Args:
-            list_of_sets (list): sets of paths that do not interesect
+            list_of_sets (list): sets of paths that do not intersect
         Returns:
             list: a combined collection of paths, now intersection
         """

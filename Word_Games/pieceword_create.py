@@ -28,11 +28,11 @@ To operate:
      Successful lookups will turn button blue, unsuccessful ones
      will turn pink. if all buttons are pink, key was invalid
   3. press each blue button to select appropriate definition or synonym
-     button wil turn green
+     button will turn green
   4. press each pink button and try to enter a suitable clue - be creative!
   5. pressing green button again allows editing of clue
   6. press Randomise to shuffle tiles. this can be repeated as necessary.
-  7. press Copy and puzzle nane or number, e.g. puzzle18
+  7. press Copy and puzzle name or number, e.g. puzzle18
   8. open pieceword.txt and paste text to end of file
   
   

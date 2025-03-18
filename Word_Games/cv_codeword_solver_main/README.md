@@ -49,7 +49,7 @@ Upcoming:
 ## Heuristics
 The following tricks are used to reduce the time taken to solve a puzzle (in some experiments, from 3 **minutes** to 0.05 **seconds**.)
 - Count the occurrences of numbers in the grid and search over the numbers in order of most to least frequently occurring.
-- Sort the letters of the alphabet according to their frequency of use in English. When subsituting candidate letters for a particular number, start with the most common letters first.
+- Sort the letters of the alphabet according to their frequency of use in English. When substituting candidate letters for a particular number, start with the most common letters first.
 
 ## Installation
 Follow these steps:

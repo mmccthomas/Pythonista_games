@@ -221,7 +221,7 @@ class State():
     
     def number_face_ups(self, longstring):
         # count number of faceup cards in foundation and tableau
-        # find remainder of string after location of 2nd seperator
+        # find remainder of string after location of 2nd separator
         str_ = longstring[longstring.index('-', longstring.index('-') +1)+1:]
         #print(f'{longstring=}, {str_=}') 
         # search string for suit code and get next character 0 or 1       
@@ -390,7 +390,7 @@ class Game:
         return 0
 
     def availableMoves(self):        
-        #we go on every build stacks,we try every possibilies :
+        #we go on every build stacks,we try every possibilities :
         #   -build ->
         #we go through the build stacks and suits stack
         for i, stock in enumerate(self.state.tableau):
@@ -529,7 +529,7 @@ class Game:
         
         #the source is a build
         if move.from_build:         
-            # cant move a king from start position into stack or on top of  another stack
+            # can't move a king from start position into stack or on top of  another stack
             if card.face == 'K' and move.to_build and move.src_index == 0:
                 return False
 
@@ -543,7 +543,7 @@ class Game:
                 dest_card = s.tableau[move.dest_stack-TABLEAU][-1]
                 #if self.debug: print(f'{card.next_up()=}, {dest_card.face=} , {card.color=},{dest_card.color=}' )
                 return (card.next_up() == dest_card.face) and (card.color != dest_card.color)
-                #true if the source card's number is lower and if the colors are differents
+                #true if the source card's number is lower and if the colors are different
            
         #from x stack to suits # S, H, C, D
         if move.to_foundation:
