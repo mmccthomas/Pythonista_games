@@ -655,7 +655,7 @@ class Gui():
 
     def add_image(self, img, **kwargs):
         """ display an image on the grid. This is included so that the image
-      can be diplayed after the gui and grid are initiated """
+      can be displayed after the gui and grid are initiated """
 
         background = SpriteNode(Texture(ui.Image.named(img)))
         background.size = (self.gs.SQ_SIZE * self.gs.DIMENSION_X,

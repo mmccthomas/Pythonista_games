@@ -252,7 +252,7 @@ class Cages:
       # count degree of all node.
       degree = np.array([sum(G[i]) for i in range(len(G))])
       
-      # initialise the posible color
+      # initialise the possible color
       colorDict = {i: colors.copy() for i in range(len(G))}
       # sort the node depends on the degree
       sortedNode = np.flip(node[degree.argsort()])

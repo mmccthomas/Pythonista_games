@@ -284,7 +284,7 @@ class Cross(PieceWord):
 
     def compute_puzzle_text(self, name='puzzle'):
         """produce all text
-        add in indexes and seperate by forward slash
+        add in indexes and separate by forward slash
         """
         board_str = ''
         for r, row in enumerate(self.board):
@@ -319,7 +319,7 @@ class Cross(PieceWord):
         self.complete()
 
     def process_turn(self, move, board):
-        """ add prosessing of board touches to initiate
+        """ add processing of board touches to initiate
         select_definition
         """
         PieceWord.process_turn(self, move, board)

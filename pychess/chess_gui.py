@@ -80,7 +80,7 @@ def highlight_square(screen, game_state, valid_moves, square_selected):
 
         if (game_state.whose_turn() and game_state.get_piece(row, col).is_player(Player.PLAYER_1)) or \
                 (not game_state.whose_turn() and game_state.get_piece(row, col).is_player(Player.PLAYER_2)):
-            # hightlight selected square
+            # highlight selected square
             s = py.Surface((SQ_SIZE, SQ_SIZE))
             s.set_alpha(100)
             s.fill(py.Color("blue"))

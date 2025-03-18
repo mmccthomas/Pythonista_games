@@ -15,7 +15,7 @@ class CuldeSacFiller(MazeTransmuteAlgo):
     """
 
     def _transmute(self):
-        """Master methot to fill in all the loops in the maze
+        """Master method to fill in all the loops in the maze
 
         Returns: None
         """

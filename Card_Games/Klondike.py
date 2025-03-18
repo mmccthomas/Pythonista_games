@@ -232,7 +232,7 @@ class KlondikeGame(Scene):
           faceup = int(state[i+1])   
           card = self.str_to_card(card_str)
           assert card is not None, 'error in  card string'
-          # card.face_up has already changed, so cant detect changed
+          # card.face_up has already changed, so can't detect changed
           if True: # card.face_up is not bool(faceup):
             
             card.set_face_up(faceup)

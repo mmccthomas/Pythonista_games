@@ -91,7 +91,7 @@ class CrossWord():
         """ computes the next word to be attempted """
 
         def log_return(word):
-            """ count the occurence of a word
+            """ count the occurrence of a word
           allows detection of unplaceable word
           """
             self.word_counter[word] += 1
@@ -244,7 +244,7 @@ class CrossWord():
                 print(self.board.shape)
 
     def update_board_and_soln(self):
-        # update all occurences of letters on board in solution_dict
+        # update all occurrences of letters on board in solution_dict
         # if a letter is not in solution_dict, then add it in
         letter_pos = np.argwhere(np.char.isalpha(self.board))
         for pos in letter_pos:
@@ -475,7 +475,7 @@ class CrossWord():
                             word.match_pattern = word.word
                             word.fixed = True
                             break
-            # now deal with indivdual letters
+            # now deal with individual letters
             # check each coordinate
             for coord in known:
                 for word in self.word_locations:
@@ -542,7 +542,7 @@ class CrossWord():
             return ''.join([y if x == '.' else x for x, y in zip(a, b)])
 
     def update_children_matches(self, word_obj, clear=False):
-        """ update the match patterns for children of current wordl
+        """ update the match patterns for children of current world
     eg if word = abacus and child1 intersects at pos 1 match for child is 'a.....' """
         parent_word = word_obj.word
         children_dict = word_obj.children
@@ -736,8 +736,8 @@ class CrossWord():
             else:
                 try:
                     found[child].append(
-                        (lprint(possibles, 3), length))  # must be atleast 1
-                    #found[child].append((possibles,100 * depth + length)) # must be atleast 1
+                        (lprint(possibles, 3), length))  # must be at least 1
+                    #found[child].append((possibles,100 * depth + length)) # must be at least 1
                     for index, try_word in enumerate(possibles):
                         #self.gui.set_message2(f'{index}/{length} possibles  at {child.start} trying {try_word}')
                         result = self._search_down(child, dict_parents,
@@ -754,7 +754,7 @@ class CrossWord():
        list comprehensions are extensively used to allow simple stepove during debug
        for defined word puzzles. there is no guessing. there can be only one solution, so if a decision cannot be made in this iteration, it must be der
        deferred  to later.
-       Use varaible max_possibles to switch between unconstrained and constrained puzzles """
+       Use variable max_possibles to switch between unconstrained and constrained puzzles """
         # self.update_board(filter_placed=True)
         # sleep(1)
 
@@ -794,7 +794,7 @@ class CrossWord():
                 result = True
             # no word fits here
             elif length is None and not word.fixed:
-                result = False  #print(f'wrong parent word {word.word} shouldnt be here')
+                result = False  #print(f'wrong parent word {word.word} shouldn't be here')
             # only one word fits
             elif length == 1:
                 # only word. use it
@@ -892,7 +892,7 @@ class CrossWord():
           with open(f'{word_file}', 'r') as f:
             words = [line.strip() for line in f]
           all_word_list.extend(words)
-        self.all_words = set(all_word_list)  # fast seach for checking
+        self.all_words = set(all_word_list)  # fast search for checking
     
     def length_matrix(self, search_directions=['down', 'across']):
         # process the board to establish starting points of words, its direction, and length
@@ -953,7 +953,7 @@ class CrossWord():
         9. verify spread of word lengths
         10. print grid
         note: X shape are desirable. if given choice of disturbing
-        X or not, dont't
+        X or not, don't
         """
         types = {k:divmod(k,2) for k in range(4)}  # for position of starting block
         self.max_length = max_length

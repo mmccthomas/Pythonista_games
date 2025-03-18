@@ -69,7 +69,7 @@ NumberWords
 Crossword grid filled with a selection of words.
 Find the letter linked to each number.
 Idea taken from Puzzler magazine
-The first puzzles are randomly genererated and may not include all letters.
+The first puzzles are randomly generated and may not include all letters.
 All others are taken from published games in magazines and newspapers.
 
 Entry point : Word_Games/NumberWord.py
@@ -154,7 +154,7 @@ Entry point : Board_Games/TrainTracks.py
 
 Tetris
 ------
-Simple implemation of a classic game. 
+Simple implementation of a classic game. 
 An early attempt by me, could be prettier!
 
 Entry point : Board_Games/tetris.py

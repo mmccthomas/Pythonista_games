@@ -7,7 +7,7 @@ Copyright (c) 1992 Colin Garbutt.
                 keep all of the registration fees (backdated).
 
 
-Whats new in version 2.0.
+What's new in version 2.0.
 
   - now supports the charity Save the Children 
     - so dig deep.
