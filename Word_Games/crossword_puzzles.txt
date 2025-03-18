@@ -1,0 +1,190 @@
+puzzle1_text:
+ACROSS                DOWN
+1  inquires (of)      2  The Bard
+4  tools              3  legislator
+10 North African      4  mommy
+   country            6  acclaim
+15 widespread         7  translucent or
+16 assemblage            hazy.
+17 benign             8  earnings
+18 picks up           9  handwriting
+19 guard              11 Not a a robot
+20 Sun computer       12 acquiring
+21 first letter of    13 a sterol lipid in
+   the greek             the bloodstream
+   alphabet           14 jail
+23 copies             22 nonfat
+26 fabricated         24 gifted
+28 travelers          25 Wired computer
+31 as in attached,       protocol
+   bound              27 conventional
+32 bawl out           29 hunt
+33 transportable      30 astronomical
+36 the collective     34 disassembled
+   noun for a group   35 before long
+   of cheetahs.       37 employments
+38 dwelling           39 offers
+41 collisions         40 disagreements
+45 accord             42 academic
+47 adversities        43 deliberation
+48 Homers home town   44 skip
+51 close              46 the combination
+52 diminutive            of a substance
+56 to hold tightly,      with oxygen.
+   to clasp.          49 authentic
+57 a university.      50 Red indigenous
+59 alarms                person
+60 advertisement      53 Nordic country
+61 Research           54 dive
+   metropolis         55 brought about
+62 apart              58 excess
+63 to have a clear     
+   idea of             
+64 dingle              
+
+puzzle1_frame:
+'1a/2s/k/3s/#/4m/e/6c/h/7a/n/8i/s/9m/s/#/10m/11o/r/12o/c/13c/o'
+'#/h/#/e/#/o/#/h/#/t/#/n/#/a/#/14p/#/r/#/b/#/h/#'
+'15m/a/i/n/s/t/r/e/a/m/#/16c/o/n/g/r/e/g/a/t/i/o/n'
+'#/k/#/a/#/h/#/e/#/o/#/o/#/u/#/i/#/a/#/a/#/l/#'
+'17g/e/n/t/l/e/#/18r/e/s/u/m/e/s/#/19s/e/n/t/i/n/e/l'
+'#/s/#/o/#/r/#/#/#/p/#/e/#/c/#/o/#/i/#/n/#/s/#'
+'20s/p/a/r/c/#/21a/22l/p/h/a/#/23t/r/a/n/s/c/r/i/p/t/s'
+'#/e/#/#/#/24t/#/i/#/e/#/25a/#/i/#/#/#/#/#/n/#/e/#'
+'26m/a/n/27u/f/a/c/t/u/r/e/d/#/28p/a/29s/s/30e/n/g/e/r/s'
+'#/r/#/s/#/l/#/e/#/i/#/s/#/t/#/e/#/n/#/#/#/o/#'
+'31s/e/c/u/r/e/d/#/32s/c/o/l/d/#/33r/e/m/o/v/34a/b/l/e'
+'#/#/#/a/#/n/#/35s/#/#/#/#/#/#/#/k/#/r/#/p/#/#/#'
+'36c/37o/a/l/i/t/i/o/n/#/38a/39b/o/40d/e/#/41i/m/p/a/c/42t/s'
+'#/c/#/#/#/e/#/o/#/43r/#/i/#/i/#/44m/#/o/#/r/#/h/#'
+'45a/c/c/46o/r/d/a/n/c/e/#/47d/i/f/f/i/c/u/l/t/i/e/s'
+'#/u/#/x/#/#/#/#/#/f/#/s/#/f/#/s/#/s/#/#/#/o/#'
+'48s/p/r/i/n/49g/f/50i/e/l/d/#/51d/e/n/s/e/#/52m/53i/c/r/o'
+'#/a/#/d/#/e/#/n/#/e/#/54p/#/r/#/#/#/55c/#/c/#/e/#'
+'56s/t/r/a/i/n/e/d/#/57c/o/l/l/e/g/58e/#/59a/l/e/r/t/s'
+'#/i/#/t/#/u/#/i/#/t/#/u/#/n/#/x/#/u/#/l/#/i/#'
+'60n/o/t/i/f/i/c/a/t/i/o/n/#/61c/i/t/y/s/e/a/r/c/h'
+'#/n/#/o/#/n/#/n/#/o/#/g/#/e/#/r/#/e/#/n/#/a/#'
+'62a/s/u/n/d/e/r/#/63u/n/d/e/r/s/t/a/n/d/#/64d/e/l/l'
+
+puzzle2_text:
+ACROSS                DOWN
+8  Taking depth       1  restrained
+   readings           2  begin
+9  an event that      3  demoralized
+   causes great       4  hideous
+   distress.          5  absolute
+10 commonwealths      6  drift
+11 not stiff in       7  Middle Eastern
+   structure             country
+12 Pick in Spanish    14 glorious
+13 lower limbs        16 identified
+15 raw                17 seclusion
+18 Primary colour     20 the act of
+19 bands                 dipping into a
+20 Number to             fluid.
+   identify magazine  23 just
+22 grown-up           26 dwells
+24 Wired data         28 accordingly
+   protocol           29 Ninety month
+25 out of              
+27 constitutions       
+30 tried               
+31 culpable            
+32 put forth           
+
+puzzle2_frame:
+'#/1c/#/2i/#/3d/#/4u/#/5u/#/6w/#/7o/#'
+'8s/o/u/n/d/i/n/g/#/9t/r/a/u/m/a'
+'#/n/#/i/#/s/#/l/#/t/#/n/#/a/#'
+'10s/t/a/t/e/s/#/11y/i/e/l/d/i/n/g'
+'#/r/#/i/#/o/#/#/#/r/#/e/#/#/#'
+'12r/o/s/a/#/13l/e/14g/s/#/15c/r/u/16d/e'
+'#/l/#/t/#/u/#/r/#/17i/#/#/#/i/#'
+'18b/l/u/e/#/19t/e/a/m/s/#/20i/s/s/n'
+'#/e/#/#/#/e/#/n/#/o/#/n/#/c/#'
+'22a/d/u/23l/t/#/24a/d/s/l/#/25f/r/o/m'
+'#/#/#/a/#/26s/#/#/#/a/#/u/#/v/#'
+'27s/28t/a/t/u/t/e/29s/#/30t/e/s/t/e/d'
+'#/h/#/e/#/a/#/e/#/i/#/i/#/r/#'
+'31g/u/i/l/t/y/#/32p/r/o/p/o/s/e/d'
+'#/s/#/y/#/s/#/t/#/n/#/n/#/d/#'
+
+puzzle3_text:
+ACROSS                DOWN
+8  hooray             1  Old Social space
+9  10th month         2  come again
+10 Of Ireland         3  cordial
+11 _  Island, US      4  swineflesh
+   state              5  infertile
+12 concern            6  outdated
+14 kindred            7  fortified
+18 an earnest         13 correspondent
+   request            14 illness
+19 imply              16 Dictionary
+22 Capital of France  17 Los _, city of angels
+23 transport service  20 dots
+   that goes back     21 Director of Star
+   and forth             Wars
+26 of this, that or   23 secure
+   it.                25 lean
+27 Little orphan       
+
+puzzle3_frame:
+'1m/#/2w/#/3t/#/4p/#/5s/#/6o/#/7a'
+'8y/a/h/o/o/#/9o/c/t/o/b/e/r'
+'s/#/a/#/n/#/r/#/e/#/s/#/m'
+'10p/a/t/r/i/c/k/#/11r/h/o/d/e'
+'a/#/#/#/c/#/#/#/i/#/l/#/d'
+'12c/a/13r/e/#/#/14a/l/l/i/e/d/#'
+'e/#/e/#/16w/#/i/#/e/#/t/#/17a'
+'#/18a/p/p/e/a/l/#/#/19m/e/a/n'
+'20s/#/o/#/b/#/#/#/21l/#/#/#/g'
+'22p/a/r/i/s/#/23s/h/u/t/25t/l/e'
+'o/#/t/#/t/#/a/#/c/#/e/#/l'
+'26t/h/e/r/e/o/f/#/27a/n/n/i/e'
+'s/#/r/#/r/#/e/#/s/#/d/#/s'
+
+puzzle4_text:
+ACROSS                DOWN
+1  auspicious         2  somewhat red.
+6  Fluids with low    3  Matching colours
+   pH                 4  a roll of paper
+10 commentaries          or parchment
+11 Wired data format  5  Scrambled place
+12 cheerless             of Wedding feast
+13 columnist             in Bible
+15 housemaid          7  Rocky Scottish
+16 entertainment.        hill
+19 firing             8  to understand or
+21 aloof                 point out the
+24 designate             difference in
+26 occupations        9  unusable
+   requiring          14 last letter of
+   skillful use of       every greek
+   the hands             alphabet
+28 an empty space     17 device
+29 administrator      18 insanity
+30 bizarre            20 enhance
+31 brand              22 alfresco
+                      23 scribed
+                      25 senior
+                      27 a rafter of a
+                         roof.
+                         
+puzzle4_frame:
+'1p/2r/o/3m/i/4s/i/5n/g/#/6a/7c/i/8d/s'
+'#/e/#/e/#/c/#/c/#/9u/#/r/#/i/#'
+'10e/d/i/t/o/r/i/a/l/s/#/11a/d/s/l'
+'#/d/#/a/#/o/#/a/#/e/#/i/#/c/#'
+'12d/i/s/m/a/l/#/#/13b/l/o/g/g/e/r'
+'#/s/#/e/#/l/#/14o/#/e/#/#/#/r/#'
+'15c/h/a/r/#/#/16a/m/u/s/e/17m/e/n/t'
+'#/#/#/i/#/18m/#/e/#/s/#/e/#/#/#'
+'19d/20i/s/c/h/a/r/g/e/#/#/21c/o/22o/l'
+'#/m/#/#/#/d/#/a/#/23s/#/h/#/u/#'
+'24a/p/p/25o/i/n/t/#/#/26c/r/a/f/t/s'
+'#/r/#/l/#/e/#/27s/#/o/#/n/#/d/#'
+'28v/o/i/d/#/29s/u/p/e/r/v/i/s/o/r'
+'#/v/#/e/#/s/#/a/#/e/#/s/#/o/#'
+'30w/e/i/r/d/#/31t/r/a/d/e/m/a/r/k'
