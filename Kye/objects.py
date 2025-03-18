@@ -281,7 +281,7 @@ class Monster(Thinker):
         return 3
 
     def act(self, game, x, y):
-        # Monsters move randomely half the time. The rest of the time we move
+        # Monsters move randomly half the time. The rest of the time we move
         # towards Kye. The object of both halves of this 'if' is to get a
         # (tx,ty) target square to move into.
 
@@ -310,7 +310,7 @@ class Monster(Thinker):
             dy = ky - y
 
             # Step towards Kye. Really missing the ternary operator here...
-            # Always step dy (up/down) in preference, as the orignial game does
+            # Always step dy (up/down) in preference, as the original game does
             if dy == 0:
                 if dx > 0:
                     tx, ty = x + 1, y
@@ -336,7 +336,7 @@ class Monster(Thinker):
                     else:
                         tx, ty = x, y-1
 
-        # Now try to move to (tx,ty). We only fall into black holes if moving randomely.
+        # Now try to move to (tx,ty). We only fall into black holes if moving randomly.
         t = game.get_at(tx, ty)
         if t is None:
             game.move_object(x, y, tx, ty)
@@ -470,7 +470,7 @@ class Slider(Thinker):
                 # No way forward due to target square(s) being occupied - stuck
                 if not plus and not minus: return False
 
-                # If both ways forwand are possible, choose randomely
+                # If both ways forwand are possible, choose randomly
                 if plus and minus:
                     if game.nextrand(2) == 0:
                         plus = False

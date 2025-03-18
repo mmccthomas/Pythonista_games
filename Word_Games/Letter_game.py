@@ -405,7 +405,7 @@ class LetterGame():
           return selection
             
   def initialise_board(self):
-    """ requires sizex, sizey fron get_size
+    """ requires sizex, sizey from get_size
                  letter_weights from load_words
     """
     for r in range(self.sizey):
@@ -479,7 +479,7 @@ class LetterGame():
       
     self.wordlist = word_list
     self.wordset = set(word_list) # for fast search
-    self.all_words = set(all_word_list) # fast seach for checking
+    self.all_words = set(all_word_list) # fast search for checking
   
   def check_for_ascii(self, wordlist, source):
       # check for unicode characters from ocr
@@ -660,7 +660,7 @@ class LetterGame():
     else:
         selection = console.input_alert("What is the dimension of the board (X, Y)? (Default is 5x5)\nEnter 2 numbers:")
     try:
-      # can use space, comma or x for seperator
+      # can use space, comma or x for separator
       size = selection.replace(',',' ').replace('x', ' ').split() 
       if len(size) == 2:
         self.sizey = int(size[1])

@@ -115,7 +115,7 @@ class GameBoard(Scene):
   def __init__(self):  # board, player, response):
     ''' board is 2d list of characters
     player is Player class
-    reponse is output from touch operations
+    response is output from touch operations
     '''
     Scene.__init__(self)
     self.board = [[]]
@@ -546,7 +546,7 @@ class GameBoard(Scene):
     self.last_board = list(map(list, self.board))
     
   def changed(self, board_update):
-    ''' return first differnce '''
+    ''' return first difference '''
     gui_board = self.board
     for j, row in enumerate(board_update):
       for i, col in enumerate(row):
@@ -839,7 +839,7 @@ class GameBoard(Scene):
       # self.board_print()
       
   def point_to_rc(self, point):
-    """ covert touch point to rc tuple """
+    """ convert touch point to rc tuple """
     col = int((point.x - GRID_POS[0]) / (self.SQ_SIZE))
     row = self.DIMENSION_Y - 1 - int((point.y - GRID_POS[1]) / (self.SQ_SIZE))
     return row, col
@@ -853,7 +853,7 @@ class GameBoard(Scene):
     return row, col
     
   def rc_to_pos(self, row, col):
-    """ covert col row  to Point object in game field coordinates
+    """ convert col row  to Point object in game field coordinates
     row, col are in (0,0) is topleft
     x,y is (0,0 is bottom right) """
     # bbox = self.game_field.bbox  # x,y,w,h

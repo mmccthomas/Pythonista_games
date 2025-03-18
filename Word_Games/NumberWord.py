@@ -12,7 +12,7 @@ The games uses a 20k word dictionary
 # incorrect blocks, missing numbers, incorrect numbers
 # or word not in words_alpha.txt
 # To  find and diagnose if solution not possible
-# number could be wrong ( particularly 19 fo 9 etc)
+# number could be wrong ( particularly 19 for 9 etc)
 # or word not in wordlist
 # added code to :
 # check for number > 30 and report its location

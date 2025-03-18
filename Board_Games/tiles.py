@@ -294,14 +294,14 @@ class TileGame(Scene):
       t.remove_from_parent()      
       
   def point_to_rc(self,point):
-    """ covert touch point to Point object """    
+    """ convert touch point to Point object """    
     bbox = self.game_field.bbox # x,y,w,h
     col = int(SIZE * (point.x - bbox.x) / bbox.w)
     row = int(SIZE * (point.y - bbox.y) / bbox.h)
     return Point(col,row)
     
   def rc_to_pos(self,tile,col,row):
-    """ covert col row  to Point object """
+    """ convert col row  to Point object """
     bbox = self.game_field.bbox # x,y,w,h
     x = col * tile.size.w  # bbox.x 
     y = row * tile.size.h 

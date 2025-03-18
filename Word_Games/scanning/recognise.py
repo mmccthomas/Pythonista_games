@@ -1,5 +1,5 @@
 # text and rectangles recognition
-# contains Vision class rectanges and text, and CoreML function
+# contains Vision class rectangles and text, and CoreML function
 import objc_util
 from objc_util import ObjCClass, nsurl, ns, autoreleasepool
 import numpy as np
@@ -621,7 +621,7 @@ class Recognise():
     
         for i in range(N):
             root = _find_root(i)
-            # re-use the rank as the class label
+            # reuse the rank as the class label
             if ranks[root] >= 0:
                 ranks[root] = ~nclasses
                 nclasses += 1

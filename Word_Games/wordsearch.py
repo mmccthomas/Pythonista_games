@@ -265,7 +265,7 @@ class WordSearch(LetterGame):
       # then try in all directions to get second letter
       # if ok, keep going in that direction until word is complete
       # or letter is wrong.
-      # then try other directions and then next occurence of letter
+      # then try other directions and then next occurrence of letter
       word = list(word.lower())
       locs = np.argwhere(self.board == word[0])
       for rc in locs:

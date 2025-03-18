@@ -17,7 +17,7 @@ def find_coeffs(pa, pb):
 	return numpy.array(res).reshape(8)
 
 def transform(startpoints, endpoints, im):
-	'''Perform a perspective transformation on an image where startpoints are moved to endpoints, and the image is streched accordingly.'''
+	'''Perform a perspective transformation on an image where startpoints are moved to endpoints, and the image is stretched accordingly.'''
 	width, height = im.size
 	coeffs = find_coeffs(endpoints, startpoints)
 
@@ -42,6 +42,6 @@ if __name__ == "__main__":
 	botleft = (randint(0, 128), randint(128, 256))
 
 	startpoints = [(0, 0),(256, 0),(256, 256),(0, 256)]
-	endponts = [topleft, topright, botright, botleft]
-	im2 = transform(startpoints, endponts, im)
+	endpoints = [topleft, topright, botright, botleft]
+	im2 = transform(startpoints, endpoints, im)
 	im2.show()

@@ -159,7 +159,7 @@ class Anagram(LetterGame):
          words.extend([f'{self.get_anagram(word)}\n' if i %3 ==2 else f'{self.get_anagram(word)}  ' for i, word in enumerate(w)])     
     msg = ''.join(words)
     # set message box to be anchored at bottom left
-    # TODO whats the right object here?
+    # TODO what's the right object here?
     x, y, w, h = self.gui.grid.bbox
     if self.gui.device.endswith('_landscape'):        
         position = ( w + 10, 50)
@@ -295,7 +295,7 @@ class Anagram(LetterGame):
       elif letter == 'Finish':
         return True    
       elif letter != '':  # valid selection
-        # select from list whether accross or down based upon selection row.
+        # select from list whether across or down based upon selection row.
         # selection items is a directory, dont know which order.
         possibles = self.selection_items
         # get keys to establish down/across 

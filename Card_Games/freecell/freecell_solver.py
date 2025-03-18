@@ -243,7 +243,7 @@ def find_solution_steps(initial_game):
     while games_queue:
         game_to_process = games_queue.popleft()
         possible_next_games = next_games(game_to_process)
-        # appends games to queue, set, and dict if not aready there
+        # appends games to queue, set, and dict if not already there
         game_to_process_str = str(game_to_process)
         for game in possible_next_games:
             game_str = str(game)

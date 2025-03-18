@@ -191,7 +191,7 @@ def executeCommand(cmd):
     else:
         raise ValueError(' '.join(cmd))
     game.updateAfterMove(prev)
-    # if no errors happen, a move occured, so save old state of board
+    # if no errors happen, a move occurred, so save old state of board
 
 def check_cascade(n):
     '''Checks if the cascade number entered as part of a command is valid.'''
@@ -264,7 +264,7 @@ def enter():
                 str = ''.join(file.readlines())
                 U.load(game, str, game.canvas)
                 # game.automove_to_foundation()
-                # solver does not automove, don't want to mess up the synching
+                # solver does not automove, don't want to mess up the syncing
             else:
                 for line in file:
                     if line.strip()[0] == '#':

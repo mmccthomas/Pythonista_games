@@ -287,7 +287,7 @@ def AStarSearch(game, cap):
 
 def greedySearchBasic(game, cap):
     '''
-    Another greedySearch algorith using a simpler heuristic function. Only
+    Another greedySearch algorithm using a simpler heuristic function. Only
     calculates how many cards are in the foundation for a given state, ignoring
     cycles.
     '''

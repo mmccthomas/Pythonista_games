@@ -284,7 +284,7 @@ class KFrame(Scene):
         # And start the new level.
         self.app.goto(nextlevel)
 
-    def helpdialog(self, reponder):
+    def helpdialog(self, responder):
         """Show the help dialog box."""
         KyeHelpDialog().show_menu()
 
