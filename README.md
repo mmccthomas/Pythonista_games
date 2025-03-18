@@ -69,7 +69,7 @@ NumberWords
 Crossword grid filled with a selection of words.
 Find the letter linked to each number.
 Idea taken from Puzzler magazine
-The first puzzles are randomly generated and may not include all letters.
+The first puzzles are randomly genererated and may not include all letters.
 All others are taken from published games in magazines and newspapers.
 
 Entry point : Word_Games/NumberWord.py
@@ -154,7 +154,7 @@ Entry point : Board_Games/TrainTracks.py
 
 Tetris
 ------
-Simple implementation of a classic game. 
+Simple implemation of a classic game. 
 An early attempt by me, could be prettier!
 
 Entry point : Board_Games/tetris.py
@@ -279,13 +279,22 @@ It allows looking up definitions and synonyms for each of the
 words using both https://www.merriam-webster.com/dictionary/word (need user key)
 and  https://www.thefreedictionary.com
 Clues can be selected from returned lists and subsequently edited.
-Resulting puzzle data can be copy/pasted into file crossword_templates.txt
+Resulting puzzle data can be copy/pasted into file crossword_puzzles.txt
 No app created yet for solving the crossword as I am more interested in creating
 them than solving!
 
 Crossword generation and word filling  is contained in Word_Games/crossword_create.py
 
 Entry point : Word_Games/general_crossword_create.py
+
+Crossword
+---------
+A simple program to manually solve crosswords produced by the above Crossword Creator and 
+puzzles in crossword_puzzles.txt
+Select in a word to enter letters.
+Buttons 'Check' will check all words, and 'Hint' will fill a random word
+
+Entry point : Word_Games/Crossword.py
 
 
 Notes
