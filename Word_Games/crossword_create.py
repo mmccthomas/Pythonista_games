@@ -91,7 +91,7 @@ class CrossWord():
         """ computes the next word to be attempted """
 
         def log_return(word):
-            """ count the occurrence of a word
+            """ count the occurence of a word
           allows detection of unplaceable word
           """
             self.word_counter[word] += 1
@@ -244,7 +244,7 @@ class CrossWord():
                 print(self.board.shape)
 
     def update_board_and_soln(self):
-        # update all occurrences of letters on board in solution_dict
+        # update all occurences of letters on board in solution_dict
         # if a letter is not in solution_dict, then add it in
         letter_pos = np.argwhere(np.char.isalpha(self.board))
         for pos in letter_pos:
@@ -475,7 +475,7 @@ class CrossWord():
                             word.match_pattern = word.word
                             word.fixed = True
                             break
-            # now deal with individual letters
+            # now deal with indivdual letters
             # check each coordinate
             for coord in known:
                 for word in self.word_locations:
@@ -542,7 +542,7 @@ class CrossWord():
             return ''.join([y if x == '.' else x for x, y in zip(a, b)])
 
     def update_children_matches(self, word_obj, clear=False):
-        """ update the match patterns for children of current world
+        """ update the match patterns for children of current wordl
     eg if word = abacus and child1 intersects at pos 1 match for child is 'a.....' """
         parent_word = word_obj.word
         children_dict = word_obj.children
@@ -736,8 +736,8 @@ class CrossWord():
             else:
                 try:
                     found[child].append(
-                        (lprint(possibles, 3), length))  # must be at least 1
-                    #found[child].append((possibles,100 * depth + length)) # must be at least 1
+                        (lprint(possibles, 3), length))  # must be atleast 1
+                    #found[child].append((possibles,100 * depth + length)) # must be atleast 1
                     for index, try_word in enumerate(possibles):
                         #self.gui.set_message2(f'{index}/{length} possibles  at {child.start} trying {try_word}')
                         result = self._search_down(child, dict_parents,
@@ -754,7 +754,7 @@ class CrossWord():
        list comprehensions are extensively used to allow simple stepove during debug
        for defined word puzzles. there is no guessing. there can be only one solution, so if a decision cannot be made in this iteration, it must be der
        deferred  to later.
-       Use variable max_possibles to switch between unconstrained and constrained puzzles """
+       Use varaible max_possibles to switch between unconstrained and constrained puzzles """
         # self.update_board(filter_placed=True)
         # sleep(1)
 
@@ -794,7 +794,7 @@ class CrossWord():
                 result = True
             # no word fits here
             elif length is None and not word.fixed:
-                result = False  #print(f'wrong parent word {word.word} shouldn't be here')
+                result = False  #print(f'wrong parent word {word.word} shouldnt be here')
             # only one word fits
             elif length == 1:
                 # only word. use it
@@ -892,7 +892,7 @@ class CrossWord():
           with open(f'{word_file}', 'r') as f:
             words = [line.strip() for line in f]
           all_word_list.extend(words)
-        self.all_words = set(all_word_list)  # fast search for checking
+        self.all_words = set(all_word_list)  # fast seach for checking
     
     def length_matrix(self, search_directions=['down', 'across']):
         # process the board to establish starting points of words, its direction, and length
@@ -931,7 +931,34 @@ class CrossWord():
           self.max_length = max(self.wordlengths)
           # self.delta_t('len matrix')
         return self.min_length, self.max_length
-    
+        
+    def create_grid_alt(self, type=3, size=15, min_length=3, max_length=9):
+        # deals with non uniform types
+        return
+        types = {0: np.array([['#', ' '],[' ', ' ']]), 
+                 1: np.array([[' ', '#'],[' ', ' ']]),
+                 2: np.array([[' ', ' '],['#', ' ']]),
+                 3: np.array([[' ', ' '],[' ', '#']])
+                 4: np.array([[' ', ' '],[' ', ' ']])
+                 }
+        self.max_length = max_length
+        self.min_length = min_length
+        if isinstance(size, tuple):
+          self.sizey, self.sizex = size
+        else:
+           self.sizey = self.sizex = size
+        self.board = np.full((self.sizey, self.sizex), SPACE)
+        # type can be fixed for regular grid
+        # or ([type, type, type], no_rows)
+        if isinstance(type, int):            
+            self.type = ([type]*ceil(self.sizex/2), ceil(self.sizey/2))
+        else:
+            self.type = type
+        # fill board with types
+        for r in range(type[1]):
+            for t in type[0]:
+                np.repeat
+        self.board[self.start[0]:self.sizey:2, self.start[1]:self.sizex:2] = BLOCK               
     def create_grid(self, type=3, size=15, min_length= 3, max_length=9):
         """ create a british style crossword grid of defined odd numbered size
         1.starts with alternating black white squares
@@ -953,7 +980,10 @@ class CrossWord():
         9. verify spread of word lengths
         10. print grid
         note: X shape are desirable. if given choice of disturbing
-        X or not, don't
+        X or not, dont't
+        
+        TODO could this be modified to switch types mid grid?
+        it would need to select every line and avoid word lengths of 1
         """
         types = {k:divmod(k,2) for k in range(4)}  # for position of starting block
         self.max_length = max_length
@@ -961,9 +991,8 @@ class CrossWord():
         if isinstance(size, tuple):
           self.sizey, self.sizex = size
         else:
-           self.sizey = self.sizex = size
-        
-        self.type = type
+           self.sizey = self.sizex = size           
+        self.type = type            
         self.start = types[type]
         self.board = np.full((self.sizey, self.sizex), SPACE)
         # fill alternating square
@@ -1105,9 +1134,9 @@ class CrossWord():
         # giving 50% chance
         size = self.sizex if row else self.sizey
         possibles = []
-        poss2 = g.permutate(2, size)
-        poss3 = g.permutate(3, size)
-        poss4 = g.permutate(4, size)
+        poss2 = self.permutate(2, size)
+        poss3 = self.permutate(3, size)
+        poss4 = self.permutate(4, size)
         random.shuffle(poss3)
         # produce all possibilities
         possibles.extend(poss2)
@@ -1126,6 +1155,7 @@ class CrossWord():
         # try each possible 
         for i, possible in enumerate(possibles):
             placed = []
+            # print('selected split', len(possible))
             # place each block
             for location in possible:
                 loc = (index, location) if row else (location, index)
@@ -1159,16 +1189,18 @@ if __name__ == '__main__':
    # random.seed(1)
    g = CrossWord(None, None, None)
    g.debug = False
-  
+   g.max_cycles=10000
    g.get_words(WordList)
    type = random.randint(0,3)
    wordlengths = Counter()
    for i in range(10):
         print(f'\nType {type} Iteration {i} ')
-        board = g.create_grid(type=type, size=(15,21), min_length=4, max_length=11)
+        board = g.create_grid(type=type, size=(21,21), min_length=4, max_length=13)
         if board is not None:
           # g.print_board(board, 'Final')
           g.length_matrix()
+          for i, word in enumerate(g.word_locations):
+          	word.index = i+1
           print(f'Type={type} {g.wordlengths}')
           wordlengths = wordlengths + Counter(g.wordlengths)
           g.empty_board = g.board.copy()
