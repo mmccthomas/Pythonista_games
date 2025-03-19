@@ -934,12 +934,16 @@ class CrossWord():
         
     def create_grid_alt(self, type=3, size=15, min_length=3, max_length=9):
         # deals with non uniform types
-        return
-        types = {0: np.array([['#', ' '],[' ', ' ']]), 
-                 1: np.array([[' ', '#'],[' ', ' ']]),
-                 2: np.array([[' ', ' '],['#', ' ']]),
-                 3: np.array([[' ', ' '],[' ', '#']])
-                 4: np.array([[' ', ' '],[' ', ' ']])
+        types = {0: np.array([['#', ' '],
+                              [' ', ' ']]), 
+                 1: np.array([[' ', '#'],
+                              [' ', ' ']]),
+                 2: np.array([[' ', ' '],
+                              ['#', ' ']]),
+                 3: np.array([[' ', ' '],
+                              [' ', '#']]),
+                 4: np.array([[' ', ' '],
+                              [' ', ' ']])
                  }
         self.max_length = max_length
         self.min_length = min_length
@@ -947,18 +951,53 @@ class CrossWord():
           self.sizey, self.sizex = size
         else:
            self.sizey = self.sizex = size
-        self.board = np.full((self.sizey, self.sizex), SPACE)
+           
+        self.board = np.full((self.sizey, self.sizex+1), SPACE)
+        
         # type can be fixed for regular grid
-        # or ([type, type, type], no_rows)
+        #  ([no_x, no_y, type1],[no_x, no_y, type2] etc))
         if isinstance(type, int):            
-            self.type = ([type]*ceil(self.sizex/2), ceil(self.sizey/2))
+            self.type = ([(self.sizex//2, self.sizey//2, type)])
         else:
             self.type = type
+            
         # fill board with types
-        for r in range(type[1]):
-            for t in type[0]:
-                np.repeat
-        self.board[self.start[0]:self.sizey:2, self.start[1]:self.sizex:2] = BLOCK               
+        for typeset in self.type:
+            # typeset is (no_x, no_y, type)
+            # subs is list of subblocks          
+            subs = [np.tile(types[typeset[2]], (typeset[1], typeset[0]))      
+                    for typeset in self.type]    
+        # now place subblocks into self.board
+        offx=0
+        for sub in subs:         
+            self.board[0: sub.shape[0], 
+                       offx: offx+sub.shape[1]] = sub
+            offx=sub.shape[1]
+        # clip board to defined size   
+        self.board = self.board[:self.sizey, :self.sizex]
+        # efficient mirroring of spaces and blocks
+        # fill spaces with element from rotated board
+        self.board = np.where(np.char.isspace(self.board), np.rot90(self.board, 2), self.board)        
+        self.print_board(msg=str(self.board.shape))
+        
+         # split rows
+        if self.debug: 
+            print('FILLING ROWS')
+        try:
+            for r in range(0, ceil(self.sizey / 2)):
+                self.split_row_alt(r, row=True)
+            # print('filled rows')
+            if self.debug: 
+                self.print_board(None, 'FINAL ROWS')
+            
+            for c in range(0, ceil(self.sizex / 2)):
+                self.split_row_alt(c, row=False)
+                
+        except ValueError as e:
+            print(e)
+            return None
+        return self.board
+         
     def create_grid(self, type=3, size=15, min_length= 3, max_length=9):
         """ create a british style crossword grid of defined odd numbered size
         1.starts with alternating black white squares
@@ -1022,6 +1061,11 @@ class CrossWord():
         index_str = ''.join(np.take(self.board, index, axis=int(not row)))
         # split the string to get word lengths
         lengths = [len(word) for word in index_str.split(BLOCK) if len(word)!=0]
+        indices = np.argwhere(np.char.isspace(np.take(self.board, index, axis=int(not row))))
+        if row:
+            indices = np.transpose(indices)
+        b = np.diff(indices)>1
+        a = indices[b]
         return lengths
         
     def is_x_design(self, loc):
@@ -1149,6 +1193,36 @@ class CrossWord():
         
         return possibles
         
+    def split_row_alt(self, index, row=True):
+        '''placing a block to make words on row min3, max max_length
+        allow for alternating space and blocks'''     
+        lengths = self.lengths(index, row)           
+        possibles = self.mix_possibles(row)
+        # try each possible 
+        for i, possible in enumerate(possibles):
+            placed = []
+            # print('selected split', len(possible))
+            # place each block
+            for location in possible:
+                loc = (index, location) if row else (location, index)
+                placed.append((loc, self.board[loc]))
+                self.board[loc] = BLOCK
+                self.mirror(loc)
+            if self.debug: 
+                print(f'trying row {index} positions {possible}')
+            if self.check_lengths(index, row):
+                if self.debug:
+                    print(f'row {index} positions {possible} is valid')
+                    self.print_board(None, index)
+                return
+            # reset blocks   
+            for item in placed:
+                loc, value = item                   
+                self.board[loc] = value
+                self.mirror(loc)
+            
+        raise ValueError('Grid is not possible')
+            
     def split_row(self, index, row=True):
         '''placing a block to make words on row min3, max max_length'''                
         possibles = self.mix_possibles(row)
@@ -1195,6 +1269,7 @@ if __name__ == '__main__':
    wordlengths = Counter()
    for i in range(10):
         print(f'\nType {type} Iteration {i} ')
+        board = g.create_grid_alt(type=(([4,4,0],[3,3, 2])), size=(15, 13), min_length=4, max_length=13)
         board = g.create_grid(type=type, size=(21,21), min_length=4, max_length=13)
         if board is not None:
           # g.print_board(board, 'Final')
