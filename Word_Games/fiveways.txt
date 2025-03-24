@@ -701,3 +701,59 @@ Puzzle13_frame:
 ' / / / / /h/ / / /c/ / / '
 ' / /t/ / / / / /f/ / / / '
 's/ / /w/ /c/ / / / / /t/h'
+
+Puzzle14:
+BASKETBALL
+BASKING
+BUCKET
+BULL
+CHASTE
+CITED
+CLUMSY
+CONKER
+CONSULT
+CRASS
+DAMSEL
+DURESS
+DWARF
+DYSTOPIA
+ECLAIR
+EGOCENTRIC
+EPIDERMIS
+ETHICS
+EYELET
+GLISSADE
+GUILLEMOT
+GURKHA
+LAUD
+LILY
+LOTUS
+MELTDOWN
+MILKMAN
+NOVELTY
+NUCLEAR
+OUTBOARD
+PISTOL
+SHADE
+SHEAF
+SQUEAL
+STILTED
+SUING
+THIN
+TOGETHER
+TOTS
+
+Puzzle14_frame:
+' /e/g/ /c/ / / / / / /e/ '
+' / / / / / /l/b/n/t/ / /s'
+' /c/ /s/ / / /g/ / / / / '
+'m/ / / / / / /e/ / / / / '
+' / / / / / / /c/ /d/ / /c'
+' / / / / / / / / / / /s/g'
+' / / /o/ / /b/ / / / / /b'
+' /t/ / / / / / / / / /p/ '
+' / / / / / / /n/ / / / / '
+'e/ / / / / /c/l/ / / / / '
+'d/ / / / / / / / / / / / '
+'e/ /m/ / / / / / / / / /t'
+'b/d/ / /s/ / /d/ / /l/s/c'

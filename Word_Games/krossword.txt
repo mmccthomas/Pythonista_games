@@ -3946,3 +3946,268 @@ Puzzle47_frame:
 ' / / / /11d/ / / / / / / / '
 ' / / / / /a/ /12/ / / / / '
 ' / / / / / /m/ / / /13/ / '
+
+Puzzle48:
+1
+NEAR
+NETT
+NIGHTCAP
+2
+FATAL
+FRAPPE
+FULFILLED
+FURROW
+3
+SAC
+SAP
+SAW
+SOU
+SPARKLE
+STRUDEL
+4
+BAD
+BAGEL
+BLOG
+BLUE
+5
+RAINMAKER
+RAPPER
+ROWAN
+6
+CATER
+CLAPTRAP
+CLARET
+COLLARED
+CRY
+CULL
+7
+YEAR
+YODEL
+YOGURT
+YOUNGER
+8
+IBEX
+IMBRUE
+IMPURE
+INLET
+9
+PEST
+PLAIN
+PLEA
+PURL
+10
+HARD
+HAT
+HILLY
+HIRE
+11
+LAIR
+LARKSPUR
+LEEBOARD
+LIE
+12
+GLEN
+GRAB
+GRAVEL
+GREAT
+GURU
+13
+TAKEOVER
+TAPE
+TEA
+TEPID
+
+Puzzle48_frame:
+' / / /1/ / / / / / / / / '
+' / / / / / / / /2/ / / / '
+' / / / / / / / / / /3/ / '
+' / /4/ / / / / / / / / / '
+' / / / / / / / / / / /5/ '
+' / / / / /6/ / / / / / / '
+' / / / / / / / / / / / / '
+'7/ / / /r/ / / / / / / /8'
+' / / /i/ / / /9/ / / / / '
+' / /a/10/ / / / / / / / / '
+' /11l/a/r/k/s/p/u/r/ / / / '
+' / / / / / / / / /12/ / / '
+' / / / /13/ / / / / / / / '
+
+Puzzle49:
+1
+CAFFEINE
+CAREFREE
+CHEERY
+CHEESE
+CHUFFED
+2
+CAKE
+CANTEEN
+COAX
+COLA
+COMEDY
+3
+RAM
+RAY
+REBUFF
+RUN
+RYE
+4
+SKUA
+SONOROUS
+SPEAR
+SPOOR
+5
+BAFFLE
+BEETROOT
+BELL
+BINDWEED
+BLESSED
+BRAN
+BREEZE
+BRIE
+6
+ADDRESS
+AGA
+AIDE
+ANYONE
+ARCHERY
+7
+CLANGER
+CLARET
+CLEMENCY
+CLIENT
+CURRY
+8
+WAND
+WIN
+WOE
+9
+GOLFERS
+GREENERY
+GREY
+GRUYERE
+GUM
+10
+ACT
+AEON
+AIL
+AIR
+AWE
+AWL
+11
+BLUR
+BOA
+BOER
+BUS
+12
+TEDDY
+TESTATE
+TONIC
+TREE
+
+Puzzle49_frame:
+' / / /e/ /1/ / / / / / / '
+' / / /z/ / / / / /2/ / / '
+' / /3/e/ / / / / / / / / '
+' / / /e/ / / / / / / / / '
+' / / /r/ / / / / / / /4/ '
+' / / /5b/l/e/s/s/e/d/ / / '
+' / / / / / / /6/ / / / / '
+'7/ / / / / / / / / / / / '
+' / / / / / / / / / /8/ / '
+' / / / / / / / / / / / /9'
+' / /10/ / / / / / /11/ / / '
+' / / / / / / / / / / / / '
+' / / / / /12/ / / / / / / '
+
+Puzzle50:
+1
+SECATEURS
+SHEARS
+SHOVEL
+SHREDDER
+STRIMMER
+2
+NOT
+NOVA
+NOW
+3
+FEE
+FIREDAMP
+FOE
+FRESH
+4
+SANDPAPER
+SCARIFIER
+SET
+SOOTY
+SPADE
+STALEMATE
+5
+RALE
+REALM
+REV
+6
+FED
+FERRY
+FIRM
+FLAT
+FORAGE
+7
+SAD
+SEPOY
+SLENDER
+8
+DEADPAN
+DEER
+DEFER
+DREARY
+9
+PAL
+PAR
+PAW
+PIT
+POOL
+10
+SCOOP
+SELL
+SPEND
+11
+LAMBDA
+LAMPREY
+LATTICE
+12
+LAW
+LEARN
+LIE
+LOG
+13
+SIP
+SIR
+SOUL
+STARE
+14
+KITE
+KNAVERY
+KNOBBLY
+KRAAL
+15
+TARADIDDLE
+TEAR
+TRAMPOLINE
+TRAY
+
+Puzzle50_frame:
+' / / / / /1/ / / / / / / '
+' / /2/ / / / / / / /3/ / '
+' / / / /4s/ / / / / / / / '
+'5/ / / /t/a/ /6/ / / / / '
+' / / / /a/ /n/ / / / / / '
+' / / /7/l/ / /d/ / / / / '
+' / / / /e/ / / /p/ / / /8'
+' / /9/ /m/ / / / /a/ / / '
+' / / / /a/ / / / / /p/10/ '
+' / / / /t/11/ / / / / /e/ '
+' / /12/ /e/ / / /13/ / / /r'
+' / / / / / /14/ / / / / / '
+' / / /15/ / / / / / / / / '

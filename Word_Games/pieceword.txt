@@ -1603,7 +1603,7 @@ ELCRUMTEXV MF B
 486_84:
 ''
 7, 5
-123
+1711121605152326073033290200082220143419132510041827280121240903063231
 
 486_84_text:
 1 Strong, bright, deep red colour •
@@ -1669,7 +1669,7 @@ M UENSITTVOTKED
 486_126:
 ''
 7, 5
-123
+3426172903022306312116081425010024110420052232190915331830101228071327
 
 486_126_text:
 1 Goes for a swim • Leisurely stroll
@@ -1731,7 +1731,7 @@ T CD CSINA GL S
 486_140:
 ''
 7, 5
-123
+0813062624001833142012221504321127210331170128070902102329342505301916
 
 486_140_text:
 1 Normal, ordinary • Rib, taunt
@@ -1795,7 +1795,7 @@ Y RWINDE  S EEM
 660_14:
 ''
 9, 4
-123
+1033242628110203340932210508130719221406041631152329200112272518001730
 
 660_14_frame:
 G PR C T R A
@@ -4255,6 +4255,247 @@ ACTMPAIC V UAME
 STUTTEAS I I I 
 A N R MEROULIRD
 
+491_4:
+''
+7, 5
+123
+
+491_4_frame:
+ORNB ETU  O  BO
+ A I AE PERBGO 
+ IRSELTHE G ER 
+R.  S MON.  NO 
+ARCDELO GLOPAD 
+M HE ENOTO I EA
+LUBAN L CATE V 
+R B G ID N EBAR
+UDEIEDG RIS U O
+K EA A TUNT PEA
+ OVW N I  AF.  
+E INAKSCY CLENI
+I HOTENESS T NA
+COY.  E HETET R
+ P EGA LA. LUNT
+R NTLES RWEREGA
+RIN A HLYA IE C
+   IR  U I DL E
+ OR. SM KE MSAI
+ EKOTEISOT AU R
+ED C DL. ATTM O
+
+491_4_text:
+1 Holy person • Leafy garden recess
+2 Towards the stern • In time past
+3 Rattling sound of cutlery or crockery
+4 Elaborately adorned • Curl up cosily
+5 Abscond with a view to marriage
+6 State flower of Tennessee • Wild
+animal's retreat
+7 _ pole, symbolic carving
+8 Cancel • Atmospheric pressure line
+9 Licit
+10 Male resident of an abbey •
+   Black playing-card
+11 Make a higher offer
+12 Reminder • Uncivil
+13 Harpoon
+14 Prairie wolf • With good-humoured
+   slyness
+15 Jeans fabric
+16 Ballerina's garment • Indian bread,
+   often teardrop-shaped
+17 Impress, stamp
+18 Curved blade for cutting grass •
+   Unknotted
+19 Pizza herb
+20 out, make economies • Bounder
+21 In the buff • Chalkboard stand
+
+491_61:
+''
+7, 5
+1929132607153422182301080317123116002105060214112009321004252430282733
+
+491_61_frame:
+HOU. WM U S E G
+ R S. E LEPERN 
+RENEASNTO H E. 
+G CCALCILEANPUN
+ILLK. O AS TR B
+L O. IM RT EAGO
+ N E TE. R C S 
+SCEM I. CADOOCU
+ E PANASYN T E 
+EBBARELYRE. SOL
+R RT. E ILT U O
+BOOEVES EP OP W
+ERNSIN P PUYY U
+  E. TPHAA NE N
+E  TIA O RYXRED
+NATOUNDLET IDIE
+T U N  I URN S 
+EATHERNEAG KOMA
+NLEA WT GR T. B
+ E SLI DIE E AS
+WINI R. SDEDR E
+
+491_61_text:
+1 Army member • Governing body in
+  a university
+2 Bother, hassle
+3 Female • Unit of gas use
+4 Wane, recede • Small variety of
+  green lentil
+5 Mixture of bitumens
+6 Rude person lacking in refinement •
+  African antelope
+7 Accustom to solid food
+  • Old stringed instrument
+8 Conical tent used as a dwelling
+9 Compass point • A cinch!
+10 Goods storage depots
+11 Narrow cut • Up to the time of
+12 Submissive
+13 Pacify • Black and white seabird
+14 Doctor called in to cover for another
+15 Preposition expressing direction •
+   Piece of window glass
+16 Shallow boat • Flying insect
+   that bites
+17 Detect
+18 Some time _, not recently •
+   Consume
+19 Vacant (property) • Loafer
+20 Vase for ashes
+21 Small migratory thrush •
+   Prepared (dough)
+ 
+491_106:
+''
+7, 5
+1106152329131832332404121925030509001431281017020830213422070126271620
+ 
+491_106_frame:
+ G  N G. H RI A
+DHESCUELIATECUR
+ T  H DE W NR O
+OUTBOOTERN TFIT
+S. L P Q CIT RE
+CENOVEAULU ESER
+  B D  FLVIERAI
+STOCOOATE N AD 
+ EX M   TMOTNOD
+KSTISEEINW RANN
+ I C L E  LA A 
+RNIANDTRUTO RUS
+ I AN  ASALLUSH
+UTE TRED R A S 
+ Y L ER HGHTSET
+EL OSTRACO I M 
+SENT I P PREGOG
+T. SWEATBI C U 
+CLELED E O HE R
+ A   SPWING AIN
+DUAULEE N AS N 
+  
+491_106_text:
+1 Station kiosk which sells magazines
+  and paperbacks
+2 Refrigerate • Excitedly eager
+3 Between one day and the next
+4 Sight or belief • Be quiet!
+5 Bird of the plover family
+6 Christmas cracker saying
+  • Advantage or property
+7 Soft cotton or woollen fabric
+8 Cleric who assists a vicar
+  • Governing body
+9 Faith, reliance
+10 Matching set of clothes •
+   Protested (against)
+11 Ginger-haired person
+12 Swinging container used during Mass •
+   Small round lump in the body
+13 Living creature
+14 Hey __, conjurer's expression
+   • Draw out, extract
+15 Stick out, or force out
+16 Free from dirt • Daisy-like flower
+17 Got into shape for a sporting event
+18 Consisting of two elements • Take
+   goods by truck
+19 Shun socially, send to Coventry
+20 Rabbit's tail • Elizabethan stringed
+   instrument
+21 Piece of sportswear for the head
+
+491_143:
+''
+7, 5
+0522172902193120071418250604281232111330160103212615092324002733340810
+
+491_143_frame:
+E ORD FTHE N UD
+WER OUO ATLIED 
+R RAM RERO L EN
+BOSI AIT  AL IO
+U COTT IDNT RN 
+GRAU EET  EL AF
+IBISIDI. E OW B
+T F.  ADDLITAHO
+EGYDIUO. M CR U
+A NWEIA GROSB B
+LEA R BAR W ERI
+E CBRES AMESA E
+T N CHOM N APE 
+EAUVE. EMART BO
+M L LUIN T EAR 
+TI ILDFUTDER FI
+ TR A U E G GO 
+SY RCHLEDVOY RA
+  I DOK AON I R
+TLECA ING COOLA
+  L CAE OGE N L
+  
+491_143_text:
+1 Human breast; twenty per cent as a fraction
+2 Banning of the export of goods to
+  certain countries
+3 Seed from cereal crops; more uncommon
+4 Shorter Morse code element; larva of
+  a louse adhering to human hair
+5 Name for the heather family of plants;
+  _ de cologne, toilet water; American
+  state with Boise as its capital
+6 River in eastern England also known
+  as the Granta; in tennis, a service
+  obstructed by the net
+7 Potato dish from Switzerland;
+  mammary gland of a cow
+8 Rode at a steady pace
+9 Unkempt, disorderly; messenger,
+  particularly a diplomat
+10 Actor's comment directed at the audience
+11 Totalling up; tiny, small
+12 Offensiveness, hatred
+13 Bizarre, strange; young person
+14 Survive longer than
+15 Freshwater food fish of the carp family;
+   suddenly pitch forward
+16 Atom or molecule with a positive or
+   negative electric charge; monkey
+   without a tail
+17 Acquire knowledge or a skill; painting
+   or sculpture, for example; leafy
+   garden recess
+18 Near or towards the stern of a boat;
+   organ responsible for maintaining
+   equilibrium
+19 Japanese floor mattress; legal term
+   relating to a suspect's whereabouts
+20 Fluid used to reduce heat in a car
+21 Narrow sill; song or poem of lament
+
 puzzle2:
 ''
 7, 5
@@ -5359,3 +5600,159 @@ ALIU DE JNTH E
 INGEAKSTAPAD  I
 N ERIS   ETEC O
 S NRTHPROCARO N
+
+puzzle24:
+""
+7, 5
+2004262406002118170327102802132533311905290715013209162230341108231412
+
+puzzle24_text:
+ 1 to encourage into action.
+ 2 as a result of. • a unique identifier
+ 3 dispersed
+ 4 Small land surrounded by water • a
+   sudden break.
+ 5 A marvel
+ 6 a social grouping, esp. based on
+   wealth • a device for awaking people,
+   or rousing their attention.
+ 7 containing or resembling fire.
+ 8 quantity. • recently made, or
+   created.
+ 9 augment
+10 assigned a suitable place in an order
+   • Christian festival
+11 visible, noticeable
+12 a latin american woman • weak and
+   insipid.
+13 a subject of a talk or an artistic
+   piece; a topic.
+14 the interior or inner part. • antenna
+15 a person who makes changes to
+   documents.
+16 speculate • courses taken.
+17 a room or area for preparing food.
+18 the movement of a real or figurative
+   fluid. • erstwhile
+19 managerial
+20 Unit of area • Type of goose
+21 revealed
+
+puzzle24_frame:
+ISLE  US NAPSTI
+ E AERNEW I U R
+CLARS D  ARMSCA
+TER I   TEXEGUE
+  CAMEIDEE M N 
+ERY P  EDDISFLO
+ IG O  K G OIVE
+BERACRHENESTL C
+  A K  Y N OYED
+HEMSS I S R EAS
+ N  KILE RACRD 
+ITOW T ALO OWAT
+ C E QN OCUTATE
+THR MITCH E P N
+ I SS  R PLARED
+RANMULO DNEOL A
+O   L NUM N INS
+LATTTET IDDEN T
+ PA O X CKEDTHS
+EN TWAIAL OU O 
+M O M S EINANCE
+
+puzzle25:
+""
+7, 5
+0004131830031229171108312306051925241532330902200114271621260728342210
+
+puzzle25_text:
+ 1 nearest • aroma
+ 3 serviceable • house of worship
+ 5 Relocation
+ 7 bodily suffering • guest room •
+   _Idle, one of the Pythons
+ 9 a strip of gauze used to protect a
+   wound • people with extensive
+   knowledge or ability in a given
+   subject.
+11 a private room on a ship. • a thing
+   of major significance
+13 a bubble, as on a painted surface. •
+   Held in high esteem.
+15 a soft, moist, shapeless mass •
+   subject • lengthwise threads in a
+   woven fabric
+17 a compound of CH
+19 Of the wedding lady • a language.
+21 parts of the year • a single wealthy
+   man, who devotes himself to a life of
+   leisure and pleasure
+
+puzzle25_frame:
+CLOTEDR E D SES
+ O  A  E   IH T
+ USARPOPI N EFU
+RICN E BRPAISTE
+ S     L  V    
+RTSXPESEABANP T
+UE  T R DT E M 
+ N N  MMI     H
+BOY L A OL T A 
+E M I E LSSE L 
+REAOCATIOW X  C
+O I   E DEMP A 
+XALA RONGALO   
+   RBOL L Y N G
+C WR NLAYE E   
+E U D H EIDA   
+ABIN  YDRC IGRA
+L D R S RSON E 
+NCEN S S BLIL T
+ N    T   B    
+LE DAG B PULS P
+
+puzzle26:
+""
+7, 5
+1730190705113233011604342427212015140012062325090213262218283129081003
+
+puzzle26_text:
+ 1 Resident of the Holy Land • Japanese
+   technology company
+ 3 conduits • stuff
+ 5 discontinuous • department store
+ 7 tablets • computer program which
+   transforms source code
+ 9 frenzy • comfort • Australian state
+11 Patron saint of Ireland • Viking home
+   land
+13 the act of demonstrating; showing or
+   explaining something. • coupe
+15 fighters • areas
+17 average • US rural state
+19 discover • likeness
+21 accurate • transparent
+
+puzzle26_frame:
+ U  E BLEAGE PI
+ENM MAR PS AC N
+ C  A ES TALRAG
+IBADEMOSHAINRTI
+N LO E I R I I 
+NCEWARSTAT CZON
+ IMO LD  N  C N
+ T SPAARK NOK D
+RYSE C  EM CO E
+ Z E XISR N I T
+RICRT M EWAUN O
+ N   DPIP L SUB
+A  LERA C CO CO
+PATI EMIL  HR  
+  INSWP IRIOELI
+NVE M MPIA RERT
+  DRM A  KEE S 
+RS  E EF F VREC
+AELASC E I ALLS
+ N R USMODIC E 
+ES COR B E CE R

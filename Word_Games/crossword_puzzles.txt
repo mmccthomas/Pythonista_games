@@ -188,3 +188,111 @@ puzzle4_frame:
 '28v/o/i/d/#/29s/u/p/e/r/v/i/s/o/r'
 '#/v/#/e/#/s/#/a/#/e/#/s/#/o/#'
 '30w/e/i/r/d/#/31t/r/a/d/e/m/a/r/k'
+
+puzzle5_text:
+ACROSS                DOWN
+10 confection(9)      1  Japanese tree(4)
+11 additional(7)      2  Part of former
+12 to deliver(9)         Yugoslavia(6)
+13 everlasting(7)     3  David _, long
+14 warranty(9)           time BBC sports
+16 an often stated       commentor(7)
+   observation        4  Emission from
+   regarding             Uranium (9)
+   something from     5  form of music
+   common                originating in
+   experience(7)         jamaica(6)
+19 bunks(4)           6  cosmetics and
+21 user's                colorants on the
+   identification        skin(6)
+   and password(5)    7  got up(4)
+23 Italy,             8  the head of the
+   colloquially(6)       government in
+26 small area of         some german-
+   land surrounded       speaking
+   by water(6)           countries.(10)
+27 fermented  juice   9  spoken(4)
+   of grapes.(5)      14 Chief angel(7)
+28 _ the Viking(4)    17 pledge(4)
+30 bookhouse(7)       18 covering(7)
+32 US vehicle         20 considered(10)
+   brand(9)           22 3 Eyes
+35 to curtail.(7)        perhaps?(3)
+38 turned on(9)       24 _ Karina(4)
+40 discerned(7)       25 heavenly(9)
+41 difficulty(9)      29 journeys(7)
+                      31 produces(6)
+                      32 the uncertain
+                         course of
+                         events(6)
+                      34 Male hispanic
+                         person(6)
+                      35 a facial skin
+                         condition(4)
+                      37 gumshoe(4)
+                      39 certificate(4)
+
+puzzle5_frame:
+'1a/#/2b/#/3c/#/4r/#/5r/#/6m/#/7r/#/8c/#/9o'
+'10c/h/o/c/o/l/a/t/e/#/11a/n/o/t/h/e/r'
+'e/#/s/#/l/#/d/#/g/#/k/#/s/#/a/#/a'
+'12r/e/n/d/e/r/i/n/g/#/13e/t/e/r/n/a/l'
+'#/#/i/#/m/#/a/#/a/#/u/#/#/#/c/#/#'
+'14g/u/a/r/a/n/t/e/e/#/16p/r/17o/v/e/r/18b'
+'a/#/#/#/n/#/i/#/#/#/#/#/a/#/l/#/l'
+'19b/e/20d/s/#/21l/o/g/22i/n/#/23i/t/a/l/i/a'
+'r/#/e/#/24a/#/n/#/i/#/25c/#/h/#/o/#/n'
+'26i/s/l/a/n/d/#/27w/i/n/e/s/#/28e/r/i/k'
+'e/#/i/#/n/#/#/#/#/#/l/#/29t/#/#/#/e'
+'30l/i/b/r/a/r/31y/#/32c/h/e/v/r/o/34l/e/t'
+'#/#/e/#/#/#/i/#/h/#/s/#/a/#/a/#/#'
+'35a/b/r/i/37d/g/e/#/38a/c/t/i/v/a/t/e/39d'
+'c/#/a/#/i/#/l/#/n/#/i/#/e/#/i/#/e'
+'40n/o/t/i/c/e/d/#/41c/h/a/l/l/e/n/g/e'
+'e/#/e/#/k/#/s/#/e/#/l/#/s/#/o/#/d'
+
+puzzle6_text:
+ACROSS                DOWN
+9  notebook           1  to give
+   computer(7)           satisfaction
+10 Illinois city(7)      to(6)
+11 augment(5)         2  eight-legged,
+12 checking (out)(9)     predatory
+13 no-nonsense(7)        arthropod(6)
+15 Send to by         3  nipper(7)
+   computer(6)        4  inquires (of)(4)
+17 beseech(4)         5  garment worn
+20 competitions(5)       around the
+21 divisions of a        neck.(5)
+   theatrical         6  theater(6)
+   performance.(4)    7  US large car(8)
+23 hole(6)            8  beauteous(8)
+25 Town in            14 one of those.(4)
+   Connecticut?(7)    16 seasoning(4)
+29 possession(9)      17 Of the chest(8)
+31 deadly(5)          19 evolved(8)
+32 median(7)          22 building(7)
+33 works(7)           24 gullet(6)
+                      26 alternative(6)
+                      27 holdups(6)
+                      28 protective
+                         covering for the
+                         feet(5)
+                      30 waft(4)
+
+puzzle6_frame:
+'1p/#/2s/#/3t/#/4a/#/5s/#/6c/#/7c/#/8g'
+'9l/a/p/t/o/p/s/#/10c/h/i/c/a/g/o'
+'e/#/i/#/d/#/k/#/a/#/n/#/d/#/r'
+'11a/d/d/e/d/#/12s/u/r/v/e/y/i/n/g'
+'s/#/e/#/l/#/#/#/f/#/m/#/l/#/e'
+'13e/a/r/n/e/s/14t/#/#/15m/a/i/l/t/o'
+'#/#/#/#/r/#/h/#/16h/#/#/#/a/#/u'
+'17p/r/19a/y/#/20g/a/m/e/s/#/21a/c/t/s'
+'e/#/d/#/#/#/t/#/r/#/22e/#/#/#/#'
+'23c/a/v/i/24t/y/#/#/25b/e/d/f/26o/r/27d'
+'t/#/a/#/h/#/28s/#/#/#/i/#/p/#/e'
+'29o/w/n/e/r/s/h/i/30p/#/31f/a/t/a/l'
+'r/#/c/#/o/#/o/#/u/#/i/#/i/#/a'
+'32a/v/e/r/a/g/e/#/33f/a/c/t/o/r/y'
+'l/#/d/#/t/#/s/#/f/#/e/#/n/#/s'

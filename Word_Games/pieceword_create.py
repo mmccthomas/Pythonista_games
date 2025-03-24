@@ -28,11 +28,11 @@ To operate:
      Successful lookups will turn button blue, unsuccessful ones
      will turn pink. if all buttons are pink, key was invalid
   3. press each blue button to select appropriate definition or synonym
-     button will turn green
+     button wil turn green
   4. press each pink button and try to enter a suitable clue - be creative!
   5. pressing green button again allows editing of clue
   6. press Randomise to shuffle tiles. this can be repeated as necessary.
-  7. press Copy and puzzle name or number, e.g. puzzle18
+  7. press Copy and puzzle nane or number, e.g. puzzle18
   8. open pieceword.txt and paste text to end of file
   
   
@@ -238,7 +238,7 @@ class PieceWord(LetterGame):
         self.compute_intersections()
         self.fill_board()
         self.solution_board = self.board.copy()
-        self.wordset = self.get_words().values()
+        
         self.set_buttons()
         while True:
             move = self.get_player_move(self.board)
@@ -346,6 +346,7 @@ class PieceWord(LetterGame):
                                                  length_first=False,
                                                  max_possibles=100,
                                                  swordsmith_strategy='dfs')
+            self.wordset = self.get_words().values()                                    
         except (Exception):
             print(traceback.format_exc())
         finally:
