@@ -1,5 +1,4 @@
 from scene import Vector2, get_screen_size
-import numpy as np
 screen_width, screen_height = get_screen_size()
 GRID_POS = Vector2(10, 40)
 GRID_SIZE= 20
