@@ -40,7 +40,7 @@ DIMENSION_Y = 8  # the dimensions of the chess board
 SQ_SIZE = HEIGHT // DIMENSION_Y  # the size of each of the squares in the board
 MOVE_SPEED = 0.05
 
-
+            
 class Player_test():
   def __init__(self):
     self.PLAYER_1 = WHITE = 'O'
@@ -115,7 +115,7 @@ class GameBoard(Scene):
   def __init__(self):  # board, player, response):
     ''' board is 2d list of characters
     player is Player class
-    response is output from touch operations
+    reponse is output from touch operations
     '''
     Scene.__init__(self)
     self.board = [[]]
@@ -289,10 +289,40 @@ class GameBoard(Scene):
       n.position = pos
       n.anchor_point = anchor
     return parent
-        
+    
+  def add_row_column_labels(self):
+      font = ('Avenir Next', self.font_size)
+      if self.use_alpha:
+          row_labels = 'A B C D E F G H I J K L M N O P Q R S T U V W X Y Z AAABACAD'
+      else:
+          if self.row_labels:
+              row_labels = self.row_labels
+          else:
+              row_labels = '0 1 2 3 4 5 6 7 8 9 101112131415161718192021222324252627282930'
+      if self.column_labels:
+          column_labels = self.column_labels
+      else:
+          column_labels = '0 1 2 3 4 5 6 7 8 9 101112131415161718192021222324252627282930'
+      for i in range(self.DIMENSION_X):
+          pos = Vector2(0 + i * self.SQ_SIZE, 0)
+          n = LabelNode(row_labels[2 * i: 2 * i + 2], parent=self.game_field)
+          n.position = (pos.x + self.SQ_SIZE / 2,
+                    pos.y + self.DIMENSION_Y * self.SQ_SIZE + 20)
+          n.color = self.grid_label_color
+          n.font = font
+          
+      for i in range(self.DIMENSION_Y):
+          pos = Vector2(0, 0 + i * self.SQ_SIZE)
+          idx = self.DIMENSION_Y - 1 - i
+          n = LabelNode(column_labels[2 * idx: 2 * idx + 2],
+                        parent=self.game_field)
+          n.position = (pos.x - 20, pos.y + self.SQ_SIZE/2)
+          n.color = self.grid_label_color
+          n.font = font
+      
   def build_background_grid(self):
     parent = Node()
-    font = ('Avenir Next', self.font_size)
+    
     if self.background_image:
       background = SpriteNode(Texture(self.background_image))
       background.size = (self.SQ_SIZE * self.DIMENSION_X,
@@ -300,17 +330,7 @@ class GameBoard(Scene):
       background.position = (0, 0)
       background.anchor_point = (0, 0)
       parent.add_child(background)
-    if self.use_alpha:
-      row_labels = 'A B C D E F G H I J K L M N O P Q R S T U V W X Y Z AAABACAD'
-    else:
-      if self.row_labels:
-         row_labels = self.row_labels
-      else:
-          row_labels = '0 1 2 3 4 5 6 7 8 9 101112131415161718192021222324252627282930'
-    if self.column_labels:
-        column_labels = self.column_labels
-    else:
-        column_labels = '0 1 2 3 4 5 6 7 8 9 101112131415161718192021222324252627282930'
+    
     # Parameters to pass to the creation of ShapeNode
     params = {
       "path": Path.rect(0, 0, self.SQ_SIZE, self.SQ_SIZE * self.DIMENSION_Y),
@@ -326,11 +346,7 @@ class GameBoard(Scene):
       n.position = pos
       n.anchor_point = anchor
       parent.add_child(n)
-      n = LabelNode(row_labels[2 * i: 2 * i + 2], parent=self.game_field)
-      n.position = (pos.x + self.SQ_SIZE / 2,
-                    pos.y + self.DIMENSION_Y * self.SQ_SIZE + 20)
-      n.color = self.grid_label_color
-      n.font = font
+      
     # Building the rows
     params["path"] = Path.rect(0, 0, self.SQ_SIZE * self.DIMENSION_X,
                                self.SQ_SIZE)
@@ -341,12 +357,7 @@ class GameBoard(Scene):
       n.position = pos
       n.anchor_point = anchor
       parent.add_child(n)
-      idx = self.DIMENSION_Y - 1 - i
-      n = LabelNode(column_labels[2 * idx: 2 * idx + 2],
-                    parent=self.game_field)
-      n.position = (pos.x - 20, pos.y + self.SQ_SIZE/2)
-      n.color = self.grid_label_color
-      n.font = font
+      
     return parent
     
   def setup_ui(self):
@@ -355,6 +366,7 @@ class GameBoard(Scene):
                               parent=self)
     self.grid = self.build_background_grid()
     self.game_field.add_child(self.grid)
+    self.add_row_column_labels()
     x, y, w, h = self.grid.bbox  # was game_field
     font = ('Avenir Next', self.font_size)
     # all location relative to grid
@@ -546,7 +558,7 @@ class GameBoard(Scene):
     self.last_board = list(map(list, self.board))
     
   def changed(self, board_update):
-    ''' return first difference '''
+    ''' return first differnce '''
     gui_board = self.board
     for j, row in enumerate(board_update):
       for i, col in enumerate(row):
@@ -839,7 +851,7 @@ class GameBoard(Scene):
       # self.board_print()
       
   def point_to_rc(self, point):
-    """ convert touch point to rc tuple """
+    """ covert touch point to rc tuple """
     col = int((point.x - GRID_POS[0]) / (self.SQ_SIZE))
     row = self.DIMENSION_Y - 1 - int((point.y - GRID_POS[1]) / (self.SQ_SIZE))
     return row, col
@@ -853,7 +865,7 @@ class GameBoard(Scene):
     return row, col
     
   def rc_to_pos(self, row, col):
-    """ convert col row  to Point object in game field coordinates
+    """ covert col row  to Point object in game field coordinates
     row, col are in (0,0) is topleft
     x,y is (0,0 is bottom right) """
     # bbox = self.game_field.bbox  # x,y,w,h

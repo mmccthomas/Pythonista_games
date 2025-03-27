@@ -53,7 +53,21 @@ class Gui():
             'New Game': self.gs.dismiss_modal_scene,
             'Quit': self.gs.close
         }
-
+    def scrollview_h(self, x, y, w, h, text='', **kwargs):       
+        scroll_view = ui.ScrollView()
+        scroll_view.frame = (x,y,w,h)
+        scroll_view.anchor_point=(0,0)
+        text_view = ui.TextView()
+        text_view.text = text
+        scroll_view.add_subview(text_view)
+        self.v.add_subview(scroll_view)
+        x, y, w, h = scroll_view.bounds
+        scroll_view.content_size = w * 2, h
+        for k, v in kwargs.items():
+            setattr(scroll_view, k, v)
+        text_view.frame = x, y, w * 2, h
+        return scroll_view, text_view
+        
     def scroll_text_box(self, text='', **kwargs):
         """ create a scroll view"""
         scrollview = ui.TextView(bg_color='black')
@@ -331,6 +345,7 @@ class Gui():
     def replace_grid(self, dimx, dimy):
         """remove and replace grid with different of squares"""
         self.gs.DIMENSION_X, self.gs.DIMENSION_Y = dimx, dimy
+        self.remove_labels()
         GRID_POS, self.gs.SQ_SIZE, self.gs.font_size = self.gs.grid_sizes(self.gs.device, dimx, dimy)
         self.grid.remove_from_parent()                        
         self.gs.grid = self.gs.build_background_grid()
@@ -618,7 +633,8 @@ class Gui():
             ])
 
         for label in labels_:
-            label.text = ''
+            label.remove_from_parent()
+            # label.text = ''
             
     def replace_labels(self,
                        which='row',
@@ -655,7 +671,7 @@ class Gui():
 
     def add_image(self, img, **kwargs):
         """ display an image on the grid. This is included so that the image
-      can be displayed after the gui and grid are initiated """
+      can be diplayed after the gui and grid are initiated """
 
         background = SpriteNode(Texture(ui.Image.named(img)))
         background.size = (self.gs.SQ_SIZE * self.gs.DIMENSION_X,
@@ -686,19 +702,19 @@ class Board():
     """ class to hold numpy 2d array representation of board
     initial can be single element value or 2d array """
 
-    def __init__(self, sizex=None, sizey=None, dtype='U1', initial=None):
-        self.sizex = sizex
-        self.sizey = sizey
-        self.dtype = dtype
-        if initial:
-            if isinstance(initial, list):
-                self.b = np.array(initial)
-                self.sizey, self.sizex = self.b.shape
-                self.dtype = self.b.dtype
+    def __init__(self, sizex=None, sizey=None, dtype='U1', initial=None):                    
+            if initial:
+                if isinstance(initial, list):
+                    self.b = np.array(initial)
+                    self.sizey, self.sizex = self.b.shape
+                    self.dtype = self.b.dtype
+                else:
+                    self.b = np.full((sizey, sizex), initial)
             else:
-                self.b = np.full((sizey, sizex), initial)
-        else:
-            self.b = np.zeros((sizey, sizex), dtype=dtype)
+                self.b = np.zeros((sizey, sizex), dtype=dtype)
+                self.sizex = sizex
+                self.sizey = sizey
+                self.dtype = dtype
 
     def valid_entry(self, value):
         if self.dtype == int and type(value) == int:
@@ -708,14 +724,14 @@ class Board():
         return False
 
     def get_rc(self, rc):
-        return self.b[rc]
+        return self.b[tuple(rc)]
 
     def set_rc(self, rc, value):
         if self.valid_entry(value):
-            self.b[rc] = value
+            self.b[tuple(rc)] = value
 
     def copyboard(self):
-        return selfb.copy()
+        return self.b.copy()
 
     def inside(self, rc):
         """test if rc is within bounds of board """
@@ -727,6 +743,14 @@ class Board():
 
     def getsize(self):
         return (self.sizey, self.sizex)
+        
+    def replace_board_section(self, coord, replacement):
+          """replace a section of ndarray board with replacement ndarray
+          """
+          r, c = coord
+          tile_y, tile_x = replacement.shape
+          self.b[r * tile_y:r * tile_y + tile_y,
+                 c * tile_x:c * tile_x + tile_x] = replacement
 
 
 class Coord(tuple):

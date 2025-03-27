@@ -20,10 +20,11 @@ from queue import Queue
 import console
 import sound
 import dialogs
+import clipboard
 #from tiles import pil2ui, slice_image_into_tiles
 import matplotlib.colors as mcolors
 import numpy as np
-
+from objc_util import on_main_thread
 
 import gui.gui_scene as gscene
 from gui.gui_interface import Gui, Squares
@@ -69,6 +70,25 @@ def lprint(seq, n):
   else:
       return(seq)
 
+def rle(inarray):
+          """ run length encoding. Partial credit to R rle function. 
+          Multi datatype arrays catered for including non Numpy
+          returns: tuple (runlengths, startpositions, values) """
+          ia = np.asarray(inarray)                # force numpy
+          n = len(ia)
+          if n == 0: 
+            return (None, None, None)
+          else:
+            y = ia[1:] != ia[:-1]               # pairwise unequal (string safe)
+            i = np.append(np.where(y), n - 1)   # must include last element posi
+            z = np.diff(np.append(-1, i))       # run lengths
+            p = np.cumsum(np.append(0, z))[:-1] # positions
+            return(z, p, ia[i])
+            
+def run_length_encoding(inarray):
+    """expanded name for rle"""
+    return rle(inarray)  
+            
 class Word():
   """ holds a word instance """
   def __init__(self, rc, direction, length):
@@ -282,6 +302,17 @@ class LetterGame():
     except(IndexError):
       return None
       
+  def replace_board_section(self, coord, replacement, board=None):
+      """replace a section of ndarray board with replacement ndarray
+      """
+      if board is None:
+          board = self.board
+      r, c = coord
+      tile_y, tile_x = replacement.shape
+      board[r * tile_y:r * tile_y + tile_y,
+            c * tile_x:c * tile_x + tile_x] = replacement
+      return board
+                   
   def format_cols(self, my_list, columns=3, width=1):
     msg = []
     if len(my_list) < columns:
@@ -324,7 +355,23 @@ class LetterGame():
   def flatten(self, list_of_lists):
     """ nice simple metthod to flatten a nested 2d list """
     return sum(list_of_lists, [])
-    
+  
+  @on_main_thread
+  def clipboard_set(self, msg):
+      '''clipboard seems to need @on_main_thread '''
+      clipboard.set(msg) 
+             
+  @on_main_thread
+  def clipboard_get(self):
+      return  clipboard.get()              
+            
+  def check_clipboard(self):
+      data = self.clipboard_get()
+      if data == '':
+          print('clipboard fail')
+      else:
+          print('clipboard', data)        
+                 
   def format_for_portrait(self, word_dict):
       """ expects a dictionary with len(words) as key, and unsorted 
       list of words with that length
@@ -405,7 +452,7 @@ class LetterGame():
           return selection
             
   def initialise_board(self):
-    """ requires sizex, sizey from get_size
+    """ requires sizex, sizey fron get_size
                  letter_weights from load_words
     """
     for r in range(self.sizey):
@@ -451,7 +498,21 @@ class LetterGame():
     w_dict[key] = w_list[:-1] # remove empty string  
     #print(w_dict)
     #self.all_words = self.wordlist
-    self.word_dict = w_dict      
+    self.word_dict = w_dict  
+        
+  def last_puzzle_name(self, file):
+      """ get last puzzle name and number in file """
+      with open(file, 'r', encoding='utf-8') as f:
+          lines = f.read()
+      lines = lines.replace('-',' ')
+      lines = lines.split('\n')        
+      w_list = [line.removesuffix('_frame:') for line in lines if line.endswith('_frame:')]
+      last_name = w_list[-1]
+      numbers = re.findall(r'\d+', last_name)
+      last_number = numbers[-1]
+      base = last_name[:last_name.index(last_number)]
+      next_number = int(last_number) + 1 
+      return base, next_number
         
   def load_words(self, word_length=None, file_list=None):
     # get subset of words
@@ -479,7 +540,7 @@ class LetterGame():
       
     self.wordlist = word_list
     self.wordset = set(word_list) # for fast search
-    self.all_words = set(all_word_list) # fast search for checking
+    self.all_words = set(all_word_list) # fast seach for checking
   
   def check_for_ascii(self, wordlist, source):
       # check for unicode characters from ocr
@@ -492,6 +553,7 @@ class LetterGame():
                   
   def length_matrix(self, search_directions=['down','across']):
     # process the board to establish starting points of words, its direction, and length
+    
     self.word_locations = []
     #self.start_time= time()
     direction_lookup =  {'down': (1, 0), 'across': (0, 1), 'left': (0, -1),
@@ -525,7 +587,6 @@ class LetterGame():
       self.wordlengths = dict(sorted(lengths.items()))                      
       self.min_length = min(self.wordlengths)         
       self.max_length = max(self.wordlengths)            
-      
       #self.delta_t('len matrix')       
     return self.min_length, self.max_length
     
@@ -560,7 +621,8 @@ class LetterGame():
     self.all_word_dict = {}
     for length in range(self.min_length, self.max_length +1):
       self.all_word_dict[length] =  {w for w in words if len(w) == length}
-      print(f'Wordlist length {length} is {len(self.all_word_dict[length])}')
+      if self.debug:
+          print(f'Wordlist length {length} is {len(self.all_word_dict[length])}')
       
   def check_hit(self, rc):    
     pass    
@@ -660,7 +722,7 @@ class LetterGame():
     else:
         selection = console.input_alert("What is the dimension of the board (X, Y)? (Default is 5x5)\nEnter 2 numbers:")
     try:
-      # can use space, comma or x for separator
+      # can use space, comma or x for seperator
       size = selection.replace(',',' ').replace('x', ' ').split() 
       if len(size) == 2:
         self.sizey = int(size[1])

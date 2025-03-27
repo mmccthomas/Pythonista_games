@@ -38,6 +38,7 @@ class ZipWord(LetterGame):
     self.word_dict = {}
     self.word_locations = []
     self.load_words_from_file(WordList)
+    self.prepare_word_lists()
     self.initialise_board()
     # create game_board and ai_board
     self.SIZE = self.get_size()
@@ -144,7 +145,8 @@ class ZipWord(LetterGame):
     """
     Main method that prompts the user for input
     """
-    wait = self.gui.set_waiting('Solving')
+    if self.test is None:
+       wait = self.gui.set_waiting('Solving')
     def transfer_props(props):
        return  {k: getattr(self, k) for k in props}
     cx = CrossWord(self.gui, self.word_locations, self.all_words)
@@ -167,11 +169,11 @@ class ZipWord(LetterGame):
        self.board = cx.populate_words_graph(max_iterations=1000, length_first=False)
     # self.check_words()
     self.create_number_board()
-    self.gui.build_extra_grid(self.gui.gs.DIMENSION_X, self.gui.gs.DIMENSION_Y,
+    if self.test is None:
+        self.gui.build_extra_grid(self.gui.gs.DIMENSION_X, self.gui.gs.DIMENSION_Y,
                               grid_width_x=1, grid_width_y=1,
                               color='grey', line_width=1)
-    self.gui.reset_waiting(wait)
-    if self.test is None:
+        self.gui.reset_waiting(wait)
         while True:
           move = self.get_player_move(self.board)
           self.process_turn(move, self.board)
@@ -205,29 +207,30 @@ class ZipWord(LetterGame):
             print(f'{selection=}')
           return selection
           
-     
+  def prepare_word_lists(self):
+      self.word_lists = {}
+      if self.word_dict:
+          # get words and puzzle frame from dict
+          for key, v in self.word_dict.items():
+            if '_frame' in key:
+             board = [row.replace("'", "") for row in v]
+             board = [row.split('/') for row in board]
+             name = key.split('_')[0]
+             self.word_lists[name] = [self.word_dict[name], board]
+             
   def initialise_board(self):
     
-    word_lists = {}
-    if self.word_dict:
-      # get words and puzzle frame from dict
-      for key, v in self.word_dict.items():
-        if '_frame' in key:
-         board = [row.replace("'", "") for row in v]
-         board = [row.split('/') for row in board]
-         name = key.split('_')[0]
-         word_lists[name] = [self.word_dict[name], board]
     if self.test is None:     
-        self.puzzle = random.choice(list(word_lists))
-        self.puzzle = self.select_list(word_lists)
+        self.puzzle = random.choice(list(self.word_lists))
+        self.puzzle = self.select_list(self.word_lists)
         if not self.puzzle:
-          self.puzzle = random.choice(list(word_lists))
+          self.puzzle = random.choice(list(self.word_lists))
     else:
         self.puzzle = self.test  
-    self.all_words, self.board = word_lists[self.puzzle]
+    self.all_words, self.board = self.word_lists[self.puzzle]
     self.all_words = [word.lower() for word in self.all_words]
     self.check_for_ascii(self.all_words, self.puzzle)
-    
+    self.sizey, self.sizex = len(self.board), len(self.board[0])
     # parse board to get word objects
     self.length_matrix()
                
@@ -260,7 +263,7 @@ class ZipWord(LetterGame):
       elif letter == 'Finish':
         return True
       elif letter != '':
-        # select from list whether across or down based upon selection row.
+        # select from list whether accross or down based upon selection row.
         # selection items is a directory, dont know which order.
         possibles = self.selection_items
         # get keys to establish down/across

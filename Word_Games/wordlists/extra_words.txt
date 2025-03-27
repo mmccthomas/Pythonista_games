@@ -1,5 +1,6 @@
 # these words were added to solve given puzzles
 aquafab
+aquafaba
 beachhead
 bonemeal
 burnout
@@ -15,9 +16,13 @@ jobseeker
 jacuzzi
 jacuzzis
 makeover
+mooli
+newsflash
 oche
 overdub
 pavlova
+polyest
+ponytailed
 rejigged
 roadie
 samosa

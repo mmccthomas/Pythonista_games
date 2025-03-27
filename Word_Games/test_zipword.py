@@ -7,28 +7,27 @@ import numpy as np
 import gc
 obj = None
 
-with open('wordpuzzles.txt') as f:
+with open('wordpuzzles.txt', encoding='utf-8') as f:
     words = f.readlines()
 names = [word.split('_')[0].replace('-',' ') 
          for word in words 
          if word.endswith('_frame:\n')]
 
-names = names[:10]
-for name in reversed(names):    
-    
-    obj = zip_word.ZipWord(name)   
+obj = zip_word.ZipWord(names[-1])   
+obj.debug = False
+for name in reversed(names):        
+    obj.test = name
+    obj.initialise_board()
+    obj.sizey, obj.sizex = len(obj.board), len(obj.board[0])    
+    obj.gui.replace_grid(obj.sizey, obj.sizex)
     t = time()
     obj.run() 
     elapsed = time() - t
     full_squares =  ~np.any(obj.solution_board == ' ')
     print(f'{name}, complete={full_squares}, no_squares={np.sum(np.char.isalpha(obj.solution_board))} in {elapsed:.2f}secs')
+    #sleep(1)
     
-    if obj is not None:
-       obj.gui.gs.view.close()
-       sleep(1)
-       #obj.gui.v = None
-       del obj
-       gc.collect()
+
        
 
 #test placing move 'sandpiper' in puzzle 1

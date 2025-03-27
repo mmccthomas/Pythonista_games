@@ -1,35 +1,26 @@
 # test solve of all puzzles in numberword
-# test user interaction of one puzzle
 import NumberWord
-from copy import deepcopy
-from time import sleep, time
-import gc
+from time import time
+import numpy as np
 
 obj = None
 with open('crossword_templates.txt') as f:
     words = f.readlines()
-names = [word.split('_')[0]for word in words if word.endswith(':\n')]
+names = [word.split('_')[0] for word in words if word.endswith(':\n')]
 
-names = names[:20]
+obj = NumberWord.CrossNumbers(names[-1])
+
 for name in reversed(names):
-    
-    
-    obj = NumberWord.CrossNumbers(name)   
+    obj.test = name
+    obj.debug = False
+    obj.initialise_board()
+    obj.sizey, obj.sizex = len(obj.board), len(obj.board[0])
+    obj.gui.replace_grid(obj.sizey, obj.sizex)
     t = time()
-    obj.run() 
+    obj.run()
     elapsed = time() - t
-    full_squares =  ~np.any(obj.solution_board == ' ')
-    print(f'{name}, complete={full_squares}, no_squares={np.sum(np.char.isalpha(obj.solution_board))} in {elapsed:.2f}secs')
-    
-    if obj is not None:
-       obj.gui.v.close()
-       del obj
-       sleep(.5)
-       gc.collect()
-
-#test placing move 'sandpiper' in puzzle 1
-move = [(r,r) for r in range(4,14)]
-#obj.process_turn(move, obj.board, test=('sandpiper', 0))
-
-
+    full_squares = ~np.any(obj.solution_board == ' ')
+    print(
+        f'{name}, complete={full_squares}, no_squares={np.sum(np.char.isalpha(obj.solution_board))} in {elapsed:.2f}secs'
+    )
 

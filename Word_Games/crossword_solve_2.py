@@ -203,11 +203,12 @@ class AlternativeSolve(LetterGame):
         for iteration in range(n):
             self.board = np.array(board)
             self.update_matches()
-            if iteration == n - 1:
-                self.debug = True
+            #if iteration == n - 1:
+            #    self.debug = True
             self.fill()
-            print()
-            self.print_board(self.board, which=f'final board {filepath},\n\t\t{self.iteration_counter} iterations for {self.placed} words')
+            if self.debug:
+                print()
+                self.print_board(self.board, which=f'final board {filepath},\n\t\t{self.iteration_counter} iterations for {self.placed} words')
             if self.board_is_full():
                 break
             else:

@@ -12,7 +12,7 @@ The games uses a 20k word dictionary
 # incorrect blocks, missing numbers, incorrect numbers
 # or word not in words_alpha.txt
 # To  find and diagnose if solution not possible
-# number could be wrong ( particularly 19 for 9 etc)
+# number could be wrong ( particularly 19 fo 9 etc)
 # or word not in wordlist
 # added code to :
 # check for number > 30 and report its location
@@ -59,8 +59,9 @@ class CrossNumbers(LetterGame):
     def __init__(self, test=None):
         # test overrides manual selections
         self.test = test
-        self.debug = False
+        self.debug = True
         self.use_np = False
+        self.word_trie = None
         # allows us to get a list of rc locations
         self.log_moves = True
         self.load_words_from_file('crossword_templates.txt')
@@ -351,21 +352,22 @@ class CrossNumbers(LetterGame):
                 
         # Load the list of words and construct the trie
         # print('Building trie word dictionary ...\n')
-        if not self.use_np:
-	        try:
-	          import pickle
-	          with open('word_trie.pk', 'rb') as f:
-	            word_trie = pickle.load(f)
-	        except Exception as e:
-	           # print('error', e)
-	           word_trie = WordDictionary()
-	           # TODO This is quite slow. is re.match on all_word_dict faster?
-	           [word_trie.add_word(word) for word in self.all_words]
-        else :
-        	  word_trie = None 
+        if self.word_trie is None:
+            if not self.use_np:
+    	        try:
+    	          import pickle
+    	          with open('word_trie.pk', 'rb') as f:
+    	            self.word_trie = pickle.load(f)
+    	        except Exception as e:
+    	           # print('error', e)
+    	           self.word_trie = WordDictionary()
+    	           # TODO This is quite slow. is re.match on all_word_dict faster?
+    	           [self.word_trie.add_word(word) for word in self.all_words]
+            else :
+            	  self.word_trie = None 
         #with open('word_trie.pkl', 'wb') as f:
         #   pickle.dump(word_trie, f)
-        return code_dict, numbers, word_trie
+        return code_dict, numbers, self.word_trie
         
     def reconstruct_board(self, decoded_words):
         # from solver decoded words reconstruct and print the board
@@ -395,16 +397,16 @@ class CrossNumbers(LetterGame):
                 result = False
             return result
         t=time()
-        code_dict, all_encoded_words, word_trie = self.create_solve_dict()
+        code_dict, all_encoded_words, self.word_trie = self.create_solve_dict()
         print(f'time to prepare {time()-t:.2f}s')
         solver = CodewordSolverDFS(all_encoded_words, code_dict,
-                                   word_trie, self.all_word_dict,  use_heuristics=True, use_np=self.use_np)                          
+                                   self.word_trie, self.all_word_dict,  use_heuristics=True, use_np=self.use_np)                          
         solver.debug = self.debug        
         t=time()                
         solver.solve()
         print(f'time to solve {time()-t:.2f}s')
         decoded_words = solver.decode_words_in_list(all_encoded_words)
-        result = check_results(word_trie, decoded_words)
+        result = check_results(self.word_trie, decoded_words)
         if self.debug:
            print(f"Decoded words:\n{decoded_words}")
            solver.print_decoded_letters()
@@ -461,7 +463,8 @@ class CrossNumbers(LetterGame):
                                        'max_depth', 'debug']))
         if self.filled_board:
            # try cv_codeword_solver first. if it fails try crossword_create solver
-           wait = self.gui.set_waiting('Solving')
+           if self.test is None:
+               wait = self.gui.set_waiting('Solving')
            success = self.solve()
            self.gui.set_prompt('Decode successful' if success else 'Decode failed')
            if False: # not success:
@@ -476,10 +479,12 @@ class CrossNumbers(LetterGame):
                except (Exception):
                    print(traceback.format_exc())
                    self.gui.set_prompt('Solution failed, No hints available')
-           self.gui.reset_waiting(wait)
+           if self.test is None:
+               self.gui.reset_waiting(wait)
         else:
             try:
-              wait = self.gui.set_waiting('Generating')
+              if self.test is None:
+                  wait = self.gui.set_waiting('Generating')
               self.board = cx.populate_words_graph(max_iterations=200,
                   length_first=False,
                   max_possibles=100,
@@ -488,7 +493,8 @@ class CrossNumbers(LetterGame):
             except (Exception):
                 print(traceback.format_exc())
             finally:
-                self.gui.reset_waiting(wait)
+                if self.test is None:
+                    self.gui.reset_waiting(wait)
             
         self.gui.update(self.board)
         # self.print_board()
@@ -515,9 +521,7 @@ class CrossNumbers(LetterGame):
             self.check_words()
             self.complete()
             
-        else:
-            self.finished = True
-            self.gui.v.close()
+        
                  
     def game_over(self):
         """ check for finished game
@@ -562,17 +566,19 @@ class CrossNumbers(LetterGame):
             self.puzzle = self.test
             
         self.board = boards[self.puzzle]
-        
+        self.sizey, self.sizex = len(self.board), len(self.board[0])
         self.word_locations = []
         self.length_matrix()
         #print(self.board), len(self.board[0]))
         
         # [print(word.coords) for word in self.word_locations]
-        print('frame ', [len(y) for y in self.board])
+        if self.debug:
+            print('frame ', [len(y) for y in self.board])
+            print(len(self.word_locations), 'words', self.min_length, self.max_length)
         self.filled_board = np.any(np.char.isdigit(np.array(self.board, dtype='U3')))
         self.board = np.array(self.board)
         self.empty_board = self.board.copy()
-        print(len(self.word_locations), 'words', self.min_length, self.max_length)
+        
       
     def print_square(self, process, color=None):
         """ render the empty grid with black squares """
