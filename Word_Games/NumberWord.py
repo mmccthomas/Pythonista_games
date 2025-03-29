@@ -59,7 +59,7 @@ class CrossNumbers(LetterGame):
     def __init__(self, test=None):
         # test overrides manual selections
         self.test = test
-        self.debug = True
+        self.debug = False
         self.use_np = False
         self.word_trie = None
         # allows us to get a list of rc locations
@@ -544,7 +544,7 @@ class CrossNumbers(LetterGame):
         else:
           file_list = file_list[1:]
         LetterGame.load_words(self, word_length, file_list=file_list)
-      
+    
     def initialise_board(self, non_filled_only=False):
         # detects if board has digits, indicating a prefilled board
         boards = {}
@@ -558,6 +558,7 @@ class CrossNumbers(LetterGame):
              boards[name] = board
         if non_filled_only:
           boards = {name: board for name, board in boards.items() if name.startswith('Puzzle')}
+        
         if self.test is None:
            self.puzzle = self.select_list(boards)
            if not self.puzzle:

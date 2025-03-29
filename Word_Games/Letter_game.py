@@ -434,11 +434,29 @@ class LetterGame():
     self.gui.set_message2(f'{self.game_over()} WON!')
     self.complete()
   
-  def select_list(self, word_lists):
-      '''Choose which category'''
+  def get_frame_sizes(self, word_dict):
+      # get board size for items in word_dict
+      # return list of strings in form '(rowsxcols)'
+      item_sizes = []
+      for item, values in word_dict.items():
+          y_len = len(values)
+          if '/' in values[0]:
+             x_len = len(values[0].split('/'))
+          else:
+             x_len = len(values[0])
+          item_sizes.append(f'({y_len}x{x_len})')
+      return item_sizes
+              
+  def select_list(self, word_lists, add_frame_sizes=True):
+      '''Choose which category
+      optionally add the grid size to the list
+      '''
       items = [s.capitalize() for s in word_lists.keys()]
       items = [item for item in items
                if not  item.endswith('_frame')]
+      if add_frame_sizes:
+         frame_sizes = self.get_frame_sizes(word_lists)        
+         items = [item + ' ' + item_size for item, item_size in zip(items, frame_sizes)] 
       # return selection
       selection = ''
       prompt = ' Select puzzle'
@@ -449,7 +467,7 @@ class LetterGame():
       if len(selection):
           if self.debug:   
             print(f'{selection=}')
-          return selection
+          return selection.split(' ')[0]
             
   def initialise_board(self):
     """ requires sizex, sizey fron get_size

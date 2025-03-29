@@ -146,8 +146,11 @@ class CrossWord(LetterGame):
 
     def select_list(self, test, select=None):
         '''Choose which category'''
-        items = [s.capitalize() for s in self.word_dict.keys()]
-        items = [item[:-5] for item in items if (item.endswith('_text'))]
+        items = [s.capitalize() for s in self.word_dict]
+        items = [item.removesuffix('_text') for item in items if (item.endswith('_text'))]
+        # get board size for items 
+        boards = {name: board for name, board in self.word_dict.items() if name.endswith('_frame')}       
+        items = [item + ' ' + item_size for item, item_size in zip(items, self.get_frame_sizes(boards))]
         # return selection
         self.gui.selection = ''
         selection = ''
@@ -159,7 +162,8 @@ class CrossWord(LetterGame):
                                          position=(800, 0))
                 while self.gui.text_box.on_screen:
                     try:
-                        selection = self.gui.selection.lower()
+                        # remove frame size string
+                        selection = self.gui.selection.lower().split(' ')[0]
                     except (Exception) as e:
                         print(e)
                 if selection == 'cancelled_':
@@ -174,7 +178,7 @@ class CrossWord(LetterGame):
             self.table = self.word_dict[selection + '_text']
 
         if selection + '_frame' in self.word_dict:
-            # rearrange frame text into N 3x3 tiles
+            
             frame = self.word_dict[selection + '_frame']
             if self.debug:
                 [print(row, len(row)) for row in frame]  # for debug

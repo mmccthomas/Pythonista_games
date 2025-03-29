@@ -2,7 +2,7 @@
 # similar to pieceword creator
 
 import numpy as np
-import base_path
+#import base_path
 import random
 import pickle
 import dialogs
@@ -10,14 +10,14 @@ from scene import get_screen_size
 from itertools import zip_longest
 from textwrap import wrap
 import matplotlib.colors as mcolors
-
-base_path.add_paths(__file__)
+from time import time
+#base_path.add_paths(__file__)
 from pieceword_create import PieceWord
 from crossword_create import CrossWord
 from Letter_game import LetterGame
 from gui.gui_interface import Squares, Coord
-#PUZZLELIST = "pieceword_templates.txt"
-#TILESIZE = 3
+PUZZLELIST = "crossword_puzzles.txt"
+OUTPUTFILE = "crossword_puzzles.txt"
 CR = '\n'
 WordList = [
     'wordlists/letters3_common.txt',
@@ -44,7 +44,8 @@ class Cross(PieceWord):
         self.tiles = None
         self.debug = False
         self.lookup_free = False
-        self.image_dims = (self.selection[1], self.selection[0])
+        self.outputfile = "crossword_puzzles.txt"
+        self.image_dims =  (self.selection[1], self.selection[0])
         self.all_clues_done = False
         self.soln_str = '123'
         # self.load_words_from_file(PUZZLELIST, no_strip=True)
@@ -66,8 +67,11 @@ class Cross(PieceWord):
         self.gui.set_enter('', stroke_color='black')  # hide box
         self.gui.set_top(f'Crossword frame {self.selection}')
         self.finished = False
-        self.gui.remove_labels()                
-
+        self.gui.remove_labels() 
+        
+                   
+    
+        
     def get_size(self):
         LetterGame.get_size(self, f'{self.selection[0]},{self.selection[1]}')
 
@@ -156,12 +160,14 @@ class Cross(PieceWord):
                                 **params, 'min_size': (80, 32)
                             })
         # adjust text size to screen
-        size = (W - w) // 28
+        fontsize = (W - w) // 28
         self.gui.set_moves('Clues',
-                           font=('Ubuntu Mono', size),
+                           font=('Ubuntu Mono', fontsize),
                            position=(w + 10, y),
                            anchor_point=(0, 0))
-        
+        # trial scrollbox, gives problem with control
+        #scroll_, self.wordsbox = self.gui.scrollview_h(w+100,h-600,(W-w), 600, text='Clues', )
+        # self.wordsbox.font=('Ubuntu Mono', size)
 
     def update_buttons(self):
         """ change button text and reset colours """
@@ -201,6 +207,7 @@ class Cross(PieceWord):
             if 'clue' in self.word_defs[word]:
                 color = 'green'
             [self.change_color(coord, color) for coord in word_obj.coords]
+        #self.wordsbox.text = self.update_clue_text()
         self.gui.set_moves(self.update_clue_text())
         
     def get_words(self):
@@ -268,7 +275,7 @@ class Cross(PieceWord):
             # add index
             text = f'{self.gui.get_numbers(word.start)[word.start]["text"]:2} '
             try:
-                text += f'{self.word_defs[word.word].get("clue", "")}'
+                text += f'{self.word_defs[word.word].get("clue", "")}({word.length})'
                 clue_list = wrap(text,
                                  width=20,
                                  initial_indent='',
@@ -284,7 +291,7 @@ class Cross(PieceWord):
 
     def compute_puzzle_text(self, name='puzzle'):
         """produce all text
-        add in indexes and separate by forward slash
+        add in indexes and seperate by forward slash
         """
         board_str = ''
         for r, row in enumerate(self.board):
@@ -317,21 +324,52 @@ class Cross(PieceWord):
             move = self.process_turn(move, self.board)
         self.gui.set_message2('')
         self.complete()
-
+    
     def process_turn(self, move, board):
-        """ add processing of board touches to initiate
-        select_definition
-        """
-        PieceWord.process_turn(self, move, board)
-        if move and hasattr(self, 'word_defs'):
+        """ process the turn
+    move is coord, new letter, selection_row
+    """
+        if move:
             coord, letter, origin = move
-            for word_obj in self.word_locations:
-                if coord in word_obj.coords:
-                    self.select_definition(word_obj.word)
-                    msg = self.update_clue_text()
-                    self.gui.set_moves(msg)
-                    return
 
+            if letter == 'Fill':
+                # new solution and buttons
+                self.fill_board()
+                self.solution_board = self.board.copy()
+                self.gui.update(self.board)
+                self.update_buttons()
+            elif letter == 'Lookup':
+                self.word_defs = {}
+                t = time()
+                self.lookup_all()
+                self.gui.set_prompt(
+                    f'lookup complete in {(time()-t):.3f} secs')
+            elif letter == 'Copy':
+                self.copy_()
+                self.gui.set_message('Data copied')
+            
+            elif letter == 'Reload':
+                self.recall_state()
+            elif letter in list(self.wordset) and hasattr(self, 'word_defs'):
+                self.select_definition(letter)
+                msg = self.update_clue_text()
+                self.gui.set_text(self.wordsbox, msg)
+            elif move and hasattr(self, 'word_defs'):
+                coord, letter, origin = move
+                for word_obj in self.word_locations:
+                    if coord in word_obj.coords:
+                        self.select_definition(word_obj.word)
+                        msg = self.update_clue_text()
+                        self.gui.set_moves(msg)
+                        # self.wordsbox.text=(msg)
+                        return
+                    
+        return 0
+        
+    
+    def copy_(self, out=None, final_cr=False):
+        super().copy_(out=self.outputfile, final_cr=final_cr)
+        
     def recall_state(self):
         """recall WIP puzzle to complete """
         with open('piecestate.pkl', 'rb') as f:

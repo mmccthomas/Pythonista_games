@@ -296,3 +296,133 @@ puzzle6_frame:
 'r/#/c/#/o/#/o/#/u/#/i/#/i/#/a'
 '32a/v/e/r/a/g/e/#/33f/a/c/t/o/r/y'
 'l/#/d/#/t/#/s/#/f/#/e/#/n/#/s'
+
+puzzle7_text:
+ACROSS                DOWN
+9  chance (upon)(9)   1  perpendicular(8)
+10 sweet-smelling     2  protection(6)
+   old                3  agency(6)
+   anaesthetic.(5)    4  jab(4)
+11 motif(5)           5  corroboration(5)
+12 Wired  internet    6  to become
+   connection(9)         curved.(7)
+13 higgledy-          7  costing little(8)
+   piggledy(8)        8  a rating.(6)
+15 heralds(6)         14 reverberate(4)
+17 roster(4)          16 Old computer
+19 Type of steak(5)      connection(4)
+20 luminous           18 firing(8)
+   celestial body(4)  21 freshly(8)
+23 water droplets in  22 Postal
+   the air.(6)           location(7)
+25 momentous(8)       23 a brief, sharp,
+29 chime in(9)           not  loud
+31 epoxy(5)              sounds(6)
+32 monarchs(5)        26 a hard yellow
+33 assessment(9)         deposit on the
+                         teeth.(6)
+                      27 defy(6)
+                      28 earthborn(5)
+                      30 hints(4)
+
+
+puzzle7_frame:
+'1v/#/2s/#/3b/#/4s/#/5p/#/6b/#/7c/#/8g'
+'9e/n/c/o/u/n/t/e/r/#/10e/t/h/e/r'
+'r/#/r/#/r/#/a/#/o/#/n/#/e/#/a'
+'11t/h/e/m/e/#/12b/r/o/a/d/b/a/n/d'
+'i/#/e/#/a/#/#/#/f/#/i/#/p/#/e'
+'13c/o/n/f/u/s/14e/d/#/15a/n/g/e/l/s'
+'a/#/#/#/#/#/c/#/16s/#/g/#/s/#/#'
+'17l/i/18s/t/#/19c/h/u/c/k/#/20s/t/a/21r'
+'#/#/h/#/22a/#/o/#/s/#/#/#/#/#/e'
+'23c/l/o/u/d/s/#/25h/i/s/26t/o/27r/i/c'
+'l/#/o/#/d/#/28h/#/#/#/a/#/e/#/e'
+'29i/n/t/e/r/r/u/p/30t/#/31r/e/s/i/n'
+'c/#/i/#/e/#/m/#/i/#/t/#/i/#/t'
+'32k/i/n/g/s/#/33a/p/p/r/a/i/s/a/l'
+'s/#/g/#/s/#/n/#/s/#/r/#/t/#/y'
+
+puzzle8_text:
+ACROSS                DOWN
+1  an english unit    2  unobstructed(7)
+   of land area(4)    3  most advanced
+4  adornment(10)         point(9)
+10 assemblies(8)      4  Of one of the
+11 diminutive(6)         Nordic
+12 Large N Carolina      countries(6)
+   city(10)           6  being in
+13 sheepling(4)          detention(7)
+14 a computer user    7  censure(8)
+   with most          8  Sim(5)
+   privileges(5)      9  Best choice(7)
+15 harmony.(4)        16 boundless(9)
+16 hideous(4)         18 _Ford, Indiana
+19 abide(4)              Jones(8)
+21 the smallest,      20 an assembly of
+   indivisible           implements(7)
+   constituent        22 external to the
+   part(4)               house(7)
+23 orb(5)             24 asset(7)
+26 a person who       25 compelling(6)
+   prepares food.(4)  27 destiny (or
+28 the state of          Chameleon
+   having                perhaps?)(5)
+   permanently left    
+   one's work(10)      
+29 edges around(6)     
+30 distinguish(8)      
+31 accomplishment(10)                   
+32 levy(4)             
+
+puzzle8_frame:
+'1a/2c/r/3e/#/4d/e/6c/o/7r/a/8t/i/9o/n'
+'#/l/#/x/#/a/#/u/#/e/#/o/#/p/#'
+'10m/e/e/t/i/n/g/s/#/11p/e/t/i/t/e'
+'#/a/#/r/#/i/#/t/#/r/#/a/#/i/#'
+'12g/r/e/e/n/s/b/o/r/o/#/13l/a/m/b'
+'#/e/#/m/#/h/#/d/#/a/#/#/#/a/#'
+'14a/d/m/i/n/#/15s/y/n/c/#/16u/g/l/y'
+'#/#/#/t/#/18h/#/#/#/h/#/n/#/#/#'
+'19s/20t/a/y/#/21a/t/22o/m/#/23g/l/o/24b/e'
+'#/o/#/#/#/r/#/u/#/25u/#/i/#/e/#'
+'26c/o/o/27k/#/28r/e/t/i/r/e/m/e/n/t'
+'#/l/#/a/#/i/#/s/#/g/#/i/#/e/#'
+'29s/k/i/r/t/s/#/30i/d/e/n/t/i/f/y'
+'#/i/#/m/#/o/#/d/#/n/#/e/#/i/#'
+'31a/t/t/a/i/n/m/e/n/t/#/32d/u/t/y'
+
+puzzle9_text:
+ACROSS                DOWN
+7  cranky(8)          1  dealt (with)(6)
+8  conduit(4)         2  conquer(8)
+9  above(4)           3  assemblage(5)
+10 Document           4  a set of
+   unapproved(8)         interlinked web
+11 expression(5)         pages(7)
+12 pill(6)            5  Common video
+15 anguish(6)            format(4)
+17 a fruity soft      6  orb(6)
+   drink.(5)          13 a dark-haired
+20 to move back or       lady(8)
+   away(8)            14 admonish(7)
+22 Direction 90°(4)   16 elevates(6)
+23 harken(4)          18 citadel(6)
+24 changeable(8)      19 to inflate.(5)
+                      21 cornet(4)
+
+
+puzzle9_frame:
+'#/1s/#/2o/#/3g/#/4w/#/5m/#/6s/#'
+'7p/e/r/v/e/r/s/e/#/8p/i/p/e'
+'#/r/#/e/#/o/#/b/#/e/#/h/#'
+'9o/v/e/r/#/10u/n/s/i/g/n/e/d'
+'#/e/#/c/#/p/#/i/#/#/#/r/#'
+'11i/d/i/o/m/#/#/12t/a/13b/l/e/t'
+'#/#/#/m/#/14r/#/e/#/r/#/#/#'
+'15g/16r/i/e/v/e/#/#/17j/u/i/18c/e'
+'#/a/#/#/#/p/#/19s/#/n/#/a/#'
+'20w/i/t/21h/d/r/a/w/#/22e/a/s/t'
+'#/s/#/o/#/o/#/e/#/t/#/t/#'
+'23h/e/a/r/#/24v/o/l/a/t/i/l/e'
+'#/s/#/n/#/e/#/l/#/e/#/e/#'

@@ -66,6 +66,7 @@ from crossword_create import CrossWord
 
 
 PUZZLELIST = "pieceword_templates.txt"
+OUTPUTFILE = "pieceword.txt"
 TILESIZE = 3
 CR = '\n'
 WordList = [
@@ -92,6 +93,7 @@ class PieceWord(LetterGame):
         self.tiles = None
         self.debug = False
         self.lookup_free = False
+        self.outputfile = "pieceword.txt"
         self.image_dims = [7, 5]
         self.all_clues_done = False
         self.soln_str = '123'
@@ -615,22 +617,6 @@ class PieceWord(LetterGame):
         """ process the turn
     move is coord, new letter, selection_row
     """
-        @on_main_thread
-        def clipboard_set(msg):
-            '''clipboard seems to need @on_main_thread '''
-            clipboard.set(msg) 
-             
-        @on_main_thread
-        def clipboard_get():
-            return  clipboard.get()              
-            
-        def check_clipboard():
-            data = clipboard_get()
-            if data == '':
-                print('clipboard fail')
-            else:
-                print('clipboard', data)        
-        
         if move:
             coord, letter, origin = move
 
@@ -647,11 +633,7 @@ class PieceWord(LetterGame):
                 self.gui.set_prompt(
                     f'lookup complete in {(time()-t):.3f} secs')
             elif letter == 'Copy':
-                name = dialogs.text_dialog('Enter name for puzzle',
-                                           text='puzzle')
-                msg = self.compute_puzzle_text(name)
-                clipboard_set(msg)
-                check_clipboard()
+                self.copy_()
                 self.gui.set_message('Data copied')
             elif letter == 'Randomise':
                 if self.all_clues_done:
@@ -663,7 +645,24 @@ class PieceWord(LetterGame):
                 msg = self.update_clue_text()
                 self.gui.set_text(self.wordsbox, msg)
         return 0
-
+        
+    def copy_(self, out=None, final_cr=True):
+        if out is None:
+            out = self.outputfile
+        base, next_number = self.last_puzzle_name(out)        
+        name = dialogs.text_dialog('Enter name for puzzle',
+                                           text=f'{base}{next_number}')
+        msg = self.compute_puzzle_text(name)
+        self.clipboard_set(msg)
+        if final_cr:
+           msg = '\n' + msg + '\n' 
+        else:
+            msg = '\n' + msg
+        with open(out, 'a', encoding='utf-8') as f:
+            f.write(msg)
+        self.check_clipboard()
+        
+                
     def reveal(self):
         """ place all tiles in their correct location """
         for n in range(self.span * self.sizey // TILESIZE):
@@ -706,6 +705,7 @@ if __name__ == '__main__':
         quit = g.wait()
         if quit:
             break
+
 
 
 
