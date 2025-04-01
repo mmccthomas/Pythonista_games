@@ -56,12 +56,13 @@ import clipboard
 from objc_util import on_main_thread
 from textwrap import wrap
 from random import shuffle, choice
+import matplotlib.colors as mcolors
 import base_path
 
 base_path.add_paths(__file__)
 from Letter_game import LetterGame
 import gui.gui_scene as gscene
-from gui.gui_interface import Coord, BoxedLabel
+from gui.gui_interface import Coord, BoxedLabel, Squares
 from crossword_create import CrossWord
 
 
@@ -69,6 +70,7 @@ PUZZLELIST = "pieceword_templates.txt"
 OUTPUTFILE = "pieceword.txt"
 TILESIZE = 3
 CR = '\n'
+
 WordList = [
     'wordlists/letters3_common.txt',
     #'wordlists/words_alpha.txt',
@@ -93,7 +95,10 @@ class PieceWord(LetterGame):
         self.tiles = None
         self.debug = False
         self.lookup_free = False
+        self.across_only = True
+        self.INIT_COLOR = 'yellow'
         self.outputfile = "pieceword.txt"
+        self.savefile = 'piecestate.pkl'
         self.image_dims = [7, 5]
         self.all_clues_done = False
         self.soln_str = '123'
@@ -125,60 +130,47 @@ class PieceWord(LetterGame):
     def save_state(self):
         """ save the state of play in pickle file """
         sys.setrecursionlimit(1000)
-        with open('piecestate.pkl', 'wb') as f:
+        with open(self.savefile, 'wb') as f:
             pickle.dump([
                 self.empty_board, self.board, self.solution_board,
                 self.word_defs, self.word_locations, self.selection
             ], f)
 
     def recall_state(self):
-        with open('piecestate.pkl', 'rb') as f:
+        with open(self.savefile, 'rb') as f:
             self.empty_board, self.board, self.solution_board, self.word_defs, self.word_locations, selection = pickle.load(
                 f)
-        if selection != self.selection:
-            console.hud_alert(
-                f'Template does not match, select {selection} first')
-            return
+        self.gui.replace_grid(self.sizex, self.sizey)
         # now update gui elements
         self.gui.update(self.board)
-        self.update_buttons()
+        self.wordset = self.get_words(self.across_only)
+        self.update_buttons(self.INIT_COLOR)        
         self.gui.set_text(self.wordsbox, self.update_clue_text())
-        for i, word in enumerate(self.get_words().values()):
-            button = 'button_' + str(i + 2)
-            color = 'lightblue' if 'def' in self.word_defs[word] else 'pink'
-            if 'clue' in self.word_defs[word]:
-                color = 'lightgreen'
-            self.gui.set_props(button, fill_color=color)
+        self.update_clue_colours()            
         self.check_all_clues()
 
-    def get_words(self):
-        word_dict = {}
-        for loc in self.word_locations:
-            if loc.direction == 'across':
-                word_dict[loc.start] = loc.word
-        return word_dict
-
+    def get_words(self, across_only=True):
+        """ link word to Word object """
+        if across_only:
+            return {word.word: word for word in self.word_locations if word.direction=='across'}
+        else:
+            return {word.word: word for word in self.word_locations}
+        
     def lookup_all(self):
         wait = self.gui.set_waiting('Looking up words')
         missing_words = []
-        for i, word in enumerate(self.wordset):
+        for word in self.wordset:
+            word_obj = self.wordset[word]
             # self.gui.set_prompt(f'looking up {word}')
             wait.name = f'Finding {word}'
             # lookup using free dictionary,merriam_webster if fail
-            self.word_defs[word] = {'def': [], 'synonyms': []}
+            self.word_defs[word] = {'def': [], 'synonyms': [], 'line_no': word_obj.start[0] + 1}
             self.lookup(word, self.lookup_free)
             no_defs = len(self.word_defs[word]['def'])
             self.lookup(word, not self.lookup_free)       
             if self.word_defs[word]['def'] and no_defs == 0:
                   missing_words.append(word)
-               
-            # change button colour to show if definition found
-            button = 'button_' + str(i + 2)
-            self.gui.set_props(
-                button,
-                fill_color='lightblue' if self.word_defs[word]['def'] else 'pink')
-            self.word_defs[word]['line_no'] = list(
-                self.get_words().keys())[i][0] + 1
+            self.update_clue_colours(word)
         self.gui.reset_waiting(wait)
         if missing_words:
            dialogs.hud_alert(f'Found {missing_words} in 2nd dictionary', duration=4)
@@ -188,6 +180,15 @@ class PieceWord(LetterGame):
                 print()
                 print(word, self.word_defs[word])
                 
+    def change_color(self, coord, color):
+        """ change the colour of a Square """
+        try:
+            item = self.gui.get_numbers(coord)
+            item[coord]['color'] = mcolors.to_rgba(color)
+            self.gui.put_numbers(item)  
+        except KeyError:
+            print(traceback.format_exc()) 
+               
     def lookup(self, word, method):         
         if method:
             self.lookup_free_dictionary(word)
@@ -242,6 +243,7 @@ class PieceWord(LetterGame):
         self.solution_board = self.board.copy()
         
         self.set_buttons()
+        self.update_buttons(self.INIT_COLOR )
         while True:
             move = self.get_player_move(self.board)
             move = self.process_turn(move, self.board)
@@ -264,23 +266,7 @@ class PieceWord(LetterGame):
             'color': 'black',
             'min_size': (80, 32)
         }
-        # Make x position be relative to previous box on same line
-        # need bbox of previous box
-        bbox = [0, 0, 0, 0]
-        for k, v in self.get_words().items():
-            pos = int(w + 20), int(h - (k[0] + 1) * h / 21)
-            if pos[1] == bbox[1]:
-                pos = bbox[0] + bbox[2] + 10, bbox[1]
-            button = self.gui.add_button(text=v,
-                                         position=pos,
-                                         fill_color='yellow',
-                                         **{
-                                             **params, 'min_size': (65, h/21 - 2)
-                                         })
-            # get bbox of just placed button as integers to allow comparison
-            bbox = [
-                int(x) for x in getattr(self.gui.gs, button).l_box_name.bbox
-            ]
+        
         self.gui.set_enter('Fill',
                            position=(w + off + 135, h),
                            fill_color='orange',
@@ -316,19 +302,28 @@ class PieceWord(LetterGame):
         self.wordsbox = self.gui.add_button(
             text='',
             title='Clues',
-            position=(w + off + 150, y+50),
-            min_size=(250, 300),
+            position=(w + off , y+50),
+            min_size=(500, 600),
             font=('Courier New', 14),
             fill_color='black',
         )
-
-    def update_buttons(self):
-        """ change button text and reset colours """
         
-        for i, word in enumerate(self.wordset):
-            button = 'button_' + str(i + 2)
-            self.gui.set_text(button, word)
-            self.gui.set_props(button, fill_color='yellow')
+    def update_buttons(self, color='white'):
+        """ change button text and reset colours """
+        coords = [coord for word in self.wordset.values() for coord in word.coords]
+        #coords = np.argwhere(np.char.isalpha(self.board))
+        # fill all squares
+        self.gui.add_numbers([
+            Squares(coord,
+                    '',
+                    color,
+                    z_position=30,
+                    alpha=.2,
+                    stroke_color='black',
+                    font=('Marker Felt', 15),
+                    text_anchor_point=(-0.9, 0.95))
+            for coord in coords],
+            clear_previous=True)
 
     def fill_board(self):
         """use  swordsmith to fill crossword
@@ -344,11 +339,14 @@ class PieceWord(LetterGame):
         cx.max_cycles = 5000
         try:
             wait = self.gui.set_waiting('Generating')
-            self.board = cx.populate_words_graph(max_iterations=100,
-                                                 length_first=False,
-                                                 max_possibles=100,
-                                                 swordsmith_strategy='dfs')
-            self.wordset = self.get_words().values()                                    
+            for i in range(10):
+                self.board = cx.populate_words_graph(max_iterations=100,
+                                                     length_first=False,
+                                                     max_possibles=100,
+                                                     swordsmith_strategy='dfs')
+                if not '.' in self.board:
+                   self.wordset = self.get_words(self.across_only)      
+                   break                        
         except (Exception):
             print(traceback.format_exc())
         finally:
@@ -426,7 +424,22 @@ class PieceWord(LetterGame):
                 return False
             else:
                 return False
-
+                
+    def update_clue_colours(self, word=None):
+        # update colour of all words, else just one
+        if word is None:
+            wordlist = self.wordset
+        else:
+            wordlist = [word]
+        for word in wordlist:
+            word_obj = self.wordset[word]
+            # change button colour to show if definition found
+            color = 'blue' if self.word_defs[word]['def'] else 'red'
+            if 'clue' in self.word_defs[word]:
+                color = 'green'
+            [self.change_color(coord, color) for coord in word_obj.coords]
+        
+        
     def get_size(self):
         LetterGame.get_size(self, '15, 21')
 
@@ -496,11 +509,7 @@ class PieceWord(LetterGame):
         clue = None
         self.gui.selection = ''
         selection = ''
-        # find button
-        for k, button in self.gui.gs.buttons.items():
-            if button.text == word:
-                button_str = 'button_' + str(k)
-                break
+        
         if self.word_defs[word]['def'] and 'clue' not in self.word_defs[word]:
             try:
                 if self.debug:
@@ -543,22 +552,14 @@ class PieceWord(LetterGame):
             clue = dialogs.text_dialog(f'Enter clue for {word}',
                                        text=self.word_defs[word].get(
                                            'clue', ''))
-
         if clue is not None and clue != '':
             self.word_defs[word]['clue'] = clue
-            if self.debug: print(self.word_defs[word]['clue'])
-            try:
-               self.gui.set_props(button_str, fill_color='lightgreen')
-            except Exception as e:
-               pass
-        else:
-            self.word_defs[word].pop('clue', None)
-            try:
-               self.gui.set_props(
-                button_str,
-                fill_color='lightblue' if self.word_defs[word] else 'pink')
-            except Exception as e:
-               pass
+        # colour squares green                                  
+        if 'clue' in self.word_defs[word]:
+            [self.change_color(coord, 'green')
+                for coord in self.wordset[word].coords
+            ]
+        
         self.check_all_clues()
         self.save_state()
 
@@ -625,7 +626,7 @@ class PieceWord(LetterGame):
                 self.fill_board()
                 self.solution_board = self.board.copy()
                 self.gui.update(self.board)
-                self.update_buttons()
+                self.update_buttons(self.INIT_COLOR)
             elif letter == 'Lookup':
                 self.word_defs = {}
                 t = time()
@@ -640,10 +641,18 @@ class PieceWord(LetterGame):
                     self.randomise_grid()
             elif letter == 'Reload':
                 self.recall_state()
-            elif letter in list(self.wordset) and hasattr(self, 'word_defs'):
-                self.select_definition(letter)
-                msg = self.update_clue_text()
-                self.gui.set_text(self.wordsbox, msg)
+
+            elif move and hasattr(self, 'word_defs'):
+                coord, letter, origin = move
+                for word_obj in self.wordset.values():
+                    if coord in word_obj.coords:
+                        self.select_definition(word_obj.word)
+                        msg = self.update_clue_text()
+                        try:
+                            self.gui.set_text(self.wordsbox, msg)
+                        except AttributeError:
+                            self.gui.set_moves(msg)
+                        return
         return 0
         
     def copy_(self, out=None, final_cr=True):

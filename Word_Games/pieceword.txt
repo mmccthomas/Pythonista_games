@@ -5715,7 +5715,7 @@ LE DAG B PULS P
 puzzle26:
 ""
 7, 5
-1730190705113233011604342427212015140012062325090213262218283129081003
+1724310607341319092901271612212808322625150011301810140205030423332022
 
 puzzle26_text:
  1 Resident of the Holy Land • Japanese
@@ -5735,24 +5735,335 @@ puzzle26_text:
 21 accurate • transparent
 
 puzzle26_frame:
- U  E BLEAGE PI
-ENM MAR PS AC N
- C  A ES TALRAG
-IBADEMOSHAINRTI
-N LO E I R I I 
-NCEWARSTAT CZON
- IMO LD  N  C N
- T SPAARK NOK D
-RYSE C  EM CO E
- Z E XISR N I T
-RICRT M EWAUN O
- N   DPIP L SUB
-A  LERA C CO CO
-PATI EMIL  HR  
-  INSWP IRIOELI
-NVE M MPIA RERT
-  DRM A  KEE S 
-RS  E EF F VREC
-AELASC E I ALLS
- N R USMODIC E 
-ES COR B E CE R
+ CO PIA CA RASC
+  HC NMILKEER U
+RIORAGP IF VCOR
+ N OSHIBA Z  E 
+WAU I N LRIC MA
+ L STANCE N  A 
+N  NVEMPI E  M 
+ NO  DA  SMORM 
+M CRS EF  B  E 
+DEM COISRBLEI A
+O ER  M ER PDIC
+WARELIPIPES E C
+ IMLERAGEERTAEL
+ T I ES A S  N 
+RYSNSWTALRECES 
+D   U LLSA  E X
+ARKENM E PATRT 
+  E C E R  I  D
+RTII TC NAINO L
+ I N OK DR ISPA
+ZONSUBO ET CE C
+
+puzzle27:
+""
+7, 5
+2604121930021728133208293327150710001416060322251811202405013423092131
+
+puzzle27_text:
+ 2 tumultuous
+ 3 category • likewise
+ 4 Of the nose
+ 5 free • Racquet sport
+ 6 Of the Emerald Isle
+ 7 peak • surrenders
+ 9 flat circular plates • Computer user
+   • a thing that helps
+11 Red Italian car • interpose
+13 Peninsular country • age • elevate
+15 amatory • stitch
+16 chemical compound of oxygen
+17 desolate • bigger
+18 barbaric
+19 being this and no more • to free from
+   difficulty
+20 fashionably
+
+puzzle27_frame:
+N E E  S IN S T
+I IGERGRAN  TUR
+T G N  A TICR A
+E OSPAI YHEI S 
+LAR A FER L ULA
+L NEROF IDIS Y 
+ T  T  Q L I F 
+RARBARBULTENNTR
+ I  K  E H L E 
+LDSA HA NISEH S
+ L UDETIS C ENT
+SETD RE IUREA A
+E OE EEONE EXID
+RENRLY B POP O 
+C CS S V T TRUE
+ RA   YIEASAGHT
+  T     S T I  
+SUTTIE ASRISCS 
+   ASE P  O MER
+      NIS N    
+LSO    N USR   
+
+puzzle28:
+""
+7, 5
+3418211607082619242732310217110103051025300420232922061415283313000912
+
+puzzle28_text:
+ 1 worry • consecrate • image file
+   format
+ 2 an underground railway. • senior
+ 3 Book code number • opening sequence •
+   First man on the moon
+ 4 any reddish pink colour. • Luke _ ,
+   Gaston in B&B
+ 5 harken • Ivy League university
+ 6 chunky
+ 7 the part of a garment that covers the
+   arm. • bug
+ 8 absolve
+ 9 Star Wars director • something to be
+   sat upon.
+10 detainments • ailing
+11 One of D-day beaches
+12 Southeastern African country •
+   without any question
+13 Words of song • interior
+14 introduced
+15 handpicked • papers
+16 an idle fancy.
+17 allows • snatch
+18 a dried stalk of a cereal plant. •
+   slumber
+19 Microsoft Internet Explorer abbr •
+   outlook • nothing
+20 a building for storing goods •
+   anaesthetic with a sweet odour
+21 stride • verse • with no delay; at
+   once.
+
+puzzle28_frame:
+IST DE J LAYIC 
+T E  DDIC  OPRE
+HYM MAI ULAWSEN
+S S  DPEGG RA N
+MAHS ER IHEATHE
+I ITRAEILT CE S
+ICKECTONEE VREA
+A   I R CEPO N 
+NDEATSTATP RW S
+M  S JINST BE E
+P GLDEATEETR F 
+LEEO N SEN IHIC
+S OLESO U INVAN
+SENO OLETTEDA Y
+ D NTRU SESSK  
+LY OUGS BI UNER
+I  R HALERAB N 
+ED   TG RP JAYS
+LYREVESLEMSIFRE
+ T VIN O N DL M
+CHOAS LUCSTEISB
+
+puzzle29:
+""
+7, 5
+2824123218192622083111091534132521003301052004293007032306162714021017
+
+puzzle29_text:
+ 2 backup
+ 4 Western Continent  • _Rico
+ 6 articulating • altered
+ 8 this night. • Country whose capital
+   is Vienna
+10 grandiose • Heathcliffs girlfriend •
+   King Charles means “my”
+12 Language of web page • protective
+   coverings for the feet • tax
+14 North African country • bargaining
+16 in or into the middle of • being of
+   advanced years
+18 smother • cleanse
+20 Things created for the first time
+   through the use of the imagination
+
+puzzle29_frame:
+ATHNESN EOUGE D
+ O    VAT F A D
+HOEEVYY EIFLT I
+ O LDETHRUER N 
+TUN E   E I IGH
+ G URI STEVIN  
+ S  R S L L  I 
+IONTONACERIANNO
+ N  O V A T  G 
+O ERLYU  S   EU
+T AE  S  T    M
+T CFY E  A  STA
+E  C KE PH E U 
+ISI         EPL
+ T L SG RE P C 
+EPIROP  A  T  I
+    M   I  REAL
+HTMTIN  L  A N 
+ I TO  R Y O E 
+INGE  MEN   UST
+ Y SED C S L  H
+
+puzzle30:
+""
+7, 5
+0704182829021603342105321108200912011910131723153331261427250630240022
+
+puzzle30_text:
+ 1 admittance • collision
+ 3 consolidated • observed
+ 5 blast
+ 6 dormant • category
+ 7 blunder
+ 8 recordings (as of a movie) for
+   playback on a tv • electronic mails
+ 9 subject
+10 yesteryear Scottish? • Short for
+   chemistry
+11 conduit • Country whose capital is
+   Djibouti
+12 _ the Viking • Armstrong
+13 effect
+14 comes in • unit of force
+15 doggy
+16 instrument • a narrow channel between
+   islands in scotland.
+17 detective
+19 said no to • a series of stairs
+   between landings.
+21 a seat on a bicycle, motorcycle, etc.
+   • customer
+
+puzzle30_frame:
+LIG T  O  C CES
+S EE O L LOSO H
+ATR A IDL R FIE
+N AREF ACR  LAN
+VID R  R EMAV  
+O E SAUNIC  ERI
+HEMRROG AM N R 
+  B U TUBENTPEC
+EILOPIK LN R D 
+E  F E  IS IO C
+NEWEXPERS   MAN
+D  E    HD WM N
+R E L HTSSSUD F
+ILS V  E  S    
+S EIERON OUNE P
+YLEL    KMPACT 
+ I INSTORI C W 
+ S Q TU UATCHED
+USETOO  EN AM E
+I E T EOSTONION
+DDL H   TR C  T
+
+puzzle31:
+""
+7, 5
+0115270622211112022423262907000816143233250931200328101934130530041718
+
+puzzle31_text:
+ 2 of or relating to the mind
+ 4 municipality • _ Carlo • rooster
+ 6 Rural US central state • a sudden
+   attack; disturbance. • restroom
+ 8 Capital of China • additional
+ 9 pick
+10 _ the Viking • Jane Austen novel
+11 one of these. • a distinct physical
+   object.
+12 Half or partly • to a great degree
+13 any canine animal.
+14 anywise • group discussion
+16 grotesque • kick out • Ninth month
+18 concludes • arrant • to stop
+   functioning
+20 complexities
+
+puzzle31_frame:
+ C    E C  O I 
+HER PSE  NARICA
+  E R M M P    
+ I A OE AERIV H
+ COGICNOTA  EHO
+   R LT HSEML P
+Y EN MONTEPTA T
+  F  P E  L S I
+S UA ALARAILG O
+L CC  I E E JEC
+YCHTHITIONS  L 
+N AI  Y F   TTE
+D TTOW    K OCK
+EMI V AL BEI E 
+X CIOW I R  ENS
+T  D G   UGL R 
+SOMJINOLO A G A
+ R E E I ENDLEC
+I LOUN  EMMAT S
+MPLW STEM  LE  
+S Y C   ALOTR F
+
+puzzle32:
+""
+7, 5
+0313292605332716221225321819170031113402200124281508212306143010090407
+
+puzzle32_text:
+ 1 dessert • generically, any small,
+   nondescript bird.
+ 2 Hungarian secret police
+ 3 Denholm _ , Indiana Jones’s actor •
+   muster
+ 4 a regulated diet.
+ 5 malevolent • suitable; competent.
+ 6 influencing
+ 7 one of those. • ravage
+ 8 coin worth 1/100  • different
+ 9 a minor mistake • that which belongs
+   to you • female primary cells, ova
+10 contemptible • conceptions
+11 Properties let out
+12 flat, circular plates • essay
+13 small area of land completely
+   surrounded by water • peruses •
+   insightful
+14 internal • one of the large bodies of
+   water separating the continents.
+15 Ninth month • ease
+16 suggest
+17 a legal proceeding • Old computer
+   connection
+18 German
+19 ailment • A pair of headphones with
+   an attached microphone.
+20 before (something significant).
+21 countries • late
+
+puzzle32_frame:
+NASE REASPUDEAD
+ S NNE M R E U 
+DIST APERELLELA
+ROWENDSETE  S H
+E IN SE ECASPRE
+HALCH YEDT PS D
+NESU LA DDIN  R
+ M NTABLE P CSI
+IONG N  RIOTA C
+ISEETAUIN H S R
+N S E R EY OTHE
+ESTECTGGSOURS E
+ISLRECRY OMMEAD
+S IE HT A I R O
+SEP DEINGUTS E 
+THAPAR DIS WG S
+I P I L FCEAAVO
+OOPARSAFFI RT M
+ILLTY T AV H ID
+O I REENNEVILS 
+NATCS S YN   PA

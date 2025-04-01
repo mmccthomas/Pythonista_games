@@ -15,12 +15,15 @@ from queue import Queue
 import logging
 import traceback
 from types import SimpleNamespace as ns
-current = os.path.dirname(os.path.realpath(__file__))
-parent = os.path.dirname(current)
-sys.path.append(parent)
-grandparent = os.path.dirname(parent)
-sys.path.append(grandparent)
-from gui.game_menu import MenuScene
+#current = os.path.dirname(os.path.realpath(__file__))
+#parent = os.path.dirname(current)
+#sys.path.append(parent)
+#grandparent = os.path.dirname(parent)
+#sys.path.append(grandparent)
+try:
+   from gui.game_menu import MenuScene
+except ModuleNotFoundError:
+    from game_menu import MenuScene
 
 screen_width, screen_height = get_screen_size()
 
@@ -244,6 +247,9 @@ class GameBoard(Scene):
       self.start_menu = {'New Game': self.dismiss_modal_scene,
                          'Quit': self.close}
   
+  # #########################################################################
+  # GUI
+   
   def build_extra_grid(self, grids_x, grids_y,
                        grid_width_x=None, grid_width_y=None,
                        color=None, line_width=2, offset=None,
@@ -288,7 +294,7 @@ class GameBoard(Scene):
       pos = Vector2(offx, offy + i * self.SQ_SIZE * grid_width_y)
       n.position = pos
       n.anchor_point = anchor
-    return parent
+
     
   def add_row_column_labels(self):
       font = ('Avenir Next', self.font_size)
@@ -429,6 +435,9 @@ class GameBoard(Scene):
     self.buttons[1] = self.enter_button
     self.buttons[1].set_index(1)
     self.enter_button.set_text_props(font=font)
+  
+  # #########################################################################
+  # LINES 
     
   def test_lines(self):
     rcs = [(0.5, 0.5), (0.5, 2.5), (3.5, 2.5),
@@ -494,7 +503,9 @@ class GameBoard(Scene):
           setattr(self.line, k, v)
         except (AttributeError):
           pass
-        
+  
+  # #########################################################################
+      
   def check_in_board(self, coord):
     r, c = coord
     return (0 <= r < self.DIMENSION_Y) and (0 <= c < self.DIMENSION_X)
@@ -579,6 +590,9 @@ class GameBoard(Scene):
         t.anchor_point = (0, 0)
         self.highlights.append(move)
         self.hl.append(t)
+        
+  # #########################################################################
+  # NUMBERS 
         
   def get_numbers(self, coords):
     """ get color and text of number square objects for temporary storage
@@ -722,7 +736,9 @@ class GameBoard(Scene):
           self.numbers[number_list] = {}
       except (KeyError):
           pass   
-            
+  
+  # ######################################################################### 
+                     
   def clear_highlights(self):
     if hasattr(self, 'hl'):
       for t in self.hl:
@@ -761,6 +777,9 @@ class GameBoard(Scene):
       self.line_timer = 0.5
       # self.turn_status()
       self.go = True'''
+  
+  # #########################################################################
+  # TOUCH 
   
   def touch_began(self, touch):
     self.touch_time = time()
@@ -873,7 +892,10 @@ class GameBoard(Scene):
     x = col * self.SQ_SIZE
     y = row * self.SQ_SIZE
     return Point(x, y)
-    
+ 
+  # #########################################################################
+  # TILES 
+  
   def get_tiles(self):
     """
     Returns an iterator over all tile objects
@@ -973,7 +995,10 @@ class GameBoard(Scene):
       ui.draw_string(text, (0, 0, w, h), font, color=color)
       img = ctx.get_image()
     return img
-    
+  
+  # #########################################################################
+  # MENU 
+      
   def show_pause_menu(self, **kwargs):
     self.menu = MyMenu('Paused', '', [i for i in self.pause_menu], **kwargs)
     self.present_modal_scene(self.menu)
@@ -1007,7 +1032,9 @@ class GameBoard(Scene):
       self.menu = None
     self.paused = False
 
-            
+# #########################################################################
+  # BOXED LABEL
+                      
 class BoxedLabel():
   """ a simple class of boxed label with a title
       box follows text size
@@ -1016,7 +1043,7 @@ class BoxedLabel():
   global GRID_POS
   
   def __init__(self, text='text', title='boxed_label',
-               min_size=(100, 50), position=(0, 0), parent=parent):
+               min_size=(100, 50), position=(0, 0), parent=None):
       ''' position is rel to grid'''
       self.position = position
       self.parent = parent
@@ -1117,7 +1144,10 @@ class BoxedLabel():
     self.index = index
     self.ident = (-index, -index)
 
-                        
+
+# #########################################################################
+# MYMENU  
+                                                 
 class MyMenu(MenuScene):
   """ subclass MenuScene to move menu to right """
   def __init__(self, title, subtitle, button_titles, layout=None):
@@ -1136,22 +1166,7 @@ class MyMenu(MenuScene):
 
 
 if __name__ == "__main__":
-  from gui.gui_interface import Squares
+  from gui_interface import Squares
   logging.basicConfig(format='%(asctime)s  %(funcName)s %(message)s',
                       level=logging.WARNING)
   run(GameBoard(), LANDSCAPE, show_fps=True)
-    
-
-
-
-
-
-
-
-
-
-
-
-
-
-

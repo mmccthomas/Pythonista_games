@@ -426,3 +426,93 @@ puzzle9_frame:
 '#/s/#/o/#/o/#/e/#/t/#/t/#'
 '23h/e/a/r/#/24v/o/l/a/t/i/l/e'
 '#/s/#/n/#/e/#/l/#/e/#/e/#'
+
+puzzle10_text:
+ACROSS                DOWN
+1  establisher(7)     1  pierced(10)
+6  firewater(7)       3  add-on(9)
+11 double-quick(7)    4  au naturel(4)
+12 a pair of          5  regal(5)
+   scales.(7)         6  peremptory(9)
+13 possesses(4)       8  schedules(9)
+14 sticky(9)          9  Indian
+16 dwindle(5)            religion(5)
+18 warranty(9)        10 fibs(4)
+21 situation which    15 answerer(10)
+   requires urgent    17 People who design
+   attention.(9)         and guide an
+22 a long narrow         undertaking(9)
+   piece of           18 a piece of
+   material(5)           apparatus to
+23 homelands(9)          convert energy
+26 US Spanish sports     from one form to
+   channel(4)            another.(9)
+29 having the         20 pushing(9)
+   highest            24 many times(5)
+   temperature.(7)    25 the joint between
+30 chemical element      the upper arm and
+   (symbol Br)(7)        the forearm.(5)
+31 Family name of UK  27 a thicket or a
+   royal family(7)       small wood(4)
+32 to shape, form,    28 resort (to)(4)
+   or improve a        
+   material.(7)        
+
+
+puzzle10_frame:
+'1p/l/3a/n/4n/e/5r/#/6a/l/8c/o/9h/o/10l'
+'e/#/p/#/u/#/o/#/r/#/a/#/i/#/i'
+'11r/a/p/i/d/l/y/#/12b/a/l/a/n/c/e'
+'f/#/e/#/e/#/a/#/i/#/e/#/d/#/s'
+'13o/w/n/s/#/14g/l/u/t/i/n/o/u/s/#'
+'r/#/d/#/#/#/#/#/r/#/d/#/#/#/15r'
+'16a/b/a/t/17e/#/18g/u/a/r/a/n/20t/e/e'
+'t/#/g/#/n/#/e/#/r/#/r/#/h/#/s'
+'21e/m/e/r/g/e/n/c/y/#/22s/t/r/i/p'
+'d/#/#/#/i/#/e/#/#/#/#/#/u/#/o'
+'#/23c/24o/u/n/t/r/i/25e/s/#/26e/s/p/n'
+'27s/#/f/#/e/#/a/#/l/#/28g/#/t/#/d'
+'29h/o/t/t/e/s/t/#/30b/r/o/m/i/n/e'
+'a/#/e/#/r/#/o/#/o/#/t/#/n/#/n'
+'31w/i/n/d/s/o/r/#/32w/r/o/u/g/h/t'
+
+puzzle11_text:
+ACROSS                DOWN
+1  the physics of     2  components(5)
+   light and          3  to do with
+   vision.(6)            fire(7)
+5  grab(6)            4  an article of
+9  Indonesian            clothing that is
+   Sultanate(6)          worn on the upper
+10 close-up(6)           part of the
+11 guard(6)              body(5)
+12 straight(6)        5  individuals(7)
+13 assignment(6)      7  anew(5)
+16 football(6)        8  an edible
+18 agency(6)             brassica plant(7)
+20 choose(6)          14 Teach(7)
+23 South East         15 nurture(7)
+   African            17 type of
+   country(6)            perfume(7)
+24 corners where two  19 electronic
+   lines                 mail(5)
+   intersect.(6)      20 natty(5)
+25 fortune(6)         22 fissure(5)
+26 One fifth on a      
+   hundred(6)          
+
+
+puzzle11_frame:
+'1o/2p/t/3i/c/4s/#/5s/n/7a/t/8c/h'
+'#/a/#/g/#/h/#/i/#/g/#/a/#'
+'9b/r/u/n/e/i/#/10n/e/a/r/b/y'
+'#/t/#/e/#/r/#/g/#/i/#/b/#'
+'11e/s/c/o/r/t/#/12l/i/n/e/a/r'
+'#/#/#/u/#/#/#/e/#/#/#/g/#'
+'13l/14e/s/s/o/15n/#/16s/o/17c/c/e/r'
+'#/d/#/#/#/o/#/#/#/o/#/#/#'
+'18b/u/r/19e/a/u/#/20s/e/l/e/22c/t'
+'#/c/#/m/#/r/#/m/#/o/#/l/#'
+'23m/a/l/a/w/i/#/24a/n/g/l/e/s'
+'#/t/#/i/#/s/#/r/#/n/#/f/#'
+'25w/e/a/l/t/h/#/26t/w/e/n/t/y'

@@ -18,6 +18,7 @@ from Letter_game import LetterGame
 from gui.gui_interface import Squares, Coord
 PUZZLELIST = "crossword_puzzles.txt"
 OUTPUTFILE = "crossword_puzzles.txt"
+
 CR = '\n'
 WordList = [
     'wordlists/letters3_common.txt',
@@ -44,7 +45,10 @@ class Cross(PieceWord):
         self.tiles = None
         self.debug = False
         self.lookup_free = False
+        self.across_only = False
+        self.INIT_COLOR = 'white'
         self.outputfile = "crossword_puzzles.txt"
+        self.savefile = 'piecestate.pkl'
         self.image_dims =  (self.selection[1], self.selection[0])
         self.all_clues_done = False
         self.soln_str = '123'
@@ -115,7 +119,7 @@ class Cross(PieceWord):
                 break
         self.board = cx.board
         self.empty_board = cx.board.copy()
-        self.wordset = self.get_words()
+        self.wordset = self.get_words(self.across_only)
         self.solution_board = self.board.copy()
         self.gui.update(self.board)
 
@@ -169,98 +173,28 @@ class Cross(PieceWord):
         #scroll_, self.wordsbox = self.gui.scrollview_h(w+100,h-600,(W-w), 600, text='Clues', )
         # self.wordsbox.font=('Ubuntu Mono', size)
 
-    def update_buttons(self):
+    def update_buttons(self, color='lightgrey'):
         """ change button text and reset colours """
-        coords = np.argwhere(np.char.isalpha(self.board))
-        # fill all squares
-        self.gui.add_numbers([
-            Squares(coord,
-                    '',
-                    'white',
-                    z_position=30,
-                    alpha=.2,
-                    stroke_color='black',
-                    font=('Marker Felt', 15),
-                    text_anchor_point=(-0.9, 0.95))
-            for coord in coords],
-            clear_previous=True)
-        # get unique word starts to avoid duplicated indexes
-        # for down and across words starting on same square
+        PieceWord.update_buttons(self, color=color)
         try:
-		        unique_words = set([word.start for word in self.word_locations])
-		        # add and save indices
-		        self.indices = {}
-		        for coord in unique_words:
-		            item = self.gui.get_numbers(coord)
-		            item[coord]['text'] = str(self.get_word_obj(coord).index)
-		            item[coord]['text_color'] = mcolors.to_rgba('red')
-		            self.indices[coord] = str(self.get_word_obj(coord).index)
-		            self.gui.put_numbers(item)
+            unique_words = set([word.start for word in self.word_locations])
+            # add and save indices
+            self.indices = {}
+            for coord in unique_words:
+                item = self.gui.get_numbers(coord)
+                item[coord]['text'] = str(self.get_word_obj(coord).index)
+                item[coord]['text_color'] = mcolors.to_rgba('red')
+                self.indices[coord] = str(self.get_word_obj(coord).index)
+                self.gui.put_numbers(item)
         except KeyError:
-         	   pass
-         	      
-    def update_clue_colours(self):
-        for word_obj in self.word_locations:
-            word = word_obj.word
-            # change button colour to show if definition found
-            color = 'blue' if self.word_defs[word]['def'] else 'red'
-            if 'clue' in self.word_defs[word]:
-                color = 'green'
-            [self.change_color(coord, color) for coord in word_obj.coords]
-        #self.wordsbox.text = self.update_clue_text()
-        self.gui.set_moves(self.update_clue_text())
+          pass
+                      
         
-    def get_words(self):
-        """ link word to Word object """
-        return {loc.word: loc for loc in self.word_locations}
-
     def get_word_obj(self, coord):
         for word_obj in self.word_locations:
             if word_obj.start == coord:
-                return word_obj
-
-    def change_color(self, coord, color):
-        """ change the colour of a Square """
-        item = self.gui.get_numbers(coord)
-        item[coord]['color'] = mcolors.to_rgba(color)
-        self.gui.put_numbers(item)
-
-    def lookup_all(self):
-        wait = self.gui.set_waiting('Looking up words')
-        missing_words = []
-        for i, word_obj in enumerate(self.word_locations):
-            word = word_obj.word
-
-            wait.name = f'Finding {word}'
-            # lookup using free dictionary,merriam_webster if fail
-            self.word_defs[word] = {'def': [], 'synonyms': [], 'line_no': word_obj.start}
-            self.lookup(word, self.lookup_free)
-            no_defs = len(self.word_defs[word]['def'])
-            self.lookup(word, not self.lookup_free)
-            if self.word_defs[word]['def'] and no_defs == 0:
-                missing_words.append(word)
-            
-            # change button colour to show if definition found
-            color = 'blue' if self.word_defs[word]['def'] else 'red'
-            [self.change_color(coord, color) for coord in word_obj.coords]
-
-        self.gui.reset_waiting(wait)
-        if missing_words:
-            dialogs.hud_alert(f'Found {missing_words} in 2nd dictionary',
-                              duration=4)
-        if self.debug:
-            for word in self.wordset:
-                print(CR, word, self.word_defs[word])
-
-    def select_definition(self, word):
-        PieceWord.select_definition(self, word)
-        #self.update_clue_colours()
-        # colour squares green
-        if 'clue' in self.word_defs[word]:
-            [self.change_color(coord, 'green')
-                for coord in self.wordset[word].coords
-            ]
-
+                return word_obj       
+    
     def check_all_clues(self):
         pass
 
@@ -325,67 +259,27 @@ class Cross(PieceWord):
         self.gui.set_message2('')
         self.complete()
     
-    def process_turn(self, move, board):
-        """ process the turn
-    move is coord, new letter, selection_row
-    """
-        if move:
-            coord, letter, origin = move
-
-            if letter == 'Fill':
-                # new solution and buttons
-                self.fill_board()
-                self.solution_board = self.board.copy()
-                self.gui.update(self.board)
-                self.update_buttons()
-            elif letter == 'Lookup':
-                self.word_defs = {}
-                t = time()
-                self.lookup_all()
-                self.gui.set_prompt(
-                    f'lookup complete in {(time()-t):.3f} secs')
-            elif letter == 'Copy':
-                self.copy_()
-                self.gui.set_message('Data copied')
-            
-            elif letter == 'Reload':
-                self.recall_state()
-            elif letter in list(self.wordset) and hasattr(self, 'word_defs'):
-                self.select_definition(letter)
-                msg = self.update_clue_text()
-                self.gui.set_text(self.wordsbox, msg)
-            elif move and hasattr(self, 'word_defs'):
-                coord, letter, origin = move
-                for word_obj in self.word_locations:
-                    if coord in word_obj.coords:
-                        self.select_definition(word_obj.word)
-                        msg = self.update_clue_text()
-                        self.gui.set_moves(msg)
-                        # self.wordsbox.text=(msg)
-                        return
-                    
-        return 0
-        
     
     def copy_(self, out=None, final_cr=False):
         super().copy_(out=self.outputfile, final_cr=final_cr)
         
     def recall_state(self):
         """recall WIP puzzle to complete """
-        with open('piecestate.pkl', 'rb') as f:
+        with open(self.savefile, 'rb') as f:
             (self.empty_board, self.board, self.solution_board,
              self.word_defs, self.word_locations, self.selection) = pickle.load(f)     
         self.sizex, self.sizey = self.selection           
         self.image_dims = self.selection
         self.gui.replace_grid(*self.selection)
         self.gui.remove_labels()     
-        self.wordset = self.get_words()
+        self.wordset = self.get_words(self.across_only)
         self.gui.set_top(f'Crossword frame {self.selection}')
         # now update gui elements
         self.gui.update(self.board)
         self.update_buttons()
         self.update_clue_colours()
-                        
+        self.gui.set_moves(self.update_clue_text())
+                       
     def initialise_board(self):
         pass
     
@@ -399,8 +293,6 @@ class Cross(PieceWord):
 if __name__ == '__main__':
     g = Cross()
     g.run()
-
-
 
 
 

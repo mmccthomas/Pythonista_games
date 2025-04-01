@@ -7,15 +7,14 @@ from time import sleep, time
 import traceback
 import random
 import re
-from math import floor, ceil
+from math import ceil
 import numpy as np
-import traceback
 import itertools
 from collections import Counter
-import matplotlib.colors as mcolors
+# import matplotlib.colors as mcolors
 from collections import defaultdict
 from types import SimpleNamespace as sname
-from Letter_game import Word
+from Letter_game import Word, rle
 import console
 
 BLOCK = '#'
@@ -149,7 +148,7 @@ class CrossWord():
                 self.gui.set_message(
                     f' placed {len(fixed)} {iteration} iterations')
 
-            fixed_weights = [5 for word in fixed]
+            # fixed_weights = [5 for word in fixed]
             # create weight for all unplaced words based on word length
             # def req(n): return n.length
             unplaced = sorted(
@@ -238,7 +237,7 @@ class CrossWord():
                 match = ''.join(match)
                 word.match_pattern = self.merge_matches(
                     word.match_pattern, match)
-            except (IndexError) as e:
+            except (IndexError):
                 print(traceback.format_exc())
                 print(word.coords)
                 print(self.board.shape)
@@ -290,7 +289,7 @@ class CrossWord():
                     # self.gui.gs.highlight_squares(word.coords)
                     self.gui.update(self.board)
                     sleep(0.25)
-                except (AttributeError) as e:
+                except (AttributeError):
                     pass
             while True:
                 try:  # exits when used all hints
@@ -382,14 +381,14 @@ class CrossWord():
                                                 length_first)
 
                 if word is None:
-                    if self.debug:
-                        try:
-                            print(
-                                f'options for word at {word.start} are {options}'
-                            )
-                            print('possibles for stuck word', self.possibles)
-                        except (AttributeError):
-                            pass
+                    #if self.debug:
+                    #     try:
+                            #print(
+                            #    f'options for word at {word.start} are {options}'
+                            #)
+                    #         print('possibles for stuck word', self.possibles)
+                    #     except (AttributeError):
+                    #         pass
                     continue
 
                 if self.debug:
@@ -397,7 +396,7 @@ class CrossWord():
                         # self.gui.gs.highlight_squares(word.coords)
                         self.gui.update(self.board)
                         sleep(0.25)
-                    except (AttributeError) as e:
+                    except AttributeError:
                         pass
                 if index == max_iterations:
                     break
@@ -546,8 +545,8 @@ class CrossWord():
     eg if word = abacus and child1 intersects at pos 1 match for child is 'a.....' """
         parent_word = word_obj.word
         children_dict = word_obj.children
-        intersections = word_obj.get_inter()
-        coords = word_obj.coords
+        # intersections = word_obj.get_inter()
+        # coords = word_obj.coords
         for key, child in children_dict.items():
             if clear:
                 child.match_pattern = ''
@@ -574,8 +573,8 @@ class CrossWord():
         else:
             parent_word = try_word
         children_dict = word_obj.children
-        intersections = word_obj.get_inter()
-        coords = word_obj.coords
+        # intersections = word_obj.get_inter()
+        # coords = word_obj.coords
         c_dict = {}
         for key, child in children_dict.items():
             match = []
@@ -659,7 +658,7 @@ class CrossWord():
                  component)  # Traverse to each node of a graph
         path = [f'{item.index}, {item.start}' for item in component]
         if self.debug:
-            print(f"Following is the Depth-first search:")  # Print the answer
+            print("Following is the Depth-first search:")  # Print the answer
             for p in path:
                 print(p)
         for i, c in enumerate(component[1:]):
@@ -932,26 +931,25 @@ class CrossWord():
           # self.delta_t('len matrix')
         return self.min_length, self.max_length
         
-    def create_grid_alt(self, type=3, size=15, min_length=3, max_length=9):
-        # deals with non uniform types
-        types = {0: np.array([['#', ' '],
-                              [' ', ' ']]), 
-                 1: np.array([[' ', '#'],
-                              [' ', ' ']]),
-                 2: np.array([[' ', ' '],
-                              ['#', ' ']]),
-                 3: np.array([[' ', ' '],
-                              [' ', '#']]),
-                 4: np.array([[' ', ' '],
-                              [' ', ' ']])
+    def initial_grid(self, type, size):
+        """ This is EXPERIMENTAL
+        
+        create initial grid with blocks changing in a row
+        type has form [(no_x1, no_y1, type1), (no_x2, no_y2, type2)]
+        where no_x1, no_y1 will form a sub grid of type 1
+        no_x2, no_y2 will form a subgrid adjacent to the first
+        """
+        types = {0: np.array([['#', ' '], [' ', ' ']]), 
+                 1: np.array([[' ', '#'], [' ', ' ']]),
+                 2: np.array([[' ', ' '], ['#', ' ']]),
+                 3: np.array([[' ', ' '], [' ', '#']]),
+                 4: np.array([[' ', ' '], [' ', ' ']])
                  }
-        self.max_length = max_length
-        self.min_length = min_length
         if isinstance(size, tuple):
           self.sizey, self.sizex = size
         else:
            self.sizey = self.sizex = size
-           
+        # widerby one space to permit filling with 2x2 patterns
         self.board = np.full((self.sizey, self.sizex+1), SPACE)
         
         # type can be fixed for regular grid
@@ -962,24 +960,34 @@ class CrossWord():
             self.type = type
             
         # fill board with types
-        for typeset in self.type:
+        for typeset in self.type:          
             # typeset is (no_x, no_y, type)
             # subs is list of subblocks          
             subs = [np.tile(types[typeset[2]], (typeset[1], typeset[0]))      
                     for typeset in self.type]    
         # now place subblocks into self.board
-        offx=0
+        offx = 0
         for sub in subs:         
             self.board[0: sub.shape[0], 
                        offx: offx+sub.shape[1]] = sub
-            offx=sub.shape[1]
+            offx = sub.shape[1]
         # clip board to defined size   
         self.board = self.board[:self.sizey, :self.sizex]
         # efficient mirroring of spaces and blocks
         # fill spaces with element from rotated board
-        self.board = np.where(np.char.isspace(self.board), np.rot90(self.board, 2), self.board)        
-        self.print_board(msg=str(self.board.shape))
+        self.board = np.where(np.char.isspace(self.board), np.rot90(self.board, 2), self.board)    
+        if self.debug:    
+            self.print_board(msg=str(self.board.shape))
+        return self.board      
         
+    def create_grid_alt(self, type=3, size=15, min_length=3, max_length=9):
+        # EXPERIMENTAL
+        
+        # deals with non uniform types
+        # iterate over every row
+        self.max_length = max_length
+        self.min_length = min_length
+        self.initial_grid(type, size)              
          # split rows
         if self.debug: 
             print('FILLING ROWS')
@@ -1050,23 +1058,25 @@ class CrossWord():
             for c in range(self.start[1] ^ 1, ceil(self.sizex / 2), 2):
                 self.split_row(c, row=False)
                 
-        except ValueError as e:
-            print(e)
+        except ValueError:
+            # print(traceback.format_exc())
             return None
         return self.board
         
+
     def lengths(self, index, row):
-        # return array of lengths of words in selected axis
-        # get row or column as string
-        index_str = ''.join(np.take(self.board, index, axis=int(not row)))
-        # split the string to get word lengths
-        lengths = [len(word) for word in index_str.split(BLOCK) if len(word)!=0]
-        indices = np.argwhere(np.char.isspace(np.take(self.board, index, axis=int(not row))))
-        if row:
-            indices = np.transpose(indices)
-        b = np.diff(indices)>1
-        a = indices[b]
-        return lengths
+        """return array of lengths and indices  of words in selected axis
+        usinf run length encding is very efficient but complex
+        get row or column
+        """
+        # get row or column as array
+        a = np.take(self.board, index, axis=int(not row))
+        lengths, start_locations, characters = rle(a)
+        lengths = list(lengths[characters == ' '])
+        indices = list(start_locations[characters == ' '])  
+        if self.debug:
+            print(a, lengths, indices)
+        return lengths, indices
         
     def is_x_design(self, loc):
         """ loc is at centre of x shape """
@@ -1096,20 +1106,25 @@ class CrossWord():
           row is True if we are dealing with rows
           """
           # check current row/col
+          lengths, indices = self.lengths(index, row)
           if self.debug: 
-              print(f'Index {index}, {"Row" if row else "Column"}, lengths {self.lengths(index, row)}')
-          if any([(l>self.max_length or l<3) for l in self.lengths(index, row)]):
+              print(f'Index {index}, {"Row" if row else "Column"}, lengths {lengths}')
+          
+          if any([(l>self.max_length or l<3) for l in lengths]):
               return False
           # check other cols/rows
           start = self.start[row] ^ 1  # invert 0-1, 1-0
           if self.debug: 
               print(f'dealing with {"Rows" if not row else "Columns"}')
           size = self.sizex if row else self.sizey
-          lengths = [self.lengths(index, not row) for index in range(start, size, 2)]
+          lengths = [self.lengths(index, not row)[0] for index in range(start, size, 2)]
           if self.debug: 
               print(f'Lengths are {lengths}')
           # if any column lengths < 3 in flattened set of lengths
-          if set(list(range(1,self.min_length))).intersection(set(sum(lengths, []))):
+          a = set(list(range(1,self.min_length)))
+          b = set(sum(lengths, []))
+          #print('b=', b)
+          if a.intersection(b):
               return False
           return True
     
@@ -1171,12 +1186,14 @@ class CrossWord():
            print(f'indices for {n} splits of {size} min {self.min_length}, max {self.max_length}  {indices}')       
        return indices
     
-    def mix_possibles(self, row):
+    def mix_possibles(self, row, size=None):
         """ mix possible splits from 2 or 3 splits """
         # split slice into minimum 2 parts, randomly 3 parts
         # no 3 parts is same as 2parts(if any)
         # giving 50% chance
-        size = self.sizex if row else self.sizey
+        if size is None:
+           size = self.sizex if row else self.sizey
+           
         possibles = []
         poss2 = self.permutate(2, size)
         poss3 = self.permutate(3, size)
@@ -1189,39 +1206,48 @@ class CrossWord():
         else:
             possibles.extend(poss3)        
             possibles.extend(poss4[:len(poss3)])
+        if not possibles:
+          # allow for shortening or no split
+          possibles.extend([[0], [None], [size-1]])
         random.shuffle(possibles) 
         
         return possibles
         
     def split_row_alt(self, index, row=True):
-        '''placing a block to make words on row min3, max max_length
-        allow for alternating space and blocks'''     
-        lengths = self.lengths(index, row)           
-        possibles = self.mix_possibles(row)
-        # try each possible 
-        for i, possible in enumerate(possibles):
-            placed = []
-            # print('selected split', len(possible))
-            # place each block
-            for location in possible:
-                loc = (index, location) if row else (location, index)
-                placed.append((loc, self.board[loc]))
-                self.board[loc] = BLOCK
-                self.mirror(loc)
-            if self.debug: 
-                print(f'trying row {index} positions {possible}')
-            if self.check_lengths(index, row):
-                if self.debug:
-                    print(f'row {index} positions {possible} is valid')
-                    self.print_board(None, index)
-                return
-            # reset blocks   
-            for item in placed:
-                loc, value = item                   
-                self.board[loc] = value
-                self.mirror(loc)
+        """EXPERIMENTAL
+        placing a block to make words on row min3, max max_length
+        allow for alternating space and blocks
+        """    
+        lengths, indices = self.lengths(index, row)           
+        lens_ = [l for l, i in zip(lengths, indices) if l>self.min_length]
+        ind_ = [i for l, i in zip(lengths, indices) if l>self.min_length]
+        for size, start in zip(lens_, ind_):
+            possibles = self.mix_possibles(row, size)
+            # try each possible 
+            for i, possible in enumerate(possibles):
+                placed = []
+                # print('selected split', len(possible))
+                # place each block
+                for location in possible:
+                    if location:
+                        loc = (index, location+start) if row else (location+start, index)
+                        placed.append((loc, self.board[loc]))
+                        self.board[loc] = BLOCK
+                        self.mirror(loc)
+                        if self.debug: 
+                            print(f'trying row {index} positions {possible}')
+                        if self.check_lengths(index, row):
+                           if self.debug:
+                               print(f'row {index} positions {possible} is valid')
+                               self.print_board(None, index)
+                           return
+                        # reset blocks   
+                        for item in placed:
+                            loc, value = item                   
+                            self.board[loc] = value
+                            self.mirror(loc)
             
-        raise ValueError('Grid is not possible')
+        #raise ValueError('Grid is not possible')
             
     def split_row(self, index, row=True):
         '''placing a block to make words on row min3, max max_length'''                
@@ -1269,7 +1295,8 @@ if __name__ == '__main__':
    wordlengths = Counter()
    for i in range(10):
         print(f'\nType {type} Iteration {i} ')
-        board = g.create_grid_alt(type=(([4,4,0],[3,3, 2])), size=(15, 13), min_length=4, max_length=13)
+        #board = g.create_grid_alt(type=(([4,4,0],[3,3, 2])), size=(15, 13), min_length=4, max_length=13)
+        # board = g.create_grid_alt(type=type, size=(15, 13), min_length=4, max_length=13)
         board = g.create_grid(type=type, size=(21,21), min_length=4, max_length=13)
         if board is not None:
           # g.print_board(board, 'Final')
@@ -1282,7 +1309,7 @@ if __name__ == '__main__':
           # print(g.final_lengths())
           g.solve_swordsmith('dfs')
           g.print_board(np.char.upper(g.board), 'Filled', show_lengths=True)
-          break
+          # break
    wordlengths = dict(sorted(wordlengths.items()))
    tot = sum(wordlengths.values())
    print('Overall Percentages ', {k: int(v * 100 / tot) for k, v in wordlengths.items()})
