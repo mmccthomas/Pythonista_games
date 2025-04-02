@@ -6067,3 +6067,107 @@ OOPARSAFFI RT M
 ILLTY T AV H ID
 O I REENNEVILS 
 NATCS S YN   PA
+
+puzzle33:
+""
+7, 5
+2717031024262806163018322901051522072113190812042531023411230914332000
+
+puzzle33_text:
+ 1 Posh part of London on the Thames •
+   Inexpensive hotels
+ 3 near the end of a period of time. •
+   SW
+ 5 named • toon , ana.
+ 7 precipitous • US longest river
+ 9 fabricated • travelling as a
+   passenger. • Driving while
+   intoxicated
+11 to be or remain suspended. • doctor
+   who performs operations
+13 Passion, as in a pop song •
+   infrequently • grandiose
+15 reporting • alert
+17 for all time • decrease
+19 Large port in Malaysia • cacophony
+21 adepts • housebroken
+
+puzzle33_frame:
+ISESSO H A HY E
+O NY  ER S Y P 
+NEDNG  E SOUALA
+URIE NN T RASIN
+N DTEDG S  VD E
+DUIS AE EATIART
+OST A RELU  GAP
+ C UCT  FEON D 
+THW E NG   IIST
+B   O LSE STLUV
+HAN ON T G EO E
+  O L ER MADREL
+ NO O  T T IELS
+ T URGGINIONJ E
+RAI E  E T TEST
+PICO ICHE I  MI
+A KNOMO SINAS  
+RM Y ALAT G IDI
+C SD  EEPOREE A
+TO  EV D U RRED
+  MU SE RS TV V
+
+puzzle34:
+""
+7, 5
+0824270728233233131100290506183120162114192610040215122217012530340309
+
+puzzle34_text:
+ 1 grappling
+ 2 shove • the hollow stem of water
+   plants
+ 3 to steal in
+ 4 assets • messenger
+ 5 exchange • Founder of Pennsylvania
+ 6 actuator • adage
+ 7 damsels
+ 8 niche • idol
+ 9 blade
+10 appointments • as in named, specified
+11 gratified
+12 Make of wood? • locality
+13 device for awaking people
+14 as in red, crimson • alone
+15 a person who lives near a given
+   place.
+16 a trip to see wild animals in their
+   own environment. • a moderate degree
+   of heat
+17 melody • Yellow flowered plant
+   cultivated for oil
+18 to have its proper place. •
+   compelling
+19 gambit
+20 Famous Japanese mountain • baron
+21 Large landmass
+
+puzzle34_frame:
+A OMTH  PK RM E
+SLO E OLOE EI S
+E  ENTE CENTL  
+IRLS  ING B  U 
+ I E HM RPUSARL
+WORD AP A R  E 
+LARNERARIRUNOWN
+ R  I TUNENN   
+OCAINGONGSAYACE
+SAFH EWARC RI  
+ V ISFAPEERORUB
+BELR EURG  WE U
+ES  KN H WEAWRE
+SATIEDE R A H X
+DY  PL M BUTI C
+ N A ASTL H   G
+FUJY R H EEDT E
+ E   LREE R U S
+M TDATLTH Y RIC
+I O   SWAP P D 
+CONWOOTON T TIN
