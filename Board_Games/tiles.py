@@ -3,14 +3,7 @@ requires pip install slidingpuzzle
 """
 import os
 import sys
-current = os.path.dirname(os.path.realpath(__file__))
-parent = os.path.dirname(current)
-sys.path.append(parent)
-grandparent = os.path.dirname(parent)
-sys.path.append(grandparent)
-from Board_Games.tile_config import *
 from scene import *
-from gui.game_menu import MenuScene
 from ui import Path
 import sound
 import random
@@ -24,6 +17,10 @@ from PIL import Image
 import logging
 import slidingpuzzle as puzz
 import io
+from tile_config import *
+sys.path.append('../')
+from gui.game_menu import MenuScene
+
 A = Action
 logging.basicConfig(format='%(asctime)s  %(funcName)s %(message)s',level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -294,14 +291,14 @@ class TileGame(Scene):
       t.remove_from_parent()      
       
   def point_to_rc(self,point):
-    """ convert touch point to Point object """    
+    """ covert touch point to Point object """    
     bbox = self.game_field.bbox # x,y,w,h
     col = int(SIZE * (point.x - bbox.x) / bbox.w)
     row = int(SIZE * (point.y - bbox.y) / bbox.h)
     return Point(col,row)
     
   def rc_to_pos(self,tile,col,row):
-    """ convert col row  to Point object """
+    """ covert col row  to Point object """
     bbox = self.game_field.bbox # x,y,w,h
     x = col * tile.size.w  # bbox.x 
     y = row * tile.size.h 

@@ -3,23 +3,18 @@ uses food icons and caterpillar theme
 random walls make it more interesting
 game finished when caterpillar eats itself
 """
-import os
 import sys
-current = os.path.dirname(os.path.realpath(__file__))
-parent = os.path.dirname(current)
-sys.path.append(parent)
-grandparent = os.path.dirname(parent)
-sys.path.append(grandparent)
-from scene import *
-from gui.game_menu import MenuScene
-from ui import Path
 import sound
 import random
 from random import uniform as rnd
 from scene import Vector2, get_screen_size
-
+from scene import *
+from ui import Path
 from math import pi
 from itertools import cycle
+
+sys.path.append('../')
+from gui.game_menu import MenuScene
 
 A = Action
 ROWS = 20

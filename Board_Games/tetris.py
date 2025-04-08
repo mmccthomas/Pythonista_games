@@ -2,11 +2,8 @@ from tetris_config import *
 from scene import *
 import os
 import sys
-current = os.path.dirname(os.path.realpath(__file__))
-parent = os.path.dirname(current)
-sys.path.append(parent)
-grandparent = os.path.dirname(parent)
-sys.path.append(grandparent)
+
+sys.path.append('../')
 from gui.game_menu import MenuScene
 from ui import Path
 import sound
@@ -15,7 +12,7 @@ from random import uniform as rnd
 import math
 from time import sleep
 from math import pi
-GRID_SIZE =30
+GRID_SIZE = 40
 A = Action
 
 

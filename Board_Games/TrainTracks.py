@@ -12,9 +12,8 @@ from queue import Queue
 from collections import deque
 from random import choice, randint, shuffle
 from time import time
-current = os.path.dirname(os.path.realpath(__file__))
-parent = os.path.dirname(current)
-sys.path.append(parent)
+
+sys.path.append('../')
 from gui.gui_interface import Coord, Gui, Squares, dotdict
 from track_solver import Graph, Layout
 from gui.gui_scene import Tile

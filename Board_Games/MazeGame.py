@@ -13,9 +13,7 @@ from ui import LINE_CAP_ROUND
 from queue import Queue
 from random import randint
 from time import sleep, time
-current = os.path.dirname(os.path.realpath(__file__))
-parent = os.path.dirname(current)
-sys.path.append(parent)
+sys.path.append('../')
 from gui.gui_interface import Gui, Squares
 from maze_generator import SelectableMaze
 
@@ -38,8 +36,8 @@ class MazeTrial():
         """Create, initialize and draw an empty board."""
         self.debug = False
         self.generator = None
-        sizes = {'Small': 15, 'Medium': 30, 'Large': 50, 'SuperLarge': 80}
-        select = dialogs.list_dialog('Maze size', ['Small', 'Medium', 'Large',  'SuperLarge'])
+        sizes = {'Very Small':10, 'Small': 15, 'Medium': 30, 'Large': 50, 'SuperLarge': 80}
+        select = dialogs.list_dialog('Maze size', ['Very Small', 'Small', 'Medium', 'Large',  'SuperLarge'])
         self.size = sizes.get(select, 30)
           
         self.display_board = np.zeros((self.size, self.size), dtype=int)
@@ -132,8 +130,8 @@ class MazeTrial():
            return (None, None), 'Enter', None  # pressed enter button
            
         # deal with buttons. each returns the button text
-        elif move[0][0] < 0 and move[0][1] < 0:
-          return (None, None), self.gui.gs.buttons[-move[0][0]].text, None
+        #elif move[0][0] < 0 and move[0][1] < 0:
+        #  return (None, None), self.gui.gs.buttons[-move[0][0]].text, None
         else:
           return move, None, None
         return (None, None), None, None
