@@ -2,7 +2,6 @@
 # similar to pieceword creator
 
 import numpy as np
-#import base_path
 import random
 import pickle
 import dialogs
@@ -11,7 +10,6 @@ from itertools import zip_longest
 from textwrap import wrap
 import matplotlib.colors as mcolors
 from time import time
-#base_path.add_paths(__file__)
 from pieceword_create import PieceWord
 from crossword_create import CrossWord
 from Letter_game import LetterGame

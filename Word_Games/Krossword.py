@@ -4,7 +4,7 @@
 # game is to choose the direction to fill the grid
 # 1. read grid and words
 # place numbered squares at each number in grid. leave alpha characters in grid
-# 2. separate words into dictionary with number as key
+# 2. seperate words into dictionary with number as key
 # 3. solve krossword using starting letter and match parameters
 # 4. reset grid and allow play.
 # 5. drag letters same as wordsearch, then select word from list.
@@ -21,8 +21,6 @@ import numpy as np
 import traceback
 import inspect
 from copy import deepcopy
-import base_path
-base_path.add_paths(__file__)
 from word_square_gen import create_word_search
 from Letter_game import LetterGame, Player
 from gui.gui_interface import Gui, Squares, Coord
@@ -377,7 +375,7 @@ class KrossWord(LetterGame):
     
 
     w_dict = self.create_wordlist_dictionary()
-    # letter board is invisible version of board, 
+    # letter board is invisble version of board, 
     # where numbers have been replaced by start letter
     # we dont want to see equivalent letters on board, but solver needs them
     self.letter_board = self.board.copy()

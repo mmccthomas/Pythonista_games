@@ -8,8 +8,6 @@ import numpy as np
 import random
 from itertools import groupby
 from scene import get_screen_size
-import base_path
-base_path.add_paths(__file__)
 from Letter_game import LetterGame
 import gui.gui_scene as gscene
 from gui.gui_interface import Coord, Squares

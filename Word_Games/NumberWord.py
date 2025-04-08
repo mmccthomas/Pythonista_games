@@ -35,8 +35,6 @@ from queue import Queue
 from ui import Image
 from scene import Texture
 import inspect
-import base_path
-base_path.add_paths(__file__)
 from cv_codeword_solver_main.solver_tools import CodewordSolverDFS, WordDictionary
 from Letter_game import LetterGame, Player
 from gui.gui_interface import Gui, Squares, Board

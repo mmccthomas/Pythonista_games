@@ -13,8 +13,7 @@ import io
 import numpy as np
 import textwrap
 import random
-import base_path
-base_path.add_paths(__file__)
+
 from types import SimpleNamespace
 from Letter_game import LetterGame
 import gui.gui_scene as gscene
@@ -67,10 +66,7 @@ class QuoteWord(LetterGame):
       if self.game_over():
         break
     self.gui.set_message2('')
-    self.gui.set_message('')
-    self.gui.set_prompt('')
-    sleep(2)
-    self.gui.gs.show_start_menu()
+    self.complete()
     
   def select_list(self):
       '''Choose which category'''

@@ -4,39 +4,27 @@ You have to guess the letter
 Chris Thomas May 2024
 
 The games uses a 20k word dictionary
-currently fixed at 13 x 13 size due to needing to create grid manually
-attempts to automate grid creation have not been successful so far
+currntly fixed at 13 x 13 size due to needing to create grid manually
+attempts to automate grid creation ahve not been succesful so far
 """
-import os
-import sys
 import random
 import console
-import dialogs
-import re
 from time import sleep
-import traceback
 import numpy as np
-from time import sleep, time
+import requests
 from queue import Queue
-from collections import defaultdict
-import base_path
-base_path.add_paths(__file__)
-from Letter_game import LetterGame, Player, Word
-import gui.gui_scene as gscene
+from Letter_game import LetterGame, Player
 from gui.gui_interface import Gui, Squares, Coord
 from crossword_create import CrossWord
-from gui.gui_scene import Tile, BoxedLabel
 import gui.gui_scene as gs
-from ui import Image, Path, LINE_JOIN_ROUND, LINE_JOIN_MITER
-from scene import Texture, Point
 WordleList = [ 'wordlists/5000-more-common.txt', 'wordlists/words_20000.txt'] 
 BLOCK = '#'
 SPACE = ' '
 file = 'https://gist.githubusercontent.com/eyturner/3d56f6a194f411af9f29df4c9d4a4e6e/raw/63b6dbaf2719392cb2c55eb07a6b1d4e758cc16d/20k.txt'
 file = 'https://www.mit.edu/~ecprice/wordlist.10000'
 def get_word_file(location, filename):
-  r = requests.get(name)
-  with open('filename', 'w') as f:
+  r = requests.get(location)
+  with open(filename, 'w') as f:
     f.write(r.text)
 
 def  board_rc(rc, board, value):

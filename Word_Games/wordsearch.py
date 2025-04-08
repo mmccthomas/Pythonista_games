@@ -1,15 +1,14 @@
-# Wordsearch game - a classic
+ # Wordsearch game - a classic
 import os
-import sys
 from queue import Queue
 from time import sleep
 import random
 import numpy as np
 import traceback
-import base_path
-base_path.add_paths(__file__)
+
 from word_square_gen import create_word_search
 from Letter_game import LetterGame, Player
+
 from gui.gui_interface import Gui, Squares, Coord
 BLOCK = '#'
 SPACE = ' '
@@ -243,11 +242,8 @@ class WordSearch(LetterGame):
        break
     
     self.gui.set_message2('Game over')
-    self.gui.set_message('')
-    self.gui.set_prompt('')
-    sleep(4)
-    self.finished = True
-    self.gui.show_start_menu()
+    self.complete()
+    
     
   def find_word_np(self, word):
       word = list(word.lower())
@@ -265,7 +261,7 @@ class WordSearch(LetterGame):
       # then try in all directions to get second letter
       # if ok, keep going in that direction until word is complete
       # or letter is wrong.
-      # then try other directions and then next occurrence of letter
+      # then try other directions and then next occurence of letter
       word = list(word.lower())
       locs = np.argwhere(self.board == word[0])
       for rc in locs:

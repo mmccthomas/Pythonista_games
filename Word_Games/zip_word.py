@@ -6,8 +6,6 @@ Chris Thomas May 2024
 The games uses a 20k word dictionary
 
 """
-import os
-import sys
 import random
 import traceback
 import dialogs
@@ -16,8 +14,7 @@ from itertools import zip_longest
 from time import sleep, time
 from queue import Queue
 import numpy as np
-import base_path
-base_path.add_paths(__file__)
+
 from Letter_game import LetterGame, Player
 from gui.gui_interface import Gui
 from crossword_create import CrossWord

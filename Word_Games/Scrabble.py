@@ -4,26 +4,22 @@ Chris Thomas July 2024
 The games uses a 20k word dictionary
 """
 import os
-import sys
-
 import traceback
 from time import sleep
 from queue import Queue
 import requests
 from types import SimpleNamespace
 from random import shuffle
-from ui import Image
-import base_path
-base_path.add_paths(__file__)
 from Letter_game import LetterGame
 import gui.gui_scene as gscene
-from gui.gui_scene import Tile
-from scene import Texture
-from gui.gui_interface import Gui
-# from scrabble_ai_main.UI import scrabble_renderer
+from ui import Image, Path, LINE_JOIN_ROUND, LINE_JOIN_MITER
+from gui.gui_scene import Tile, BoxedLabel
+from scene import Texture, Point
+from gui.gui_interface import Gui, Coord
+#from scrabble_ai_main.UI import scrabble_renderer
 import scrabble_ai_main.Game.scrabble_game as scrabble_game
 import scrabble_ai_main.Game.scrabble_objects as scrabble_objects
-wordlists =['wordlists/scrabble.txt',  # official scrabble dict
+wordlists =['wordlists/scrabble.txt', # official scrabble dict
             'scrabble_ai_main/Data/lang/en/3000_oxford_words.txt',
             'wordlists/5000-more-common.txt',
             'wordlists/words_10000.txt']
@@ -34,23 +30,20 @@ BLOCK = '#'
 SPACE = ' '
 FINISHED = (-10, -10)
 
-
 def get_word_file(location, filename):
   r = requests.get(location)
   with open(filename, 'w') as f:
     f.write(r.text)
-
-        
+    
 def fn_piece(piece):
-    return f's_{piece}'  
-
-                            
+      return f's_{piece}'  
+              
 class PPlayer():
   def __init__(self):
     self.PLAYER_1 = ' '
     self.PLAYER_2 = '@'
     self.EMPTY = ' '
-    self.PIECE_NAMES = ' abcdefghijklmnopqrstuvwxyz0123456789.'
+    self.PIECE_NAMES  =' abcdefghijklmnopqrstuvwxyz0123456789.'
     self.PIECES = [f'../gui/tileblocks/s_{k}.png' for k in self.PIECE_NAMES]
     self.PIECES.append('../gui/tileblocks/s_@.png')
     self.PLAYERS = None
@@ -67,10 +60,10 @@ class Scrabble(LetterGame):
     # load the gui interface
     self.q = Queue()
     self.gui = Gui(self.board, PPlayer())
-    self.gui.gs.q = self.q  # pass queue into gui
+    self.gui.gs.q = self.q # pass queue into gui
     self.COLUMN_LABELS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'[:self.sizex]
     self.gui.set_alpha(True) 
-    self.gui.set_grid_colors(grid='Scrabble.jpg')  # background is classic board
+    self.gui.set_grid_colors(grid='Scrabble.jpg') # background is classic board
     self.gui.require_touch_move(False)
     self.gui.allow_any_move(True)
     self.gui.setup_gui(log_moves=True)
@@ -79,11 +72,11 @@ class Scrabble(LetterGame):
     self.gameengine = scrabble_game.GameEngine(self.gamestate, wordlist)
     # menus can be controlled by dictionary of labels and functions without parameters
     self.gui.set_pause_menu({'Continue': self.gui.dismiss_menu, 
-                             'New ....': self.restart,
-                             'Options': self.options,
-                             'Autoplay': self.ai_move,
-                             'Complete Game': self.complete_game,
-                             'Quit': self.quit})
+                              'New ....': self.restart,
+                              'Options': self.options,
+                              'Autoplay': self.ai_move,
+                              'Complete Game': self.complete_game,
+                              'Quit': self.quit})
     self.gui.set_start_menu({'New Game': self.restart, 'Quit': self.quit})    
     x, y, w, h = self.gui.grid.bbox    
     
@@ -93,19 +86,19 @@ class Scrabble(LetterGame):
     'button1': (w+20, h/6), 'button2': (w+250, h/6), 'button3': (w+140, h/6),
     'button4': (w+250, h/6-50), 'button5': (w+140, h/6-50),
     'box1': (w+5, 200+h/8-6), 'box2': (w+5, 200-6), 'box3': (w+5, 2*h/3),
-    'box4': (w+5, h-50), 'font': ('Avenir Next', 24)},
+    'box4': (w+5, h-50), 'font': ('Avenir Next', 24) },
                                        
     'ipad13_portrait': {'rackpos': (50-w, h+50), 'rackscale': 0.9, 'rackoff': h/8,
     'button1': (w/2, h+200), 'button2': (w/2, h+50), 'button3': (w/2, h+250),
     'button4': (w/2, h+100), 'button5': (w/2, h+150),
     'box1': (45, h+h/8+45), 'box2': (45, h+45), 'box3': (2*w/3, h+45),
-    'box4': (2*w/3, h+200), 'font': ('Avenir Next', 24)},
+    'box4': (2*w/3, h+200), 'font': ('Avenir Next', 24) },
     
     'ipad_landscape': {'rackpos': (10, 200), 'rackscale': 1.0, 'rackoff': h/8,
     'button1': (w+10, h/6), 'button2': (w+230, h/6), 'button3': (w+120, h/6),
     'button4': (w+230, h/6-50), 'button5': (w+120, h/6-50),
     'box1': (w+5, 200+h/8-6), 'box2': (w+5, 200-6), 'box3': (w+5, 2*h/3),
-    'box4': (w+5, h-50), 'font': ('Avenir Next', 20)},
+    'box4': (w+5, h-50), 'font': ('Avenir Next', 20) },
     
     'ipad_portrait': {'rackpos': (50-w, h+50), 'rackscale': 1.0, 'rackoff': h/8,
     'button1': (9*w/15, h+190), 'button2': (9*w/15, h+30), 'button3': (9*w/15, h+150),
@@ -117,19 +110,19 @@ class Scrabble(LetterGame):
     'button1': (w+10, h/6), 'button2': (w+230, h/6), 'button3': (w+120, h/6),
     'button4': (w+230, h/6-50), 'button5': (w+120, h/6-50),
     'box1': (w+5, 200+h/8-6), 'box2': (w+5, 200-6), 'box3': (w+5, 2*h/3),
-    'box4': (w+5, h-50), 'font': ('Avenir Next', 15)},
+    'box4': (w+5, h-50), 'font': ('Avenir Next', 15) },
     
-    # 'iphone_landscape': {'rackpos': (10, 0), 'rackscale': 1.5, 'rackoff': h/4,
-    # 'button1': (w+5, h), 'button2': (w+300, h-50), 'button3': (w+300, h-100),
-    # 'button4': (w+300, h-150), 'button5': (w+300, h-200),
+    #'iphone_landscape': {'rackpos': (10, 0), 'rackscale': 1.5, 'rackoff': h/4,
+    #'button1': (w+5, h), 'button2': (w+300, h-50), 'button3': (w+300, h-100),
+    #'button4': (w+300, h-150), 'button5': (w+300, h-200),
     # 'box1': (w+5, h/4-6), 'box2': (w+5, -6), 'box3': (w+5, h/2),
     # 'box4': (w+5, h), 'font': ('Avenir Next', 15)},
     
-    # 'iphone_portrait': {'rackpos': (10, 200), 'rackscale': 1.5, 'rackoff': h/8,
-    # 'button1': (w, h/6), 'button2': (w+250, h/6), 'button3': (w+140, h/6),
-    # 'button4': (w/2, h+100), 'button5': (w/2, h+150),
-    # 'box1': (5, h+h/8-6), 'box2': (5, h-6), 'box3': (5, h),
-    # 'box4': (5, h-50),  'font': ('Avenir Next', 15)}
+    #'iphone_portrait': {'rackpos': (10, 200), 'rackscale': 1.5, 'rackoff': h/8,
+    #'button1': (w, h/6), 'button2': (w+250, h/6), 'button3': (w+140, h/6),
+    #'button4': (w/2, h+100), 'button5': (w/2, h+150),
+    #'box1': (5, h+h/8-6), 'box2': (5, h-6), 'box3': (5, h),
+    #'box4': (5, h-50),  'font': ('Avenir Next', 15)}
     'iphone_portrait': {'rackpos': (50-w, h+50), 'rackscale': 1.5, 'rackoff': h/8,
     'button1': (9*w/15, h+190), 'button2': (9*w/15, h+30), 'button3': (9*w/15, h+150),
     'button4': (9*w/15, h+70), 'button5': (9*w/15, h+110),
@@ -137,19 +130,21 @@ class Scrabble(LetterGame):
     'box4': (3*w/4, h+160), 'font': ('Avenir Next', 15)},
      }
     self.posn = SimpleNamespace(**position_dict[self.gui.device])
-    self.time_delay = 1    
+    self.time_delay = 1
+
+    
     
   def add_boxes(self):
       """ add non responsive decoration boxes"""
       x, y, w, h = self.gui.grid.bbox 
       tsize = self.posn.rackscale * self.gui.gs.SQ_SIZE
       box = self.gui.add_button(text='', title='Computer', position=self.posn.box1, 
-                                min_size=(7 * tsize+10, tsize+10), 
-                                fill_color='red')
+                          min_size=(7 * tsize+10, tsize+10), 
+                          fill_color='red')
       self.gui.set_props(box, font=self.posn.font)
       box = self.gui.add_button(text='', title='Player', position=self.posn.box2, 
-                                min_size=(7 * tsize+10, tsize+10), 
-                                fill_color='blue')
+                          min_size=(7 * tsize+10, tsize+10), 
+                          fill_color='blue')
       self.gui.set_props(box, font=self.posn.font)
       self.scores = self.gui.add_button(text='', title='Scores', position=self.posn.box3, 
                                         min_size=(50, 50),
@@ -157,33 +152,34 @@ class Scrabble(LetterGame):
                                         font=self.posn.font)
       self.gui.set_props(self.scores, font=self.posn.font)
       self.turn = self.gui.add_button(text='Your Turn', title='Turn', position=self.posn.box4, 
-                                      min_size=(50, 50), 
-                                      fill_color='clear')
+                                        min_size=(50, 50), 
+                                        fill_color='clear' )
       self.gui.set_props(self.turn, font=self.posn.font)
     
   def set_buttons(self):
     """ install set of active buttons """ 
     x, y, w, h = self.gui.grid.bbox       
-    self.gui.set_enter('Play', position=self.posn.button1,
-                       stroke_color='black', fill_color='yellow',
-                       color='black', font=self.posn.font)   
-    self.gui.add_button(text='Autoplay', title='', position=self.posn.button2, 
-                        min_size=(80, 32), reg_touch=True,
-                        stroke_color='black', fill_color='yellow',
-                        color='black', font=self.posn.font) 
-    self.gui.add_button(text='Shuffle', title='', position=self.posn.button3,
-                        min_size=(100, 32), reg_touch=True,
-                        stroke_color='black', fill_color='yellow',
-                        color='black', font=self.posn.font)
-    self.gui.add_button(text='Swap', title='', position=self.posn.button4,
-                        min_size=(100, 32), reg_touch=True,
-                        stroke_color='black', fill_color='orange',
-                        color='black', font=self.posn.font)
-    self.gui.add_button(text='Options', title='', position=self.posn.button5,
-                        min_size=(100, 32), reg_touch=True,
-                        stroke_color='black', fill_color='orange',
-                        color='black', font=self.posn.font)
-   
+    button = self.gui.set_enter('Play', position=self.posn.button1,
+                                stroke_color='black', fill_color='yellow',
+                                color='black', font=self.posn.font)   
+    button = self.gui.add_button(text='Autoplay', title='', position=self.posn.button2, 
+                                 min_size=(80, 32), reg_touch=True,
+                                 stroke_color='black', fill_color='yellow',
+                                 color='black', font=self.posn.font) 
+    button = self.gui.add_button(text='Shuffle', title='', position=self.posn.button3,
+                                 min_size=(100, 32), reg_touch=True,
+                                 stroke_color='black', fill_color='yellow',
+                                 color='black', font=self.posn.font)
+    button = self.gui.add_button(text='Swap', title='', position=self.posn.button4,
+                                 min_size=(100, 32), reg_touch=True,
+                                 stroke_color='black', fill_color='orange',
+                                 color='black', font=self.posn.font)
+    button = self.gui.add_button(text='Options', title='', position=self.posn.button5,
+                                 min_size=(100, 32), reg_touch=True,
+                                 stroke_color='black', fill_color='orange',
+                                 color='black', font=self.posn.font)
+
+    
   def display_rack(self, tiles, y_off=0):
     """ display players rack
     y position offset is used to select player_1 or player_2
@@ -220,10 +216,10 @@ class Scrabble(LetterGame):
        pass   
        
   def update_rack(self, player='human'):
-    if player == 'human':
+    if player=='human':
         return [tile.letter.lower() if tile else '@' for tile in self.gamestate.player_1.rack.tiles] 
     else:
-        return [tile.letter.lower() if tile else '@' for tile in self.gamestate.player_2.rack.tiles] 
+        return [tile.letter.lower() if tile else '@' for tile in self.gamestate.player_2.rack.tiles ] 
         
   def shuffle_tiles(self):
       """ shuffle tiles of human player"""
@@ -245,35 +241,34 @@ class Scrabble(LetterGame):
       pieces_used = 0
       while pieces_used == 0:
         move = self.get_player_move(self.board)         
-        pieces_used = self.process_turn(move, self.board)         
+        pieces_used = self.process_turn( move, self.board)         
         self.update_board()
-      if self.game_over():
-          break      
+      if self.game_over(): break      
       self.human_rack = self.update_rack('human')
       self.update_board()
       self.gui.set_text(self.turn, 'AI Turn')
       sleep(self.time_delay)
       self.ai_move()      
-      if self.game_over():
-          break       
+      if self.game_over(): break
+    self.complete()       
    
   def game_over(self):
     """ check for finished game """
     return self.gamestate.game_ended  
     
   def sync_board(self):
-    """ construct board from gamestate"""
+    """ constuct board from gamestate"""
     return [[cell.tile.letter.lower() if cell.tile else '-' for cell in row] for row in self.gamestate.board.board]
     
   def process_turn(self, move, board):
     """ process the turn
     move is coord, new letter, selection_row
     """ 
-    
+    rack = self.rack_player1 if self.gamestate.current_player().name == 'Human' else self.rack_player2
     player = self.gamestate.current_player()
     if move:
       coord, letter, row = move
-      r, c = coord
+      r,c = coord
       if letter == 'Enter':
         # confirm placement
         result = self.gameengine.play_draft()
@@ -306,11 +301,11 @@ class Scrabble(LetterGame):
            
       elif letter != '':  # valid selection
         try:
-            r, c = coord
+            r,c = coord
             cell = self.gamestate.board.board[r][c]
             # get point value of selected tile
             point = player.rack.tiles[row].point
-            cell.tile = scrabble_objects.Tile(letter.upper(), point=point) 
+            cell.tile = scrabble_objects.Tile(letter.upper(),point=point) 
             cell.tile.draft = True
             self.gamestate.player_1.rack.tiles[row].draft = True
             self.human_rack[row] = '@'
@@ -327,7 +322,7 @@ class Scrabble(LetterGame):
     rack = self.rack_player1 if self.gamestate.current_player().name == 'Human' else self.rack_player2
     
     if move[0] == (-1, -1):
-       return (None, None), 'Enter', None  # pressed enter button
+       return (None, None), 'Enter', None # pressed enter button
        
     # deal with buttons. each returns the button text    
     elif move[0][0] < 0 and move[0][1] < 0:
@@ -361,7 +356,7 @@ class Scrabble(LetterGame):
                return
             self.gui.set_text(self.turn, 'AI Turn')
             sleep(self.time_delay)
-            self.ai_move()  # make computer move, not recursive
+            self.ai_move() # make computer move, not recursive
         else:
             self.gui.set_text(self.turn, 'AI Turn')
             self.gameengine.ai_make_move(gui=self.gui) 
@@ -375,7 +370,7 @@ class Scrabble(LetterGame):
   
   def complete_game(self):
     while True:
-      self.ai_move()  # human then ai
+      self.ai_move() # human then ai
       if self.game_over():
         self.gui.set_message2('Game Over')
         break
@@ -385,7 +380,7 @@ class Scrabble(LetterGame):
       '''will swap out letters placed on board
       if none placed will swap out all tiles
       ''' 
-      drafts = [tile.draft for tile in self.gamestate.player_1.rack.tiles]
+      drafts = [tile.draft for  tile in self.gamestate.player_1.rack.tiles]
       all_tiles = not any(drafts) 
       self.gameengine.swap_draft(all_tiles)
       self.sync_board() 
@@ -397,9 +392,10 @@ class Scrabble(LetterGame):
   def options(self):
       x, y, w, h = self.gui.grid.bbox   
       self.gameengine.ai_handle_turn()
-      self.gui.input_text_list('Play options', items=self.gameengine.ai_possible_move_ids, position=(w, h))
+      self.gui.input_text_list('Play options', items=self.gameengine.ai_possible_move_ids, position=(w,h))
       while self.gui.text_box.on_screen:    
           try:
+            selection = self.gui.selection
             selection_row = self.gui.selection_row
           except (Exception) as e:
             print(e)
@@ -417,6 +413,9 @@ class Scrabble(LetterGame):
                   
 class Renderer():    
 
+
+
+
     def on_change(self, option_item):
         self.gameengine.clear_draft()
         for cell, tile in self.gameengine.ai_possible_moves[option_item[1]].items():
@@ -432,12 +431,10 @@ class Renderer():
         
         drop_down_widget.reset_value()
         drop_down_widget.update_items([])
-
-                
+        
 if __name__ == '__main__':
   g = Scrabble()
   g.run()
 
   
-
 

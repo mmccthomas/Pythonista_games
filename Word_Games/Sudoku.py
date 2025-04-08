@@ -1,5 +1,4 @@
-import os
-import sys
+
 import random
 import traceback
 from time import sleep, time
@@ -8,8 +7,6 @@ import numpy as np
 from Letter_game import LetterGame, Player
 import sudoko_solve
 from cages import Cages
-import base_path
-base_path.add_paths(__file__)
 
 from gui.gui_interface import Gui, Squares
 
@@ -230,11 +227,8 @@ class Sudoko(LetterGame):
         break
     
     self.gui.set_message2('Game over')
-    self.gui.set_message('')
-    self.gui.set_prompt('')
-    sleep(4)
-    self.finished = True
-    self.gui.show_start_menu()
+    self.complete()
+    
   ######################################################################
   
   def select_list(self):

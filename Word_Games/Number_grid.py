@@ -7,8 +7,6 @@ import numpy as np
 import console
 from Letter_game import LetterGame
 import latin_squares
-import base_path
-base_path.add_paths(__file__)
 from gui.gui_interface import Gui, Squares
 
 

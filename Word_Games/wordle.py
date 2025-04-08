@@ -2,11 +2,11 @@ import random
 import console
 import dialogs
 import ui
-import base_path
-base_path.add_paths(__file__)
+
 from time import sleep
 from queue import Queue
 from Letter_game import LetterGame, Player
+
 import gui.gui_scene as gscene
 from gui.gui_interface import Gui, Squares
 WordleList = ['wordlists/5000-more-common.txt'] 
@@ -52,11 +52,7 @@ class Wordle(LetterGame):
         break                  
     self.print_board()
     self.gui.set_message2('')
-    self.gui.set_message('') 
-    self.gui.set_prompt('')
-    sleep(4)
-    self.finished = True
-    self.gui.gs.show_start_menu()   
+    self.complete()
     
   def get_size(self):
     LetterGame.get_size(self, '5, 6')

@@ -4,8 +4,6 @@
 # game is to choose the direction to fill the grid
 # This is a variant of KrossWord where ghere are multiple starting letters
 import numpy as np
-import base_path
-base_path.add_paths(__file__)
 from Krossword import KrossWord
 from gui.gui_interface import Squares, Coord
  
@@ -62,8 +60,3 @@ class FiveWays(KrossWord):
 if __name__ == '__main__':
   g = FiveWays()
   g.run()
- 
-  while True:
-    quit = g.wait()
-    if quit:
-      break

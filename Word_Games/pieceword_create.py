@@ -57,9 +57,6 @@ from objc_util import on_main_thread
 from textwrap import wrap
 from random import shuffle, choice
 import matplotlib.colors as mcolors
-import base_path
-
-base_path.add_paths(__file__)
 from Letter_game import LetterGame
 import gui.gui_scene as gscene
 from gui.gui_interface import Coord, BoxedLabel, Squares

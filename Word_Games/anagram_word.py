@@ -7,8 +7,6 @@ The games uses a 20k word dictionary
 """
 import os
 import sys
-import base_path
-base_path.add_paths(__file__)
 import random
 import console
 import dialogs
@@ -159,7 +157,7 @@ class Anagram(LetterGame):
          words.extend([f'{self.get_anagram(word)}\n' if i %3 ==2 else f'{self.get_anagram(word)}  ' for i, word in enumerate(w)])     
     msg = ''.join(words)
     # set message box to be anchored at bottom left
-    # TODO what's the right object here?
+    # TODO whats the right object here?
     x, y, w, h = self.gui.grid.bbox
     if self.gui.device.endswith('_landscape'):        
         position = ( w + 10, 50)
@@ -193,7 +191,7 @@ class Anagram(LetterGame):
         
     cx.set_props(**transfer_props(['board', 'empty_board', 'all_word_dict', 
                                    'max_depth', 'debug']))
-    self.board = cx.populate_words_graph(max_iterations=200, length_first=False, max_possibles=100, swordsmith=True)  
+    self.board = cx.populate_words_graph(max_iterations=200, length_first=False, max_possibles=100, swordsmith_strategy='dfs')  
     self.populate_order = cx.populate_order
     # self.print_board()
     self.check_words()
@@ -295,7 +293,7 @@ class Anagram(LetterGame):
       elif letter == 'Finish':
         return True    
       elif letter != '':  # valid selection
-        # select from list whether across or down based upon selection row.
+        # select from list whether accross or down based upon selection row.
         # selection items is a directory, dont know which order.
         possibles = self.selection_items
         # get keys to establish down/across 
