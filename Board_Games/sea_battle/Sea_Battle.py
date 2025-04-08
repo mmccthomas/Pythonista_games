@@ -17,11 +17,7 @@ import sound
 
 SOUND = True
 
-current = os.path.dirname(os.path.realpath(__file__))
-parent = os.path.dirname(current)
-sys.path.append(parent)
-grandparent = os.path.dirname(parent)
-sys.path.append(grandparent)
+sys.path.append('../../')
 import gui.gui_scene as gscene
 from gui.gui_interface import Gui, Squares
 
@@ -139,7 +135,7 @@ class Ship():
 class Ships(Ship):
    """ class to hold set of ships for each player """
    def __init__(self, size, remaining_ships):
-     # initial load with remaining
+     # initiall load with remaing
      self.ships =[] # a list of Ship
      self.remaining_ships = remaining_ships
      self.all = []

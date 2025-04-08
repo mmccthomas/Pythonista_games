@@ -8,11 +8,8 @@
 # detect by mismatch in board contents
 import os
 import sys
-current = os.path.dirname(os.path.realpath(__file__))
-parent = os.path.dirname(current)
-sys.path.append(parent)
-grandparent = os.path.dirname(parent)
-sys.path.append(grandparent)
+sys.path.append('../')
+sys.path.append('../../')
 from datetime import datetime
 import time
 from time import sleep
