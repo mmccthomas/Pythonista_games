@@ -19,7 +19,7 @@
 """kye.game - implements the Kye game state and behaviour."""
 
 from objects import *
-from common import xsize, ysize
+from common_cmt import xsize, ysize
 
 
 class KGame:
@@ -327,7 +327,7 @@ class KGame:
             dx, dy = m[1:]
 
         if dx != 0 and dy != 0:
-            # Diagonal move. If either square either side of the diagonal is
+            # Diagonal move. If either square either side of the diagnoal is
             # occupied, we cannot move diagonally.
             xt, yt = self.get_atB(x+dx, y), self.get_atB(x, y+dy)
             if m[0] == 'abs':

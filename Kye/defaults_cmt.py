@@ -17,10 +17,8 @@
 #
 """kye.defaults_cmt - contains the KyeDefaults class."""
 
-from os import environ
-from os.path import join
 import json
-
+import pathlib
 
 class KyeDefaults:
     """Class for reading, querying and saving game preferences,
@@ -32,7 +30,7 @@ class KyeDefaults:
     def __init__(self):
         # Path to the config file.
         self.settings = None
-        self.cf = join('.', "kye_config.json")
+        self.cf = pathlib.Path('.', "kye_config.json")
         self.content = {}
         # Initialise.
         self.init_content = {'current': {'filename': "intro.kye",

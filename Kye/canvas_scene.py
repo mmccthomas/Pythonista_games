@@ -20,7 +20,7 @@
 """kye.canvas - module containing the KCanvas class,
 which implements the display of the game itself."""
 
-from common import xsize, ysize, tsize, findfile, KyeImageDir, image_dict, device_size
+from common_cmt import xsize, ysize, tsize, findfile, KyeImageDir, image_dict, device_size
 import ui
 import os
 from PIL import Image

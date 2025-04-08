@@ -20,23 +20,20 @@
 frame contains menubar, statusbar and canvas
 very important to add @ui.in_background decorator"""
 
-from common import image_dict, interval, xsize, ysize, kyepaths
-from os.path import basename, join
-from os import listdir
-import time
+from common_cmt import  interval, kyepaths
+import pathlib
 import ui
-import defaults_cmt
-import console
+# import defaults_cmt
 import dialogs
 import pickle
-from dialogs import _ListDialogController
+# from dialogs import _ListDialogController
 from scene import *
-from canvas_scene import KCanvas
+# from canvas_scene import KCanvas
 from input_ui import KMoveInput
-from stbar_ui import StatusBar
-from dialogs_ui import GotoDialog, KyeHelpDialog, KyeAboutDialog
-from dialogs_ui import getopendialog
-from queue import Queue
+# from stbar_ui import StatusBar
+# from dialogs_ui import GotoDialog, KyeHelpDialog , KyeAboutDialog
+# from dialogs_ui import getopendialog
+# from queue import Queue
 from copy import deepcopy
 """ menus has File, Level, View and Help"""
 
@@ -51,19 +48,20 @@ class KFrame(Scene):
          
     def prepare_file_list(self):
       """ list recent files first latest first, then all others.
+      TODO avoid using os
     """
       # get levels from multiple directories, sort each and flatten arrays
-      # p.upper()+'.kye'
-      levels = [sorted(listdir(p)) for p in kyepaths]
+      levels = [sorted([f.name  for f in pathlib.Path().glob(f"{p}/*.*")]) for p in kyepaths]
       # add a title line in front ofeach list
       levels =[[f'\t\t\t\t\t\t{path.upper()}.:'] + level for level, path in zip(levels, kyepaths)]
       levels = sum(levels,[])
       recent = self.recent_levels
-      check_icon = ui.Image.named('iob:flag_24')
+      # check_icon = ui.Image.named('iob:flag_24')
       # white so invisible
-      other_icon = ui.Image.named('iow:flag_24')
+      # other_icon = ui.Image.named('iow:flag_24')
       # remove any other files and recent files
-      for i in levels:
+      
+      for i in levels[:]:
         if i.split('.')[1] not in ['kye', 'KYE', ':']:
           levels.remove(i)
         if i in recent:
@@ -106,7 +104,7 @@ class KFrame(Scene):
                   {'title': 'Save state', 'action': self.savestate},
                   {'title': 'Restore state', 'action': self.restorestate}
                   ]
-       l = len(buttons)
+       
        v = ui.View(bg_color='white',frame=(0,0,120, (50 + len(buttons) * 50)))
        self.setup_view(v, buttons)
        #print(v['Restore state'])
@@ -118,7 +116,7 @@ class KFrame(Scene):
                   {'title': 'Small', 'action': self.selsize},
                   {'title': 'Large', 'action': self.selsize},
                   {'title': 'Cancel', 'action': self.selsize}]
-       l = len(buttons)
+       
        v = ui.View(bg_color='white',frame=(0,0,120, (20 + len(buttons) * 50)))
        self.setup_view(v, buttons)
        v.present('popover', popover_location = (330, 40))
@@ -178,7 +176,7 @@ class KFrame(Scene):
         """Set an addition to the window title after the level name."""
         try:
             del self.__title[2]
-        except (IndexError) as e:
+        except (IndexError):
             pass
         if extitle is not None:
             self.__title.append(extitle)
@@ -214,7 +212,7 @@ class KFrame(Scene):
       try:
         # self.saved_state = None
         self.app.goto(sel)
-      except (Exception) as e:
+      except (Exception):
         dialogs.hud_alert(f'Level {sel} not known')
       #responder.superview.close()
       
@@ -255,14 +253,14 @@ class KFrame(Scene):
     def savestate(self, responder):
       responder.superview.close()
       self.saved_state = deepcopy(self.app._KyeApp__game)
-      print(self.saved_state)
+      # print(self.saved_state)
       with open('saved_state.pkl', 'wb') as f:
           pickle.dump(self.saved_state, f)
       
       
     def restorestate(self, responder):      
       responder.superview.close()
-      print('restored', self.saved_state)
+      # print('restored', self.saved_state)
       try:
           with open('saved_state.pkl', 'rb') as f:
               saved_state = pickle.load(f)
@@ -278,13 +276,13 @@ class KFrame(Scene):
         if nextlevel != "":
             end_title = f"Level completed.  {endmsg[0]}secs\n\n {endmsg[1]}\n\n Entering level {nextlevel}"
         else:
-            end_title = f"All levels completed.\n\n Returning to first level"
+            end_title = "All levels completed.\n\n Returning to first level"
             
         dialogs.alert(end_title,button1="OK", hide_cancel_button=True)
         # And start the new level.
         self.app.goto(nextlevel)
 
-    def helpdialog(self, responder):
+    def helpdialog(self, reponder):
         """Show the help dialog box."""
         KyeHelpDialog().show_menu()
 
@@ -294,4 +292,6 @@ class KFrame(Scene):
         # console.alert(message)
 
 
-
+if __name__ == '__main__':
+    g = KFrame(app=None, settings=None)
+    g.prepare_file_list()

@@ -1,4 +1,4 @@
-#!/usr/bin/env puzzle game
+#!/usr/bin/env puzzle game ''
 
 #    Copyright (C) 2005, 2006, 2007, 2010 Colin Phipps <cph@moria.org.uk>
 #
@@ -16,12 +16,11 @@
 #    along with this program; if not, write to the Free Software
 #    Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #
-# completely modified by Chris Thomas for ipad using Pythonista
+# completely modified bu Chris Thomas for ipad using Pythonista
 # Drawing surfaces are using scene module
 # Menu uses ui module buttons
 import ui
 from scene import *
-import os
 import dialogs
 import sys
 from frame_scene import KFrame
@@ -30,7 +29,7 @@ from stbar_ui import StatusBar
 from input_ui import KMoveInput
 from defaults_cmt import KyeDefaults
 from app import KyeApp
-from common import tsize, device_size
+from common_cmt import tsize, device_size
 
 
 def build_menu(view):

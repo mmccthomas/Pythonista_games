@@ -18,16 +18,11 @@
 
 """kye.app - the Kye game application. Just contains the KyeApp class.
 """
-import os
-from os.path import basename
 import time
 import console
-import random
 import ui
-from common import tryopen, kyepaths
+from common_cmt import tryopen, kyepaths
 from game import KGame, KGameFormatError
-# from input_ui import  
-
 
 class KyeApp:
     """This class is a wrapper around the game class,
@@ -126,11 +121,11 @@ class KyeApp:
             self._frame.level_title(self.__playfile, self.__game.thislev)
             self._status.update_bar(hint=self.__game.hint,
                                     levelnum=f'{self.__game.levelnum}/{self.__game.levels}')
-        except (KeyError) as e:
+        except (KeyError):
             self._frame.error_message(f"Level {self.__playlevel} not known")
-        except (KGameFormatError) as e:
+        except (KGameFormatError):
             self._frame.error_message(f"{self.__playfile} is not a valid Kye level file.")
-        except (IOError) as e:
+        except (IOError):
             self._frame.error_message(f"Failed to read {self.__playfile}")
         if self.__game is not None:
             self.__gamestate = "playing level"
@@ -156,9 +151,17 @@ class KyeApp:
 
     def known_levels(self):
         """Returns a list of levels that the player knows about from this level set."""
-        return self.__defaults.get_known_levels(basename(self.__playfile))
+        try:
+            file_base = self.__playfile.split('/')[1]
+        except IndexError:
+            file_base = self.__playfile
+        return self.__defaults.get_known_levels(file_base)
         
     def completed_levels(self):
         """Returns a list of levels that the player knows about from this level set."""
-        return self.__defaults.get_completed_levels(basename(self.__playfile))
+        try:
+            file_base = self.__playfile.split('/')[1]
+        except IndexError:
+            file_base = self.__playfile
+        return self.__defaults.get_completed_levels(file_base)
 

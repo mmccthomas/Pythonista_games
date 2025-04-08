@@ -21,7 +21,7 @@
 
 from scene import *
 from canvas_scene import Tile
-from common import image_dict, device_size
+from common_cmt import image_dict, device_size
         
 class StatusBar(Scene):
     """Kye status bar."""

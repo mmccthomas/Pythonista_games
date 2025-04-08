@@ -20,7 +20,7 @@
 """kye.dialogs - classes for dialog boxes used by the interface."""
 
 from os.path import exists
-from common import kyepaths, version
+from common_cmt import kyepaths, version
 import ui
 import dialogs
 
