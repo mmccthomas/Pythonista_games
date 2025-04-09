@@ -5,9 +5,13 @@ import os
 import sys
 import time
 from queue import Queue
+current = os.path.dirname(os.path.realpath(__file__))
+parent = os.path.dirname(current)
+sys.path.append(parent)
+grandparent = os.path.dirname(parent)
+sys.path.append(grandparent)
 
-sys.path.append('../')
-sys.path.append('../../')
+
 from util.save.saving import path_to_save_file, allow_save
 from util.aiduel.dueling import get_dueling_ai_class
 from datetime import datetime

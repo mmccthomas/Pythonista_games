@@ -11,8 +11,14 @@ import os
 import sys
 import time
 from datetime import datetime
-sys.path.append('../')
-sys.path.append('../../')
+
+current = os.path.dirname(os.path.realpath(__file__))
+parent = os.path.dirname(current)
+sys.path.append(parent)
+grandparent = os.path.dirname(parent)
+sys.path.append(grandparent)
+
+
 import gui.gui_scene as gscene
 from gui.gui_interface import Gui
 
