@@ -24,15 +24,16 @@ kyepaths - the list of paths that we will try for opening levels
 given on the command line,
 and for searching for tilesets.
 image_dict
-"""
 
-from os.path import exists, join, isfile
+CMT Apr 2025 removed references to os
+"""
+import pathlib
+from os.path import join, isfile
 from PIL import Image
 import ui
 import codecs
 import numpy as np
 from scene import Texture, Rect
-from os import listdir
 import zipfile
 import os
 import sys
@@ -108,12 +109,12 @@ def load_images():
         images = sorted(zip.namelist()[1:])
         
     # remove any other files
-    for i in images:
+    for i in images[:]:
         if i.split('.')[1] not in ['png', 'gif']:
           images.remove(i)
     if '/' in images[0]:
         images = [i.split('/')[1] for i in images]
-    images2 = ['images/' + i for i in images]
+    # images2 = ['images/' + i for i in images]
     images = [i.split('.')[0] for i in images]
     # combine_images(10,0,images2)
 
@@ -136,13 +137,11 @@ def load_images():
 
 def tryopen(filename, paths):
     """Returns a reading file handle for filename,
-    searching through directories in the supplied paths."""
-    if isfile(filename):
-        return filename
-    else:
-        for path in paths:
-            if isfile(join(path, filename)):
-              return join(path, filename)
+    searching through directories in the supplied paths."""        
+    for path in paths:
+            p = pathlib.PurePath(path, filename)
+            if p.exists():
+              return p.as_posix()
   
     raise KGameFormatError("Unable to find file "+filename)
 
@@ -150,15 +149,7 @@ def tryopen(filename, paths):
 def findfile(filename):
   """Looks for filename, searching a built-in list of directories;
   returns the path where it finds the file.
-  for _, dirs, files in os.walk(".")
-    for name in dirs:
-      print("dir ",name)
-      if filename == name:
-        return filename
-    for file in files:
-      print("file ", file)
-      if file == name:
-        return filename"""
+  """ 
   return 'kye/images'
 
 
@@ -193,7 +184,7 @@ class KyeFile():
     	#stringlist=[x.decode('utf-8') for x in self.file_contents]
     	self.file_lines = self.file_contents.split('\n')
     	self.file_lines =[line.strip() for line in self.file_lines]
-    except (Exception) as e:
+    except (Exception):
     	raise (Exception, " decode error in file, strange unicode?")
  
     
@@ -215,7 +206,7 @@ class KyeFile():
     try:
       level_names = self.file_lines[1::23][:-1]
       if any([level is None for level in level_names]):
-        raise KGameFormatError(f'Error in file, empty level number found')
+        raise KGameFormatError('Error in file, empty level number found')
         return None
       else:
       	self.level_names = level_names
@@ -233,7 +224,7 @@ class KyeFile():
     if levelname == '' or levelname is None:
     	levelname = self.current_level
     	
-    levelnames = self.get_level_names()
+    # levelnames = self.get_level_names()
     try:
       # skip first line (no of levels)
       index = self.file_lines.index(levelname, 1)
@@ -241,7 +232,7 @@ class KyeFile():
       self.hint = self.file_lines[index + 1]
       self.exitmsg = self.file_lines[index + 2]
       return index
-    except (Exception) as e:
+    except (Exception):
      	raise (KyeGameRuntimeError, f'no level {levelname} in file')
      	 
     else:
@@ -301,4 +292,5 @@ if __name__ == "__main__":
 	print(a.get_next_level())
 	print(a.get_grid('20'))
 	#print(a.get_next_level())
+	filehandle = tryopen('intro.kye', kyepaths)
 	

@@ -1,5 +1,5 @@
 # text and rectangles recognition
-# contains Vision class rectangles and text, and CoreML function
+# contains Vision class rectanges and text, and CoreML function
 import objc_util
 from objc_util import ObjCClass, nsurl, ns, autoreleasepool
 import numpy as np
@@ -20,7 +20,7 @@ import dialogs
 import photos
 import resource
 
-DEBUG = False
+DEBUG = True
 
 VNImageRequestHandler = ObjCClass('VNImageRequestHandler')
 VNRecognizeTextRequest = ObjCClass('VNRecognizeTextRequest')
@@ -412,11 +412,7 @@ class Recognise():
        
        return df
     
-    def normalise(self, df):    
-		    #try something else.
-		    # fit poly lines to rach group of points in y and x
-		    # then find which poly line each point is closest to
-		    def poly(df, sort, axis):
+    def poly(self,df, sort, axis):
 		        # fit a polynomial to each line
 		        df2 = df.sort_values(by=sort,  ignore_index=True)        
 		        diffs = np.diff(df2[axis])
@@ -445,11 +441,15 @@ class Recognise():
 		          else:
 		            plt.plot(trendpoly(xs), xs)
 		        return polycoeffs
-		        
+		         
+    def normalise(self, df):    
+		    #try something else.
+		    # fit poly lines to rach group of points in y and x
+		    # then find which poly line each point is closest to		        
 		    # remove any alpha   
 		    df = df[df['label'].str.isnumeric()] 
-		    py = poly(df, ['y', 'x'], 'y')
-		    px = poly(df, ['x', 'y'], 'x')
+		    py = self.poly(df, ['y', 'x'], 'y')
+		    px = self.poly(df, ['x', 'y'], 'x')
 		    # print(px)
 		    # print(py)
 		    x, y = np.array(df[['x','y']]).T
@@ -621,7 +621,7 @@ class Recognise():
     
         for i in range(N):
             root = _find_root(i)
-            # reuse the rank as the class label
+            # re-use the rank as the class label
             if ranks[root] >= 0:
                 ranks[root] = ~nclasses
                 nclasses += 1

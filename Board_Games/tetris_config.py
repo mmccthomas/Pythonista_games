@@ -24,19 +24,23 @@ COLORS = {
 UI = {
 	"LEFT_BTN": {
 		"texture": 'typw:Left',
+		"size": (100,100),
 		"position": Vector2(50, 100)
 	},
 	"RIGHT_BTN": {
 		"texture": 'typw:Right',
-		"position": Vector2(100, 100)
+		"size": (100,100),
+		"position": Vector2(150, 100)
 	},
 	"ROTATE_BTN": {
 		"texture": 'typw:Refresh',
-		"position": Vector2(150,100)
+		"size": (100,100),
+		"position": Vector2(250, 100)
 	},
 	"DOWN_BTN": {
-		"texture": 'typw:Down',
-		"position": Vector2(200, 100)
+		"texture": 'typw:Down',		
+		"size": (100,100),
+		"position": Vector2(350, 100)
 	}
 
 }

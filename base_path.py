@@ -1,4 +1,5 @@
 # this file should be copied to Python Modules/site_packages(user)
+#
 import os
 import sys
 # find the path to current file
@@ -13,7 +14,7 @@ def add_paths(filename):
     paths = []
     try:
         paths.append(path_item)    
-        for f in ['gui', 'Board_Games', 'Word_Games']:
+        for f in ['gui', 'Board_Games', 'Word_Games', 'Card_Games']:
         	  paths.append(path_item + '/' + f)
         [sys.path.append(d) for d in paths]
         return paths

@@ -10,16 +10,11 @@ import console
 from collections import defaultdict
 from time import sleep, time
 import sys
-import os
 from queue import Queue
 import logging
 import traceback
 from types import SimpleNamespace as ns
-#current = os.path.dirname(os.path.realpath(__file__))
-#parent = os.path.dirname(current)
-#sys.path.append(parent)
-#grandparent = os.path.dirname(parent)
-#sys.path.append(grandparent)
+
 try:
    from gui.game_menu import MenuScene
 except ModuleNotFoundError:

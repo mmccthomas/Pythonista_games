@@ -3,16 +3,10 @@ from scene import *
 import ui
 import sys
 import time
-import os
 import console
 from queue import Queue
 import numpy as np
-
-current = os.path.dirname(os.path.realpath(__file__))
-parent = os.path.dirname(current)
-sys.path.append(parent)
-grandparent = os.path.dirname(parent)
-sys.path.append(grandparent)
+sys.path.append('../')
 
 import gui.gui_scene as gscene
 from gui.gui_scene import BoxedLabel
@@ -95,6 +89,7 @@ class Gui():
         self.font = ('Avenir Next', 32)
         self.width = 200
         self.allows_multiple_selection = False
+        self.autocorrect_type=False
 
         for k, v in kwargs.items():
             setattr(self, k, v)
@@ -119,7 +114,8 @@ class Gui():
                               frame=(10, 45, self.width - 30, height),
                               font=self.font,
                               text_color='black',
-                              bordered=True)
+                              bordered=True,
+                              autocorrect_type=self.autocorrect_type)
         # change frame size to fit list
         self.text_box.frame = (0, 0, self.width, height + 55)
         self.t.data_source = self.t.delegate = self.data

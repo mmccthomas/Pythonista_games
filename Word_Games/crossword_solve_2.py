@@ -10,8 +10,6 @@ import random
 import re
 import numpy as np
 import inspect
-import base_path
-base_path.add_paths(__file__)
 from Letter_game import LetterGame
 BLOCK = '#'
 SPACE = ' '

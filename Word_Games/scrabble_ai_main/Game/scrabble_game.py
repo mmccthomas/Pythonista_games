@@ -2,11 +2,11 @@ import os
 import sys
 current = os.path.dirname(os.path.realpath(__file__))
 parent = os.path.dirname(current)
-sys.path.append(parent)
+# sys.path.append(parent)
 grandparent = os.path.dirname(parent)
-sys.path.append(grandparent)
-from Game.scrabble_objects import *
-from AI.scrabble_wordfinder import *
+# sys.path.append(grandparent)
+from scrabble_ai_main.Game.scrabble_objects import *
+from scrabble_ai_main.AI.scrabble_wordfinder import *
 #import pygame as p
 import time
 

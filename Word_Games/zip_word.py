@@ -196,9 +196,11 @@ class ZipWord(LetterGame):
       selection = ''
       prompt = ' Select puzzle'
       selection = dialogs.list_dialog(prompt, items)
-      
+      print(selection)
       if selection == 'cancelled_':
-          return None 
+          return random.choice(items) 
+      if selection is None:
+          return random.choice(items) 
       if len(selection):
           if self.debug:   
             print(f'{selection=}')

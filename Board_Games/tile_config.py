@@ -2,7 +2,7 @@ from scene import Vector2, get_screen_size
 import numpy as np
 screen_width, screen_height = get_screen_size()
 GRID_POS = Vector2(10, 40)
-SIZE = 7
+SIZE = 4
 GRID_SIZE= screen_width // (2*SIZE) 
 TILES = ""
 INITIAL_LINE_SPEED = 1

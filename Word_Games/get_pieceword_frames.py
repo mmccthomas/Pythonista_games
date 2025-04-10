@@ -42,19 +42,25 @@ for puzzle, frame, word_loc in zip(puzzles, frames, lengths):
   
 # now have unique boards, word lengths and names
 # sort them by word lengths
-result = [{'puzzle': puzzle, 'frame':	'\n'.join(['/'.join(row) for row in frame]), 'lengths': length} for puzzle, frame, length in zip(all_names, unique_frames, all_lengths)]
+result = [{'puzzle': puzzle, 'frame': '\n'.join(['/'.join(row) for row in frame]), 'lengths': length} for puzzle, frame, length in zip(all_names, unique_frames, all_lengths)]
 print(f'In {len(all_frames)}, {len(unique_frames)} were unique')
 
 print('sorted')
 result = sorted(result, key=lambda d: min(d['lengths'].keys()))
 for d in result:
-	print(d['puzzle'], d['lengths'])
-	# print(d['frame'])
-# select ones with fewest 3 letter words	
-for i, d in enumerate(result[-12:]):
-	print(f'Puzzle{i+1}_frame:')
-	print(d['frame'])
-	print()
-	
+  print(d['puzzle'], d['lengths'])
+  # print(d['frame'])
+# select ones with minimum of 4 letter words  
+# and 2 with 3 letter words
+i = 1
+for d in result:
+  if min(d['lengths'])==4 or d['lengths'][3]==2:
+     # print(d['puzzle'])
+     print(f'Puzzle{i}_frame:')
+     print(d['frame'])
+     print()
+     i=i+1
+  
+
 
 

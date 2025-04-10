@@ -516,3 +516,47 @@ puzzle11_frame:
 '23m/a/l/a/w/i/#/24a/n/g/l/e/s'
 '#/t/#/i/#/s/#/r/#/n/#/f/#'
 '25w/e/a/l/t/h/#/26t/w/e/n/t/y'
+
+puzzle12_text:
+ACROSS                DOWN
+8  snapshot(5)        1  prescribe(7)
+9  discreet(7)        2  Focus on from a
+10 Director of           distance(4)
+   Titanic(7)         3  entry points(5)
+11 a yellowish        4  scale(4)
+   citrus fruit.(5)   5  degree of
+12 Pacific island(4)     excellence(7)
+14 to make longer(6)  6  last(8)
+18 grown-ups(6)       7  of a person,
+19 chuffed(4)            lacking warmth
+22 contests to be        and emotion.(5)
+   the first(5)       13 of the courts of
+23 the top surface       law(8)
+   of a desk.(7)      14 elevated
+26 altercation(7)        railroads(3)
+27  large             16 conclusion(7)
+   carnivorous        17 to select and
+   bird(5)               take or
+                         approve.(7)
+                      20 Citizen of
+                         Iraq(5)
+                      21 made a request
+                         of(5)
+                      23 blunt(4)
+                      25 labels(4)
+
+
+puzzle12_frame:
+'1s/#/2z/#/3d/#/4s/#/5q/#/6t/#/7s'
+'8p/h/o/t/o/#/9p/r/u/d/e/n/t'
+'e/#/o/#/o/#/a/#/a/#/r/#/o'
+'10c/a/m/e/r/o/n/#/11l/e/m/o/n'
+'i/#/#/#/s/#/#/#/i/#/i/#/y'
+'12f/i/13j/i/#/#/14e/x/t/e/n/d/#'
+'y/#/u/#/16c/#/l/#/y/#/a/#/17a'
+'#/18a/d/u/l/t/s/#/#/19g/l/a/d'
+'20i/#/i/#/o/#/#/#/21a/#/#/#/o'
+'22r/a/c/e/s/#/23d/e/s/k/25t/o/p'
+'a/#/i/#/u/#/u/#/k/#/a/#/t'
+'26q/u/a/r/r/e/l/#/27e/a/g/l/e'
+'i/#/l/#/e/#/l/#/d/#/s/#/d'

@@ -1,5 +1,5 @@
-from AI.trie import *
-from Game.scrabble_objects import alphabet
+from scrabble_ai_main.AI.trie import *
+from scrabble_ai_main.Game.scrabble_objects import alphabet
 
 class WordFinder:
     def __init__(self, word_list_file, board):

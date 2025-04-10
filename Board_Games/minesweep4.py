@@ -7,16 +7,13 @@ modified to all ui with buttons
 """
 import os
 import sys
-current = os.path.dirname(os.path.realpath(__file__))
-parent = os.path.dirname(current)
-sys.path.append(parent)
-grandparent = os.path.dirname(parent)
-sys.path.append(grandparent)
+
 from scene import *
 import ui
 import sound
 import random
 from random import randint
+sys.path.append('../')
 from gui.game_menu import MenuScene
 from time import sleep
 import console
