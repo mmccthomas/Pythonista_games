@@ -91,7 +91,7 @@ def can_add_to_cascade(card, cascades, i):
             return False
     return True
         
-def ok_to_automove(card, foundation):
+def ok_to_automove(card, foundation, pr=False):
     '''
     Return True if a card can be automoved to a foundation list.
 
@@ -102,6 +102,8 @@ def ok_to_automove(card, foundation):
     Return value:
       True if the card can be automoved, else False
     '''
+    if pr:
+       print(card, foundation, can_add_to_foundation(card, foundation))
     if not can_add_to_foundation(card, foundation):
         return False
     value, sVal = card
@@ -211,9 +213,9 @@ def automove_to_foundation(foundation, freecell, cascades):
                 if ok_to_automove(card, foundation):
                     mustCheckAgain = True
                     move_freecell_to_foundation(freecell, foundation, slot)
+        
         if not mustCheckAgain:
             break
-
 #
 #  Calculation functions. Find a single int (for making the moves list)
 #
@@ -261,5 +263,3 @@ def longest_movable_sequence(cards):
             break
         sizeOfSeq += 1
     return sizeOfSeq
-
-

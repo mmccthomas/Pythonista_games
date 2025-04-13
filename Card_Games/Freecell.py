@@ -11,7 +11,7 @@ from types import SimpleNamespace
 base_path.add_paths(__file__)
 from gui.game_menu import MenuScene
 from freecell.free_cell import Freecell
-from freeCellSolver.free_solver import Solver
+from freecell.free_solver import Solver
 
 w, h = get_screen_size()
 # w, h = 1112, 834
@@ -176,7 +176,7 @@ class FreecellGame(Scene):
                   face = '10' if card.face == 'T' else card.face
                   image = f'card:{self.suit_name[card.suit]}{face}' 
               else:
-                  image = f'./freeCellSolver/pics/{self.face_index[card.face]:02d}{card.suit}.gif'
+                  image = f'./freecell/pics/{self.face_index[card.face]:02d}{card.suit}.gif'
               card.tileobject = (Tile(image, 0, 0,
                                 z_position=1,
                                 parent=self))

@@ -38,7 +38,7 @@ def findValidMoves(game):
         else:
             nc += 1
             emptyCascades.append(i)
-
+    
     # find maxCards in moving to a non-empty cascade, and an empty cascade (B)
     maxCards = FF.max_cards_to_move(nc, nf)
     maxCardsB = maxCards - nc

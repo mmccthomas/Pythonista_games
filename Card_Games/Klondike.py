@@ -211,9 +211,9 @@ class KlondikeGame(Scene):
              image = 'card:BackGreen1'
       else:
           if card.get_face_up():
-             image = f'./freeCellSolver/pics/{self.face_index[card.face]:02d}{card.suit}.gif'
+             image = f'./freecell/pics/{self.face_index[card.face]:02d}{card.suit}.gif'
           else:
-              image = f'./freeCellSolver/pics/back111.gif'
+              image = f'./freecell/pics/back111.gif'
       if position:       
          # existing image, just change texture       
          card.tileobject.texture = Texture(ui.Image.named(image))

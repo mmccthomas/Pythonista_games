@@ -312,7 +312,7 @@ def executeCommand(state, str):
         n = int(cmd[2])
         p = int(cmd[3])
         multi_move_cascade_to_cascade(cascades, m, n, p)
-    automove_to_foundation(foundation, freecell, cascades)
+    #automove_to_foundation(foundation, freecell, cascades)
     cascades = tuple(map(tuple, cascades))
     newState = tuple(map(tuple, (foundation, freecell, cascades)))
     # repackage everything
