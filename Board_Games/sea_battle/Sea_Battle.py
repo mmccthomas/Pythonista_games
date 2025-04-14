@@ -272,6 +272,9 @@ class BattleShip():
     if self.gui.get_device().endswith('_portrait'):
       posn1 = (0, h+60)
       posn2 = (w/2, h+60)
+    elif self.gui.get_device() == 'iphone_landscape':
+        posn1 = (w+10, h / 2)
+        posn2 = (w+ 180, h / 2)
     else:
       posn1 = (w+10, h/2)
       posn2 = (w+10, h/6)

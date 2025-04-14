@@ -4,6 +4,10 @@
 import base_path
 from scene import *
 from time import sleep
+try:
+    from change_screensize import get_screen_size
+except ImportError:
+    from scene import get_screen_size
 import traceback
 import dialogs
 from random import choice
@@ -35,6 +39,9 @@ if w == 1366:
 elif w == 1112:
     # ipad
     cardsize = Size(114, 155)
+elif w == 1133:
+    # ipad mini
+    cardsize = Size(109, 148)
 elif w == 852:
     # iphone landscape
     cardsize = Size(43, 59)

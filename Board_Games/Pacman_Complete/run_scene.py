@@ -1,4 +1,5 @@
 # convert run.py to use Pythonista scene on ios instead of Pygame
+# TODO get this working again
 from scene import *
 import os
 import sys

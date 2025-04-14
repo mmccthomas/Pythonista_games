@@ -648,25 +648,35 @@ class TrainTracks():
         'ipad_landscape': {'rackpos': (0, -10), 'rackscale': 1.0, 'rackoff': 2, 'edit_size': (230, 140),
                            'button1': (w + 35, 20), 'button2': (w + 35, 190), 'button3': (w + 150, 190),
                            'button4': (w + 150, 140), 'button5': (w + 35, 90), 'button6': (w + 35, 140), 
-                           'box1': (w + 30, h -10 - 4 * (sqsize + 20)), 'box2': (w + 30, 90-6), 'box3': (w + 5, 2 * h / 3),
+                           'box1': (w + 38, h -2 - 4 * (sqsize + 20)), 'box2': (w + 30, 90-6), 'box3': (w + 5, 2 * h / 3),
                            'box4': (w + 5, h - 50), 'font': ('Avenir Next', 20)},
         
-        'ipad_portrait': {'rackpos': (-w, 249), 'rackscale': 0.7, 'rackoff': 4, 'edit_size': (250, 110),
+        'ipad_portrait': {'rackpos': (-w, 350), 'rackscale': 0.7, 'rackoff': 4, 'edit_size': (250, 110),
                           'button1': (690, h + 100), 'button2': (430, h +150), 'button3': (550 , h + 150),
                           'button4': (550, h + 100), 'button5': (430, h + 100), 'button6': (430, h + 100),
                           'box1': (45, h + 55), 'box2': (420, h + 90), 'box3': (3 * w / 4, h + 35),
                           'box4': (3 * w / 4, h + 160), 'font': ('Avenir Next', 20)},
+        'ipad_mini_landscape': {'rackpos': (0, -10), 'rackscale': 1.0, 'rackoff': 2, 'edit_size': (230, 140),
+                           'button1': (w + 35, 20), 'button2': (w + 35, 165), 'button3': (w + 150, 165),
+                           'button4': (w + 150, 115), 'button5': (w + 35, 65), 'button6': (w + 35, 115), 
+                           'box1': (w + 40, h -5 - 4 * (sqsize + 20)), 'box2': (w + 30, 62), 'box3': (w + 5, 2 * h / 3),
+                           'box4': (w + 5, h - 50), 'font': ('Avenir Next', 20)},
         
+        'ipad_mini_portrait': {'rackpos': (-w, 249), 'rackscale': 0.7, 'rackoff': 4, 'edit_size': (250, 110),
+                          'button1': (690, h + 100), 'button2': (430, h +150), 'button3': (550 , h + 150),
+                          'button4': (550, h + 100), 'button5': (430, h + 100), 'button6': (430, h + 100),
+                          'box1': (45, h + 55), 'box2': (420, h + 90), 'box3': (3 * w / 4, h + 35),
+                          'box4': (3 * w / 4, h + 160), 'font': ('Avenir Next', 20)},
         'iphone_landscape': {'rackpos': (0, -50), 'rackscale': 1.5, 'rackoff': 2, 'edit_size': (255, 130),
-                             'button1': (w + 185, h / 6), 'button2': (w + 185, 230), 'button3': (w + 330, 245),
-                             'button4': (w + 330, 180), 'button5': (w + 185, 180), 'button6': (9 * w / 15, h + 150),
-                             'box1': (w + 30, h - 50 -4* (sqsize +20)), 'box2': (w + 180, 165 - 6), 'box3': (w + 5, 2 * h / 3),
+                             'button1': (w + 215, h / 6), 'button2': (w + 215, 245), 'button3': (w + 330, 245),
+                             'button4': (w + 330, 180), 'button5': (w + 215, 180), 'button6': (9 * w / 15, h + 150),
+                             'box1': (w + 37, -20), 'box2': (w + 210, 165 - 6), 'box3': (w + 5, 2 * h / 3),
                              'box4': (w + 5, h - 50), 'font': ('Avenir Next', 20)},
             
-        'iphone_portrait': {'rackpos': (-w -25, h -10), 'rackscale': 1.5, 'rackoff': 2, 'edit_size': (135, 190),
+        'iphone_portrait': {'rackpos': (-w -30, h + 10), 'rackscale': 1.5, 'rackoff': 2, 'edit_size': (135, 190),
                             'button1': (9 * w / 15, h + 100), 'button2': (9 * w / 15, h + 300), 'button3': (9 * w / 15, h + 250),
                             'button4': (9 * w / 15, h + 200), 'button5': (9 * w / 15, h + 150), 'button6': (9 * w / 15, h + 150),
-                            'box1': (0, h + h / 8 + 45), 'box2': (180,  h + 145), 'box3': (3 * w / 4, h + 35),
+                            'box1': (0, h + h / 8 + 20), 'box2': (180,  h + 145), 'box3': (3 * w / 4, h + 35),
                             'box4': (3 * w / 4, h + 160), 'font': ('Avenir Next', 15)},
          }
         self.posn = SimpleNamespace(**position_dict[self.gui.device])
@@ -687,7 +697,7 @@ class TrainTracks():
                                 fill_color='clear')
       self.gui.set_props(box, font=self.posn.font)
       
-      box = self.gui.add_button(text='', title='Editor',
+      box = self.gui.add_button(text='', title='',
                                 position=self.posn.box2,
                                 min_size=self.posn.edit_size,
                                 fill_color='clear')

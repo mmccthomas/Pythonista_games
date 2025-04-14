@@ -12,7 +12,13 @@ from random import uniform as rnd
 import math
 from time import sleep
 from math import pi
-GRID_SIZE = 40
+try:
+    from change_screensize import get_screen_size
+except ImportError:
+    from scene import get_screen_size
+w, h = get_screen_size()
+
+GRID_SIZE = h // 27
 A = Action
 
 

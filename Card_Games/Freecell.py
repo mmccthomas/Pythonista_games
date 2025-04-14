@@ -4,6 +4,10 @@ and solver by Akshay Yeluri https://github.com/akshayyeluri/freeCell
 """
 import base_path
 from scene import *
+try:
+    from change_screensize import get_screen_size
+except ImportError:
+    from scene import get_screen_size
 from time import sleep
 import traceback
 import dialogs
@@ -22,6 +26,9 @@ if w == 1366:
 elif w == 1112:
     # ipad
     cardsize = Size(114, 155)
+elif w == 1133:
+    # ipad mini
+    cardsize = Size(109, 148)
 elif w == 852:
     # iphone landscape
     cardsize = Size(43, 59)
