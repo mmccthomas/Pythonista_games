@@ -50,7 +50,7 @@ class CrossWord(LetterGame):
         """ install set of active buttons
         Note: **{**params,'min_size': (80, 32)} overrides parameter
          """
-        W, H = get_screen_size()
+        W, H = self.gui.wh
         x, y, w, h = self.gui.grid.bbox
         off = 50
         params = {

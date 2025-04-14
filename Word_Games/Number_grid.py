@@ -36,7 +36,7 @@ class Player():
     
     self.PIECES = [f'../gui/tileblocks/{k}.png' for k in self.PIECE_NAMES]
     self.PIECE_NAMES.extend(list('+-*/=#'))
-    for k in ['add_1', 'sub_1', 'mult_1', 'div', 'eq_1', 'grey_1_1']:
+    for k in ['add', 'sub', 'mult', 'div', 'eq', 'grey']:
         self.PIECES.append(f'../gui/tileblocks/{k}.png')
     
     
@@ -94,6 +94,10 @@ class NumberGrid(LetterGame):
            position = (w+10, 8*h/9)
        case 'ipad13_portrait':
            position = (8*w/9, h+50)
+       case'ipad_mini_landscape':
+           position = (w+10, 8*h/9)
+       case'ipad_mini_portrait':
+           position = (7*w/9, h+50)
     self.gui.set_enter('Note ', fill_color='clear',
                        font=('Avenir Next', 50),
                        position=position)

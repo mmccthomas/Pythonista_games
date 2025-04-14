@@ -120,12 +120,36 @@ class Cross(PieceWord):
         self.wordset = self.get_words(self.across_only)
         self.solution_board = self.board.copy()
         self.gui.update(self.board)
+        
+    def box_positions(self):
+        # positions of all objects for all devices
+        x, y, w, h = self.gui.grid.bbox
+        off = 100
+        position_dict = {'ipad13_landscape': {
+        'button1': (w + off + 135, h), 'button2': (w + off + 275, h), 'button3': (w + off + 365, h),
+        'button4': (w + off + 275, h - 80), 'button5': (w + off + 135, h - 80),
+        'box1': (w + off , y), 'boxsize': (500, 600), 'font': ('Avenir Next', 12)},
+
+        'ipad_landscape': {
+        'button1': (w + off + 70, h), 'button2': (w + off + 210, h), 'button3': (w + off + 300, h),
+        'button4': (w + off + 210, h - 50), 'button5': (w + off + 70, h - 50),
+        'box1': (w + 10 , y), 'boxsize': (500, 600), 'font': ('Avenir Next', 12)},
+        
+        'ipad_mini_landscape': {
+        'button1': (w + off + 40, h), 'button2': (w + off + 180, h), 'button3': (w + off + 270, h),
+        'button4': (w + off + 180, h - 50), 'button5': (w + off + 40, h - 50),
+        'box1': (w + 10 , y), 'boxsize': (500, 530), 'font': ('Avenir Next', 12)}
+        }
+        try:
+            self.posn = SimpleNamespace(**position_dict[self.gui.device])
+        except (KeyError):
+            raise KeyError('Portrait mode  or iphone not supported')
 
     def set_buttons(self):
         """ install set of active buttons
         Note: **{**params,'min_size': (80, 32)} overrides parameter
          """
-        W, H = get_screen_size()
+        W, H = self.gui.wh
         x, y, w, h = self.gui.grid.bbox
         off = 50
         t = h / self.selection[1]
@@ -139,24 +163,24 @@ class Cross(PieceWord):
         }
 
         self.gui.set_enter('Fill',
-                           position=(w + off, h),
+                           position=self.posn.button1,
                            fill_color='orange',
                            **params)
         self.gui.add_button(text='Lookup',
-                            position=(w + off + 140, h),
+                            position=self.posn.button2,
                             fill_color='orange',
                             **{
                                 **params, 'min_size': (80, 32)
                             })
         self.gui.add_button(text='Copy',
-                            position=(w + off + 230, h),
+                            position=self.posn.button3,
                             fill_color='orange',
                             **{
                                 **params, 'min_size': (80, 32)
                             })
 
         self.gui.add_button(text='Reload',
-                            position=(w + off, h - 80),
+                            position=self.posn.button4,
                             fill_color='orange',
                             **{
                                 **params, 'min_size': (80, 32)
@@ -165,7 +189,7 @@ class Cross(PieceWord):
         fontsize = (W - w) // 28
         self.gui.set_moves('Clues',
                            font=('Ubuntu Mono', fontsize),
-                           position=(w + 10, y),
+                           position=self.posn.box1,
                            anchor_point=(0, 0))
         # trial scrollbox, gives problem with control
         #scroll_, self.wordsbox = self.gui.scrollview_h(w+100,h-600,(W-w), 600, text='Clues', )
@@ -248,6 +272,7 @@ class Cross(PieceWord):
         self.min_ = 4
         self.max_ = 12
         self.fill_board()
+        self.box_positions()
         self.set_buttons()
         self.gui.update(self.board)
         self.update_buttons()

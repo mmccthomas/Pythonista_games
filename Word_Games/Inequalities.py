@@ -92,6 +92,10 @@ class Futoshiki(LetterGame):
                 position = (w+10, 8*h/9)
             case 'ipad13_portrait':
                 position = (8*w/9, h+50)
+            case'ipad_mini_landscape':
+                position = (w+10, 8*h/9)
+            case'ipad_mini_portrait':
+                position = (7*w/9, h+50)
         self.gui.set_enter('Note ', fill_color='clear',
                            font=('Avenir Next', 50),
                            position=position)

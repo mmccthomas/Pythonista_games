@@ -57,6 +57,7 @@ from objc_util import on_main_thread
 from textwrap import wrap
 from random import shuffle, choice
 import matplotlib.colors as mcolors
+from types import SimpleNamespace
 from Letter_game import LetterGame
 import gui.gui_scene as gscene
 from gui.gui_interface import Coord, BoxedLabel, Squares
@@ -238,7 +239,7 @@ class PieceWord(LetterGame):
         self.compute_intersections()
         self.fill_board()
         self.solution_board = self.board.copy()
-        
+        self.box_positions()
         self.set_buttons()
         self.update_buttons(self.INIT_COLOR )
         while True:
@@ -248,7 +249,31 @@ class PieceWord(LetterGame):
             #  break
         self.gui.set_message2('')
         self.complete()
+        
+    def box_positions(self):
+        # positions of all objects for all devices
+        x, y, w, h = self.gui.grid.bbox
+        off = 100
+        position_dict = {'ipad13_landscape': {
+        'button1': (w + off + 135, h), 'button2': (w + off + 275, h), 'button3': (w + off + 365, h),
+        'button4': (w + off + 275, h - 80), 'button5': (w + off + 135, h - 80),
+        'box1': (w + off , y), 'boxsize': (500, 600), 'font': ('Avenir Next', 12)},
 
+        'ipad_landscape': {
+        'button1': (w + off + 70, h), 'button2': (w + off + 210, h), 'button3': (w + off + 300, h),
+        'button4': (w + off + 210, h - 50), 'button5': (w + off + 70, h - 50),
+        'box1': (w + 10 , y), 'boxsize': (500, 600), 'font': ('Avenir Next', 12)},
+        
+        'ipad_mini_landscape': {
+        'button1': (w + off + 70, h), 'button2': (w + off + 210, h), 'button3': (w + off + 300, h),
+        'button4': (w + off + 210, h - 50), 'button5': (w + off + 70, h - 50),
+        'box1': (w + 10 , y), 'boxsize': (500, 530), 'font': ('Avenir Next', 12)}
+        }
+        try:
+            self.posn = SimpleNamespace(**position_dict[self.gui.device])
+        except (KeyError):
+            raise KeyError('Portrait mode  or iphone not supported')
+            
     def set_buttons(self):
         """ install set of active buttons
         Note: **{**params,'min_size': (80, 32)} overrides parameter
@@ -265,32 +290,31 @@ class PieceWord(LetterGame):
         }
         
         self.gui.set_enter('Fill',
-                           position=(w + off + 135, h),
+                           position=self.posn.button1,
                            fill_color='orange',
                            **params)
         self.gui.add_button(text='Lookup',
-                            position=(w + off + 275, h),
+                            position=self.posn.button2,
                             fill_color='orange',
                             **{
                                 **params, 'min_size': (80, 32)
                             })
         self.gui.add_button(text='Copy',
-                            position=(w + off + 365, h),
+                            position=self.posn.button3,
                             fill_color='orange',
                             **{
                                 **params, 'min_size': (80, 32)
                             })
 
         self.randomise_button = self.gui.add_button(text='Randomise',
-                                                    position=(w + off + 275,
-                                                              h - 80),
+                                                    position=self.posn.button4,
                                                     fill_color='red',
                                                     **{
                                                         **params, 'min_size':
                                                         (80, 32)
                                                     })
         self.gui.add_button(text='Reload',
-                            position=(w + off + 135, h - 80),
+                            position=self.posn.button5,
                             fill_color='orange',
                             **{
                                 **params, 'min_size': (80, 32)
@@ -299,8 +323,8 @@ class PieceWord(LetterGame):
         self.wordsbox = self.gui.add_button(
             text='',
             title='Clues',
-            position=(w + off , y+50),
-            min_size=(500, 600),
+            position=self.posn.box1,
+            min_size=self.posn.boxsize,
             font=('Courier New', 14),
             fill_color='black',
         )

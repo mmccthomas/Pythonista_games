@@ -236,7 +236,7 @@ class GameBoard(Scene):
       fontsize = {'iphone_landscape': 16, 'iphone_portrait': 12, 
                       'ipad_landscape': 24, 'ipad_portrait': 24,
                       'ipad13_landscape': 24, 'ipad13_portrait': 24,
-                      'ipad_mini_landscape': 24, 'ipad_mini__portrait': 24}[self.device_size()]
+                      'ipad_mini_landscape': 20, 'ipad_mini_portrait': 20}[self.device_size()]
       return fontsize
           
   def setup_gui(self, **kwargs):
@@ -436,6 +436,14 @@ class GameBoard(Scene):
         position = (150, h + 20)
         anchor_point = (0, 0)
         pos_button = (350, 350)
+      case 'ipad_mini_landscape':
+        position = (w + 10, h / 2)
+        anchor_point = (0, 0.5)
+        pos_button = (800, 0)
+      case 'ipad_mini_portrait':
+        position = (150, h + 30)
+        anchor_point = (0, 0)
+        pos_button = (600, 600)
       case _:
         position = (150, h + 20)
         anchor_point = (0, 0)
