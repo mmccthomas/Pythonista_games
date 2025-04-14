@@ -6,8 +6,10 @@ This is a series of python word and board games to operate on the iPad using the
 In general, the games do not work well on iPhone due to smaller screen area and the restrictions of touch interface.
 Some optimisation has been made to operate in iPad Portrait mode, but Landscape is generally preferred.
 The games do not autodetect orientation change.
-All games were developed using a 13" Ipad. Most games have automatic detection od device size and orientation
-but there is a backlog of improvements.
+All games were developed using a 13" Ipad. Most games have automatic detection of device size and orientation
+on startup. Tested using Ipad 13", IPad 10", IPad Mini, IPhone.
+The  module change_screensize.py should be placed into site-packages (user). It allows creation of a virtual 
+device window, and detection of virtual window size.
 
 The games all use the Scene module, which is a thin wrapper around the Apple UiKit framework.
 
