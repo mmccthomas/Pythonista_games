@@ -6,6 +6,10 @@ import time
 import console
 from queue import Queue
 import numpy as np
+try:
+    from change_screensize import get_screen_size
+except ImportError:
+    from scene import get_screen_size
 sys.path.append('../')
 
 import gui.gui_scene as gscene
@@ -332,7 +336,10 @@ class Gui():
         # returns string ipad_landscape, ipad_portrait,
         #                iphone_landscape, iphone_portrait
         return self.gs.device
-
+        
+    def get_fontsize(self):
+        return self.gs.get_fontsize()
+        
     def setup_gui(self, **kwargs):
         self.gs.setup_gui(**kwargs)
         self.game_field = self.gs.game_field

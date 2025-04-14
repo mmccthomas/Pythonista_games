@@ -34,6 +34,10 @@ import codecs
 import numpy as np
 from scene import Texture, Rect
 import zipfile
+try:
+    from change_screensize import get_screen_size
+except ImportError:
+    from scene import get_screen_size
 
 
 xsize = 30
@@ -44,11 +48,11 @@ IMAGE_NAME = 'image.png'
 
 
 def device_size():
-	w, h = ui.get_screen_size()
+	w, h = get_screen_size()
 	device = None
 	if w > 1200 and h > 1000:
 		device = 'ipad13_landscape'
-	elif w > 1000:
+	elif w > 1000 and h > 800:
 		device = 'ipad_landscape'
 	elif w > 800 and h > 1000:
 		device = 'ipad_portrait'
@@ -56,6 +60,8 @@ def device_size():
 		device = 'iphone_landscape'
 	elif w < 400 and h > 800:
 		device = 'iphone_portrait'
+	elif w > 1100 and h > 700:
+		device = 'ipad_mini_landscape'
 	else:
 		device = None
 	return device

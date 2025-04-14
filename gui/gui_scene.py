@@ -2,7 +2,11 @@
 # The GUI engine for several games
 #
 from scene import *
-from scene import Vector2, get_screen_size
+from scene import Vector2 # , get_screen_size
+try:
+    from change_screensize import get_screen_size
+except ImportError:
+    from scene import get_screen_size
 import sound
 from ui import Path, Image
 from copy import copy
@@ -19,6 +23,8 @@ try:
    from gui.game_menu import MenuScene
 except ModuleNotFoundError:
     from game_menu import MenuScene
+
+
 
 screen_width, screen_height = get_screen_size()
 
@@ -38,7 +44,7 @@ DIMENSION_Y = 8  # the dimensions of the chess board
 SQ_SIZE = HEIGHT // DIMENSION_Y  # the size of each of the squares in the board
 MOVE_SPEED = 0.05
 
-            
+                                      
 class Player_test():
   def __init__(self):
     self.PLAYER_1 = WHITE = 'O'
@@ -151,10 +157,12 @@ class GameBoard(Scene):
       self.Player = Player_test()
       self.setup_gui()
       self.test_lines()
-      
+  
+  
+          
   def device_size(self):
       """ return the device type and orientation """
-      size = tuple(ui.get_screen_size())
+      size = tuple(get_screen_size())
       match size:
         case (1366.00, 1024.00):
           device = 'ipad13_landscape'
@@ -168,6 +176,10 @@ class GameBoard(Scene):
           device = 'iphone_landscape'
         case (393.00, 852.00):
           device = 'iphone_portrait'
+        case (1133.0, 744.0):
+          device = 'ipad_mini_landscape'
+        case (744.0, 1133.0):
+          device = 'ipad_mini_portrait'
         case _:
           device = None
       return device
@@ -205,10 +217,28 @@ class GameBoard(Scene):
          grid_size = w - 50
          font_size = 24
          
+      case 'ipad_mini_landscape':
+         GRID_POS = (50, 85)
+         grid_size = h - 150
+         font_size = 24
+         
+      case 'ipad_mini_portrait':
+         GRID_POS = (35, 85)
+         grid_size = w - 50
+         font_size = 24
+         
     SQ_SIZE = grid_size // max(dimx, dimy)
          
     return GRID_POS, SQ_SIZE, font_size
-         
+  
+  def get_fontsize(self):
+      # adjustable font sizes for screen
+      fontsize = {'iphone_landscape': 16, 'iphone_portrait': 12, 
+                      'ipad_landscape': 24, 'ipad_portrait': 24,
+                      'ipad13_landscape': 24, 'ipad13_portrait': 24,
+                      'ipad_mini_landscape': 24, 'ipad_mini__portrait': 24}[self.device_size()]
+      return fontsize
+          
   def setup_gui(self, **kwargs):
     global GRID_POS
     GRID_POS, self.SQ_SIZE, self.font_size = self.grid_sizes(self.device, self.DIMENSION_X, self.DIMENSION_Y)

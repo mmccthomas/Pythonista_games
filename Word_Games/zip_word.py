@@ -104,10 +104,10 @@ class ZipWord(LetterGame):
            else:
                w = sorted([word for word in wordlist])
          filtered_dict[k] = w 
+         fontsize = self.gui.get_fontsize() * 0.8
          if self.gui.device.endswith('landscape'):             
              position = (width + 10, -20)
              font = 'Fira Mono'
-             fontsize = 18
              anchor = (0, 0)
              word_block =[f'LEN={k}: ']
              word_block.extend(w)
@@ -120,13 +120,12 @@ class ZipWord(LetterGame):
              #             for i, word in enumerate(w)])
              anchor = (0, 0)
              position = (40, height+20)
-             fontsize = 18
              word_block =[f'LEN={k}: ']
              word_block.extend(w)
              font = 'Fira Mono'
              no_characters = (scr_w - position[0]) // (fontsize*.75)
              words.extend('\n'.join(wrap(' '.join(word_block), no_characters)) + '\n')
-             
+         
     if self.gui.device.endswith('_portrait'):          
       # format into columns if it fits
       w_cols, s, no_lines = self.format_for_portrait(filtered_dict) 

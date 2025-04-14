@@ -29,6 +29,7 @@ from stbar_ui import StatusBar
 from input_ui import KMoveInput
 from defaults_cmt import KyeDefaults
 from app import KyeApp
+
 from common_cmt import tsize, device_size
 
 
@@ -62,9 +63,10 @@ def main(**argv):
   kyeapp = KyeApp(defaults=defaults, playfile="intro.kye")
   # Create GUI and run the app. This doesn't return until the user exits.
   device = device_size()
-  if device == 'ipad_landscape':
+  if device == 'ipad_landscape':    
     tilesize = 32
     v = ui.load_view('kye_ui.pyui')
+    v.frame = (0, 0, 1113, 834)
   elif device == 'ipad_portrait':
     tilesize = 27
     v = ui.load_view('kye_ui_portrait.pyui')
@@ -76,6 +78,10 @@ def main(**argv):
     tilesize = 16
     v = ui.load_view('kye_ui.pyui')
     v.frame = (0, 0, 850, 352)
+  elif device == 'ipad_mini_landscape':
+    tilesize = 32
+    v = ui.load_view('kye_ui.pyui')
+    v.frame = (0, 0, 1133, 744)
   else:
     dialogs.hud_alert('Iphone portrait not supported')
     sys.exit()
@@ -86,6 +92,8 @@ def main(**argv):
                                 settings=defaults.settings, tilesize=tilesize)
   if device == 'iphone_landscape':
     v['status'].position = (0, 150)
+  elif device == 'ipad':
+    v['status'].position = (0, 50)
 
   build_menu(v)
   kyeapp.run(v)

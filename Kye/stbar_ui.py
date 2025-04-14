@@ -42,6 +42,8 @@ class StatusBar(Scene):
         device = device_size()
         if device== 'iphone_landscape':
           self.position = (100,100)
+        elif device== 'ipad':
+          self.position = (100,100)
         else:
           self.position = (0,0)
         self.image_dict = image_dict #load_images()

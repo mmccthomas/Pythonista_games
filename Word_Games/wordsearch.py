@@ -62,12 +62,13 @@ class WordSearch(LetterGame):
     except ValueError:
        max_len = 10
     _, _, w, h = self.gui.grid.bbox
+    fontsize = self.gui.get_fontsize()
     if self.gui.gs.device.endswith('_landscape'):
         msg = self.format_cols(display_words, columns=2, width=max_len)
-        self.gui.set_moves(msg, font=('Avenir Next', 25), anchor_point=(0,0),position=(w+40,0))
+        self.gui.set_moves(msg, font=('Avenir Next', fontsize), anchor_point=(0,0),position=(w+40,0))
     elif self.gui.gs.device.endswith('_portrait'):
         msg = self.format_cols(display_words, columns=5, width=max_len)
-        self.gui.set_moves(msg, font=('Avenir Next', 20), position=(0, h+40) )
+        self.gui.set_moves(msg, font=('Avenir Next', fontsize), position=(0, h+40) )
     self.gui.update(self.board)
     
   def get_size(self):

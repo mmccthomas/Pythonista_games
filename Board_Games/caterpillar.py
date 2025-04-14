@@ -9,6 +9,11 @@ import random
 from random import uniform as rnd
 from scene import Vector2, get_screen_size
 from scene import *
+try:
+    from change_screensize import get_screen_size
+except ImportError:
+    from scene import get_screen_size
+
 from ui import Path
 from math import pi
 from itertools import cycle
