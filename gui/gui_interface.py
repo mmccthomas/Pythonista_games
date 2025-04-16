@@ -797,8 +797,15 @@ class Coord(tuple):
         ''' implement // '''
         return Coord(tuple(p / scalar for p in self.val))
 
-    def all_neighbours(self):
-        return [Coord(self.__add__(d)) for d in self.all_dirs]
+    def all_neighbours(self, sizex=None, sizey=None):
+        """all directions if in board"""
+        if sizex is None:
+            return [Coord(self.__add__(d)) for d in self.all_dirs]
+        else:
+            return [
+                Coord(self.__add__(d)) for d in self.all_dirs
+                if self.in_board(Coord(self.__add__(d)), sizex, sizey)
+            ]
 
     def nsew(self, sizex=None, sizey=None):
         """ up, down, left, right """

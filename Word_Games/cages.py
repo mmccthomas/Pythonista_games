@@ -3,15 +3,21 @@
 # otherwise move on to next tile
 import numpy as np
 import random
-from math import prod
+from math import prod, sqrt
+from polyminoes import polymino_dict
+import matplotlib.pyplot as plt
+import matplotlib.colors as mcolors
+
 SIZE = 9
 
 
 class Cages:
     
-    def __init__(self, level=None):
+    def __init__(self, level=None, size=9, pent_set=None):
         # types ## ### ### ## ##.  #
         #            #.  ##. ## ###
+        self.color_map = ("⬛", "🟦", "🟥", "🟧", "🟩", "🟪",  "🟫", "⬜")
+        self.cage_colors = ["blue", "red", "yellow", "green", "purple", "cyan"]
         if level is None:
           self.piece_types = (
               [[1, 1]], [[2, 2, 2]],
@@ -23,20 +29,40 @@ class Cages:
               [[1, 1]], [[2, 2, 2]],
               [[3, 0], [3, 3]], [[4, 0, 0], [4, 4, 4]],
               [[5, 5], [5, 5]])
-              
-        self.color_map = ("⬛", "🟦", "🟥", "🟧", "🟩", "🟪",  "🟫", "⬜")
-        self.cage_colors = ["blue", "red", "yellow", "green", "purple", "cyan"]
-        self.board = np.zeros((SIZE, SIZE), dtype=int)
+        elif level == 'Full':
+            if pent_set:
+                piece_types = pent_set
+            else:
+                piece_types = [2,3,4,5,6]
+            self.piece_types = [item for k, v in polymino_dict.items() for item in v if k in piece_types]
+            colordict = mcolors.CSS4_COLORS  # a curated list of colors
+            self.color_map = [random.choice(list(colordict)) for _ in self.piece_types] 
+        self.size = size   
+        self.suguru = False
+        
+        self.board = np.zeros((self.size, self.size), dtype=int)
         
         self.piece_positions = self.gen_piece_positions(self.piece_types)
         self.delta = np.array([[-1, 0], [1, 0], [0, -1], [0, 1]])
         self.solutions = []
         self.terminate = False
     
-    def draw_board(self, board):
+    def draw_board_(self, board):
         def cm(n):
           return np.array([self.color_map[i] for i in n])
         print(np.apply_along_axis(cm, 0, board))
+        
+    def draw_board(self, board):                        
+        # for testing with full set polyminoes
+        # use matplotlib instead of print  
+        # create discrete colormap        
+        cmap = mcolors.ListedColormap(self.color_map)
+        fig, ax = plt.subplots()
+        ax.imshow(board, cmap=cmap)
+        locs = np.argwhere(board>0)
+        for loc in locs:
+            ax.annotate(str(board[tuple(reversed(loc))]),xy=loc)
+        plt.show()
         
     def get_board_rc(self, rc, board):
         try:
@@ -87,7 +113,7 @@ class Cages:
          # get coordinate pairs
          # look in vert and horizontal dirns
          coords = np.transpose(self.delta + loc)
-         out_of_bounds = np.argwhere((coords < 0) | (coords > 8))
+         out_of_bounds = np.argwhere((coords < 0) | (coords > self.size-1))
          if out_of_bounds.shape[0] != 0:
            coords = np.delete(coords, out_of_bounds[:, 1], axis=1)
          # if surrounded by non zero, flag a result
@@ -131,46 +157,51 @@ class Cages:
     def solve_board(self, board, pieces, display):
         """ place cages on empty board """
         cages = []
-        iterations = 0
+        l_pieces = len(pieces) - 1
+        self.iterations = 0
         if self.terminate:
             return
             
         while True:
-          iterations += 1
+          self.iterations += 1
           if display:
               print('iterations', iterations)
               self.draw_board(board)
-          if iterations % 100 == 0:
+          if self.iterations % 100 == 0:
             # start again
             print('Restarting search')
-            iterations = 0
+            self.iterations = 0
             cages = []
-            board = np.zeros((SIZE, SIZE), dtype=int)
+            board = np.zeros((self.size, self.size), dtype=int)
             if display:
-               print('iterations', iterations)
+               print('iterations', self.iterations)
           # win condition is whole board is covered in pieces
           if np.all(board):
-              self.solutions.append(board)
-              print(f"Solutions: {len(self.solutions):,}")
-              print(f"Iterations: {iterations:,}\n")
+              #self.solutions.append(board)
+              #print(f"Solutions: {len(self.solutions):,}")
+              print(f"Iterations: {self.iterations:,}\n")
               if display:
                   self.draw_board(board)
                   print(cages)
               return board, cages  # comment this to continuously search
               print('Restarting search')
-              iterations = 0
+              self.iterations = 0
               cages = []
-              board = np.zeros((SIZE, SIZE), dtype=int)
+              board = np.zeros((self.size, self.size), dtype=int)
           else:
             for r, row in enumerate(self.board):
               for c, pos in enumerate(row):
                 if self.board[r][c] != 0:  # not empty
                   continue  # next c
-                if iterations < 2:
-                   piece_positions = pieces[random.randint(0, len(pieces)-1)]
+                if self.iterations < 2:
+                   piece_positions = pieces[random.randint(0, l_pieces)]
                 else:
-                   # only 2 or 3 squares to fill in spaces - faster
-                   piece_positions = pieces[random.randint(0, 2)]
+                    if self.suguru:          
+                       piece_positions = pieces[random.randint(0, l_pieces)]  
+                    else:              
+                       # only 2 or 3 squares to fill in spaces - faster
+                       piece_positions = pieces[random.randint(0, 2)]
+                       
                 for position in piece_positions:
                   new_board, legal_move, squares = self.add_piece(board, position, r, c)
                   if legal_move:
@@ -193,7 +224,7 @@ class Cages:
           origin = self.get_board_rc(loc, cage_board)
           # get coordinate pairs
           coords = delta + loc
-          coords = np.clip(coords, 0, 8)
+          coords = np.clip(coords, 0, self.size-1)
           # can use clipping to defeat out of bounds
           for coord in coords:
             neighbour = self.get_board_rc(coord, cage_board)
@@ -278,21 +309,56 @@ class Cages:
           
     def cage_board_view(self):
         # create cage view of board
-        self.cage_board = np.zeros((SIZE, SIZE), dtype=int)
+        self.cage_board = np.zeros((self.size, self.size), dtype=int)
         for index, item in enumerate(self.cages):
           number_val, coords = item
           for coord in coords:
             self.board_rc(coord, self.cage_board, index)
         return self.cage_board
-        
+    
+    def check_suguru(self, board, display=None):
+        # This performs search and then checks whether any
+        # cages are adjacent to one with same number
+        self.solution,  cages = self.run(display=display)
+        """
+        if display:
+            self.draw_board(self.solution)
+        all_indices = np.argwhere(self.solution>0)
+        if cages:
+          for cage in cages:
+            coords = [(r, c) for r, c, _ in cage]
+            numbers = [self.solution[r][c] for r, c, _ in cage]
+            # check if any cage next to another with same number
+            delta = [[-1, 0], [1, 0], [0, -1], [0, 1]]
+            neighbours = []
+            for r, c in coords:
+               for y, x in delta:
+                   next_r, next_c = r+y, c+x
+                   if 0 <= next_r <  self.size:
+                       if 0 <= next_c <  self.size:
+                           if (next_r, next_c) not in coords:
+                               neighbours.append((next_r, next_c))
+                           
+            #print('neighbours', [(n,self.solution[n]) for n in  neighbours])
+            #print('coords', numbers[0], coords)
+            for neighbour in neighbours:               
+                if self.solution[neighbour] == numbers[0]:
+                    # another solution required
+                    print('fails at', neighbour, numbers[0], self.solution[neighbour])
+                    return False
+        """
+        self.cages = cages 
+        return True
+
     def check_cage(self, board, display=False, kenken=False):
       # get cage solution and see if it fits
-        _, cages = self.run(display=display)
+        self.solution,  cages = self.run(display=display)
         if cages:
           self.cages = []
           for cage in cages:
             coords = [(r, c) for r, c, _ in cage]
             numbers = [board[r][c] for r, c, _ in cage]
+            
             if len(numbers) == len(set(numbers)):
               # no duplicates              
               if not kenken:
@@ -360,7 +426,10 @@ class Cages:
         return neighbours[prev_one].pop(), dirn
       
     def dotted_lines(self, coords, delta=0.435):
-      """draw dotted lines inside each cage"""
+      """draw dotted lines inside each cage
+      This is pretty complicated
+      for each coordinate, which is the centre of a box
+      calculate the edgle lines inside each box"""
       delta = 0.25 if delta < 0.25 else delta
       delta = 0.5 if delta > 0.50 else delta
       tol = 0.01
@@ -373,15 +442,26 @@ class Cages:
       # produce points around each coordinate
       expanded = np.array([dxdy * delta +  nodes[i] for i in range(nodes.shape[0])])
       expanded = np.concatenate(expanded, axis=0)
-      edges = np.unique(expanded, axis=0)
+      edges = np.unique(expanded, axis=0)      
+
+      def internal_nodes(edges, delta,):
+          # find internal edges, ddfined as
+          # those adjacent to 3 others
+          test_dist =0.5
+          close_list = []
+          for i, edge in enumerate(edges):
+              dist = np.sqrt(np.sum(np.square(edges - edge), axis=1))
+              item = dist[dist< test_dist]
+              if len(item) == 4:
+                  close_list.append(i)                  
+          return close_list  
       
       # deal with special case  2x2 square
+      # or any shape with an internal node
       # remove internal edges otherwise we get a torus
-      if nodes.size == 8 and all(np.ptp(nodes, axis=0) == (1, 1)):
-           xmin, ymin = min(edges[:, 1]) + tol, min(edges[:, 0]) + tol
-           xmax, ymax = max(edges[:, 1]) - tol, max(edges[:, 0]) - tol
-           remove = [index for index, edge in enumerate(edges)  if  xmin < edge[1] < xmax and ymin < edge[0] < ymax]
-           edges = np.delete(edges, remove, axis=0)
+      remove = internal_nodes(edges, delta)
+      edges = np.delete(edges, remove, axis=0)
+      
            
       def flatten(xss):
          return [x for xs in xss for x in xs]
@@ -428,9 +508,31 @@ class Cages:
 
 if __name__ == "__main__":
     # a=np.random.randint(0,4,(SIZE,SIZE))
-    b = Cages('Easy')
-    b.check_cage(b.board, display=True)
-    b.cage_board = b.cage_board_view()
-    print(b.cage_board)
-    b.color_4colors(True)
-    # b.check_zeroes(a)
+    for _ in range(10):
+        for size in range(6, 7): # 15, 2):
+            b = Cages('Full', size=size)
+            while True:            
+               result = b.check_suguru(b.board, display=False)
+               if result:
+                   break
+            b.draw_board(b.solution)   
+            #b.check_cage(b.board, display=False)
+            #b.draw_board(b.solution)
+        b.cage_board = b.solution #cage_board_view()
+        # now to assign colours and numbers                
+        
+        b.adj_matrix = b.adj_matrix(b.cage_board)
+        # b.cage_colors = ['lunar green', 'desert brown', 'cashmere', 'linen']
+        b.cage_colors = ['cyan', 'yellow', 'pink', 'linen', 'green']
+        color_map_dict = b.color_4colors(colors=b.cage_colors)
+        color_map_dict = {k: color_map_dict[k] for k in sorted(list(color_map_dict))}
+        color_map_list = list(color_map_dict.values())
+        
+        b.color_map = color_map_list
+        b.draw_board(b.cage_board)
+        delta=0.45
+        cage_coords = sorted([[(r, c) for r, c, _ in cage]  for cage in b.cages], key=len)       
+        for coords in cage_coords:                    
+            print(coords)
+            points = b.dotted_lines(coords, delta=delta)
+        # b.check_zeroes(a)
