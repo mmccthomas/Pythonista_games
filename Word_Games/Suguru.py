@@ -4,13 +4,15 @@ import traceback
 from time import sleep, time
 from queue import Queue
 import numpy as np
+import inspect
+import console
 from itertools import permutations
 from Letter_game import LetterGame, Player
-import sudoko_solve
 from cages import Cages
-
+from  peek import peek
+import json
+import matplotlib.pyplot as plt
 from gui.gui_interface import Gui, Squares, Coord
-
 
 """ This game is the Sudoko grid puzzle
 both standard and Killer type are supported
@@ -24,13 +26,14 @@ FINISHED = (-10, -10)
 NOTE = (-1, -1)
 HINT = (-2, -2)
 SIZE = 9  # fixed for Sudoko
-
+FILENAME = 'suguru.txt'
 
 class Suguru(LetterGame):
   
-  def __init__(self):
+  def __init__(self, test=None):
     self.debug = False
     self.sleep_time = 0.1
+    self.test = test
     self.hints = 0
     self.cage_colors = ['teal', 'salmon', 'dark turquiose', 'yellow']
     # self.cage_colors = ['lunar green', 'desert brown', 'cashmere', 'linen']
@@ -63,10 +66,6 @@ class Suguru(LetterGame):
                              'Quit': self.quit})
     self.gui.set_start_menu({'New Game': self.restart, 'Quit': self.quit})
     
-    '''.                 r c.           cols.                rows
-    board dict converts from alpha numeric grid location to (r, c)
-     '''
-    self.board_dict={k: (v,i) for i in range(SIZE) for v, k in enumerate(sudoko_solve.unitlist[i])}
     
     x, y, w, h = self.gui.grid.bbox
     match  self.gui.device:
@@ -88,11 +87,6 @@ class Suguru(LetterGame):
     self.gui.set_enter('Note ', fill_color='clear', font=('Avenir Next', 50),position=position)
     self.gui.set_top('', position=(0, h+30))
    
-  def create_number_board(self):
-    """ redraws the board with cleared items blank tiles for unknowns
-    and letters for known"""
-    # start with empty board
-    self.solution_board = self.copy_board(self.board)
          
   def process_wordlist(self,  sep=False):
     puzzles = []
@@ -107,118 +101,229 @@ class Suguru(LetterGame):
         else:
             puzzles.append(line)
     return puzzles
+    
+  def time_us(self, t0, msg=''):
+     print(f'{msg} {int((time()-t0) * 1e6):_}us') 
                          
   def check_valid(self, cage, number_set):
-      # check if surrounding squares have same number
-      # return False if found      
-      for index, loc in zip(number_set, cage):     
-          r, c = loc
-          # max 3x3 array around loc
-          subset = self.board[max(r-1,0):min(r+2, self.size), max(c-1, 0):min(c+2, self.size)] 
-          if np.any(np.isin(index, subset)):              
+      # iterate thru each location in cage with
+      # corresponding number
+      # for each, check if surrounding squares have same number
+      # return False if found 
+      #locs=[]     
+      for index, loc in zip(number_set, cage):          
+          subset = self.gui.subset(self.board, loc, N=3)          
+          if np.any(np.isin(index, subset)):
+              self.clear_cage(cage)
               return False
-          # if ok, set board[loc] to value
-          self.board_rc(loc, self.board, index)
-               #neighbours = loc.all_neighbours(self.size, self.size)
-               #if any([self.get_board_rc(neighbour, self.board) == index for neighbour in neighbours]):
-               #    return False
+          else:
+              
+              self.board_rc(loc, self.board, index)
+              #locs.append(loc)
       return True
-                           
-  def fill(self, cage_no, animate):
+        
+  def clear_cage(self, cage):
+      # clear cage
+      c = np.array(cage)
+      self.board[(c[:,0], c[:,1])] = 0  
+        
+  def sort_cages(self, cg, mode=0):  
+      self.cage_coords = [[Coord((r, c)) for r, c, _ in cage]  for cage in cg.cages]  
+      if mode == 1:
+           # perfom depth first search on cages starting from shortest
+           cg.small_adj_matrix()
+           #start from smallest cage
+           a = [len(v) for v in cg.cages]
+           start = a.index(min(a))
+           cg.dfs(start)               
+           self.cage_coords  =  [x for _, x in sorted(zip(cg.path, self.cage_coords), key=lambda pair: pair[0])]
+      else:
+            self.cage_coords = sorted([[Coord((r, c)) for r, c, _ in cage]  for cage in cg.cages], key=len)     
+  
+  def cage_board_view(self, cages):
+        # create cage view of board
+        # set board very big, then reduce
+        board = np.zeros((20, 20), dtype=int)
+        for cage in cages:
+            for item in cage:
+                r, c, number_val = item
+                board[(r, c)] = number_val
+        # furthest non zero value 
+        r, c = np.max(np.argwhere(board>0), axis=0)
+        board = board[:r+1, :c+1]
+        return board
+                  
+  def load_puzzles(self):                   
+      try:
+          with open(FILENAME, 'r') as f:
+              data = f.read()
+          puzzle_strings = data.split('\n')          
+          puzzles = []
+          cage_sets= [json.loads(p) for p in puzzle_strings if p]
+          for cage in cage_sets:
+              board = self.cage_board_view(cage)
+              puzzles.append((board, cage))
+          return puzzles
+      except FileNotFoundError:
+          pass
+      
+  def store_valid_puzzle(self, cg):
+      """ add valid puzzle to file """
+      # store in cages
+      cages = [[(cage[0], cage[1], int(self.board[(cage[0], cage[1])])) for cage in cagelist] for cagelist in cg.cages]    
+      with open('suguru.txt', 'a') as f:
+          f.write(json.JSONEncoder().encode(cages) + '\n')
+                                                                                                                                                 
+  def fill(self, cage_no, length, animate):
       """ use dfs to iterate through permutations of number set
+      TODO not working correctly yet needs debug
       """ 
-      if animate:
-            #utils.clear_terminal()
-            self.gui.print_board(self.board, which=str(cage_no))     
-            if cage_no < len(self.cage_coords):
-                print(self.cage_coords[cage_no])
-
+      self.fill_iteration += 1
+      
       # if the grid is filled, succeed if every word is valid and otherwise fail
       if ~np.any(self.board ==0):
             return True
-      if cage_no == len(self.cage_coords):
+      if cage_no == length:
             return False
+     
+      if self.fill_iteration > self.size*10:
+            if self.debug: print('too many iterations')
+            return False
+   
       cage = self.cage_coords[cage_no]
+      if self.debug:
+          print(f'\nCage {cage_no} Recursion depth >>>>>>>>>>>>>>>>>>>>>> {len(inspect.stack())-self.initial_depth}')                    
+          # self.gui.print_board(self.board, which=str(cage_no), highlight=cage)     
+          
       numbers = self.permutation_dict[len(cage)] 
       random.shuffle(numbers)
-      for number_set in numbers:
-          if self.check_valid(cage, number_set):
-               if self.fill(cage_no+1, animate):
+      number_sets = self.permutation_dict[len(cage)]
+      for index, number_set in enumerate(number_sets):
+          if self.debug:
+              #print(f'{number_set} {index=}/{len(self.permutation_dict[len(cage)])}', end=' ')
+              self.gui.print_board(self.board, which=f'cage={cage_no} index={index}', highlight=self.cage_coords[cage_no])     
+          t=time()
+          if self.check_valid(cage, number_set):               
+               if self.fill(cage_no+1, length, animate):
+                  if self.debug: self.time_us(t, f'fill pass {index}')
                   return True
-          else:
-              # t = np.array(cage)
-              # self.board[(t[:,0], t[:,1])] = 0
-              [self.board_rc(coord, self.board, 0) for coord in cage]        
-      return False
-          
-  def create_puzzle(self, cages):
+               self.clear_cage(cage)
+               if self.debug: print('backing up')
+          #self.time_us(t, f'check fail {index}')
+      if self.debug: self.time_us(t, f'fill fail {index}')
+      return False      
+
+  def create_puzzle(self, cg):
        """Create Suguru puzzle
        rules: 
            each cage contains numbers up to its size
-           each number may not be adjacent to the same number in any direction           
+           each number may not be adjacent to the same number in any direction      
+       cages is generated by Cages.run() in cages.py 
+       TODO order the cages so as to fail early
+       currently by length, but maybe proximity?           
+       """       
+       self.board = np.zeros((self.size, self.size), dtype=int)
+       self.sort_cages(cg, mode=0)       
        
-       """
-       # self.board = np.zeros((self.size, self.size), dtype=int)
-       self.cage_coords = sorted([[Coord((r, c)) for r, c, _ in cage]  for cage in cages], key=len)       
-       cage_no = 0
-       result = self.fill(cage_no, animate=False)           
+       # shuffle once
+       [random.shuffle(self.permutation_dict[len(cage)]) for cage in cg.cages]
+       self.initial_depth = len(inspect.stack())       
+       self.fill_iteration = 0
+       self.initial_depth = len(inspect.stack())       
+       result = self.fill(cage_no=0, length=len(self.cage_coords), animate=False)           
        if result:                                        
-          self.solution_board = self.board.copy()
+          self.solution_board = self.board.copy().astype('U1')
           self.gui.print_board(self.solution_board, which='final')
        else:
            raise RuntimeError('no fill possible')
        
   def suguru_setup(self, random_color=False):
-    """ setup grid for suguru """
-    self.board = np.zeros((self.size,self.size), dtype=int)
-    self.gui.remove_labels()
-    self.gui.replace_grid(*self.board.shape)
-    self.gui.remove_labels()
-    self.sizey, self.sizex = self.board.shape
-    
-    # setup cages creation
-    cg = Cages('Full', size=self.size, pent_set=[2,3,4,5,6])
-    cg.suguru = True
-    self.permutation_dict = {k: list(permutations(list(range(1, k+1)))) for k in range(1,7)}
-    
-    # fit cages to board
-    # might take several goes
-    self.start_time = time()
-    iteration = 0
-    while True:
-      try:
-          # This performs search and then checks whether any
-          # cages are adjacent to one with same number          
-          cg.solution, cg.cages = cg.run(display=self.debug)     
-          if self.debug:     
-             cg.draw_board(cg.solution)
-          self.create_puzzle(cg.cages)
-          break
-      except RuntimeError:
-         iteration += 1
-         print(f'{cg.iterations}')
-         print(f'{iteration=} not solvable')
-         continue
-  
-    self.gui.set_message(f'Solved in {iteration * cg.iterations} iterations in {(time() - self.start_time):.2f} secs')    
-    
+    """ setup grid for suguru 
+    options
+    6x6, 2-6, 5 visible
+    8x8, 1-5, 10 visible
+    8x8, 2-6, 9 visible
+    8x8, 1-5, 9 visible"""
+    if isinstance(self.puzzle, int):        
+        self.board = np.zeros((self.size,self.size), dtype=int)    
+        self.gui.replace_grid(*self.board.shape)
+        #self.gui.remove_labels()
+        self.sizey, self.sizex = self.board.shape
+        
+        # setup cages creation
+        cg = Cages('Full', size=self.size, pent_set=self.tiles)
+        cg.suguru = True
+        self.permutation_dict = {k: list(permutations(list(range(1, k+1)))) for k in range(1,7)}
+        
+        # fit cages to board
+        # might take several goes
+        self.start_time = time()
+        iteration = 0
+        times = []
+        times2=[]
+        t2=time()
+        wait = self.gui.set_waiting('Finding puzzle')
+        while True:
+            try: 
+                wait.name = f'# {iteration} in {(time()-t2):.1f}s'     
+                t=time()
+                cg.solution, cg.cages = cg.run(display=self.debug)                 
+                if self.debug: cg.draw_board(cg.solution)
+                times.append(time()-t)
+                t=time()
+                self.create_puzzle(cg)
+                times2.append(time()-t)
+                break
+            except RuntimeError:
+                iteration += 1
+                times2.append(time()-t)
+                #print(f'{cg.iterations}')
+                if self.debug: print(f'{iteration=} not solvable')
+                continue 
+        times = np.array(times)
+        times2 = np.array(times2)
+        # print(times)
+        # print(times2)
+        print(f'{np.mean(times)=:.3f} {np.std(times)=:.3f}')
+        print(f'{np.mean(times2)=:.3f} {np.std(times2)=:.3f}')
+        print(f'{iteration=}')
+        self.gui.reset_waiting(wait)
+        self.store_valid_puzzle(cg)
+        #plt.cla()
+        #plt.hist(times, density=False, bins=30)  # density=False would make counts
+        #plt.hist(times2, density=False, bins=30)  # density=False would make counts
+        #plt.show()
+        self.gui.set_message(f'Solved in {iteration * cg.iterations} iterations in {(time() - self.start_time):.2f} secs')    
+                        
+        # now to assign colours and numbers
+        self.cage_board = cg.solution
+        # store coord and total for later display
+        
+        if self.debug:
+            self.gui.print_board(self.cage_board, which='cage board')
+            
+    else:
+        # selected a working puzzle from the file
+        self.board, cages = self.puzzle
+        cg = Cages('Full', size=self.board.shape[0])
+        cg.suguru = True
+        self.start_visible = 8
+        self.gui.replace_grid(*self.board.shape)
+        #self.gui.remove_labels()
+        self.sizey, self.sizex = self.board.shape
+        self.size = self.board.shape[0]
+        self.cage_coords = sorted([[Coord((r, c)) for r, c, _ in cage]  for cage in cages], key=len)    
+        self.cage_board = self.board.copy()
+        self.solution_board = self.board.copy().astype('U1')
     # display starting values
-    # clear all numbers  bar two
+    # clear all numbers  bar INITIAL
     self.board = self.board.astype('U1')
-    INITIAL=3
-    self.number_locs = np.argwhere(np.char.isnumeric(self.board))
-    number_loc_list = list(self.number_locs)
+    number_loc_list = self.gui.number_locs(self.board)
     random.shuffle(number_loc_list)   
-    [self.board_rc(loc, self.board,  ' ') for loc in number_loc_list[INITIAL:]]
-    self.gui.update(self.board.astype('U1'))
+    [self.board_rc(loc, self.board,  ' ') for loc in number_loc_list[self.start_visible:]]
+    self.gui.update(self.board.astype('U1'))       
     
-    # now to assign colours and numbers
-    self.cage_board = cg.solution
-    # store coord and total for later display
-    
-    if self.debug:
-        self.gui.print_board(self.cage_board, which='cage board')
-    self.adj_matrix = cg.adj_matrix(self.cage_board)
+    self.adj_matrix = cg.calc_adj_matrix(self.cage_board)
     color_map_dict = cg.color_4colors(colors=self.cage_colors)
     color_map_dict = {k: color_map_dict[k] for k in sorted(list(color_map_dict))}
     color_map_list = list(color_map_dict.values())
@@ -251,9 +356,6 @@ class Suguru(LetterGame):
                               for coord in coords], clear_previous=False)
     self.delta_t('display cages')
          
-  def calc_board(self, board, values):
-     [self.board_rc(self.board_dict[k], board, ' ' if v in ['.', '0'] else v) for k, v in values.items()]
-     return board
   
   #########################################################################
   # main loop
@@ -261,67 +363,100 @@ class Suguru(LetterGame):
     """
     Main method that prompts the user for input
     """
+    if self.test is None:
+       console.clear()
     self.gui.clear_messages()
     self.gui.set_enter('Note', fill_color='clear')    
     self.notes = {}
-    selected = self.select_list()
-    self.suguru_setup(random_color=False)            
-    #self.gui.update(self.solution_board.astype('U1'))     
-    self.gui.set_message2('')
-    while True:
-      self.gui.set_top(f'Sudoko\t\tLevel {self.puzzle}\t\tHints : {self.hints}',
-                       font=('Avenir Next', 20))
-      move = self.get_player_move(self.board)
-      sleep(0.1)
-      moves = self.select(move, self.board, text_list=False)
-      self.process_selection(moves)
-      
-      if self.game_over():
-        break
+    selected = self.select_list(self.test)
     
-    self.gui.set_message2('Game over')
-    self.complete()
+        
+    if self.debug: self.gui.gs.close()
+    self.suguru_setup(random_color=False)            
+    # self.gui.update(self.solution_board.astype('U1'))     
+    self.gui.set_message2('')
+    if self.test is None:
+        while True:
+          self.gui.set_top(f'Sudoko\t\tLevel {self.board.shape[0]}\t\tHints : {self.hints}',
+                           font=('Avenir Next', 20))
+          move = self.get_player_move(self.board)
+          sleep(0.1)
+          moves = self.select(move, self.board, text_list=False)
+          self.process_selection(moves)
+          
+          if self.game_over():
+            break
+    
+          self.gui.set_message2('Game over')
+          self.complete()
     
   ######################################################################
   
-  def select_list(self):
-      '''Choose which category'''
-      items = [s.capitalize() for s in ['5x5', '6x6', '7x7', '9x9', '11x11']]
+  def select_list(self, test=None):
+      '''Choose which category
+                               N.  piece sizes visible'''
+      puzzles_from_file = self.load_puzzles()
+          
+      self.options = {'Easy': (5, [1,3,4,5], 8),
+                      'Guardian': (6, [1,3,4,5], 7),
+                      'Medium': (7, [2, 3, 4, 5], 10),
+                      'Hard': (8, [2,3,4,5,6], 9),
+                      'Hardest': (8, [1,2,3,4,5], 8)}
+      for ix, puzzle in enumerate(puzzles_from_file):
+          s = puzzle[0].shape
+          self.options[f'Puzzle{ix+1} ({s[0]}x{s[1]})'] = ix
+          
+      items = [s.capitalize() for s in self.options]
       self.gui.selection = ''
       selection = ''
-      prompt = ' Select category'
-      while self.gui.selection == '':
-        if self.gui.device.endswith('_portrait'):
-            x, y, w, h = self.gui.game_field.bbox
-            position = (x + w, 40)
-        else:
-            position = None
-        self.gui.input_text_list(prompt=prompt, items=items, position=position)
-        
-        while self.gui.text_box.on_screen:
-          sleep(.2)
-          try:
-            selection = self.gui.selection
-          except (Exception) as e:
-            print(e)
-            print(traceback.format_exc())
-   
-        if selection == "Cancelled_":
-          return False
-        elif len(selection) > 1:
-          self.size = int(selection.split('x')[0])
+      if test is None:
+          prompt = ' Select category'
+          while self.gui.selection == '':
+            if self.gui.device.endswith('_portrait'):
+                x, y, w, h = self.gui.game_field.bbox
+                position = (x + w, 40)
+            else:
+                position = None
+            self.gui.input_text_list(prompt=prompt, items=items, position=position)
             
-          self.puzzle = self.size
-          self.gui.selection = ''
-          return True
-        else:
-            self.size = 7
-            return False
-                
+            while self.gui.text_box.on_screen:
+              sleep(.1)
+              try:
+                selection = self.gui.selection
+              except (Exception) as e:
+                print(e)
+                print(traceback.format_exc())
+       
+            if selection == "Cancelled_":
+              return False
+            elif len(selection) > 1:
+              if selection.startswith('Puzzle'):
+                 self.puzzle = puzzles_from_file[int(selection.split(' ')[0][6:])]
+                 
+              else:
+                  self.size = self.options[selection][0]
+                  self.tiles = self.options[selection][1]  
+                  self.start_visible = self.options[selection][2] 
+                  self.puzzle = self.size
+              self.gui.selection = ''
+              return True
+            else:
+                self.size = 7
+                return False
+      else:
+           # testing we enter here
+           selection = test
+           self.size = self.options[selection][0]
+           self.tiles = self.options[selection][1]  
+           self.start_visible = self.options[selection][2] 
+           self.puzzle = self.size
+           self.gui.selection = ''
+           return True
+                     
   def game_over(self):
     """ check for finished game
     board matches solution"""
-    return self.board == self.solution_board  
+    return np.array_equal(self.board, self.solution_board)
  
   def update_notes(self, coord):
      """ update any related notes using known validated number"""
@@ -366,9 +501,7 @@ class Suguru(LetterGame):
       msg = ''.join([f'{let}\n' if i % 4 == 3 else f'{let}  ' for i, let in enumerate(item)]).strip()
       data = self.gui.get_numbers(pos)[pos]
       data['text'] = msg
-      if self.puzzle.startswith('Killer'):
-         total = str(self.totals[pos]) if pos in self.totals else ''
-         data['text'] = total + '\n' + msg
+      
       self.gui.put_numbers({pos: data}, font=font)
   
   def process_selection(self, move):
@@ -395,7 +528,7 @@ class Suguru(LetterGame):
               self.gui.update(self.board.astype('U1'))
               
               # test if correct
-              if self.get_board_rc(coord, self.board) != str(self.get_board_rc(coord, self.solution_board)):
+              if self.get_board_rc(coord, self.board) != self.get_board_rc(coord, self.solution_board):
                 if self.debug:
                    print('testing', letter, coord)
                 # make square flash yellow
@@ -405,7 +538,7 @@ class Suguru(LetterGame):
                 data_temp['color'] = 'yellow'
                 data_temp['alpha'] = 0.7
                 self.gui.put_numbers({coord: data_temp})
-                sleep(0.5)
+                sleep(1.0)
                 self.board_rc(coord, self.board, ' ')
                 
                 # clear note. should clear try value from note also
@@ -461,7 +594,7 @@ class Suguru(LetterGame):
           # now open list
           if board is None:
               board = self.board
-          possibles = list(sudoko_solve.digits)  # 1 thru 9
+          possibles = list('123456789')  # 1 thru 9
           items = possibles
           if long_press or self.hint:
               prompt = "Select multiple"
@@ -488,7 +621,7 @@ class Suguru(LetterGame):
             panel = select_method(prompt=prompt, items=items, position=position,
                                       allows_multiple_selection = (long_press or self.hint))             
             while panel.on_screen:
-                sleep(.2)
+                sleep(.1)
                 try:
                   selection = self.gui.selection.lower()
                   selection_row = self.gui.selection_row
@@ -498,7 +631,7 @@ class Suguru(LetterGame):
                 except (Exception) as e:
                   print(e)
                   print(traceback.format_exc())           
-   
+            
             if selection in items:
               self.gui.selection = ''
               if self.debug:
@@ -528,7 +661,7 @@ class Suguru(LetterGame):
   def perform_hint(self):
     """ uncover a random empty square """
     while True:
-      coord = (random.randint(0, 8), random.randint(0, 8))
+      coord = (random.randint(0, self.size), random.randint(0, self.size))
       if self.get_board_rc(coord, self.board) != SPACE:
         continue
       else:
@@ -545,13 +678,6 @@ class Suguru(LetterGame):
     self.__init__()
     self.run()
      
-  def display(self, values):
-    """Display these values as a 2-D grid.
-    A1=(0,0), A2=(0,1), B1=(1,0) etc"""
-    [self.board_rc(self.board_dict[k], self.board, ' ' if v in ['.', '0'] else v) for k, v in values.items()]
-    self.gui.update(self.board.astype('U1'))
-    sleep(self.sleep_time)
-    
           
 if __name__ == '__main__':
   Suguru().run()

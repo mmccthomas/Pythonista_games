@@ -4,7 +4,7 @@
 import numpy as np
 import random
 from math import prod, sqrt
-from polyminoes import polymino_dict
+from polyminoes import polymino
 import matplotlib.pyplot as plt
 import matplotlib.colors as mcolors
 
@@ -14,27 +14,29 @@ SIZE = 9
 class Cages:
     
     def __init__(self, level=None, size=9, pent_set=None):
+        """ numbers of polyminoes are no_boxes*100 + type number """
         # types ## ### ### ## ##.  #
         #            #.  ##. ## ###
+        self.pent_set = pent_set
         self.color_map = ("⬛", "🟦", "🟥", "🟧", "🟩", "🟪",  "🟫", "⬜")
         self.cage_colors = ["blue", "red", "yellow", "green", "purple", "cyan"]
         if level is None:
           self.piece_types = (
-              [[1, 1]], [[2, 2, 2]],
-              [[3, 0], [3, 3]], [[4, 0, 0], [4, 4, 4]],
-              [[5, 5], [5, 5]], [[6, 6, 0], [0, 6, 6]],
-              [[0, 7, 0], [7, 7, 7]])
+              [[201, 201]], [[302, 302, 302]],
+              [[303, 0], [303, 303]], [[304, 0, 0], [304, 304, 304]],
+              [[405, 405], [405, 405]], [[406, 406, 0], [0, 406, 406]],
+              [[0, 407, 0], [407, 407, 407]])
         elif level == 'Easy':
            self.piece_types = (
-              [[1, 1]], [[2, 2, 2]],
-              [[3, 0], [3, 3]], [[4, 0, 0], [4, 4, 4]],
-              [[5, 5], [5, 5]])
+              [[201, 201]], [[302, 302, 302]],
+              [[303, 0], [303, 303]], [[304, 0, 0], [304, 304, 304]],
+              [[405, 405], [405, 405]])
         elif level == 'Full':
             if pent_set:
                 piece_types = pent_set
             else:
                 piece_types = [2,3,4,5,6]
-            self.piece_types = [item for k, v in polymino_dict.items() for item in v if k in piece_types]
+            self.piece_types = [item for k, v in polymino().items() for item in v if k in piece_types]
             colordict = mcolors.CSS4_COLORS  # a curated list of colors
             self.color_map = [random.choice(list(colordict)) for _ in self.piece_types] 
         self.size = size   
@@ -58,7 +60,8 @@ class Cages:
         # create discrete colormap        
         cmap = mcolors.ListedColormap(self.color_map)
         fig, ax = plt.subplots()
-        ax.imshow(board, cmap=cmap)
+        # remove 100s number, which represents cage length
+        ax.imshow(board % 100, cmap=cmap)
         locs = np.argwhere(board>0)
         for loc in locs:
             ax.annotate(str(board[tuple(reversed(loc))]),xy=loc)
@@ -149,10 +152,12 @@ class Cages:
         [self.board_rc((r, c), new_board, val) for r, c, val in changed_squares]
 
         # check if the move created any illegal squares
-        if not self.check_zeroes(new_board):
+        if self.suguru and 1 in self.pent_set:
+           return new_board, legal_move, changed_squares
+        elif  not self.check_zeroes(new_board):
             return board, False, None
-
-        return new_board, legal_move, changed_squares
+        else:
+            return new_board, legal_move, changed_squares
 
     def solve_board(self, board, pieces, display):
         """ place cages on empty board """
@@ -165,11 +170,12 @@ class Cages:
         while True:
           self.iterations += 1
           if display:
-              print('iterations', iterations)
+              print('iterations', self.iterations)
               self.draw_board(board)
           if self.iterations % 100 == 0:
             # start again
-            print('Restarting search')
+            if display:
+                print('Restarting search')
             self.iterations = 0
             cages = []
             board = np.zeros((self.size, self.size), dtype=int)
@@ -179,12 +185,14 @@ class Cages:
           if np.all(board):
               #self.solutions.append(board)
               #print(f"Solutions: {len(self.solutions):,}")
-              print(f"Iterations: {self.iterations:,}\n")
+              if display:
+                  print(f"Iterations: {self.iterations:,}\n")
               if display:
                   self.draw_board(board)
                   print(cages)
               return board, cages  # comment this to continuously search
-              print('Restarting search')
+              if display: 
+                  print('Restarting search')
               self.iterations = 0
               cages = []
               board = np.zeros((self.size, self.size), dtype=int)
@@ -209,7 +217,7 @@ class Cages:
                     cages.append(squares)
                     break  # next board position
                     
-    def adj_matrix(self, cage_board):
+    def calc_adj_matrix(self, cage_board):
       """ Construct adjacent matrix to allow colour algorithm
          adjacent matrix has size for all nodes (individual cages) on board
          a one in row, column shows adjacency
@@ -321,6 +329,7 @@ class Cages:
         # cages are adjacent to one with same number
         self.solution,  cages = self.run(display=display)
         """
+        TODO need to prevent 2x1 blocks next to each other
         if display:
             self.draw_board(self.solution)
         all_indices = np.argwhere(self.solution>0)
@@ -504,8 +513,31 @@ class Cages:
                                    
     def run(self, display=True):
         return self.solve_board(self.board, self.piece_positions, display=display)
+    
+    def small_adj_matrix(self):
+        # construct adjacency matrix of cage index, not value
+        cage_ = self.solution.copy()
+        for k, v in enumerate(self.cages):
+            for item in v:
+                r, c, _ = item                
+                cage_[r,c] =  k
+        self.ident_cage_board = cage_
+        self.a_m = self.calc_adj_matrix(cage_)
+        self.vertex_data = list(range(0, self.a_m.shape[0]))
+        
+    def dfs_util(self, v, visited):
+        visited[v] = True
+        self.path.append(self.vertex_data[v])
+        for i in range(self.a_m.shape[0]):
+            if self.a_m[v][i] == 1 and not visited[i]:
+                self.dfs_util(i, visited)
 
-
+    def dfs(self, start_vertex_data):
+        visited = [False] * self.a_m.shape[0]
+        self.path=[]
+        start_vertex = self.vertex_data.index(start_vertex_data)
+        self.dfs_util(start_vertex, visited)
+        
 if __name__ == "__main__":
     # a=np.random.randint(0,4,(SIZE,SIZE))
     for _ in range(10):
@@ -520,8 +552,15 @@ if __name__ == "__main__":
             #b.draw_board(b.solution)
         b.cage_board = b.solution #cage_board_view()
         # now to assign colours and numbers                
+        b.small_adj_matrix()
+        #start from smallest cage
+        a= [len(v) for v in b.cages]
+        i = a.index(min(a))
         
-        b.adj_matrix = b.adj_matrix(b.cage_board)
+        b.dfs(i)
+        print(b.ident_cage_board)
+        print(b.path)
+        b.adj_matrix = b.calc_adj_matrix(b.cage_board%100)
         # b.cage_colors = ['lunar green', 'desert brown', 'cashmere', 'linen']
         b.cage_colors = ['cyan', 'yellow', 'pink', 'linen', 'green']
         color_map_dict = b.color_4colors(colors=b.cage_colors)

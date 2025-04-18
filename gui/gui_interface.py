@@ -463,7 +463,27 @@ class Gui():
         ''' if board, it is a single [row,col] '''
         self.gs.board = list(map(list, board))  # board.copy()
         self.gs.redraw_board(fn_piece=fn_piece)
-
+        
+    def subset(self, board, loc, N=3):
+        # get a subset of board of max NxN, centred on loc
+        # subset is computed with numpy slicing
+        # to make it as fast as possible
+        # max and min are used to clip subset close to edges
+        r, c = loc
+        subset = board[max(r - (N-2), 0):min(r + N-1, board.shape[0]),
+                              max(c - 1, 0):min(c + 2, board.shape[1])] 
+        return subset
+    
+    def number_locs(self, board):
+        # return a list of numeric characters in np board
+        locs = np.argwhere(np.char.isnumeric(board))
+        return list(locs)
+        
+    def alpha_locs(self, board):
+        # return a list of alpha characters in np board
+        locs = np.argwhere(np.char.alpha(board))
+        return list(locs)
+      
     def add_numbers(self, items, clear_previous=True, **kwargs):
         # items are each an instance of Swuares object
         self.gs.add_numbers(items, clear_previous, **kwargs)
@@ -556,11 +576,16 @@ class Gui():
                     items.append(f"{cell}{j}{i}")
         print('board:', which, items)
 
-    def print_board(self, board, which=None):
+    def print_board(self, board, which=None, highlight=None):
+        # optionally make chars underlined
+        # highlight is a list of r,c coordinates
         print('board:', which)
         for j, row in enumerate(board):
             for i, col in enumerate(row):
-                print(board[j][i], end=' ')
+                if highlight and (j, i) in highlight:
+                  print(str(board[j][i]) + '\u0333', end=' ')  
+                else:
+                   print(str(board[j][i]), end=' ')
             print()
 
     def input_message(self, message):

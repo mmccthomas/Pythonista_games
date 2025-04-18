@@ -148,7 +148,7 @@ class Sudoko(LetterGame):
     self.totals = {k[0]: v for v, k in cg.cages}
     if self.debug:
         print('cage board\n', self.cage_board)
-    self.adj_matrix = cg.adj_matrix(self.cage_board)
+    self.adj_matrix = cg.calc_adj_matrix(self.cage_board)
     color_map_dict = cg.color_4colors(colors=self.cage_colors)
     self.delta_t('calculate cages')
     self.square_list = []
