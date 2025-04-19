@@ -181,7 +181,7 @@ class GameBoard(Scene):
         case (744.0, 1133.0):
           device = 'ipad_mini_portrait'
         case _:
-          device = None
+          device = 'ipad_landscape'
       return device
       
   def grid_sizes(self, device, dimx, dimy):

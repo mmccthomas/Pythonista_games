@@ -308,7 +308,7 @@ class Cages:
             if len(colorDict[nd]) > 1:
                 colorDict[nd].remove(setTheColor[0])
             else:
-                colorDict[nd] = random.choice(['lunar green', 'desert brown', 'cashmere', 'linen'])
+                colorDict[nd] = random.choice(['lunar green', 'cashmere', 'linen'])
                 print(f'needed extra color {colorDict[nd]} for n={n}, nd={nd}')
       return theSolution
       # Print the solution

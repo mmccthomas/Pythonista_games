@@ -35,8 +35,8 @@ class Suguru(LetterGame):
     self.sleep_time = 0.1
     self.test = test
     self.hints = 0
-    self.cage_colors = ['teal', 'salmon', 'dark turquiose', 'yellow']
-    # self.cage_colors = ['lunar green', 'desert brown', 'cashmere', 'linen']
+    self.cage_colors = ['teal', 'salmon', 'dark turquiose', 'yellow',
+                        'lunar green', 'cashmere', 'linen']
     # self.cage_colors = ['#D8D0CD', '#B46543', '#DF5587', '#C83F5F']
     
     # allows us to get a list of rc locations
@@ -153,16 +153,20 @@ class Suguru(LetterGame):
         board = board[:r+1, :c+1]
         return board
                   
-  def load_puzzles(self):                   
+  def load_puzzles(self):  
+      """ return a dictionary of list of puzzles for each size"""          
       try:
           with open(FILENAME, 'r') as f:
               data = f.read()
           puzzle_strings = data.split('\n')          
-          puzzles = []
+          puzzles = {'5x5':[], '6x6': [], '7x7': [], '8x8': [], '9x9': []}
           cage_sets= [json.loads(p) for p in puzzle_strings if p]
           for cage in cage_sets:
               board = self.cage_board_view(cage)
-              puzzles.append((board, cage))
+              shape = f'{board.shape[0]}x{board.shape[1]}'
+              puzzles[shape].append((board, cage))
+          self.msg = '\n'.join([f'{k},  {len(v)} puzzles' for k, v in puzzles.items()])
+          print(self.msg)
           return puzzles
       except FileNotFoundError:
           pass
@@ -245,6 +249,8 @@ class Suguru(LetterGame):
     8x8, 2-6, 9 visible
     8x8, 1-5, 9 visible"""
     if isinstance(self.puzzle, int):        
+        # #############################################################################
+        # create new puzzle of size self.puzzle 
         self.board = np.zeros((self.size,self.size), dtype=int)    
         self.gui.replace_grid(*self.board.shape)
         #self.gui.remove_labels()
@@ -303,43 +309,40 @@ class Suguru(LetterGame):
             self.gui.print_board(self.cage_board, which='cage board')
             
     else:
+        # #############################################################################
         # selected a working puzzle from the file
         self.board, cages = self.puzzle
         cg = Cages('Full', size=self.board.shape[0])
         cg.suguru = True
-        self.start_visible = 8
         self.gui.replace_grid(*self.board.shape)
         #self.gui.remove_labels()
         self.sizey, self.sizex = self.board.shape
-        self.size = self.board.shape[0]
         self.cage_coords = sorted([[Coord((r, c)) for r, c, _ in cage]  for cage in cages], key=len)    
         self.cage_board = self.board.copy()
         self.solution_board = self.board.copy().astype('U1')
+        cg.cages = cages
     # display starting values
     # clear all numbers  bar INITIAL
     self.board = self.board.astype('U1')
     number_loc_list = self.gui.number_locs(self.board)
     random.shuffle(number_loc_list)   
     [self.board_rc(loc, self.board,  ' ') for loc in number_loc_list[self.start_visible:]]
-    self.gui.update(self.board.astype('U1'))       
-    
+    self.gui.update(self.board.astype('U1'))     
+      
+    # convert to non adjacent colours
+    [self.board_rc((r,c), self.cage_board, k) 
+        for (k, v) in enumerate(cg.cages) 
+        for (r, c, _) in v ]
     self.adj_matrix = cg.calc_adj_matrix(self.cage_board)
     color_map_dict = cg.color_4colors(colors=self.cage_colors)
     color_map_dict = {k: color_map_dict[k] for k in sorted(list(color_map_dict))}
-    color_map_list = list(color_map_dict.values())
-    
+    color_map_list = list(color_map_dict.values())    
     cg.color_map = color_map_list
-    #cg.draw_board(self.cage_board)
-    
-        
-    self.delta_t('calculate cages')
-    self.square_list = []
-    self.start_time = time()
-    # add dotted lines around cages
-    
-    delta=0.45
-    linewidth=2
-    linedash=[10,10]
+    #cg.draw_board(self.cage_board)                   
+    # add dotted lines around cages    
+    delta = 0.45
+    linewidth = 2
+    linedash = [10, 10]
     for coords in self.cage_coords:                    
         points = cg.dotted_lines(coords, delta=delta)
         points = [self.gui.rc_to_pos(point) for point in points]
@@ -353,9 +356,7 @@ class Suguru(LetterGame):
         self.gui.add_numbers([Squares(coord, '', color, z_position=30,
                                       alpha=0.5, font=('Avenir Next', 20),
                                       text_anchor_point=(-0.9, 0.9))
-                              for coord in coords], clear_previous=False)
-    self.delta_t('display cages')
-         
+                              for coord in coords], clear_previous=True)             
   
   #########################################################################
   # main loop
@@ -368,10 +369,11 @@ class Suguru(LetterGame):
     self.gui.clear_messages()
     self.gui.set_enter('Note', fill_color='clear')    
     self.notes = {}
+    self.puzzles_from_file = self.load_puzzles()
+    self.gui.set_moves(self.msg)
     selected = self.select_list(self.test)
-    
-        
-    if self.debug: self.gui.gs.close()
+            
+    if self.debug or self.test: self.gui.gs.close()
     self.suguru_setup(random_color=False)            
     # self.gui.update(self.solution_board.astype('U1'))     
     self.gui.set_message2('')
@@ -394,17 +396,20 @@ class Suguru(LetterGame):
   
   def select_list(self, test=None):
       '''Choose which category
-                               N.  piece sizes visible'''
-      puzzles_from_file = self.load_puzzles()
+                               N.  piece sizes visible
+       for puzzles from file, categorise by size
+       choose a size and it picks one at random'''
           
-      self.options = {'Easy': (5, [1,3,4,5], 8),
-                      'Guardian': (6, [1,3,4,5], 7),
+      self.options = {'Random 5x5': (5, [1,3,4,5], 8),
+                      'Random 6x6': (6, [1, 3, 4, 5, 6], 7),
+                      'Random 7x7': (7, [2, 3, 4, 5], 10),
+                      'Random 8x8': (8, [2,3,4,5,6], 9),      
+                      'Easy': (5, [1,3,4,5], 8),
+                      'Guardian': (6, [1, 3, 4, 5, 6], 7),
                       'Medium': (7, [2, 3, 4, 5], 10),
                       'Hard': (8, [2,3,4,5,6], 9),
-                      'Hardest': (8, [1,2,3,4,5], 8)}
-      for ix, puzzle in enumerate(puzzles_from_file):
-          s = puzzle[0].shape
-          self.options[f'Puzzle{ix+1} ({s[0]}x{s[1]})'] = ix
+                      'Hardest': (9, [2, 3, 4, 5, 6], 8)}
+      
           
       items = [s.capitalize() for s in self.options]
       self.gui.selection = ''
@@ -430,14 +435,16 @@ class Suguru(LetterGame):
             if selection == "Cancelled_":
               return False
             elif len(selection) > 1:
-              if selection.startswith('Puzzle'):
-                 self.puzzle = puzzles_from_file[int(selection.split(' ')[0][6:])]
-                 
-              else:
-                  self.size = self.options[selection][0]
-                  self.tiles = self.options[selection][1]  
-                  self.start_visible = self.options[selection][2] 
-                  self.puzzle = self.size
+              self.size, self.tiles, self.start_visible = self.options[selection]
+              if selection.startswith('Random'):
+                 puzzle_list = self.puzzles_from_file[selection.split(' ')[1]]
+                 if puzzle_list:             
+                     self.puzzle = random.choice(puzzle_list)                    
+                 else:
+                     console.hud_alert(f'No stored puzzles {selection.split(" ")[1]}')    
+                     return False         
+              else:                                    
+                   self.puzzle = self.size                            
               self.gui.selection = ''
               return True
             else:
@@ -446,9 +453,7 @@ class Suguru(LetterGame):
       else:
            # testing we enter here
            selection = test
-           self.size = self.options[selection][0]
-           self.tiles = self.options[selection][1]  
-           self.start_visible = self.options[selection][2] 
+           self.size, self.tiles, self.start_visible = self.options[selection]
            self.puzzle = self.size
            self.gui.selection = ''
            return True
