@@ -356,7 +356,7 @@ class Suguru(LetterGame):
         self.gui.add_numbers([Squares(coord, '', color, z_position=30,
                                       alpha=0.5, font=('Avenir Next', 20),
                                       text_anchor_point=(-0.9, 0.9))
-                              for coord in coords], clear_previous=True)             
+                              for coord in coords], clear_previous=False)             
   
   #########################################################################
   # main loop
@@ -378,8 +378,12 @@ class Suguru(LetterGame):
     # self.gui.update(self.solution_board.astype('U1'))     
     self.gui.set_message2('')
     if self.test is None:
-        while True:
-          self.gui.set_top(f'Sudoko\t\tLevel {self.board.shape[0]}\t\tHints : {self.hints}',
+      while True:
+          if self.puzzle_no >=0:
+              self.gui.set_top(f'Suguru\t{self.board.shape[0]}x{self.board.shape[1]}\t#{self.puzzle_no}\t\t\tHints : {self.hints}',
+                           font=('Avenir Next', 20))
+          else:                 
+               self.gui.set_top(f'Suguru\t{self.board.shape[0]}x{self.board.shape[1]}\t\t\tHints : {self.hints}',
                            font=('Avenir Next', 20))
           move = self.get_player_move(self.board)
           sleep(0.1)
@@ -389,8 +393,8 @@ class Suguru(LetterGame):
           if self.game_over():
             break
     
-          self.gui.set_message2('Game over')
-          self.complete()
+      self.gui.set_message2('Game over')
+      self.complete()
     
   ######################################################################
   
@@ -404,13 +408,15 @@ class Suguru(LetterGame):
                       'Random 6x6': (6, [1, 3, 4, 5, 6], 7),
                       'Random 7x7': (7, [2, 3, 4, 5], 10),
                       'Random 8x8': (8, [2,3,4,5,6], 9),      
+                      'Random 9x9': (9, [2, 3, 4, 5, 6], 8), 
+                      '-----------': (5, [1,3,4,5], 8),
                       'Easy': (5, [1,3,4,5], 8),
                       'Guardian': (6, [1, 3, 4, 5, 6], 7),
                       'Medium': (7, [2, 3, 4, 5], 10),
                       'Hard': (8, [2,3,4,5,6], 9),
                       'Hardest': (9, [2, 3, 4, 5, 6], 8)}
       
-          
+      self.puzzle_no = -1  
       items = [s.capitalize() for s in self.options]
       self.gui.selection = ''
       selection = ''
@@ -438,8 +444,9 @@ class Suguru(LetterGame):
               self.size, self.tiles, self.start_visible = self.options[selection]
               if selection.startswith('Random'):
                  puzzle_list = self.puzzles_from_file[selection.split(' ')[1]]
-                 if puzzle_list:             
-                     self.puzzle = random.choice(puzzle_list)                    
+                 if puzzle_list:
+                     self.puzzle_no = random.randint(0, len(puzzle_list)-1)       
+                     self.puzzle = puzzle_list[self.puzzle_no]               
                  else:
                      console.hud_alert(f'No stored puzzles {selection.split(" ")[1]}')    
                      return False         
@@ -466,33 +473,21 @@ class Suguru(LetterGame):
   def update_notes(self, coord):
      """ update any related notes using known validated number"""
      # remove note from validated cell
+     coord = Coord(coord)
      self.notes.pop(coord, None)
      known_value = str(self.get_board_rc(coord, self.board))
-     
-     r, c = coord
-     # look along row
-     for col in range(self.size):
+     for neighbour in coord.all_neighbours():
        try:
-         self.notes[(r, col)].remove(known_value)
+         self.notes[neighbour].remove(known_value)
        except (KeyError, ValueError):
          pass
-     # look along col
-     for row in range(self.size):
-       try:
-         self.notes[(row, c)].remove(known_value)
-       except (KeyError, ValueError):
-         pass
-     # look in local 3x3 square
-     # gets start of enclosing 3x3 square
-     r_off = 3 * (r // 3)
-     c_off = 3 * (c // 3)
- 
-     for r in range(3):
-       for c in range(3):
+     # remove known from notes in same cage
+     same_cage_coords = np.argwhere(self.cage_board==self.cage_board[coord])
+     for loc in same_cage_coords:
          try:
-           self.notes[(r + r_off, c + c_off)].remove(known_value)
+             self.notes[tuple(loc)].remove(known_value)
          except (KeyError, ValueError):
-           pass
+            pass
      if self.debug:
          print('removed note', coord, known_value, self.notes)
      
