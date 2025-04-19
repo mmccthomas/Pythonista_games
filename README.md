@@ -19,7 +19,7 @@ Style note:
 Due to the limited debugging in Pythonista, I frequently used a non-preferred way to use list comprehensions
 e.g. [print(x) for x in iterable]
 This is to allow stepping over an iteration loop during debug.
-Hint: a conditional breakpoint mode would be nice!
+Hint: a conditional breakpoint mode would be nice, or ability to set breakpoint in called module.
 
 Games are:
 
@@ -40,6 +40,20 @@ The Sudoko solve engine is provided by
 http://norvig.com/sudoku.html
 
 Entry point : Word_Games/Sudoku.py
+
+Suguru
+------
+Variant of Sudoko in which coloured cages contain
+numbers 1 to size of cage, and no number can be next to the same 
+in any direction.
+New puzzles can be created, but beware that these can take a long time,
+up to 30min for 9x9 grid.
+Valid games are stored in suguru.txt (json format) , and are selected by
+choosing Random NxN.
+Any additionally created puzzles will be stored in suguru.txt
+Run Word_Games/test_suguru.py to automate new puzzle creation.
+
+Entry point : Word_Games/Suguru.py
 
 Wordsearch
 ----------
