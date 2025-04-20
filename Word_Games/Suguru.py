@@ -1,4 +1,3 @@
-
 import random
 import traceback
 from time import sleep, time
@@ -6,10 +5,10 @@ from queue import Queue
 import numpy as np
 import inspect
 import console
+import json
 from itertools import permutations
 from Letter_game import LetterGame, Player
 from cages import Cages
-import json
 from gui.gui_interface import Gui, Squares, Coord
 
 """ This game is the Suguru grid puzzle
@@ -53,7 +52,7 @@ class Suguru(LetterGame):
     self.gui.require_touch_move(False)
     self.gui.allow_any_move(True)
     self.gui.setup_gui(log_moves=False)
-    
+    self.gui.orientation(self.display_setup)
     # menus can be controlled by dictionary of labels
     # and functions without parameters
     self.gui.set_pause_menu({'Continue': self.gui.dismiss_menu,
@@ -62,28 +61,64 @@ class Suguru(LetterGame):
                              'Reveal': self.reveal,
                              'Quit': self.quit})
     self.gui.set_start_menu({'New Game': self.restart, 'Quit': self.quit})
-        
+    
+    
+  def display_setup(self):
+    """set positions of display
+    elements for different device
+    sizes
+    This is called also when devis is rotated
+    """
+    W, H = self.gui.get_device_screen_size()
+    self.gui.device = self.gui.get_device()
     x, y, w, h = self.gui.grid.bbox
     match  self.gui.device:
        case'ipad_landscape':
-           position = (w+10, 8*h/9)
+           position_hint = (w+10, 8*h/9)
+           self.num_position = (x+w+50, h / 2) 
+           position_puzzles = (w+10, h/4)
        case'ipad_portrait':
-           position = (7*w/9, h+50)
+           position_hint = (7*w/9, h+50)
+           self.num_position = (w/3, y)
+           position_puzzles = (w/2, h)
        case 'iphone_portrait':
-           position = (180, 470)
+           position_hint = (200, 420)
+           self.num_position = (x, y)
+           position_puzzles = (x+30, h+50)
        case 'ipad13_landscape':
-           position = (w+10, 8*h/9)
+           position_hint = (w+10, 8*h/9)
+           self.num_position = (w+100, h / 2)
+           position_puzzles = (w+10, h/4)
        case 'ipad13_portrait':
-           position = (8*w/9, h+50)
+           position_hint = (7*w/9, h+50)
+           self.num_position = (w/3, y)
+           position_puzzles = (w/2, h)
        case'ipad_mini_landscape':
-           position = (w+10, 8*h/9)
+           position_hint = (w+10, 8*h/9)
+           self.num_position = (x+w+50, h / 2)
+           position_puzzles = (w+10, h/4)
        case'ipad_mini_portrait':
-           position = (7*w/9, h+50)
+           position_hint = (8*w/9, h+50)
+           self.num_position = (w/3, 30)
+           position_puzzles = (w/2, h+50)  
+       case'iphone_landscape':
+           position_hint = (w+10, 8*h/9)
+           self.num_position = (x+w+50, h / 2)
+           position_puzzles = (w+10, h/4)
+       case _:
+           position_hint = (w+10, 8*h/9)
+           self.num_position = (x+w+50, h / 2)
+           position_puzzles = (w+10, h/4)
            
+    self.gui.gs.pause_button.position = (32, H - 36)
     self.gui.set_enter('Note ', fill_color='clear',
                        font=('Avenir Next', 50),
-                       position=position)
-    self.gui.set_top('', position=(0, h+30))
+                       position=position_hint)
+    self.gui.set_top(self.gui.get_top(),
+                         position=(0, h))
+    self.gui.set_moves(self.gui.get_moves(),
+                       anchor_point = (0,0),
+                       position=position_puzzles)
          
   def process_wordlist(self,  sep=False):
     puzzles = []
@@ -167,7 +202,8 @@ class Suguru(LetterGame):
               puzzles[shape].append((board, cage))
           self.msg = '\n'.join([f'{k},  {len(v)} puzzles'
                                 for k, v in puzzles.items()])
-          print(self.msg)
+          if self.test:
+              print(self.msg)
           return puzzles
       except FileNotFoundError:
           pass
@@ -358,7 +394,7 @@ class Suguru(LetterGame):
     cg.color_map = color_map_list
         
     delta = 0.45
-    linewidth = 2
+    linewidth = 2 if self.gui.device.startswith('ipad') else 1
     linedash = [10, 10]
     for coords in self.cage_coords:
         # add dotted lines around cages
@@ -385,9 +421,10 @@ class Suguru(LetterGame):
       self.gui.clear_messages()
       self.gui.set_enter('Note', fill_color='clear')
       self.notes = {}
-      self.puzzles_from_file = self.load_puzzles()
-      self.gui.set_moves(self.msg)
+      self.puzzles_from_file = self.load_puzzles()      
       self.select_list(self.test)
+      self.display_setup()
+      self.gui.set_moves(self.msg)
               
       if self.debug or self.test:
           self.gui.gs.close()
@@ -631,18 +668,10 @@ class Suguru(LetterGame):
           selection = ''
           x, y, w, h = self.gui.grid.bbox
           while self.gui.selection == '':
-              if self.gui.device in ['ipad13_landscape']:
-                  position = (950, h / 2)
-              elif self.gui.device == 'ipad_landscape':
-                  position = (x+w+50, h / 2)
-              elif self.gui.device.endswith('_portrait'):
-                  position = (x, y)
-              else:
-                  position = (x + w, h / 2)
                      
               panel = self.gui.input_numbers(
                          prompt=prompt, items=items,
-                         position=position,
+                         position=self.num_position,
                          allows_multiple_selection=(long_press or self.hint))
               while panel.on_screen:
                   sleep(.1)

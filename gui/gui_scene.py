@@ -393,7 +393,7 @@ class GameBoard(Scene):
     
   def setup_ui(self):
     
-    pause_button = SpriteNode('iow:pause_32', position=(32, self.size.h - 36),
+    self.pause_button = SpriteNode('iow:pause_32', position=(32, self.size.h - 36),
                               parent=self)
     self.grid = self.build_background_grid()
     self.game_field.add_child(self.grid)
@@ -810,7 +810,13 @@ class GameBoard(Scene):
       self.line_timer = 0.5
       # self.turn_status()
       self.go = True'''
-  
+      
+  def did_change_size(self):    
+    try:
+      self.orientation()
+    except AttributeError as e:
+      pass
+      
   # #########################################################################
   # TOUCH 
   

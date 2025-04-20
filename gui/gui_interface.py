@@ -335,8 +335,11 @@ class Gui():
     def get_device(self):
         # returns string ipad_landscape, ipad_portrait,
         #                iphone_landscape, iphone_portrait
-        return self.gs.device
+        return self.gs.device_size()
         
+    def get_device_screen_size(self):
+        return get_screen_size()
+           
     def get_fontsize(self):
         return self.gs.get_fontsize()
         
@@ -344,6 +347,10 @@ class Gui():
         self.gs.setup_gui(**kwargs)
         self.game_field = self.gs.game_field
         self.grid = self.gs.grid
+        
+    def orientation(self, fn):
+        
+        self.gs.orientation = fn
         
     def replace_grid(self, dimx, dimy):
         """remove and replace grid with different of squares"""
@@ -400,12 +407,18 @@ class Gui():
         for k, v in kwargs.items():
             setattr(self.gs.msg_label_t, k, v)
         self.gs.msg_label_t.text = msg
+        
+    def get_top(self):
+        return self.gs.msg_label_t.text
 
     def set_moves(self, msg, **kwargs):
         # right box
         for k, v in kwargs.items():
             setattr(self.gs.msg_label_r, k, v)
         self.gs.msg_label_r.text = msg
+        
+    def get_moves(self):
+        return self.gs.msg_label_r.text
 
     def set_enter(self, msg, **kwargs):
         # modify existing enter button BoxedLabel object
