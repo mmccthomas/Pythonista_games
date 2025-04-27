@@ -4211,3 +4211,268 @@ Puzzle50_frame:
 ' / /12/ /e/ / / /13/ / / /r'
 ' / / / / / /14/ / / / / / '
 ' / / /15/ / / / / / / / / '
+
+Puzzle51:
+1
+SCAB
+SEER
+SOB
+STAID
+2
+DENT
+DEW
+DUO
+3
+MARSALA
+MATCHBOX
+MEETS
+MOA
+MOTOR
+MUD
+4
+BATED
+BEE
+BIRO
+BUS
+5
+PARODYING
+PATH
+POWER
+6
+RANDOM
+RECYCLED
+ROE
+ROSE
+7
+SETTEE
+SHEETS
+SOLACE
+SENSIBLE
+SOYA
+8
+SAMPLER
+SERBIAN
+STEW
+9
+ANACONDA
+AREA
+ATOMISER
+10
+SATIN
+SCHOOLBOY
+SHEPHERD
+SPAR
+SPEND
+STEADY
+11
+SEMI
+SEPTEMBER
+SHINY
+SIN
+12
+FATE
+FIT
+FLESHY
+13
+NAVY
+NEPHEW
+NINE
+NOR
+14
+PIONEER
+PORTEND
+PRESAGE
+PROPHESY
+PUDDING
+
+Puzzle51_frame:
+' / / / / / / /1/ / / / / '
+' / / / / / / / / / / / /e'
+' /2/ / / / / / / / / /l/ '
+' / / / / / / / / / /b/ / '
+' / /3/ / / / / /4/i/ / /5'
+'6/ / / /7/ / / /s/ / / / '
+' / / / / / / /n/ / / /8/ '
+' / / /9/ / /e/ / / / / / '
+' / / / / /10s/h/e/p/h/e/r/d'
+' / / / / / / / / / /11/ / '
+' /12/ / / / / / / / / / / '
+' / / /13/ / / / / / / / / '
+' / / / / / /14/ / / / / / '
+
+Puzzle52:
+1
+ACCESSORY
+ADHESION
+AFFIX
+ANNEX
+ATTACHMENT
+2
+SHOTGUN
+STY
+SUE
+3
+WALNUT
+WAS
+WEDDING
+WHITENER
+WISHBONE
+WOE
+WRITHE
+4
+TAX
+TEEN
+TIE
+5
+SCAN
+SEMOLINA
+SHOP
+SIDLING
+STEREO
+6
+SOCK
+SOLICIT
+SPRINT
+7
+ELEVEN
+ELIXIRS
+ELOPEMENT
+ENIGMA
+EXPLAIN
+8
+SEE
+SLANT
+SNAIL
+SNARE
+SONS
+9
+MEAD
+MEW
+MOONLIT
+MUNG
+10
+SATURATED
+SEASONAL
+SEEP
+SHOULD
+SWOT
+11
+WAN
+WAY
+WIN
+WISE
+12
+HANG
+HEN
+HOG
+HUE
+13
+BEE
+BERG
+BUS
+14
+SAGA
+SAINT
+SERPENT
+SNARL
+SPASM
+
+Puzzle52_frame:
+' / / / /1/ / / / / /o/ / '
+' / / / / / / / / /e/ /2/ '
+' / / / / / / /3/r/ / / / '
+' / / / / / / /e/ / / / / '
+' /4/ / / / /t/ / / / / / '
+' / / / / /5s/ / / / / / / '
+' / /6/ / /e/ / / / / / / '
+'7/ / / / /m/ / / / / / / '
+' / / / / /o/8/ / / /9/ / '
+' / / / / /l/ / / / / / /10'
+' /11/ / / /i/ / / /12/ / / '
+' / / / / /n/ / / / / /13/ '
+' / / / / /a/14/ / / / / / '
+
+Puzzle53:
+1
+RIG
+ROMANCE
+ROUGH
+2
+QUAINT
+QUANTUM
+QUIET
+3
+ALTO
+ARCH
+ATHLETE
+AUGUR
+AUTOMATIC
+4
+IDEA
+IDLE
+IMPLODE
+INN
+IRIS
+5
+SEDGE
+SEVENTY
+STIMULANT
+6
+EEL
+EFT
+ENOUGH
+EVICT
+7
+PIETY
+PLAN
+PORE
+8
+FANDANGO
+FONDUE
+FRY
+9
+GERM
+GLUTTON
+GNAT
+GOTH
+GRATE
+GUNBOAT
+10
+BAD
+BOND
+BOON
+BRAMBLES
+11
+OHM
+OMBUDSMAN
+ONUS
+OVARY
+12
+MAR
+MERINGUE
+MEW
+MISO
+13
+CORD
+CORNEA
+CRECHE
+CUMULUS
+14
+HEN
+HENNA
+HERMIT
+
+Puzzle53_frame:
+' / / / /1/ / / / / / / / '
+' / / / / / / /2q/ / / / / '
+' / / / / / /u/u/ / / / / '
+'3/ / / / /a/ /i/ / /4/ / '
+' / / / /n/ / /e/5/ / / / '
+' / / /t/ /6/ /t/ / / / / '
+' / /u/ / / / / / /7/ / / '
+' /m/ / / / / / / / / /8/ '
+' / / /9/ / / / / / / / / '
+' / / / / / / / /10/ / / / '
+' / / / /11/ / / / / / / /12'
+' / / / / / / /13/ / / / / '
+' / / / / /14/ / / / / / / '

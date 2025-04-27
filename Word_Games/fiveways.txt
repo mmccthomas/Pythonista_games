@@ -757,3 +757,59 @@ Puzzle14_frame:
 'd/ / / / / / / / / / / / '
 'e/ /m/ / / / / / / / / /t'
 'b/d/ / /s/ / /d/ / /l/s/c'
+
+Puzzle15:
+BEAUTIFUL
+BLOB
+BOLSTER
+BOUNTY
+BYPASS
+CARIBBEAN
+CENT
+CHEETAH
+CLARIFY
+COBWEB
+CRIB
+CYCLE
+DARTS
+DEBRIEF
+DEPOT
+DIABETIC
+DIETER
+DIVER
+DRAB
+FEDERATE
+FLEXIBLE
+FLORID
+FRIES
+HAMSTER
+HAVOC
+HERNIA
+INTERSECT
+ITALIC
+IVORY
+PHI
+PIERCE
+PRECINCT
+RADIUS
+REVIVAL
+RHOMBUS
+RUGBY
+SCUFF
+UNCLE
+UNEARTH
+
+Puzzle15_frame:
+'d/p/d/ /c/h/ / / / / / / '
+' / / / / / / / / / /c/r/ '
+'p/ / /r/c/ / / /d/h/s/ /b'
+' /i/ / / / / / / / / / / '
+' /f/ /d/ / / / / / / / / '
+'c/ / / / / / / / / / / / '
+' /c/ / /b/ / / / / / / / '
+' / / / / /d/b/ / / / / /f'
+' / / /c/ / / / / /p/ /c/d'
+' / / / / / /f/f/ / / / / '
+' / / / / /u/ / / / / / /r'
+' / / / /b/d/ / / / / /i/ '
+'i/ /b/ / /r/h/ / / / / /u'

@@ -14,7 +14,7 @@ sys.path.append('../')
 
 import gui.gui_scene as gscene
 from gui.gui_scene import BoxedLabel
-
+import os
 
 class Gui():
     # allow for non square board
@@ -40,6 +40,10 @@ class Gui():
         self.dismiss_menu = self.gs.dismiss_modal_scene
         self.device = self.gs.device
         self.long_touch = self.gs.long_touch
+        try:
+            self.number_panel = ui.load_view('Number_panel.pyui')
+        except FileNotFoundError:
+            self.number_panel = None
 
         # menus can be controlled by dictionary of labels
         # and functions without parameters
@@ -261,7 +265,8 @@ class Gui():
                       panel='Number_panel.pyui',
                       **kwargs):
         """ pop up a number panel """
-        self.number_panel = ui.load_view(panel)
+        if panel != 'Number_panel.pyui':
+            self.number_panel = ui.load_view(panel)
         self.buttons = [
             button for button in self.number_panel.subviews
             if isinstance(button, ui.Button)
@@ -278,7 +283,7 @@ class Gui():
             setattr(self.number_panel, k, v)
         self.number_items = []
         self._panel = self.number_panel
-        self._itemlist = self.number_items
+        self._itemlist = self.number_items     
         self.v.add_subview(self.number_panel)
         return self.number_panel
 
