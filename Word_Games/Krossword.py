@@ -22,7 +22,7 @@ import traceback
 import inspect
 from copy import deepcopy
 from word_square_gen import create_word_search
-from Letter_game import LetterGame, Player
+from Letter_game import LetterGame, Player, Word
 from gui.gui_interface import Gui, Squares, Coord
 BLOCK = '#'
 SPACE = ' '
@@ -39,6 +39,7 @@ class KrossWord(LetterGame):
     self.strikethru = True
     self.log_moves = True
     self.debug = False
+    self.max_iteration = 1000
     self.table = None
     self.straight_lines_only = True
     self.get_size()  # just to provide board and sizex
@@ -168,7 +169,10 @@ class KrossWord(LetterGame):
           fewest_matches = 0
         return fewest_possibles, fewest_matches     
         
-  
+  def get_word(self, start,  direction):
+    for word in self.word_locations:
+        if  word.start == start and word.direction == direction:
+          return word
     
   def place_word(self, possible, previous=False):
       """ fill board
@@ -188,6 +192,8 @@ class KrossWord(LetterGame):
           for index, l in enumerate(word):
               self.board[start + dirn * index] = l
               self.letter_board[start + dirn * index] = l
+          w = Word(rc=start, direction=compass[tuple(dirn)].lower(), length=len(word), word=word)
+          self.word_locations.append(w)
           try:             
               self.start_dict[position]['words'].remove(word)
               self.wordlist[position].remove(word)
@@ -201,13 +207,15 @@ class KrossWord(LetterGame):
           try:
               self.start_dict[position]['words'].append(word)
               self.wordlist[position].append(word)
+              self.word_locations.remove(self.get_word(word,compass[tuple(dirn)].lower()))
+              
           except (KeyError):
              self.wordlist[None].append(word)
           self.placed -= 1
           
       if self.debug:
          
-         self.gui.print_board(self.board, f'stack depth= {len(inspect.stack(0))}')        
+         self.gui.print_board(self.board, f'stack depth= {len(inspect.stack(0))} iteration {self.iteration_counter}')        
          self.gui.update(self.board)
          print('\n\n')
          #sleep(0.1)
@@ -215,7 +223,8 @@ class KrossWord(LetterGame):
                                
   def fill(self):
         self.iteration_counter += 1
-        
+        if self.iteration_counter >= self.max_iteration:
+          return True
         # if the grid is filled, succeed if every word is valid and otherwise fail
         if self.board_is_full():
             return True
@@ -495,7 +504,7 @@ class KrossWord(LetterGame):
                     print('letter ', selection, 'row', selection_row)
                 for coord, letter in zip(move, selection):
                   self.board[coord] = letter
-                  
+                self.move = move   
                 #check if correct
                 if all([self.board[coord] == self.solution[coord] for coord in move]):                 
                    word = item_list[selection_row]      
@@ -526,9 +535,17 @@ class KrossWord(LetterGame):
   def reveal(self):
       # reveal all words
       self.gui.update(self.solution)
+      for word in self.word_locations:
+          #self.gui.draw_line([self.gui.rc_to_pos(Coord(word.coords[i]) + (-.5, .5))
+          #                    for i in [0, 1]],
+          #                   line_width=10, color='green', alpha=0.8)         
+          self.gui.draw_line([self.gui.rc_to_pos(Coord(word.coords[i]) + (-.5, .5))
+                                 for i in [0, -1]],
+                                line_width=8, color='red', alpha=0.5)         
       
       sleep(3)
-      self.gui.show_start_menu()
+      self.gui.show_start_menu(menu_position=self.start_menu_pos)
+      
       
   def restart(self):
     """ reinitialise """
@@ -576,8 +593,10 @@ class KrossWord(LetterGame):
     _, _, w, h = self.gui.grid.bbox
     if self.gui.device.endswith('_landscape'):
         self.gui.set_enter('Undo', position=(w + 50, -50))
+        self.start_menu_pos = (w+250, 200)
     else:
         self.gui.set_enter('Undo', position=(w - 50, h + 50))
+        self.start_menu_pos = (w-50, h+50)
     self.word_locations = []
     
     self.initialise_board()

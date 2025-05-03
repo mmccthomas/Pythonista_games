@@ -6172,7 +6172,12 @@ M TDATLTH Y RIC
 I O   SWAP P D 
 CONWOOTON T TIN
 
-Puzzle35-4_text:
+puzzle35_4:
+''
+7, 5
+0710112933003205142512222013163426091528010221241906081830172304273103
+
+puzzle35_4_text:
 1 Time period • Less than zero •
   Feel sore all over
 2 Seventh Greek character •
@@ -6208,8 +6213,36 @@ of moisture
    Prize-winning novel
 21 Genuine • Gave medicine to •
    Affectedly cute
-   
-Puzzle36-64_text:
+
+puzzle35_4_frame:
+  GDUEE ACHET L
+ECHE. DER A H A
+ H NTI. RIZEL C
+YEAANEREOO ESTE
+ X   I. RLACC R
+STUABLESTD TRAR
+DGEEYEINU R I. 
+ L T B I LUNPAS
+WEEEROAPPOT T I
+ R IRT. I E S A
+TAMO. IONESIORB
+  UDEAN G E Y S
+ECKR M W WEAS S
+ O ETAWIS. FUNT
+OSED N CHHEFB. 
+ER H S NEITHI G
+RATO ATERN ONAE
+ V R C E SAPE D
+INE E T. YOGFEL
+D SSLEOAL I T. 
+ESTE.  N TRUICI
+
+puzzle36_64:
+''
+7, 5
+0710112933003205142512222013163426091528010221241906081830172304273103
+
+puzzle36_64_text:
 1 1986 Tim Rice/Benny Andersson
   musical • Declare (a marriage) void
 2 Double-reeded wind instrument • String
@@ -6242,8 +6275,36 @@ Puzzle36-64_text:
    Book of maps • Measure of distance
 21 Wheeled platform for a cine camera •
    Last but not ___, proverb
-   
-Puzzle37-113_text:
+
+puzzle36_64_frame:
+MIN TIER D LEMI
+I ELIMPINILET A
+TIR O  L T DOLL
+ROSANTC CHEMCCU
+ERTS OOBO DEK F
+ C SOUM RK NIFL
+HESS A N. B T R
+E TWINTSAMULED 
+ADIO G TR GOREN
+R W L PET P AT 
+UR ATEU ASIRMIC
+E SRE NTIICE V 
+SAGN E M I R BE
+T EG CRISSTEERA
+O NSETOT T D O 
+ICKE OX GERENNU
+A E YATLA N E S
+TALP RY LHAHAME
+POPUILD FL SSIT
+ED S M ALASH G 
+R AEASADER EHAR
+
+puzzle37_113:
+''
+7,5 
+1732140407032326282111083302291318053122300034241210152516062009270119
+
+puzzle37_113_text:
 1 Zone, area • Madden, infuriate
 2 Piece of equipment driven by electricity
   or other power
@@ -6270,8 +6331,36 @@ Puzzle37-113_text:
 20 Removed dirt from
 21 Furtive, sly • -nisi divorce document
    preliminary
-   
-Puzzle38-150_text:
+
+puzzle37_113_frame:
+UI KIN EDL CENR
+ APED OR LOANE 
+NT DEC ALO NGAL
+PETL NAGELP NED
+E IAIDD J PI CL
+AWED OOREER AKY
+E TWHEDALU R T 
+REE U  L TRACHI
+I MOTTBLER I E 
+ EAST SEC O DER
+F VO PH HIPSE S
+ANIATEARI R REE
+OPIR CL OONS ME
+U SINTAIND OSE 
+SNEN EN A AM NO
+RNEPIR G ATOGED
+ O  R EANG P A 
+PULASS T ED ERT
+ENN N TORR A O 
+ O NGR MACADPEA
+STI E SEN C A G
+
+puzzle38_150:
+''
+7, 5
+0701180025211622260614082429041309192034283031023315172310122705113203
+      
+puzzle38_150_text:
 1 Withdrew and turned back
 2 Sport of unarmed combat that developed
   in Japan • Greek goddess of the rainbow
@@ -6309,3 +6398,26 @@ Puzzle38-150_text:
 20 Hindu lady's traditional dress •
    Ostentatiously creative
 21 Time of being a junior officer
+
+puzzle38_150_frame:
+TEDRETCAN F NSE
+O IO H L RTYA L
+Y VT RTTA Y TE 
+P KCT  B ROVW L
+I EOAFJUD L AGO
+CADG E S AFFK C
+ O NOWH LCHEAPP
+C.  S ELF E M I
+OUTETSDO SAC ST
+O OAVO T REAEAF
+GNU. W. C V G O
+ AR W ENAOOMORG
+Y R BR L LAXE I
+NUSEYEAVEOLIAPT
+I OX SREX M  E 
+ P ENA V  FLNCE
+RISD. SARS A A 
+ T. S  L MEMCRA
+ECK U N RON EAD
+ E SETC AU S T 
+ENTO AHIPCHEVEN

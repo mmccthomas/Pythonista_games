@@ -1,7 +1,7 @@
 import random
 import string
 
-def place_word(board, word, coords, max_iteration=500):
+def place_word(board, word, coords, max_iteration=500, space='-'):
     # Randomly choose orientation: 0=horizontal, 1=vertical, 2=diagonal
     orientation = random.randint(0, 3)
     # helper to improve readability
@@ -33,7 +33,7 @@ def place_word(board, word, coords, max_iteration=500):
             reverse = random.choice([True, False])
             if reverse:
                 word = word[::-1]
-            space_available = all(board[row][c] == '-' or 
+            space_available = all(board[row][c] == space or 
               board[row][c] == word[i] 
                 for i, c in _range(col))
             if space_available:
@@ -48,7 +48,7 @@ def place_word(board, word, coords, max_iteration=500):
             reverse = random.choice([True, False])
             if reverse:
                 word = word[::-1]
-            space_available = all(board[r][col] == '-' or 
+            space_available = all(board[r][col] == space or 
                 board[r][col] == word[i] 
                   for i, r in _range(row))
             if space_available:
@@ -63,7 +63,7 @@ def place_word(board, word, coords, max_iteration=500):
             reverse = random.choice([True, False])
             if reverse:
                 word = word[::-1]
-            space_available = all(board[r][c] == '-' or 
+            space_available = all(board[r][c] == space or 
                 board[r][c] == word[i] 
                   for i, (r, c) in _range((row, col)))
             if space_available:
@@ -78,7 +78,7 @@ def place_word(board, word, coords, max_iteration=500):
             reverse = random.choice([True, False])
             if reverse:
                 word = word[::-1]
-            space_available = all(board[r][c] == '-' or 
+            space_available = all(board[r][c] == space or 
                 board[r][c] == word[i] 
                   for i, (r, c) in enumerate(zip(range(row, row-len(word), -1),
                                                  range(col, col+len(word)))))

@@ -1,4 +1,4 @@
-j# Pieceword game
+# Pieceword game
 # tiles are 3x3 squares, to fit into 15 x 35 grid
 # file for each puzzle has 3 sections,
 # puzzleno, puzzleno_text, and puzzleno_frame

@@ -90,7 +90,7 @@ def run_length_encoding(inarray):
 
 class Word():
   """ holds a word instance """
-  def __init__(self, rc, direction, length):
+  def __init__(self, rc, direction, length, **kwargs):
     self.start = rc
     self.index = 0
     self.coords = []
@@ -107,17 +107,34 @@ class Word():
     self.set_coords()
     self.child_index = 0
     self.max_depth = 3
-    
+    for k, v in kwargs.items():
+      setattr(self, k, v)
+      
   def __repr__(self):
-    return(f'Word_{self.index}{self.start}_{self.direction}({self.length})={self.word}')
+    return(f'Word_{self.index}{self.start}_{self.direction.upper()}({self.length})={self.word}')
     
   def set_coords(self):
     r, c = self.start
-    if self.direction == 'across':
-      self.coords = [(r, c + x) for x in range(self.length)]
-    else:
-       self.coords = [(r + y, c) for y in range(self.length)]
-       
+    match self.direction.lower():
+      case 'across' | 'e':
+          self.coords = [(r, c + i) for i in range(self.length)]
+      case 'down' | 's':
+          self.coords = [(r + i, c) for i in range(self.length)]
+      case 'n':
+          self.coords = [(r - i, c) for i in range(self.length)]
+      case 'ne':
+          self.coords = [(r - i, c + i) for i in range(self.length)]
+      case 'se':
+          self.coords = [(r + i, c + i) for i in range(self.length)]
+      case 'sw':
+          self.coords = [(r + i, c - i) for i in range(self.length)]
+      case 'w':
+          self.coords = [(r, c - i) for i in range(self.length)]
+      case 'nw':
+          self.coords = [(r - i,  c - i) for i in range(self.length)]
+      case _:
+         raise ValueError(f'Direction {self.direction} not known')
+          
   def set_word(self, word, index=None):
     self.word = word
     # dictionary is coord: (letter, index of letter)}

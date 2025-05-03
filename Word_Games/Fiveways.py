@@ -13,6 +13,7 @@ class FiveWays(KrossWord):
   def __init__(self):
     KrossWord.__init__(self)   # same as KrossWord
     self.debug = False
+    self.max_iteration = 1000
     self.wordfile = 'fiveways.txt'
     self.strikethru = False 
   
@@ -53,6 +54,17 @@ class FiveWays(KrossWord):
     # sort alphabetically    - was longest to shortest
     self.wordlist[None]  = sorted(self.wordlist[None]) #,key=len, reverse=True)
     self.update_matches() 
+    
+  def process_turn(self, move, board, test=None):
+     KrossWord.process_turn(self, move, board, test=None)     
+     # change the colour of a correct start letter to green 
+     move = self.predict_direction(move)
+     if move:
+         if all([self.board[coord] == self.solution[coord]  for coord in move]):          
+           items = self.gui.get_numbers(move[0])
+           [v.update(color='orange') for v in items.values()]
+           self.gui.put_numbers(items)
+        
       
   def run(self):
     KrossWord.run(self)

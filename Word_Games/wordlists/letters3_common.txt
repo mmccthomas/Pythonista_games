@@ -120,7 +120,6 @@ cry
 cub
 cud
 cue
-cum
 cup
 cur
 cut
@@ -725,7 +724,6 @@ wog
 wok
 won
 woo
-wop
 wot
 wow
 wry
