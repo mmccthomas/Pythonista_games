@@ -1,9 +1,13 @@
 import random
 import string
 
-def place_word(board, word, coords, max_iteration=500, space='-'):
+def place_word(board, word, coords, max_iteration=500, space='-', bias=None):
     # Randomly choose orientation: 0=horizontal, 1=vertical, 2=diagonal
-    orientation = random.randint(0, 3)
+    # if bias is set, it is a list of probabilities for h, v or d
+    if bias is None:
+       orientation = random.randint(0, 3)
+    else:
+       orientation = random.choices([0,1,2], k=1, weights=bias)[0]
     # helper to improve readability
     def start(offset):
       ''' random number'''

@@ -219,8 +219,12 @@ class KrossWord(LetterGame):
          self.gui.update(self.board)
          print('\n\n')
          #sleep(0.1)
-      self.update_matches(self.letter_board)      
-                               
+      self.update_matches(self.letter_board)  
+          
+  def no_locs_filled(self):
+      latest = self.board.size - len(np.argwhere(self.board == ' '))
+      return latest  
+                                    
   def fill(self):
         self.iteration_counter += 1
         if self.iteration_counter >= self.max_iteration:
@@ -240,6 +244,11 @@ class KrossWord(LetterGame):
         # iterate through all possible matches in the fewest-match slot
         #store a copy of the current board
         previous_board = self.board.copy()
+        # store best filled board for later debug
+        if self.no_locs_filled() > self.best_filled:
+            self.best_filled = self.no_locs_filled()
+            self.best_filled_board = self.board.copy()
+            
         previous_letter_board = self.letter_board.copy()
         if self.debug:
             print('remaining words', self.wordlist)
@@ -264,19 +273,38 @@ class KrossWord(LetterGame):
     """solve the krossword
     use dfs search.
     """  
+    self.word_locations = []
     t = time()
+    self.best_filled = 0
     self.fill()
     solve_time = time() - t
     complete = 'Board Complete' if self.board_is_full() else 'Board not Complete'
     msg = f'Placed {self.placed} words ,{complete} in {self.iteration_counter} iterations, {solve_time:.3f}secs'
+    if not self.board_is_full():
+      self.gui.print_board(self.best_filled_board, which='best filled board for debug')
     self.gui.set_prompt(msg)
     self.gui.set_message('')   
     self.solution = self.board.copy()
     self.board = self.empty_board
     self.wordlist = self.wordlist_original.copy()
     self.gui.update(self.board) 
+    self.show_directions()    
     return msg
-                
+    
+  def show_directions(self):  
+    v = h = d = 0
+    for word in self.word_locations:
+      if word.direction.lower() in ['n', 's']:
+         v += 1
+      elif word.direction.lower() in ['e', 'w']:
+         h += 1
+      elif word.direction.lower() in ['ne', 'nw', 'se', 'sw']:
+         d += 1
+    print(f'{v=}, {h=}, {d=}')
+    total = v +h +d
+    print(f'{v/total:.0%}, {h/total:.0%}, {d/total:.0%}')    
+    self.gui.set_message(f'{v=}, {h=}, {d=}')   
+                               
   def print_board(self, remove=None):
     """
     Display the  players game board
@@ -431,6 +459,9 @@ class KrossWord(LetterGame):
           if selection + '_frame' in self.word_dict:
              self.table = self.word_dict[selection + '_frame']
           self.wordlist = [word.lower() for word in self.wordlist]
+          self.gui.selection = ''
+          return selection
+        elif selection == 'New':
           self.gui.selection = ''
           return selection
         elif len(selection) > 1:
@@ -599,7 +630,7 @@ class KrossWord(LetterGame):
     _, _, w, h = self.gui.grid.bbox
     if self.gui.device.endswith('_landscape'):
         self.gui.set_enter('Undo', position=(w + 50, -50))
-        self.start_menu_pos = (w+250, 200)
+        self.start_menu_pos = (w+250, h)
     else:
         self.gui.set_enter('Undo', position=(w - 50, h + 50))
         self.start_menu_pos = (w-50, h+50)

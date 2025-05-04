@@ -6,18 +6,18 @@ including the starter letters, can appear in more than one
 However, don't forget that a starter letter is the initial letter of just one of the listed words.
 When solving, it will help you to strike through the starter letters of the words as you fill them in the grid.
 
-words are not themed.
+Words are not themed.
 
 routine needs to be super fast as lots of words will be searched
 
 The algorithm uses a wordsearch filler for a set of N words,
 words are drawn from 10k wordset with lengths defined in dictionary
-A after this, gaps are filled witha search algorithm with min word length of 4,
-with final gaps min length 3 letters
-# Generate N random start locations and letters
+After this, gaps are filled with a simple search algorithm with min word length of 4,
+with final gaps min length 3 letters. the search algorithm tries to start a word at each 
+blank position, accepting the first word it tinds.
 
+# Generate N random start locations and letters
 # most lengths 5,6,7
-# word lengths {3: 9, 4: 72, 5: 127, 6: 134, 7: 126, 8: 60, 9: 26, 10: 6, 11: 1}
 """
 import random
 import numpy as np
@@ -36,7 +36,7 @@ WORDLIST = "wordlists/words_10000.txt"
 LETTERS3 = "wordlists/letters3_common.txt"
 # number or words in ineavh length to choose
 # percentages
-STATS = {4: 10, 5: 26, 6: 26, 7: 18, 8: 13, 9: 5}
+STATS = {4: 5, 5: 31, 6: 26, 7: 18, 8: 13, 9: 5, 10: 5}
 
 
 def add(a, b):
@@ -121,9 +121,9 @@ class Cross(KrossWord):
       coords = {}
       for word in words:
         w = word.replace(' ', '')
-        success, coord = word_square_gen.place_word(board, w, coords,
-                                                    max_iteration=500,
-                                                    space=' ')
+        # bias the word placements for horizontal > vertical > diagonal
+        success, coord = word_square_gen.place_word(
+          board, w, coords, max_iteration=300, space=' ', bias=[0.8, 1., 0.5])
         if success:
           words_placed.append(word)
       return board, words_placed, coords
@@ -147,6 +147,7 @@ class Cross(KrossWord):
          
       # longest words first
       wordlist = sorted(wordlist, key=len, reverse=True)
+      # random.shuffle(wordlist)
       return wordlist
                  
   def wordsearch(self, size=13, no_start=38, iterations=10):
@@ -160,47 +161,61 @@ class Cross(KrossWord):
       # need  to get existing puzzle names
       self.existing_puzzles()
       
-      self.word_locations = []
-      
-      wordlist = self.initial_words(no_start)
-      # Monte Carlo search word_search to find best
-      no_words_placed = 0
-      for i in range(iterations):
-          self.board, words_placed, self.word_coords = self.create_word_search(wordlist, size)
-          # print(f'{i =}, {len(words_placed)}/{len(self.wordlist)}')
-          if len(words_placed) > no_words_placed:
-              best = self.board, words_placed, self.word_coords
-              no_words_placed = len(words_placed)
-              if len(words_placed) == len(wordlist):
-                  break
-      self.board, words_placed, self.word_coords = best
-      index = 0
-      for word, coords in self.word_coords.items():
-          if coords:
-              if ''.join([self.board[c] for c in coords]) != word:
-                  coords.reverse()
-              dirn = sub(coords[1], coords[0])
-              self.word_locations.append(Word(coords[0], compass[dirn].lower(), len(word), word=word, index=index))
-              index += 1
+      # loop until get a filled puzzle
+      iteration = 1
+      while self.locs_unfilled():
+          print(f'{iteration=}')
+          iteration += 1
+          self.word_locations = []
+          wordlist = self.initial_words(no_start)
+          # Monte Carlo search word_search to find best
+          no_words_placed = 0
+          for i in range(iterations):
+              t=time()
+              self.board, words_placed, self.word_coords = self.create_word_search(wordlist, size)
+              #print('elapsed', time()-t)
+              #self.print_board(self.board, which=(i, no_words_placed))
+              # print(f'{i =}, {len(words_placed)}/{len(self.wordlist)}')
+              if len(words_placed) > no_words_placed:
+                  best = self.board, words_placed, self.word_coords
+                  no_words_placed = len(words_placed)
+                  
+                  if len(words_placed) == len(wordlist):
+                      break
+          print()
+          self.board, words_placed, self.word_coords = best
+          index = 0
+          for word, coords in self.word_coords.items():
+              if coords:
+                  if ''.join([self.board[c] for c in coords]) != word:
+                      coords.reverse()
+                  dirn = sub(coords[1], coords[0])
+                  self.word_locations.append(Word(coords[0], compass[dirn].lower(), len(word), word=word, index=index))
+                  index += 1
+          if self.debug:
+              self.print_board(self.board, highlight=[w.start for w in self.word_locations])
+              print(f'{len(words_placed)=}, sorted by length {sorted(self.word_locations, key=attrgetter("length"))}')
+              print()
+              print(f'{len(words_placed)=}, sorted by position {sorted(self.word_locations, key=attrgetter("start"))}')
+          self.fill_remaining()
+          
       if self.debug:
           self.print_board(self.board, highlight=[w.start for w in self.word_locations])
-          print(f'{len(words_placed)=}, sorted by length {sorted(self.word_locations, key=attrgetter("length"))}')
-          print()
-          print(f'{len(words_placed)=}, sorted by position {sorted(self.word_locations, key=attrgetter("start"))}')
-      self.fill_remaining()
-      self.print_board(self.board, highlight=[w.start for w in self.word_locations])
-      # print(len(words_placed), sorted(self.word_locations, key=attrgetter('index')))
-      [print(word) for word in sorted(self.word_locations, key=attrgetter('index'))]
-                    
+          # print(len(words_placed), sorted(self.word_locations, key=attrgetter('index')))
+          [print(word) for word in sorted(self.word_locations, key=attrgetter('index'))]
+      self.empty_board = np.full_like(self.board, ' ')
+      for word in self.word_locations:
+          self.empty_board[word.start] = self.board[word.start]
+                
+  def locs_unfilled(self):
+      latest = [tuple(loc) for loc in np.argwhere(self.board == ' ')]
+      random.shuffle(latest)
+      return latest   
+                     
   def fill_remaining(self):
       """ attempt to fill remaing by placing a new start location
-      in unfilled area, then see if adjoining squares can be filled"""
-      def locs_unfilled():
-          latest = [tuple(loc) for loc in np.argwhere(self.board == ' ')]
-          random.shuffle(latest)
-          return latest
-          
-      unfilled_locs = locs_unfilled()
+      in unfilled area, then see if adjoining squares can be filled"""                
+      unfilled_locs = self.locs_unfilled()
       self.start_locs = unfilled_locs
       # add in additional 3 letter word dictionary
       # _, extra_dict = self.load_words(LETTERS3)
@@ -219,7 +234,7 @@ class Cross(KrossWord):
                 break
             loc = unfilled_locs[-1]
             placed = self.find_possibles(loc=loc)
-            unfilled_locs = locs_unfilled()
+            unfilled_locs = self.locs_unfilled()
             if self.debug:
                 print('unfilled', len(unfilled_locs), unfilled_locs)
             if placed:
@@ -240,9 +255,6 @@ class Cross(KrossWord):
       # start_locs = np.argwhere(self.board != ' ')
       # if overlap is False, limit word length to stop at another initial point
       # if single_only is True only allow single option
-      def locs_unfilled():
-          return [tuple(loc) for loc in np.argwhere(self.board == ' ')]
-          
       if loc is None:
         start_locs = self.start_locs
       else:
@@ -344,7 +356,7 @@ class Cross(KrossWord):
   def print_board(self, board, which='', highlight=None):
       # optionally make chars Uppercase
       # highlight is a list of r,c coordinates
-      print('board:', which)
+      print(f'board: {which}')
       print('    ' + ''.join([f'{str(i):<2}' for i in range(board.shape[0])]))
       print('    ' + '--' * board.shape[0])
       for j, row in enumerate(board):
@@ -406,6 +418,7 @@ class Cross(KrossWord):
       for word in self.word_locations:
         loc = word.start
         frame[loc] = self.board[loc]
+      self.empty_board = frame
       board_str = ''
       for r, row in enumerate(frame):
           board_str += "'"
@@ -453,7 +466,13 @@ class Cross(KrossWord):
      # length of words and number in starting letters
      puzzles = []
      for puzzle, contents in word_dict.items():
+         try:
+             contents.remove('New:')
+         except ValueError:
+             pass
+         contents = list(set(contents))
          contents.remove('')
+       
          no_words = len(contents)
          Freq = Counter([len(words) for words in contents])
          Start = Counter([words[0] for words in contents])
@@ -499,15 +518,25 @@ class Cross(KrossWord):
         
       
 if __name__ == '__main__':
-  save = True
+  save = False
   console.clear()
   cx = Cross()
-  cx.stats()
+  # cx.stats()
   t = time()
   cx.wordsearch(size=13, no_start=38, iterations=20)
   print('elapsed', time()-t)
   text = cx.compute_puzzle_text(name=f'{cx.base}{cx.next_number}',
                                 add_coords=False)
+  v = h = d = 0
+  for word in cx.word_locations:
+    if word.direction.lower() in ['n', 's']:
+       v += 1
+    elif word.direction.lower() in ['e', 'w']:
+       h += 1
+    elif word.direction.lower() in ['ne', 'nw', 'se', 'sw']:
+       d += 1
+  print(f'{v=}, {h=}, {d=}')
+      
   print(text)
   if save:
       with open('fiveways.txt', 'a', encoding='utf-8') as f:
