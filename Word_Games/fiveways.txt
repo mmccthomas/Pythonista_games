@@ -1316,3 +1316,519 @@ Puzzle24_frame:
 ' / / /s/p/ / / / / / / / '
 ' /d/u/ / / / / / / / /g/s'
 'k/r/ / / / / / / / / / /b'
+
+Puzzle25:
+ABLE
+ANGRY
+BATMAN
+BELLY
+CADILLAC
+CELLS
+CELLULAR
+CHEAP
+CHIP
+DISCS
+EDT
+ESSENCE
+EVENT
+GALLERY
+HANDLE
+HOTELS
+HUNDREDS
+INITIALLY
+LOBBY
+MALL
+MINI
+MOUNTED
+NHL
+OPTICS
+PARENTS
+PCS
+PERL
+PETE
+REMARKS
+SEEMED
+SEVEN
+SOUP
+TALENT
+TRIES
+TRUSTS
+UNTITLED
+URGE
+WINTER
+WIRE
+YET
+
+Puzzle25_frame:
+'e/ / / / / / /p/m/p/ / / '
+'e/ / /s/ / / / /i/e/ / / '
+' / / / / / / /h/ / / / / '
+'c/m/t/ / / /c/ / / / / / '
+'p/ /b/ / / / / / / / / / '
+' / / / / / / /c/ / /w/ /s'
+'o/ / / / / /g/r/ / /b/m/l'
+' / / / / / / / / / / / /h'
+'t/t/ / / / / / / / / /a/n'
+' / / / / / / / / / /s/ / '
+'c/y/ / / /h/ / / /a/ / / '
+' / /p/d/ / / / / / /u/ / '
+' /w/ / / / /c/ / / / / /u'
+
+Puzzle26:
+BAGHDAD
+BAHAMAS
+BOUND
+CASIO
+CELL
+CLEARING
+COLORS
+CONSIDER
+CUBE
+EDEN
+EMPEROR
+FILTERS
+FUJI
+GIRLS
+GOLF
+HATS
+HONEY
+IEEE
+ING
+IST
+JEEP
+LENS
+LISA
+MAIDEN
+MICHEL
+MRNA
+NEIL
+NOTICE
+PMID
+POSTINGS
+REFORMS
+RELIEF
+SAVES
+SELLER
+SHOWER
+SUSTAINED
+TERM
+TULSA
+TWINS
+USED
+WELLNESS
+YACHT
+YRS
+
+Puzzle26_frame:
+'g/ / / /t/p/r/m/ / / / /y'
+'u/ /n/ / / / / / /f/ / / '
+' / / / / / /r/ / / /e/n/b'
+'e/p/m/ / /j/ / / / / /l/ '
+' / / / / / /s/ /c/ / / / '
+' /g/ /c/i/ / / / / / /f/ '
+' / /w/ / / / / / /s/ / / '
+' /i/ / / / /t/ /h/ / / / '
+' / / / / / / / / / /t/ / '
+' / / / / / / / / / / / / '
+' /y/ / / / / /l/ / / / / '
+' / /i/ / / / / /c/ /s/ / '
+'b/ /b/ /c/s/ /c/ / / /m/h'
+
+Puzzle27:
+BEVERAGE
+BLINK
+CATCH
+CLOTHES
+COLON
+COMFORT
+CRISIS
+FARMER
+FORK
+FOSTER
+GIFT
+GRADUALLY
+GSM
+IDOL
+KNEE
+KNIVES
+LATITUDE
+LAWRENCE
+LINKING
+LOUD
+MAKE
+MEASURES
+MESSAGE
+MOTHER
+NAKED
+NEEDLE
+OHIO
+PRESENT
+PROPER
+ROBOT
+SCENE
+SEEM
+SERVER
+SOUNDS
+TIER
+TOYS
+URLS
+USA
+VALVE
+VEGAS
+WMA
+
+Puzzle27_frame:
+' /k/g/s/m/ / / / / / /s/b'
+' /n/ /c/ / / / / / / / /l'
+' / / / / / / / /l/ / / / '
+'m/ / / / / / /v/ / / / / '
+'w/ /v/ / / / /n/u/ / / / '
+'b/l/ / / / / / / /m/ / / '
+' / / /g/ / / / / / / / / '
+' / / /f/f/ / / /t/c/c/s/ '
+' / / / / / / /l/r/ / / / '
+' / / / / / / / /t/ /f/ / '
+' /s/u/ / / / / / / / / / '
+'o/ / / / / / / / / / / /g'
+'c/ / / / /p/p/ / / /k/ /i'
+
+Puzzle28:
+ACER
+ACROSS
+ALOT
+ATTEMPTS
+BANGBUS
+BARN
+BEER
+BUDAPEST
+CLEAR
+CORRECTED
+COUPONS
+COVERS
+DEAF
+EOS
+FLOWER
+FOCUSES
+GOALS
+GONNA
+HIRING
+HOMEWORK
+IDEA
+INCH
+JANET
+JOHN
+KNOWS
+LOADS
+MUG
+PROT
+PST
+RENDER
+RISE
+SEGMENTS
+SLIDES
+STUDIO
+THEHUN
+TRAINS
+TURN
+URGE
+VATICAN
+VECTOR
+
+Puzzle28_frame:
+'e/ / /c/ /p/ / / /c/ /v/p'
+' / / / / /j/ / / / /g/ / '
+' / / / / / / /s/t/ / / / '
+' / / / /a/ / /b/m/ /u/ / '
+' / / /i/ / / / / / / / / '
+' /s/t/ / / /k/g/ / / / / '
+' /c/ / / / / /f/ / / /h/ '
+' /s/ / / / / / / / / /r/ '
+'h/ / / /j/ / / / /b/ / /a'
+' / / / / /a/ /d/a/ /f/ / '
+' / / / /c/ / / / / / / / '
+'r/ / /b/b/ / / / / / / /i'
+' / / / / /l/t/ / / / / /v'
+
+Puzzle29:
+ABOUT
+BLANKET
+BOUTIQUE
+BRISTOL
+CAUSE
+CENTER
+CENTRE
+CHICK
+CIALIS
+CLINIC
+DALLAS
+DPI
+DUI
+EARL
+FALSE
+FORESTS
+FUEL
+GDP
+GRANTED
+HER
+HORSES
+JOY
+LEGACY
+LINUX
+MAKE
+MEMO
+MOUNTING
+MYSPACE
+NANO
+PICS
+PIG
+PILOT
+RETAIL
+SEES
+SMTP
+SOMALIA
+TALE
+TAXATION
+TRANCE
+USE
+VENUE
+VOLUNTEER
+
+Puzzle29_frame:
+'d/ / /s/ /h/ / / / / /c/j'
+'b/ / / / /f/ / / / / / / '
+' / / / / / /f/l/ / / / / '
+' / / / / /p/ /c/ / / / / '
+' /l/ / / /t/ / / /p/m/a/ '
+' /c/ / / / / / / /b/ /b/ '
+' / /c/ / /s/ /d/ / / / / '
+' / / / /t/ /m/ /v/h/ / / '
+' / / /g/ / / / / / / / /t'
+'p/ / / / / /r/ / / / / / '
+'d/ / / / / /c/ / / / / / '
+'g/ /c/ /e/m/n/ / / /s/ / '
+'v/ / / / / / / /m/ /u/ /f'
+
+Puzzle30:
+ACIDS
+ACRE
+ADWARE
+ASSURED
+BATH
+BEAN
+BEEN
+BOTH
+BRAS
+CAMP
+CAPTURED
+CARBON
+COMPARE
+CONGO
+CRAIG
+FALL
+HAIR
+HELPS
+HENRY
+HOP
+ICON
+IMAGES
+LANE
+MAGAZINE
+NAME
+OHIO
+OWNS
+PLANET
+PLASTIC
+PRAGUE
+PRIDE
+REHAB
+REMOVAL
+RIDER
+SOA
+SPACE
+STANFORD
+SUBLIME
+TREAT
+TWELVE
+USED
+VIOLATION
+WHERE
+YANG
+
+Puzzle30_frame:
+'b/ /t/h/ /a/ / / / / / /s'
+'a/c/ / /v/ / /h/ / / / /u'
+' / / / / / / / /a/ / / / '
+' / / / / / / / / /n/ / / '
+' / / / /f/ / / / / /h/ / '
+' / / / / /p/ /p/ /a/ / /s'
+' / / / / / / / /c/ / / / '
+'t/ /i/b/c/ /l/h/ / / / / '
+'w/ /m/ / / / / / / / / / '
+' / / / / /c/ / / / /r/ / '
+' /r/ / / / / / / / / / / '
+' /p/ /r/y/s/ / / / / /o/c'
+' /b/ / / /o/p/b/c/ /s/b/i'
+
+Puzzle31:
+ANALOG
+ANTIQUES
+ARMENIA
+CAMPAIGN
+CARS
+CERTIFIED
+CIRCUS
+DECADE
+DELL
+DICKE
+DOCTORS
+ELSE
+EMOTIONAL
+FEEDING
+HELL
+HELPS
+JOEL
+LAKE
+LANE
+LASER
+LICENSES
+LYING
+MARINA
+MATCH
+MEAL
+MEM
+MENTAL
+NEEDLE
+PEACE
+RAYS
+REJECT
+REQUIRE
+SKI
+STAN
+STRUGGLE
+TENANT
+TERRY
+TIER
+TORTURE
+YES
+
+Puzzle31_frame:
+'n/t/m/l/d/ / /c/d/j/ / /l'
+' / / / /e/ / / / / /s/ / '
+' / / / /f/ / / / / / / / '
+' / / / / /m/ / / / / /l/ '
+' / / / / / /c/ /d/ /m/ / '
+' / / / / / / /t/ / / / / '
+' / / / / / / / /c/ / / / '
+' / / / / /a/ /r/ / / /r/s'
+'l/ / / / / / /m/ / / / / '
+' / / / / / /d/ / / /h/ / '
+' / / / / / /r/ / /y/ / / '
+'p/ / / / /a/t/m/l/c/ / /h'
+'s/t/a/ / / / / / / / /e/ '
+
+Puzzle32:
+ALONG
+ANGELA
+BRAS
+CENT
+CHASSIS
+COLUMNS
+CUISINE
+CUPS
+DATA
+DIEGO
+FATTY
+FEELINGS
+FRANK
+GIRL
+HOPEFULLY
+IMPOSED
+INCOME
+INFORMED
+INTERACT
+INTRO
+JANET
+KAI
+KYLE
+LOADING
+LONELY
+LYNN
+MAIN
+NEWTON
+NORWAY
+PETS
+PRIZES
+PROMOTION
+RANK
+RANKED
+SMART
+STANLEY
+TERMINAL
+VIII
+WASTE
+
+Puzzle32_frame:
+'c/ / / / / / /d/ / / / /c'
+' /f/j/ / / / /p/ / / / / '
+' / /p/ / / / / / / / /c/t'
+' / /l/b/ / / /l/g/ / / / '
+' / / /c/ / / / / / /i/ / '
+' / / / / / /m/ / / / / / '
+' / / / /n/i/ /v/ / / / /i'
+' / / / / / /p/ /h/ / / / '
+' / / / / / / / / / / / / '
+' / /k/ / / / / / / /d/r/l'
+' / /i/ / / / / /s/ / / / '
+' /s/ / / / / / /i/ / / / '
+'n/w/k/a/f/a/ / / / / /r/f'
+
+Puzzle33:
+AAA
+ALLEGED
+ATTITUDE
+AVOID
+BABY
+BLIND
+COP
+CREATED
+CROSSWORD
+DIRECTLY
+FLAME
+GAMBLING
+GBA
+GUILTY
+INDUSTRY
+IPS
+ISSUES
+MEETUP
+NEITHER
+NETWORKS
+OPTIONS
+PACKED
+PARA
+PERFECTLY
+PERU
+PHYS
+POWDER
+PULLED
+RANKS
+REFINED
+RUN
+SHOE
+THUS
+TOKYO
+
+Puzzle33_frame:
+'g/b/ / / / / / / / / /d/p'
+'f/ / / / /n/ / / / / / / '
+'r/ / / / / / / / / /b/ / '
+' / / / / / / /n/i/g/ /c/ '
+'p/ / / / / /m/ / / / /r/p'
+' / / /t/ / / / / / / / /i'
+' /s/ / / / / / / / / / /g'
+' /r/ / / / / / / / / / / '
+' /a/ / / / / / / /a/p/ / '
+' / / / / /p/ / / / / / / '
+' / / /c/a/ / / / / / / / '
+'o/p/ / / / / / / / / /i/ '
+'c/t/ / / / /a/ / / / / / '

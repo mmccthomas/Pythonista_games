@@ -11,8 +11,6 @@ sys.path.append(parent)
 grandparent = os.path.dirname(parent)
 sys.path.append(grandparent)
 
-
-from util.save.saving import path_to_save_file, allow_save
 from util.aiduel.dueling import get_dueling_ai_class
 from datetime import datetime
 from connect4.connect4_player import Connect4Player
@@ -89,8 +87,6 @@ class Connect4(Game):
     
     # menus can be controlled by dictionary of labels and functions without parameters
     self.gui.gs.pause_menu = {'Continue': self.gui.gs.dismiss_modal_scene, 
-                              'Save': self.save, 
-                              'Load': self.load, 
                               'Show Game': self.getBoardHistory,
                               'Quit': self.quit}
     self.gui.gs.start_menu = {'New Game': self.run, 
@@ -171,51 +167,7 @@ class Connect4(Game):
       self.gui.set_grid_colors(None, "orange")
       self.gui.valid_moves(self.highlight_winning(), False)        
       time.sleep(3)
-      self.gui.gs.clear_highlights()    
-
-  def save(self):
-    SAVE_FILENAME = "connect4_save.txt"
-    self.saveGame(self.turn, SAVE_FILENAME)        
-  
-  def validateLoadedSaveState(self, board, piece, turn):
-      """Make sure the state loaded from the save file is valid. Returns a boolean"""
-      if piece not in [RED, YELLOW]:
-          print(f"Invalid user piece!")
-          return False
-      if turn not in [RED, YELLOW]:
-          print(f"Invalid player turn!")
-          return False
-      for row in board:
-          if len(row) != 7:
-              print(f"Invalid board!")
-              return False
-          if row.count(EMPTY) + row.count(RED) + row.count(YELLOW) != 7:
-              print(f"Board contains invalid pieces!")
-              return False
-      return True
-      
-  def load(self): # from gui
-    SAVE_FILENAME = "connect4_save.txt"
-
-    if os.path.exists(SAVE_FILENAME):
-      try:
-          turn, board, userPiece = self.loadSavedGame(SAVE_FILENAME)   
-          if self.validateLoadedSaveState(board, userPiece, turn):
-            self.turn = turn
-            self.gameBoard = board
-            self.userPiece = userPiece    
-          print(self.turn, self.userPiece, self.gameBoard)
-          
-          self.gui.set_message('')
-          self.gui.set_message2('')
-          self.gui.set_prompt(f"Resuming saved game...")
-          self.printBoard()
-          self.loaded_file = True
-          self.run()
-      except (Exception) as e:
-          print('Reading file' ,e)
-          self.gui.set_prompt('Error reading save file')
-  
+      self.gui.gs.clear_highlights()     
   
   def printAsciiTitleArt(self):
       """Prints the fancy text when you start the program"""

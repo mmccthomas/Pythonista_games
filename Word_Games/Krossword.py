@@ -424,8 +424,16 @@ class KrossWord(LetterGame):
           except (Exception) as e:
             print(e)
             print(traceback.format_exc())
-            
-        if len(selection) > 1:
+                    
+        if selection == "Cancelled_":
+          selection = random.choice(items)
+          self.wordlist = self.word_dict[selection]
+          if selection + '_frame' in self.word_dict:
+             self.table = self.word_dict[selection + '_frame']
+          self.wordlist = [word.lower() for word in self.wordlist]
+          self.gui.selection = ''
+          return selection
+        elif len(selection) > 1:
           self.puzzle = selection
           self.wordlist = self.word_dict[selection]
           if selection + '_frame' in self.word_dict:
@@ -433,8 +441,6 @@ class KrossWord(LetterGame):
           self.wordlist = [word.lower() for word in self.wordlist]
           self.gui.selection = ''
           return selection
-        elif selection == "Cancelled_":
-          return False
         else:
             return False
             
