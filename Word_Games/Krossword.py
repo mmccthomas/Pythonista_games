@@ -61,6 +61,7 @@ class KrossWord(LetterGame):
                               color='grey', line_width=1)
     # menus can be controlled by dictionary of labels and functions without parameters
     self.gui.set_pause_menu({'Continue': self.gui.dismiss_menu,
+                             'New Game': self.restart,
                              'Reveal': self.reveal,
                              'Replay': self.replay,
                              'Quit': self.quit})
