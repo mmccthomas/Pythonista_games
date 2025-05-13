@@ -111,7 +111,7 @@ class Word():
       setattr(self, k, v)
       
   def __repr__(self):
-    return(f'Word_{self.index}{self.start}_{self.direction.upper()}({self.length})={self.word}')
+    return(f'Word_{self.index}{self.start}_{self.direction.upper()}({self.length})= {self.word.capitalize()}')
     
   def set_coords(self):
     r, c = self.start
@@ -215,6 +215,13 @@ class Word():
             length -= 1
             """
             
+  def update_match(self, board):
+      self.match_pattern = ''.join(
+        [board[loc] 
+         if board[loc].isalpha() else '.' 
+         for loc in self.coords]
+         )
+                      
   def get_child_coord(self, child_obj):
     '''returns key from children dictionary'''
     for coord, v in self.children.items():

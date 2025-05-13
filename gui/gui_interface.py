@@ -354,7 +354,7 @@ class Gui():
         self.grid = self.gs.grid
         
     def orientation(self, fn):
-        
+        """ Passes a funtion to be called when device is rotated """ 
         self.gs.orientation = fn
         
     def replace_grid(self, dimx, dimy):

@@ -145,8 +145,11 @@ class CrossWord():
         else:
             fixed = [word for word in self.word_locations if word.fixed]
             if self.debug:
-                self.gui.set_message(
+                try:
+                   self.gui.set_message(
                     f' placed {len(fixed)} {iteration} iterations')
+                except AttributeError:
+                   pass 
 
             # fixed_weights = [5 for word in fixed]
             # create weight for all unplaced words based on word length
@@ -335,13 +338,16 @@ class CrossWord():
         if self.debug:
             print(self.populate_order)
 
-    def solve_swordsmith(self, strategy='dfs'):
+    def solve_swordsmith(self, strategy='dfs', type='British'):
         """ solve using swordsmith implementation"""
         import swordsmith.swordsmith as sword
         # convert board to grid, replace space with dot, and hash with space
         self.board = np.array(self.empty_board)
         grid = np.char.replace(np.char.replace(self.board, ' ', '.'), '#', ' ')
-        crossword = sword.BritishCrossword.from_grid(grid)
+        if type == 'British':
+            crossword = sword.BritishCrossword.from_grid(grid)
+        else:
+            crossword = sword.AmericanCrossword.from_grid(grid)
         crossword.max_cycles = self.max_cycles
         filler = sword.get_filler(sname(**{'strategy': strategy, 'k': 5}))
         wordlist = sword.Wordlist(self.all_words)
@@ -363,20 +369,26 @@ class CrossWord():
                              length_first=True,
                              max_iterations=2000,
                              max_possibles=None,
-                             swordsmith_strategy=False):
+                             swordsmith_strategy=False,
+                             type='British'):
         # for all words attempt to fit in the grid, allowing for intersections
         # some spaces may be known on empty board
         self.start_time = time()
         index = 0
         if swordsmith_strategy:
-            index = self.solve_swordsmith(strategy=swordsmith_strategy)
+            index = self.solve_swordsmith(strategy=swordsmith_strategy, type=type)
         else:
             self.populate_order = []
-            while any([not word.fixed for word in self.word_locations]):
+            while (any([not word.fixed for word in self.word_locations])
+                  or np.any(self.board =='.')):
                 fixed = [word for word in self.word_locations if word.fixed]
                 if self.debug:
+                  print(f' placed {len(fixed)} {index} iterations')
+                  try:
                     self.gui.set_message(
                         f' placed {len(fixed)} {index} iterations')
+                  except AttributeError:
+                    pass
                 word = self.get_next_cross_word(index, max_possibles,
                                                 length_first)
 
@@ -394,6 +406,7 @@ class CrossWord():
                 if self.debug:
                     try:
                         # self.gui.gs.highlight_squares(word.coords)
+                        self.gui.print_board(self.board, which=index)
                         self.gui.update(self.board)
                         sleep(0.25)
                     except AttributeError:
@@ -411,7 +424,11 @@ class CrossWord():
 
         # self.update_board(filter_placed=False)
         if self.debug:
+           try:
             self.gui.print_board(self.board)
+           except AttributeError:
+             pass
+           finally:
             print('Population order ', self.populate_order)
         ptime = self.delta_t('time', do_print=False)
         method = '' if not swordsmith_strategy else swordsmith_strategy
@@ -419,8 +436,11 @@ class CrossWord():
         words = len([w for w in self.word_locations if w.word])
         print('no words', words)
         # print(msg)
-        self.gui.set_prompt(msg)
-        self.gui.update(self.board)
+        try:
+            self.gui.set_prompt(msg)
+            self.gui.update(self.board)
+        except AttributeError:
+          pass
         return self.board
 
     def get_word(self, wordlist, req_letters, wordlength):
@@ -528,6 +548,7 @@ class CrossWord():
             word_obj.update_grid('', self.board, text)
             if self.debug:
                 print(f'Placed word {word_obj}')
+                self.gui.print_board(self.board)
             self.update_children_matches(word_obj)
             for coord, child in word_obj.children.items():
                 # print(child.match_pattern, type(child.match_pattern))
@@ -807,9 +828,15 @@ class CrossWord():
                 max_component = []
                 for index, try_word in enumerate(possibles):
                     if self.debug:
-                        self.gui.set_message(
+                        print(
                             f'{index}/{length} possibles  at {word.start} trying {try_word}'
-                        )
+                           )
+                        try:
+                           self.gui.set_message(
+                            f'{index}/{length} possibles  at {word.start} trying {try_word}'
+                           )
+                        except AttributeError:
+                          pass
                     result = self._search_down(word,
                                                dict_parents,
                                                try_word=try_word,

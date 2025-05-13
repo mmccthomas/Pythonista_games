@@ -1,3 +1,6 @@
+New:
+create new
+
 Puzzle1:
 #659-72
 1
@@ -3288,10 +3291,6 @@ Puzzle39_frame:
 ' / / / / / /13/ / / / / / '
 
 Puzzle40:
-4
-13
-L
-4
 1
 CHIPOLATA
 CHIPS

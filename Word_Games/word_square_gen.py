@@ -1,6 +1,6 @@
 import random
 import string
-
+            
 def place_word(board, word, coords, max_iteration=500, space='-', bias=None):
     # Randomly choose orientation: 0=horizontal, 1=vertical, 2=diagonal
     # if bias is set, it is a list of probabilities for h, v or d
@@ -114,15 +114,17 @@ def create_word_search(words, size=15):
 
     return board, words_placed, coords
 
+
+
+      
 def display_board(board):
     for row in board:
         print(' '.join(row))
 
-
-
-import random
-  #for key in all_words:
-  # words = all_words[key]
-  #board = create_word_search(words)
+if __name__ == '__main__':
+  
+  #wordset = get_wordset('wordlists/words_10000.txt') 
+  pass
+  #board = create_word_search(wordset, size=13)
   #display_board(board)
-  # print(words)
+  #print(words)
