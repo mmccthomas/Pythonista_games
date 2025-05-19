@@ -626,8 +626,30 @@ class Cross():
             '', f'{name}:', '\n'.join(words), '', f'{name}_frame:',
             self.to_frame()
         ])
-        return all_text    
- 
+        return all_text
+            
+    def show_coverage(self, start_dict):
+        """ plot board showing which squares below to which words """
+        board  = np.full((self.board_size, self.board_size), UNFILLED)
+        letters = list('abcdefghjklmnopqrstuvwxyz')[::-1] 
+        # populate starts first
+        [set_board(board, loc, letters.pop()) for loc in start_dict]
+        letters = list('abcdefghjklmnopqrstuvwxyz')[::-1] 
+        for start, words in start_dict.items():
+            letter = letters.pop()
+            for coords in words:
+               for coord in coords:
+                 if board[coord] == UNFILLED:
+                     board[coord] = letter
+                 elif coord not in start_dict:
+                     board[coord] = '*'
+            #self.print_board(board, highlight=start_dict)
+        self.print_board(board, highlight=start_dict)
+        # lower case latters are only reachable from associated start
+        # asterisks from muliple starts
+        # dot not reachable
+        return board
+          
     def set_all_matches(self, board):
         [word_.update_match(board) for word_ in self.word_locations]
         
@@ -694,7 +716,7 @@ class Cross():
             self.place_word(word_, possible)
             # self.place_word(fewest.start, fewest.coords, possible)
             # print()
-            # self.print_board(self.board, which=f'{self.iteration_counter}, {word_}  {possible.capitalize()} {self.no_locs_filled()}/169 depth= # {len(inspect.stack(0))}', highlight=self.start_locs)
+            self.print_board(self.board, which=f'{self.iteration_counter}, {word_}  {possible.capitalize()} {self.no_locs_filled()}/169 depth= # {len(inspect.stack(0))}', highlight=self.start_locs)
             # now proceed to next fewest match
             if self.fill():
                 return True
@@ -757,12 +779,12 @@ class Cross():
             [set_board(self.board, loc, val)
                 for loc, val in zip(start_locs, start_letters)]
             self.set_all_matches(self.board)
-            
+            self.words_to_process = self.words_to_visit
             # process words in length order, then diagonals
-            words_to_process = sorted(self.word_locations,
-                                      key=attrgetter('length'))
-            self.words_to_process = sorted(words_to_process,
-                                           key=lambda x: len(x.direction))
+            #self.words_to_process = sorted(self.word_locations,
+            #                          key=attrgetter('length'))
+            #self.words_to_process = sorted(words_to_process,
+            #                               key=lambda x: len(x.direction))
             # self.words_to_process = [word_ for word_ in words_to_process if word_.direction in ['NE', 'SE', 'SW', 'NW']]
     
             self.fill()
@@ -1043,34 +1065,46 @@ class Cross():
             if length >= 3:
                 lengths[d_name] = length
         return lengths
-    
+        
+    def no_diagonals(self, *starts):
+        """ ensure starts are not in diagonals with each other """
+        coords = np.array([divmod(start_index, self.board_size) for start_index in starts])
+
+        # Compute all indices that meet the conditions
+        # i, j = np.where((coords[:, 1] == coords[:, np.newaxis, 1]) &(abs(coords[:, 0] - coords[:, np.newaxis, 0]) < 1.2 * threshold)
+        
+        for coord1 in coords:
+          for coord2 in coords:
+              d = coord1 - coord2 
+              if np.any(d) and d[0] == d[1]:
+                return False
+        return True
+            
     def check_coverage(self, *starts):
             """
-            Checks if the given starting square configuration covers the entire board.
-    
+            Checks if the given starting square configuration covers the entire board.    
             Args:
                 starts: A list of integers, where each integer represents the
-                        flattened index of a starting square.
-    
+                        flattened index of a starting square.    
             Returns:
                 True if the board is fully covered, False otherwise.
             """
             def pyfunc(i):
               return f'{hex(i).upper()[2:]:<2}'
-            #vhex = np.vectorize(pyfunc)
+            # vhex = np.vectorize(pyfunc)
             
             t=time()
-            board = self.board.copy()
+            board = self.num_board.copy()
             start_coords = np.array([divmod(start_index, self.board_size) for start_index in starts])
             # Iterate through each starting square and direction to mark covered squares.
             #print(start_coords)
-            for r, c in start_coords:              
+            for i, (r, c) in enumerate(start_coords):              
               alldirs = self.dirs(board, r, c)
               for dirn in alldirs:
                 if self.max_word_length >= len(dirn) >= self.min_word_length:
                     locs = np.divmod(dirn, self.board_size)
                     board[tuple(locs)] = True
-              #self.print_board(vhex(board), which=(r,c), spc=3)
+              #self.print_board(vhex(board), which=(i, (r,c)), spc=3)
               
             
             # Check if all squares have been covered.
@@ -1080,9 +1114,9 @@ class Cross():
             #self.print_board(vhex(board))
             return np.all(board==1)        
             
-  
-    def place_pieces2(self, board_size=13):
-        """
+    def place_pieces(self, board_size=13):
+        """place pieces such that all squares covered
+    
         Solves the board coverage problem using the python-constraint library.
     
         Args:
@@ -1097,12 +1131,14 @@ class Cross():
         """
         problem = Problem()
         self.board_size = board_size
-        self.board = np.arange(board_size*board_size).reshape((board_size,board_size))
-        #self.board = np.full((self.board_size, self.board_size), False)
-        #self.indices = np.argwhere(self.board==False)
+        # for speed, the board to be filled is comprised of numbers 0+N*N-1
+        # this allows positions to be quivkly converted to (row, col) 
+        self.num_board = np.arange(board_size*board_size).reshape((board_size,board_size))
+  
         # Define variables for the starting squares.  Each variable's domain is the
         # range of possible square indices (0 to board_size*board_size - 1).
         start_squares = [f'start_{i}' for i in range(self.num_start_squares)]
+        #randomize seed start values to avoid trivial solutions
         numbers = list(range(board_size * board_size))
         random.shuffle(numbers)
         problem.addVariables(start_squares, numbers)
@@ -1112,40 +1148,13 @@ class Cross():
         
         # Add the custom constraint to ensure full board coverage.    
         problem.addConstraint(FunctionConstraint(self.check_coverage), start_squares)
-    
+        
+        # Add the custom constraint to ensure start squares are not on diagonals from each other
+        #problem.addConstraint(FunctionConstraint(self.no_diagonals), start_squares)
         # Attempt to find a solution.
-        solution = problem.getSolution()
+        return problem.getSolution()
     
-        if solution:
-            # Convert the flattened indices to (row, column) coordinates.
-            start_coordinates = np.array([divmod(solution[var], board_size) for var in start_squares])     
-            print("Solution found:")   
-            return start_coordinates
-        else:
-            print("No solution found.")
-            return None  # Indicate that no solution was found.
-                    
-            
-    def place_pieces(self, size):
-        """place pieces such that all squares covered
-      """
-        problem = Problem()
-        cols = list(range(size))
-        rows = list(range(size))
-        random.shuffle(rows)
-        random.shuffle(cols)
-        problem.addVariables(cols, rows)
-        problem.addConstraint(AllDifferentConstraint())
-        for col1 in cols:
-            for col2 in cols:
-                if col1 < col2:
-                    problem.addConstraint(
-                        lambda row1, row2, col1=col1, col2=col2: abs(
-                            row1 - row2) != abs(col1 - col2) and row1 != row2,
-                        (col1, col2),
-                    )
-        return problem.getSolutionIter()
-
+        
     def test_filled(self, r, c, board, start_locs):
         # from start point r,c. get coordinates of all locations
         # > 2 and less than 11
@@ -1193,7 +1202,7 @@ class Cross():
         # now fill word_locations
         for k, words in start_dict.items():
             for coords in words:
-                if coords:
+                if len(coords)>=3:
                   direction = self.compass[sub(coords[1], coords[0])]  # N, S etc
                   word_ = Word(k,
                                direction.upper(),
@@ -1296,27 +1305,73 @@ class Cross():
         # _, total = self.difficulty(self.word_locations)
         return score, board, total
         
+    def decode_board(self, board, start_dict):
+        """ this will associate squares with parent words that cannot be covered by any others
+        process the start dict form start_loc: [[list coords], [list_coords]
+        filter this to remove any coord that is present in other lists
+        we end up with a copy of start_dict with items which must be placed """
+  
+        # a set of all other coords
+        sdict = defaultdict(list)
+        
+        for key, value in start_dict.items():
+          all_coords = []
+          for k, v in start_dict.items():
+             if k == key:
+                continue
+             all_coords.append(v)
+          # unravel coords
+          all_coords = sum(all_coords, [])
+          all_coords = set(sum(all_coords, []))
+          
+          sdict[key]=[]
+          for word in value:
+            for coord in word[:]:
+              if coord in all_coords:
+                word.remove(coord)
+            sdict[key].append(word)
+            
+        words_to_visit = []
+        for k, v in sdict.items():
+          for word, dirn in zip(v, self.dir_str):
+             if word:
+               if len(word) == 1 and word[0] == k:
+                 continue
+               for word_ in self.word_locations:
+                   if word_.start == k and word_.direction == dirn.upper():
+                     words_to_visit.append(word_)
+        words_to_visit = sorted(words_to_visit, key=attrgetter('length'), reverse=True)
+        return sdict, words_to_visit
+        
+        
+      
+      
     def compute_start_positions(self, size, iterations=10):
-        """ Use 'N queens'  CSD algorithm to get best start positions
-      using Monte Carlo search """
+        """ Use   CSD algorithm to get best start positions
+         using Monte Carlo search 
+         This ensures that solution SHOULD fill the grid.
+         next step  is to compute words and then to ensure that all
+         squares can be reached by one or mord of those words.
+         if this fails, compute a new set """
         Best = namedtuple("Best", "board start_locs start_dict score")
         best_score = size*size
         best = None
         score = 0
         t1 = time()
-        # create an iterator with one piece on each row and column
-        start_locs = self.place_pieces2(size)
-        if start_locs is  not None:
-           start_dict = self.compute_start_dict(start_locs)
-           return start_dict
         # iterate through possible solutions to see which best allows board to fill
         count = 0
         for i in range(iterations):
             self.board = np.full((size, size), ' ')
             # next attempt
             try:
-                start_locs = sorted([(r, c) for r, c in next(pieces).items()])
-            except StopIteration:
+                # run solver again to get new random values
+                solution = self.place_pieces(size)
+                if solution is None:
+                  raise RuntimeError('No solution for placement')
+                start_coordinates = np.array([divmod(var, self.board_size) for var in solution.values()])   
+                start_locs = [tuple(loc) for loc in start_coordinates]             
+                 #    start_locs = sorted([(r, c) for r, c in #next(pieces).items()])
+            except Exception:
                 # best = Best(self.board.copy(), start_locs, start_dict, score)
                 traceback.print_exc()
                 break
@@ -1324,10 +1379,17 @@ class Cross():
                 print(start_locs)
             start_dict = self.compute_start_dict(start_locs, size_only=True)
             self.board = np.full((size, size), ' ')
-            for j, v in enumerate(start_dict.values()):
-                neighbours = set(sum(v, []))
-                [set_board(self.board, (r, c), string.ascii_lowercase[j])
-                 for r, c in neighbours]
+            board = self.show_coverage(start_dict)
+            if '.' in board:
+              continue
+              
+            # Now have valid start set
+            start_dict = self.compute_start_dict(start_locs)
+            sdict, self.words_to_visit = self.decode_board(board, start_dict)
+            best = Best(board.copy(), start_locs, start_dict, 0)
+            return best 
+            
+            
             
             score = self.board.size - len(self.locs_unfilled())
             # if self.debug:
@@ -1404,7 +1466,7 @@ def main():
     console.clear()
     cx = Cross()
     size = 13
-    cx.num_start_squares=15
+    cx.num_start_squares=16
     cx.use_random = False
     Best = namedtuple("Best", "board start_locs start_dict score")
     cx.all_start_coords = cx.get_starts('krossword.txt')
@@ -1414,13 +1476,15 @@ def main():
 
     # find the best start positions
     best = cx.compute_start_positions(size, iterations=500)
+    #start_dict = cx.compute_start_dict(start_locs)
+    cx.show_coverage(best.start_dict)
     # print('Best starts', best.start_locs)
     print()
     # start_locs = random.choice(cx.all_start_coords)
-    if best:
-      start_locs = best.start_locs
+    if True : #best:
+      #start_locs = best.start_locs
       cx.board = np.full((size, size), ' ')
-      best = Best(cx.board, start_locs, cx.compute_start_dict(start_locs), 0)
+      #best = Best(cx.board, start_locs, cx.compute_start_dict(start_locs), 0)
       # cx.cc = crossword_create.CrossWord(Gui(cx.board, None), cx.word_locations,
       #                                   cx.wordset)
       # cx.cc.gui.gs.close()
