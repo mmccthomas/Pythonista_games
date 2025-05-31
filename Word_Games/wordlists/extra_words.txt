@@ -12,7 +12,8 @@ frontman
 gelato
 glovebox
 gravlax
-gumboot
+gumboo
+ipad
 jobseeker
 jacuzzi
 jacuzzis

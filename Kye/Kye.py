@@ -91,9 +91,11 @@ def main(**argv):
   v['sceneview'].scene = KFrame(kyeapp, recentlevels=defaults.get_recent(),
                                 settings=defaults.settings, tilesize=tilesize)
   if device == 'iphone_landscape':
-    v['status'].position = (0, 150)
-  elif device == 'ipad':
-    v['status'].position = (0, 50)
+    v['status'].position = (0, 0)
+  elif device == 'ipad_landscape':
+    v['status'].position = (0, 0)
+  else:
+     v['status'].position = (0, 0) 
 
   build_menu(v)
   kyeapp.run(v)

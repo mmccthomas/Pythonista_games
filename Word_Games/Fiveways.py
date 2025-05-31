@@ -6,6 +6,7 @@
 import numpy as np
 from Krossword import KrossWord
 from gui.gui_interface import Squares, Coord
+import generate_five
  
  
 class FiveWays(KrossWord):
@@ -13,6 +14,7 @@ class FiveWays(KrossWord):
   def __init__(self):
     KrossWord.__init__(self)   # same as KrossWord
     self.debug = False
+    self.max_iteration = 2000
     self.wordfile = 'fiveways.txt'
     self.strikethru = False 
   
@@ -21,10 +23,18 @@ class FiveWays(KrossWord):
     For Fiveways there are a number of start positions shown
     create start_dict with structure
     {: {words: [wordlist], coords: {Coord: [matches], Coord: [matches], ...}}"""
-    
-    board = [row.replace("'", "") for row in self.table]
-    board = [row.split('/') for row in board]
-    self.board = np.array(board)
+    if self.selection == 'New':
+        # compute new puzzle
+        import generate_five
+        cx = generate_five.Cross()
+        cx.wordsearch(size=13, no_start=38, iterations=20)
+        self.board = cx.empty_board
+        self.wordlist = sorted([word.word.lower() for word in cx.word_locations]) 
+        cx.print_board(cx.board, highlight=[word.start for word in cx.word_locations])
+    else:
+        board = [row.replace("'", "") for row in self.table]
+        board = [row.split('/') for row in board]
+        self.board = np.array(board)
     self.letter_board = self.board # not used in fiveways  
     # fill start_dict
     start_positions = np.argwhere(np.char.isalpha(self.board))
@@ -53,6 +63,46 @@ class FiveWays(KrossWord):
     # sort alphabetically    - was longest to shortest
     self.wordlist[None]  = sorted(self.wordlist[None]) #,key=len, reverse=True)
     self.update_matches() 
+    
+  def display_setup(self):
+    """set positions of display
+    elements for different device
+    sizes
+    This is called also when devis is rotated
+    """
+    W, H = self.gui.get_device_screen_size()
+    self.gui.device = self.gui.get_device()
+    x, y, w, h = self.gui.grid.bbox
+    match  self.gui.device:
+       case'ipad_landscape' | 'ipad13_landscape'| 'ipad_mini_landscape' | 'iphone_landscape':
+           self.gui.set_enter('Undo', position=(w + 50, -50))
+           self.start_menu_pos = (w+250, h)
+           position_puzzles = (w+10, h/4)
+       case'ipad_portrait' | 'iphone_portrait' | 'ipad13_portrait' | 'ipad_mini_portrait' :
+           self.gui.set_enter('Undo', position=(w - 50, h + 50))
+           self.start_menu_pos = (w-50, h+50)
+           position_puzzles = (w/2, h)
+       case _:
+           self.gui.set_enter('Undo', position=(w + 50, -50))
+           self.start_menu_pos = (w+250, h)
+           position_puzzles = (w+10, 0)          
+    self.gui.gs.pause_button.position = (32, H - 36)   
+    self.gui.set_top(self.gui.get_top(),
+                     position=(0, h+25))
+    self.gui.set_moves(self.gui.get_moves(),
+                       anchor_point=(0, 0),
+                       position=position_puzzles) 
+                         
+  def process_turn(self, move, board, test=None):
+     KrossWord.process_turn(self, move, board, test=None)     
+     # change the colour of a correct start letter to green 
+     move = self.predict_direction(move)
+     if move:
+         if all([self.board[coord] == self.solution[coord]  for coord in move]):          
+           items = self.gui.get_numbers(move[0])
+           [v.update(color='orange') for v in items.values()]
+           self.gui.put_numbers(items)
+        
       
   def run(self):
     KrossWord.run(self)

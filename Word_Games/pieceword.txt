@@ -6171,3 +6171,253 @@ FUJY R H EEDT E
 M TDATLTH Y RIC
 I O   SWAP P D 
 CONWOOTON T TIN
+
+puzzle35_4:
+''
+7, 5
+0710112933003205142512222013163426091528010221241906081830172304273103
+
+puzzle35_4_text:
+1 Time period • Less than zero •
+  Feel sore all over
+2 Seventh Greek character •
+  Ceremonial sphere
+3 Horse-breeding farm • Baby's
+  towel • Dimensions
+4 Piece performed by two people •
+  Small street
+5 Domesticate • Small landmass
+6 To the time • Thick chain,
+  rope or wire
+7 Hole in a needle
+8 Unwind • Error, mistake
+9 Cigar with square-cut ends
+10 Twin sound system •
+To do with cats
+11 Take a test again after failing
+   first time
+12 Least common • Chilliest
+13 Not one or the other
+14 Part of a horse's foot •
+   Formal speech
+15 Tree's juice
+16 Waist measure • Exude droplets
+of moisture
+17 Reverberation • Colt or filly
+18 Pricey • Master cook
+19 Someone who practises yoga •
+   Lizard with adhesive toes •
+   Border, rim
+20 bother, Scottish slang •
+   Hotel du __, Booker-
+   Prize-winning novel
+21 Genuine • Gave medicine to •
+   Affectedly cute
+
+puzzle35_4_frame:
+  GDUEE ACHET L
+ECHE. DER A H A
+ H NTI. RIZEL C
+YEAANEREOO ESTE
+ X   I. RLACC R
+STUABLESTD TRAR
+DGEEYEINU R I. 
+ L T B I LUNPAS
+WEEEROAPPOT T I
+ R IRT. I E S A
+TAMO. IONESIORB
+  UDEAN G E Y S
+ECKR M W WEAS S
+ O ETAWIS. FUNT
+OSED N CHHEFB. 
+ER H S NEITHI G
+RATO ATERN ONAE
+ V R C E SAPE D
+INE E T. YOGFEL
+D SSLEOAL I T. 
+ESTE.  N TRUICI
+
+puzzle36_64:
+''
+7, 5
+0710112933003205142512222013163426091528010221241906081830172304273103
+
+puzzle36_64_text:
+1 1986 Tim Rice/Benny Andersson
+  musical • Declare (a marriage) void
+2 Double-reeded wind instrument • String
+  or rope • Sliding window frame
+3 Broadcasting medium • PlayStation
+  or Wii user, eg
+4 Look after • Winter's thin layer of
+  ice crystals • Heap of hay
+5 Warned of danger
+6 Lengthy harangue • Amount paid
+  by a tenant
+7 Subside
+8 Russian royalist • Follow the example of
+9 Go briskly on a horse • Clotted blood
+10 Proposed spot • Happen, come about •
+   Used to be
+11 Tibetan pack animal • Animal's coat
+12 Plucked stringed instrument • Musket,
+   eg • Title of the former king of Iran
+13 Row, rank • Rhythm
+14 Lame • Piece of pottery
+15 Fix in a position
+16 Rousing song • Term of endearment
+17 Longed for
+18 Middle Eastern bazaar • More
+   considerate • Firmly against
+19 Modified music track • Association of
+   tradespeople
+20 Restore after marking for deletion •
+   Book of maps • Measure of distance
+21 Wheeled platform for a cine camera •
+   Last but not ___, proverb
+
+puzzle36_64_frame:
+MIN TIER D LEMI
+I ELIMPINILET A
+TIR O  L T DOLL
+ROSANTC CHEMCCU
+ERTS OOBO DEK F
+ C SOUM RK NIFL
+HESS A N. B T R
+E TWINTSAMULED 
+ADIO G TR GOREN
+R W L PET P AT 
+UR ATEU ASIRMIC
+E SRE NTIICE V 
+SAGN E M I R BE
+T EG CRISSTEERA
+O NSETOT T D O 
+ICKE OX GERENNU
+A E YATLA N E S
+TALP RY LHAHAME
+POPUILD FL SSIT
+ED S M ALASH G 
+R AEASADER EHAR
+
+puzzle37_113:
+''
+7,5 
+1732140407032326282111083302291318053122300034241210152516062009270119
+
+puzzle37_113_text:
+1 Zone, area • Madden, infuriate
+2 Piece of equipment driven by electricity
+  or other power
+3 (Had) got up • Aplenty,
+  in great quantity
+4 Member of a plotting group
+5 Put on cargo • One-eighth of a gallon
+6 Heaped up
+7 Produce a litter • Moved slowly
+8 Mounted bullfighter
+9 Fish-eating mammal • On your guard
+10 Family animal
+11 Walk wearily, trudge • Imprint
+12 Wonder
+13 Languor • Bravery award to wear
+14 Pacify
+15 Period of work • Having fine
+   personal qualities
+16 Serious
+17 Chain of rocks under the sea •
+   Handed over money
+18 Handled cunningly
+19 Gave your views • More good-hearted
+20 Removed dirt from
+21 Furtive, sly • -nisi divorce document
+   preliminary
+
+puzzle37_113_frame:
+UI KIN EDL CENR
+ APED OR LOANE 
+NT DEC ALO NGAL
+PETL NAGELP NED
+E IAIDD J PI CL
+AWED OOREER AKY
+E TWHEDALU R T 
+REE U  L TRACHI
+I MOTTBLER I E 
+ EAST SEC O DER
+F VO PH HIPSE S
+ANIATEARI R REE
+OPIR CL OONS ME
+U SINTAIND OSE 
+SNEN EN A AM NO
+RNEPIR G ATOGED
+ O  R EANG P A 
+PULASS T ED ERT
+ENN N TORR A O 
+ O NGR MACADPEA
+STI E SEN C A G
+
+puzzle38_150:
+''
+7, 5
+0701180025211622260614082429041309192034283031023315172310122705113203
+      
+puzzle38_150_text:
+1 Withdrew and turned back
+2 Sport of unarmed combat that developed
+  in Japan • Greek goddess of the rainbow
+3 Having ample space
+4 Police officers' letter after alpha and
+  before charlie • Establish by law
+5 Central calm area of a cyclone • Greeted
+  with a hand signal • Loutish person
+6 Tyrannosaurus -_, fearsome dinosaur
+7 Be in favour (of) • Aromatic oil burned
+  during religious ceremonies
+8 Pertinent, relevant
+9 Rod carried as a symbol of authority •
+  Packing case for transporting goods
+10 Grind food in the mouth • Having a great
+   deal of foliage • Study (a subject) at
+   university
+11 Eagerly expectant • Burden of
+   responsibility
+12 Large bag made of coarse material •
+   Welsh breed of dog favoured by the
+   former Queen • Part of a cooker used
+   when roasting
+13 Tiny spot or mark • Ecclesiastical law
+14 Film props and scenery
+15 Souvenir, keepsake • Embassy employee
+   with responsibility for a specific subject
+16 Careless and negligent
+17 Large antelope from Africa • Abdominal
+   pain frequently suffered by babies • Small
+   fairy said to help Santa at Christmas
+18 Round space in which gladiators fought •
+   Surpass, be better than
+19 Familiar, recognised
+20 Hindu lady's traditional dress •
+   Ostentatiously creative
+21 Time of being a junior officer
+
+puzzle38_150_frame:
+TEDRETCAN F NSE
+O IO H L RTYA L
+Y VT RTTA Y TE 
+P KCT  B ROVW L
+I EOAFJUD L AGO
+CADG E S AFFK C
+ O NOWH LCHEAPP
+C.  S ELF E M I
+OUTETSDO SAC ST
+O OAVO T REAEAF
+GNU. W. C V G O
+ AR W ENAOOMORG
+Y R BR L LAXE I
+NUSEYEAVEOLIAPT
+I OX SREX M  E 
+ P ENA V  FLNCE
+RISD. SARS A A 
+ T. S  L MEMCRA
+ECK U N RON EAD
+ E SETC AU S T 
+ENTO AHIPCHEVEN

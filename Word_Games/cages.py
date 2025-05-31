@@ -66,7 +66,51 @@ class Cages:
         for loc in locs:
             ax.annotate(str(board[tuple(reversed(loc))]),xy=loc)
         plt.show()
-        
+    
+    def is_same_cage(self, cage_coords, loc1, loc2):
+        """Returns true if two coordinates belong to the same cage.
+        """
+        def find_cage_index(loc):
+          index = 0
+          for fields in cage_coords:
+              if loc in fields:
+                  return index
+              index += 1
+      
+        flat = sum(cage_coords, [])
+        if loc1 not in flat or loc2 not in flat: return False
+        return find_cage_index(loc1) == find_cage_index(loc2) 
+    
+    def print_cage_board(self, board, cage_coords, which=None, highlight=None):
+        """Print the board with cages to the console.
+    
+        :param board: The board to print
+        :param cage_coords: list of list of (r, c) locations for each cage
+        :param which: text to identify board
+        :param highlight: list of r,c locations to underline content
+        """
+        print('board:', which)
+        Y, X = board.shape
+        print("+" + "---+" * X)
+        for y in range(Y):
+            print("|", end="")
+            sep_line = "|"
+            for x in range(X):
+                if highlight and (y, x) in highlight:
+                      value = str(board[y][x]) + '\u0333'  
+                else:
+                    value = str(board[y][x])
+                end_char = "|"
+                if x < X and self.is_same_cage(cage_coords,(y,x), (y, x+1)):
+                    end_char = " "
+                if y < Y and self.is_same_cage(cage_coords, (y, x), (y+1, x)):
+                    sep_line += "   +"
+                else:
+                    sep_line += "---+"
+                print(f" {value if  value != '0' else ' '} {end_char}", end="")
+            print()
+            print(sep_line)
+           
     def get_board_rc(self, rc, board):
         try:
           return board[rc[0]][rc[1]]

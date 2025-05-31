@@ -393,7 +393,7 @@ class GameBoard(Scene):
     
   def setup_ui(self):
     
-    pause_button = SpriteNode('iow:pause_32', position=(32, self.size.h - 36),
+    self.pause_button = SpriteNode('iow:pause_32', position=(32, self.size.h - 36),
                               parent=self)
     self.grid = self.build_background_grid()
     self.game_field.add_child(self.grid)
@@ -810,7 +810,13 @@ class GameBoard(Scene):
       self.line_timer = 0.5
       # self.turn_status()
       self.go = True'''
-  
+      
+  def did_change_size(self):    
+    try:
+      self.orientation()
+    except AttributeError as e:
+      pass
+      
   # #########################################################################
   # TOUCH 
   
@@ -1183,19 +1189,28 @@ class BoxedLabel():
                                                  
 class MyMenu(MenuScene):
   """ subclass MenuScene to move menu to right """
-  def __init__(self, title, subtitle, button_titles, layout=None):
+  def __init__(self, title, subtitle, button_titles, layout=None, **kwargs):
     MenuScene.__init__(self, title, subtitle, button_titles, layout)
+    self.menu_position = None
+    for k, v in kwargs.items():
+      setattr(self, k, v)
+    
     
   def did_change_size(self):
     # 834,1112 ipad portrait
     # 1112, 834 ipad landscape
     # 852, 393 iphone landscape
     self.bg.size = (1, 1)
-    if self.size.h > self.size.w:
-      self.bg.position = self.size.w * 0.5, self.size.h * 0.6
+    if self.menu_position is None:
+      if self.size.h > self.size.w:
+        self.bg.position = self.size.w * 0.5, self.size.h * 0.6
+      else:
+        self.bg.position = self.size.w * 0.85, self.size.h * 0.5
+      self.menu_bg.position = self.bg.position
     else:
-      self.bg.position = self.size.w * 0.85, self.size.h * 0.5
-    self.menu_bg.position = self.bg.position
+        self.bg.position = self.menu_position
+        self.menu_bg.position = self.menu_position
+        
 
 
 if __name__ == "__main__":

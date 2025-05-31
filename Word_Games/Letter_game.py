@@ -18,7 +18,6 @@ from objc_util import on_main_thread
 sys.path.append('../')
 from gui.gui_interface import Gui, Squares
 
-
 # Board characters
 DESTROY = "D"
 EMPTY = "-"
@@ -86,14 +85,77 @@ def rle(inarray):
 def run_length_encoding(inarray):
     """expanded name for rle"""
     return rle(inarray)
+
+# #Encode word dictionary as Trie Node
+# Slow to initialise, fast to search
+
+                                                                                                                
+class TrieNode:
+    def __init__(self):
+        self.children = {}
+        self.is_word = False
+        
+        
+class WordDictionary:
+    def __init__(self):
+        self.root = TrieNode()
+        self.possibles = []
+
+    def add_word(self, word):
+        current_node = self.root
+        for character in word:
+            current_node = current_node.children.setdefault(character, TrieNode())
+        # Node for final char in word. Set flag is_word to True
+        current_node.is_word = True
+        
+    def search(self, word):
+        # is word in dictionary?
+        def dfs(node, index):
+            if index == len(word):
+                return node.is_word
+               
+            if word[index] == ".":
+                for child in node.children.values():
+                    if dfs(child, index+1):
+                        return True
+                    
+            if word[index] in node.children:
+                return dfs(node.children[word[index]], index+1)
             
+            return False
+        return dfs(self.root, 0)
+    
+    def get_possibles(self, pattern):
+        # find all possibles for match patter in dictionary
+        words = []
+        self._collect_words(self.root, pattern, 0, '', words)
+        return words
+
+    def _collect_words(self, node, pattern,  index, current_word, word_list):
+        if index == len(pattern):
+          if node.is_word:
+              word_list.append(current_word)
+          return
+        char = pattern[index]
+        if char == ".":
+            # Wildcard: Explore all children
+            for c, child in node.children.items():
+                self._collect_words(child, pattern, index+1,  current_word+c, word_list)
+        elif char in node.children:
+            # Exact match
+            self._collect_words(node.children[char], pattern, index + 1, current_word + char, word_list)
+              
 
 class Word():
+  # class instance or _word_trie for later searching
+  _word_trie = None
+  
   """ holds a word instance """
-  def __init__(self, rc, direction, length):
+  def __init__(self, rc, direction, length, **kwargs):
     self.start = rc
     self.index = 0
     self.coords = []
+    self.np_coords = None
     self.intersections = []  # shared positions with other words
     self.direction = direction
     self.length = length
@@ -107,17 +169,42 @@ class Word():
     self.set_coords()
     self.child_index = 0
     self.max_depth = 3
+    self.no_possibles = 0
+    self.possibles = []
     
+    
+    for k, v in kwargs.items():
+      setattr(self, k, v)
+      
   def __repr__(self):
-    return(f'Word_{self.index}{self.start}_{self.direction}({self.length})={self.word}')
+    word = self.word if self.word else self.match_pattern
+    return (f'Word_{self.index}{self.start}_{self.direction.upper()}({self.length})= {word.capitalize()}')
     
   def set_coords(self):
     r, c = self.start
-    if self.direction == 'across':
-      self.coords = [(r, c + x) for x in range(self.length)]
-    else:
-       self.coords = [(r + y, c) for y in range(self.length)]
-       
+    match self.direction.lower():
+      case 'across' | 'e':
+          self.coords = [(r, c + i) for i in range(self.length)]
+      case 'down' | 's':
+          self.coords = [(r + i, c) for i in range(self.length)]
+      case 'n':
+          self.coords = [(r - i, c) for i in range(self.length)]
+      case 'ne':
+          self.coords = [(r - i, c + i) for i in range(self.length)]
+      case 'se':
+          self.coords = [(r + i, c + i) for i in range(self.length)]
+      case 'sw':
+          self.coords = [(r + i, c - i) for i in range(self.length)]
+      case 'w':
+          self.coords = [(r, c - i) for i in range(self.length)]
+      case 'nw':
+          self.coords = [(r - i,  c - i) for i in range(self.length)]
+      case _:
+         raise ValueError(f'Direction {self.direction} not known')
+         
+    # this is used to apply to board array    
+    self.np_coords = tuple(np.array(self.coords).T)
+    
   def set_word(self, word, index=None):
     self.word = word
     # dictionary is coord: (letter, index of letter)}
@@ -129,13 +216,17 @@ class Word():
   def get_word(self):
     return self.word
     
+  @property
+  def is_diagonal(self):
+      return self.direction in ['NE', 'SE', 'SW', 'NW']
+       
   def undo_word(self, coord, direction):
     """ erase a word, except for intersection """
     raise NotImplementedError
     
   def get_children(self):
    """exclude caller"""
-   return {coord:child for coord,child in self.children.items() if child!= self}
+   return {coord: child for coord, child in self.children.items() if child != self}
       
   def get_next_child(self):
     """ fetch next child word in order"""
@@ -191,25 +282,57 @@ class Word():
      pass
      """
        delta = (0, 0)
-            length = 1 
+            length = 1
             while self.check_in_board(add(rc, delta)) and self.get_board_rc(add(rc, delta), self.board) != BLOCK :
                 length += 1
                 delta = add(delta, d)
             length -= 1
             """
-            
+                        
+  def update_match(self, board):
+      """ update match_pattern from supplied numpy 2d board """
+      # use self.np_coords which are in correct form to 
+      # directly index 2d character array
+      # try to get fastest.
+      # assumes empty squares are dot
+      b = board[self.np_coords]
+      # b[~np.char.isalpha(b)] = '.'
+      self.match_pattern  = ''.join(b)
+      #self.match_pattern = ''.join([board[loc] if board[loc].isalpha() else '.' for loc in self.coords])
+      
+      
   def get_child_coord(self, child_obj):
     '''returns key from children dictionary'''
     for coord, v in self.children.items():
         if v == child_obj:
             return coord
 
-            
+  def get_possibles(self, wordlist=None):
+      # if specified, wordlist is set of words with correct length
+      # it may also have correct start letter
+      if self._word_trie:
+          possibles = self._word_trie.get_possibles(self.match_pattern)
+      elif wordlist:
+          m = re.compile(self.match_pattern)
+          possibles = [w for w in wordlist if m.search(w)]
+      else:
+          raise RuntimeError('No wordlist or word_trie set')
+      self.no_possibles = len(possibles)
+      self.possibles = possibles
+      return possibles
+      
+  @classmethod
+  def create_trie(cls, word_dict):
+      """ load word trie """
+      cls._word_trie = WordDictionary()
+      [cls._word_trie.add_word(word) for word in word_dict]
+
+                    
 class Player():
   def __init__(self):
     
     # images = slice_image_into_tiles('Letters_blank.jpg', 6, 5)
-    characters = '__abcd_efghijklmnopqrstuv wxyz*'
+    # characters = '__abcd_efghijklmnopqrstuv wxyz*'
     # IMAGES ={characters[j]:pil2ui(images[j]) for j in range(1,30)}
     # test
     # for d,i in IMAGES.items():
@@ -219,14 +342,14 @@ class Player():
     self.EMPTY = ' '
     self.PIECE_NAMES = 'abcdefghijklmnopqrstuvwxyz0123456789. '
     self.PIECES = [f'../gui/tileblocks/{k}.png' for k in self.PIECE_NAMES[:-2]]
-    self.PIECES.append(f'../gui/tileblocks/@.png')
-    self.PIECES.append(f'../gui/tileblocks/_.png')
+    self.PIECES.append('../gui/tileblocks/@.png')
+    self.PIECES.append('../gui/tileblocks/_.png')
     self.PLAYERS = None
 
                                                      
 SOUND = True
 # WORDLISTS = [ 'wordlists/letters5.txt']
-WORDLISTS = ['wordlists/5000-more-common.txt'] # 'wordlists/letters3.txt', 'wordlists/letters10.txt']
+WORDLISTS = ['wordlists/5000-more-common.txt']  # 'wordlists/letters3.txt', 'wordlists/letters10.txt']
   
 
 class LetterGame():
@@ -264,7 +387,7 @@ class LetterGame():
     self.gui.set_start_menu({'New Game': self.restart, 'Quit': self.quit})
     self.max_depth = 4
     self.word_counter = None
-    self.all = [[j,i] for i in range(self.sizex) for j in range(self.sizey) if self.board[j][i] == EMPTY]
+    self.all = [[j, i] for i in range(self.sizex) for j in range(self.sizey) if self.board[j][i] == EMPTY]
     # self.gui.valid_moves(self.all, message=None)
     # self.toggle_density_chart = False # each call to density chart will switch on and off
     self.load_words(word_length=self.sizex)
@@ -536,11 +659,11 @@ class LetterGame():
     # get subset of words
     # letter weighting
     # computed from 5000 common words
-    self.letter_weights= {
+    self.letter_weights = {
         'a': 0.601, 'b': 0.127, 'c': 0.366, 'd': 0.282, 'e': 1.0,   'f': 0.144,
         'g': 0.200, 'h': 0.178, 'i': 0.670, 'j': 0.013, 'k': 0.058, 'l': 0.412,
         'm': 0.208, 'n': 0.600, 'o': 0.490, 'p': 0.241, 'q': 0.016, 'r': 0.622,
-        's': 0.4884,'t': 0.613, 'u': 0.2863, 'v': 0.1164,'w': 0.0696,
+        's': 0.4884, 't': 0.613, 'u': 0.2863, 'v': 0.1164, 'w': 0.0696,
         'x': 0.030, 'y': 0.123, 'z': 0.008,
         '0': 0.0, '1': 0.0, '2': 0.0, '3': 0.0, '4': 0.0, '5': 0.0,
         '6': 0.0, '7': 0.0, '8': 0.0, '9': 0.0, '.': 0.0}
@@ -754,7 +877,7 @@ class LetterGame():
     except (AttributeError, TypeError):
        self.sizex = self.sizey = 5
        board_dimension = (5, 5)
-       print(f"Invalid input. The board will be 5x5!")
+       print("Invalid input. The board will be 5x5!")
     # self.gui.gs.DIMENSION_Y, self.gui.gs.DIMENSION_X = board_dimension
     self.create_game_board(board_dimension)
     return board_dimension
@@ -916,7 +1039,7 @@ class LetterGame():
     if board is None:
         board = self.game_board
     coord_list = []
-    prompt = (f"Select  position (A1 - {self.COLUMN_LABELS[-1]}{self.sizey})")
+    # prompt = (f"Select  position (A1 - {self.COLUMN_LABELS[-1]}{self.sizey})")
     # sit here until piece place on board
     items = 0
     
@@ -924,8 +1047,8 @@ class LetterGame():
       # self.gui.set_prompt(prompt, font=('Avenir Next', 25))
       
       move = self.wait_for_gui()
-      if items == 0:
-          st = time()
+      # if items == 0:
+      #     st = time()
       # print('items',items, move)
       try:
         # spot = spot.strip().upper()

@@ -1,4 +1,3 @@
-
 import random
 import traceback
 from time import sleep, time
@@ -6,10 +5,10 @@ from queue import Queue
 import numpy as np
 import inspect
 import console
+import json
 from itertools import permutations
 from Letter_game import LetterGame, Player
 from cages import Cages
-import json
 from gui.gui_interface import Gui, Squares, Coord
 
 """ This game is the Suguru grid puzzle
@@ -23,6 +22,8 @@ NOTE = (-1, -1)
 HINT = (-2, -2)
 SIZE = 9  # fixed f
 FILENAME = 'suguru.txt'
+INITIAL_DICT = 'sug_dict.txt'
+NOTE_text = '\u270e'
 
 
 class Suguru(LetterGame):
@@ -32,6 +33,9 @@ class Suguru(LetterGame):
     self.sleep_time = 0.1
     self.test = test
     self.hints = 0
+    # allow use of initial value file
+    # with computed start values
+    self.computed_known = True
     self.cage_colors = ['teal', 'salmon', 'dark turquiose', 'yellow',
                         'lunar green', 'cashmere', 'linen']
     # self.cage_colors = ['#D8D0CD', '#B46543', '#DF5587', '#C83F5F']
@@ -53,41 +57,73 @@ class Suguru(LetterGame):
     self.gui.require_touch_move(False)
     self.gui.allow_any_move(True)
     self.gui.setup_gui(log_moves=False)
-    
+    self.gui.orientation(self.display_setup)
     # menus can be controlled by dictionary of labels
     # and functions without parameters
     self.gui.set_pause_menu({'Continue': self.gui.dismiss_menu,
                              'New ....': self.restart,
                              'Hint': self.perform_hint,
+                             'Fill possibles': self.possibles,
                              'Reveal': self.reveal,
                              'Quit': self.quit})
     self.gui.set_start_menu({'New Game': self.restart, 'Quit': self.quit})
-        
+    
+  def display_setup(self):
+    """set positions of display
+    elements for different device
+    sizes
+    This is called also when devis is rotated
+    """
+    W, H = self.gui.get_device_screen_size()
+    self.gui.device = self.gui.get_device()
     x, y, w, h = self.gui.grid.bbox
     match  self.gui.device:
        case'ipad_landscape':
-           position = (w+10, 8*h/9)
+           position_hint = (w+10, 8*h/9)
+           self.num_position = (x+w+50, h / 2)
+           position_puzzles = (w+10, h/4)
        case'ipad_portrait':
-           position = (7*w/9, h+50)
+           position_hint = (7*w/9, h+50)
+           self.num_position = (w/3, y)
+           position_puzzles = (w/2, h)
        case 'iphone_portrait':
-           position = (180, 470)
+           position_hint = (200, 420)
+           self.num_position = (x, y)
+           position_puzzles = (x+30, h+50)
        case 'ipad13_landscape':
-           position = (w+10, 8*h/9)
+           position_hint = (w+10, 8*h/9)
+           self.num_position = (w+100, h / 2)
+           position_puzzles = (w+10, h/4)
        case 'ipad13_portrait':
-           position = (8*w/9, h+50)
+           position_hint = (7*w/9, h+50)
+           self.num_position = (w/3, y)
+           position_puzzles = (w/2, h)
        case'ipad_mini_landscape':
-           position = (w+10, 8*h/9)
+           position_hint = (w+10, 8*h/9)
+           self.num_position = (x+w+50, h / 2)
+           position_puzzles = (w+10, h/4)
        case'ipad_mini_portrait':
-           position = (7*w/9, h+50)
-       
+           position_hint = (8*w/9, h+50)
+           self.num_position = (w/3, 30)
+           position_puzzles = (w/2, h+50)
        case'iphone_landscape':
-           position = (w+10, 8*h/9)
-       case'iphone_portrait':
-           position = (7*w/9, h+50)   
-    self.gui.set_enter('Note ', fill_color='clear',
+           position_hint = (w+10, 8*h/9)
+           self.num_position = (x+w+50, h / 2)
+           position_puzzles = (w+10, h/4)
+       case _:
+           position_hint = (w+10, 8*h/9)
+           self.num_position = (x+w+50, h / 2)
+           position_puzzles = (w+10, h/4)
+           
+    self.gui.gs.pause_button.position = (32, H - 36)
+    self.gui.set_enter(NOTE_text, color='red', fill_color='lightgrey',
                        font=('Avenir Next', 50),
-                       position=position)
-    self.gui.set_top('', position=(0, h+30))
+                       position=position_hint)
+    self.gui.set_top(self.gui.get_top(),
+                     position=(0, h))
+    self.gui.set_moves(self.gui.get_moves(),
+                       anchor_point=(0, 0),
+                       position=position_puzzles)
          
   def process_wordlist(self,  sep=False):
     puzzles = []
@@ -160,6 +196,7 @@ class Suguru(LetterGame):
   def load_puzzles(self):
       """ return a dictionary of list of puzzles for each size"""
       try:
+          self.solution_dict = {}
           with open(FILENAME, 'r') as f:
               data = f.read()
           puzzle_strings = data.split('\n')
@@ -171,7 +208,14 @@ class Suguru(LetterGame):
               puzzles[shape].append((board, cage))
           self.msg = '\n'.join([f'{k},  {len(v)} puzzles'
                                 for k, v in puzzles.items()])
-          print(self.msg)
+
+          if self.computed_known:
+              with open(INITIAL_DICT, 'r') as f:
+                  data = f.read()
+              self.solution_dict = json.loads(data)
+            
+          if self.test:
+              print(self.msg)
           return puzzles
       except FileNotFoundError:
           pass
@@ -316,15 +360,20 @@ class Suguru(LetterGame):
         self.gui.reset_waiting(wait)
         self.store_valid_puzzle(cg)
         self.gui.set_message(f'Solved in {iteration * cg.iterations}'
-                             f'iterations in {(time() - self.start_time):.2f} secs')
+               f'iterations in {(time() - self.start_time):.2f} secs')
                         
         # now to assign colours and numbers
         self.cage_board = cg.solution
         # store coord and total for later display
-        
+        self.solved = None
         if self.debug:
             self.gui.print_board(self.cage_board, which='cage board')
-            
+        # clear all numbers  bar INITIAL
+        self.board = self.board.astype('U1')
+        number_loc_list = self.gui.number_locs(self.board)
+        random.shuffle(number_loc_list)
+        [self.board_rc(loc, self.board,  ' ')
+            for loc in number_loc_list[self.start_visible:]]
     else:
         # #############################################################################
         # selected a working puzzle from the file
@@ -339,15 +388,26 @@ class Suguru(LetterGame):
         self.cage_board = self.board.copy()
         self.solution_board = self.board.copy().astype('U1')
         cg.cages = cages
-        
+        self.cages = cages
+            
+        if self.computed_known and self.solution_dict:
+            number_loc_list = self.solution_dict[str(cages)][0]
+            # mark if puzzle was solved or not
+            self.solved = bool(self.solution_dict[str(cages)][1])
+            self.start_visible = 0
+            board = np.full(self.board.shape, ' ')
+            [self.board_rc(loc, board, str(self.board[tuple(loc)]))
+             for loc in number_loc_list]
+            self.board = board
+        else:
+            self.board = self.board.astype('U1')
+            number_loc_list = self.gui.number_locs(self.board)
+            random.shuffle(number_loc_list)
+            [self.board_rc(loc, self.board,  ' ')
+             for loc in number_loc_list[self.start_visible:]]
     # #############################################################################
     # display starting values
-    # clear all numbers  bar INITIAL
-    self.board = self.board.astype('U1')
-    number_loc_list = self.gui.number_locs(self.board)
-    random.shuffle(number_loc_list)
-    [self.board_rc(loc, self.board,  ' ')
-        for loc in number_loc_list[self.start_visible:]]
+
     self.gui.update(self.board.astype('U1'))
       
     # convert to non adjacent colours
@@ -362,7 +422,7 @@ class Suguru(LetterGame):
     cg.color_map = color_map_list
         
     delta = 0.45
-    linewidth = 2
+    linewidth = 2 if self.gui.device.startswith('ipad') else 1
     linedash = [10, 10]
     for coords in self.cage_coords:
         # add dotted lines around cages
@@ -387,11 +447,12 @@ class Suguru(LetterGame):
       if self.test is None:
          console.clear()
       self.gui.clear_messages()
-      self.gui.set_enter('Note', fill_color='clear')
+      self.gui.set_enter(NOTE_text, color='red', fill_color='lightgrey')
       self.notes = {}
       self.puzzles_from_file = self.load_puzzles()
-      self.gui.set_moves(self.msg)
       self.select_list(self.test)
+      self.display_setup()
+      self.gui.set_moves(self.msg)
               
       if self.debug or self.test:
           self.gui.gs.close()
@@ -400,16 +461,20 @@ class Suguru(LetterGame):
       self.gui.set_message2('')
       if self.test is None:
         while True:
+            if self.solved is None:
+                status = '?'
+            else:
+                status = '\u2713' if self.solved else '\u2717'
             if self.puzzle_no >= 0:
                 self.gui.set_top(f'Suguru\t{self.board.shape[0]}x{self.board.shape[1]}'
-                                 f'\t#{self.puzzle_no}\t\t\tHints : {self.hints}',
+                                 f'\t#{self.puzzle_no}\t{status}\tHints : {self.hints}',
                                  font=('Avenir Next', 20))
             else:
                 self.gui.set_top(f'Suguru\t{self.board.shape[0]}x{self.board.shape[1]}'
-                                 f'\t\t\tHints : {self.hints}',
+                                 f'\t{status}\tHints : {self.hints}',
                                  font=('Avenir Next', 20))
             move = self.get_player_move(self.board)
-            sleep(0.1)
+            sleep(0.0)
             moves = self.select(move, self.board, text_list=False)
             self.process_selection(moves)
             
@@ -494,7 +559,7 @@ class Suguru(LetterGame):
       """ check for finished game
       board matches solution"""
       return np.array_equal(self.board, self.solution_board)
- 
+      
   def update_notes(self, coord):
      """ update any related notes using known validated number"""
      # remove note from validated cell
@@ -520,6 +585,21 @@ class Suguru(LetterGame):
      for pos, item in self.notes.items():
          self.add_note(pos, item)
          
+  def possibles(self):
+      for cage in self.cages:
+          cell_coords = [(cell[0], cell[1]) for cell in cage]
+          existing = [self.board[loc] for loc in cell_coords]
+          for cell in cage:
+              loc = (cell[0], cell[1])
+              if self.board[loc] != ' ':
+                  continue
+              subset = list(np.ravel(self.gui.subset(self.board, loc, N=3)))
+              exclude = set(existing + subset)
+              cell_poss = [str(i) for i in range(1, len(cage) + 1)
+                           if str(i) not in exclude]
+              self.notes[loc] = cell_poss
+              self.add_note(loc, cell_poss)
+                               
   def add_note(self, pos, item):
       """ add a note to a cell"""
       font = ('Avenir', 6)
@@ -599,7 +679,7 @@ class Suguru(LetterGame):
           return True
                   
   def select(self, moves, board, text_list=True):
-      """ 
+      """
       open number panel to select number
       or numbers
       """
@@ -608,9 +688,13 @@ class Suguru(LetterGame):
       if moves == NOTE:
           self.hint = not self.hint
           if self.hint:
-              self.gui.set_enter('NOTE', fill_color='red')
+              self.gui.set_enter(NOTE_text,
+                                 color='white',
+                                 fill_color='red')
           else:
-              self.gui.set_enter('Note ', fill_color='clear')
+              self.gui.set_enter(NOTE_text.upper(),
+                                 color='red',
+                                 fill_color='lightgrey')
           return (None, None), None, None
         
       if moves == HINT:
@@ -635,21 +719,13 @@ class Suguru(LetterGame):
           selection = ''
           x, y, w, h = self.gui.grid.bbox
           while self.gui.selection == '':
-              if self.gui.device in ['ipad13_landscape']:
-                  position = (950, h / 2)
-              elif self.gui.device == 'ipad_landscape':
-                  position = (x+w+50, h / 2)
-              elif self.gui.device.endswith('_portrait'):
-                  position = (x, y)
-              else:
-                  position = (x + w, h / 2)
                      
               panel = self.gui.input_numbers(
                          prompt=prompt, items=items,
-                         position=position,
+                         position=self.num_position,
                          allows_multiple_selection=(long_press or self.hint))
               while panel.on_screen:
-                  sleep(.1)
+                  sleep(.01)
                   try:
                       selection = self.gui.selection.lower()
                       selection_row = self.gui.selection_row
@@ -688,6 +764,7 @@ class Suguru(LetterGame):
     
   def perform_hint(self):
       """ uncover a random empty square """
+      # self.possibles()
       while True:
           coord = (random.randint(0, self.size), random.randint(0, self.size))
           if self.get_board_rc(coord, self.board) != SPACE:

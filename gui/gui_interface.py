@@ -14,7 +14,7 @@ sys.path.append('../')
 
 import gui.gui_scene as gscene
 from gui.gui_scene import BoxedLabel
-
+import os
 
 class Gui():
     # allow for non square board
@@ -40,6 +40,10 @@ class Gui():
         self.dismiss_menu = self.gs.dismiss_modal_scene
         self.device = self.gs.device
         self.long_touch = self.gs.long_touch
+        try:
+            self.number_panel = ui.load_view('Number_panel.pyui')
+        except FileNotFoundError:
+            self.number_panel = None
 
         # menus can be controlled by dictionary of labels
         # and functions without parameters
@@ -261,7 +265,8 @@ class Gui():
                       panel='Number_panel.pyui',
                       **kwargs):
         """ pop up a number panel """
-        self.number_panel = ui.load_view(panel)
+        if panel != 'Number_panel.pyui':
+            self.number_panel = ui.load_view(panel)
         self.buttons = [
             button for button in self.number_panel.subviews
             if isinstance(button, ui.Button)
@@ -278,7 +283,7 @@ class Gui():
             setattr(self.number_panel, k, v)
         self.number_items = []
         self._panel = self.number_panel
-        self._itemlist = self.number_items
+        self._itemlist = self.number_items     
         self.v.add_subview(self.number_panel)
         return self.number_panel
 
@@ -335,8 +340,11 @@ class Gui():
     def get_device(self):
         # returns string ipad_landscape, ipad_portrait,
         #                iphone_landscape, iphone_portrait
-        return self.gs.device
+        return self.gs.device_size()
         
+    def get_device_screen_size(self):
+        return get_screen_size()
+           
     def get_fontsize(self):
         return self.gs.get_fontsize()
         
@@ -344,6 +352,10 @@ class Gui():
         self.gs.setup_gui(**kwargs)
         self.game_field = self.gs.game_field
         self.grid = self.gs.grid
+        
+    def orientation(self, fn):
+        """ Passes a funtion to be called when device is rotated """ 
+        self.gs.orientation = fn
         
     def replace_grid(self, dimx, dimy):
         """remove and replace grid with different of squares"""
@@ -400,12 +412,18 @@ class Gui():
         for k, v in kwargs.items():
             setattr(self.gs.msg_label_t, k, v)
         self.gs.msg_label_t.text = msg
+        
+    def get_top(self):
+        return self.gs.msg_label_t.text
 
     def set_moves(self, msg, **kwargs):
         # right box
         for k, v in kwargs.items():
             setattr(self.gs.msg_label_r, k, v)
         self.gs.msg_label_r.text = msg
+        
+    def get_moves(self):
+        return self.gs.msg_label_r.text
 
     def set_enter(self, msg, **kwargs):
         # modify existing enter button BoxedLabel object

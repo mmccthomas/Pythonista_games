@@ -1,9 +1,13 @@
 import random
 import string
-
-def place_word(board, word, coords, max_iteration=500):
+            
+def place_word(board, word, coords, max_iteration=500, space='-', bias=None):
     # Randomly choose orientation: 0=horizontal, 1=vertical, 2=diagonal
-    orientation = random.randint(0, 3)
+    # if bias is set, it is a list of probabilities for h, v or d
+    if bias is None:
+       orientation = random.randint(0, 3)
+    else:
+       orientation = random.choices([0,1,2], k=1, weights=bias)[0]
     # helper to improve readability
     def start(offset):
       ''' random number'''
@@ -33,7 +37,7 @@ def place_word(board, word, coords, max_iteration=500):
             reverse = random.choice([True, False])
             if reverse:
                 word = word[::-1]
-            space_available = all(board[row][c] == '-' or 
+            space_available = all(board[row][c] == space or 
               board[row][c] == word[i] 
                 for i, c in _range(col))
             if space_available:
@@ -48,7 +52,7 @@ def place_word(board, word, coords, max_iteration=500):
             reverse = random.choice([True, False])
             if reverse:
                 word = word[::-1]
-            space_available = all(board[r][col] == '-' or 
+            space_available = all(board[r][col] == space or 
                 board[r][col] == word[i] 
                   for i, r in _range(row))
             if space_available:
@@ -63,7 +67,7 @@ def place_word(board, word, coords, max_iteration=500):
             reverse = random.choice([True, False])
             if reverse:
                 word = word[::-1]
-            space_available = all(board[r][c] == '-' or 
+            space_available = all(board[r][c] == space or 
                 board[r][c] == word[i] 
                   for i, (r, c) in _range((row, col)))
             if space_available:
@@ -78,7 +82,7 @@ def place_word(board, word, coords, max_iteration=500):
             reverse = random.choice([True, False])
             if reverse:
                 word = word[::-1]
-            space_available = all(board[r][c] == '-' or 
+            space_available = all(board[r][c] == space or 
                 board[r][c] == word[i] 
                   for i, (r, c) in enumerate(zip(range(row, row-len(word), -1),
                                                  range(col, col+len(word)))))
@@ -110,15 +114,17 @@ def create_word_search(words, size=15):
 
     return board, words_placed, coords
 
+
+
+      
 def display_board(board):
     for row in board:
         print(' '.join(row))
 
-
-
-import random
-  #for key in all_words:
-  # words = all_words[key]
-  #board = create_word_search(words)
+if __name__ == '__main__':
+  
+  #wordset = get_wordset('wordlists/words_10000.txt') 
+  pass
+  #board = create_word_search(wordset, size=13)
   #display_board(board)
-  # print(words)
+  #print(words)

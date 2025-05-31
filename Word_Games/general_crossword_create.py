@@ -8,7 +8,8 @@ import dialogs
 from scene import get_screen_size
 from itertools import zip_longest
 from textwrap import wrap
-import matplotlib.colors as mcolors
+import matplotlib.colors as mcolor
+from types import SimpleNamespace
 from time import time
 from pieceword_create import PieceWord
 from crossword_create import CrossWord
@@ -124,20 +125,20 @@ class Cross(PieceWord):
     def box_positions(self):
         # positions of all objects for all devices
         x, y, w, h = self.gui.grid.bbox
-        off = 100
+        off = 0
         position_dict = {'ipad13_landscape': {
-        'button1': (w + off + 135, h), 'button2': (w + off + 275, h), 'button3': (w + off + 365, h),
-        'button4': (w + off + 275, h - 80), 'button5': (w + off + 135, h - 80),
+        'button1': (w + off + 35, h), 'button2': (w + off + 150, h), 'button3': (w + off + 265, h),
+        'button4': (w + off + 35, h - 80),
         'box1': (w + off , y), 'boxsize': (500, 600), 'font': ('Avenir Next', 12)},
 
         'ipad_landscape': {
         'button1': (w + off + 70, h), 'button2': (w + off + 210, h), 'button3': (w + off + 300, h),
-        'button4': (w + off + 210, h - 50), 'button5': (w + off + 70, h - 50),
+        'button4': (w + off + 210, h - 50),
         'box1': (w + 10 , y), 'boxsize': (500, 600), 'font': ('Avenir Next', 12)},
         
         'ipad_mini_landscape': {
         'button1': (w + off + 40, h), 'button2': (w + off + 180, h), 'button3': (w + off + 270, h),
-        'button4': (w + off + 180, h - 50), 'button5': (w + off + 40, h - 50),
+        'button4': (w + off + 180, h - 50),
         'box1': (w + 10 , y), 'boxsize': (500, 530), 'font': ('Avenir Next', 12)}
         }
         try:

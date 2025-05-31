@@ -12,7 +12,7 @@ names = ['Easy', 'Regular', 'Medium', 'Hard', 'Hardest']
 obj = suguru.Suguru()   
 obj.debug = False
 for name in reversed(names): 
-    for i in range(3):    
+    for i in range(5):    
         obj.test = name
         print(f'{name=}, #{i}')
         #obj.initialise_board()
