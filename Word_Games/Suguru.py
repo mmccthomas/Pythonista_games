@@ -79,7 +79,11 @@ class Suguru(LetterGame):
            position = (w+10, 8*h/9)
        case'ipad_mini_portrait':
            position = (7*w/9, h+50)
-           
+       
+       case'iphone_landscape':
+           position = (w+10, 8*h/9)
+       case'iphone_portrait':
+           position = (7*w/9, h+50)   
     self.gui.set_enter('Note ', fill_color='clear',
                        font=('Avenir Next', 50),
                        position=position)

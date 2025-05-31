@@ -7,7 +7,7 @@ from time import sleep, time
 import numpy as np
 import gc
 obj = None
-names = ['Easy', 'Guardian', 'Medium', 'Hard', 'Hardest']
+names = ['Easy', 'Regular', 'Medium', 'Hard', 'Hardest']
 
 obj = suguru.Suguru()   
 obj.debug = False

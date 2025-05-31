@@ -383,7 +383,8 @@ class CrossWord():
                 if word is None:
                     #if self.debug:
                     #     try:
-                            #print(
+                
+                                        #print(
                             #    f'options for word at {word.start} are {options}'
                             #)
                     #         print('possibles for stuck word', self.possibles)
