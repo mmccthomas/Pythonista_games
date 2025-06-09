@@ -157,6 +157,14 @@ Fill the spaces with unique numbers to satisfy the inequalities.
 
 Entry point: Word_Games/Inequalities.py
 
+Crossword
+---------
+A simple program to manually solve crosswords produced by the  Crossword Creator program below 
+and puzzles in crossword_puzzles.txt
+Select in a word to enter letters.
+Buttons 'Check' will check all words, and 'Hint' will fill a random word
+
+Entry point : Word_Games/Crossword.py
 
 TrainTracks
 -----------
@@ -251,6 +259,15 @@ a version of Snake modelled on The Very Hungry Caterpillar for my grandchildren
 
 Entry point : Board_Games/caterpillar.py
 
+
+Space Shooter
+-------------
+Modified and improved(?)
+# https://gist.github.com/anonymous/a03bfdab757c1d978061
+Changed icons, added shields, and quite a bit of refactoring
+
+Entry point : AI_games/a_spaceShooter.py
+
 Klondike
 --------
 Classic card game known also as Solitaire.
@@ -264,6 +281,27 @@ Freecell
 Classic solitaire card game.
 Drag the cards to new positions
 Entry point : Card_Games/Freecell.py
+
+Jigsaw Puzzle
+-------------
+A classic rendering of a jigsaw puzzle.
+Creates random puzzle from scratch, with good control over jigsaw piece appearance.
+You select puzzle number of pieces and select an image from your photo library.
+A Finish button will animate any remaining unplaced pieces.
+Uses class  Piece in jigsaw_piece.py which could be used for other games.
+
+Entry point: Board_Games/jig_saw_2.py
+
+AI Games
+--------
+I have been experimenting with using Google Gemini AI to create some classic games.
+VERY impressive!
+See AI_games/readme.md for more details
+So far, created and fixed:
+Pool,  Pong, Tank, Missile Command, Galaxians, Flappy Bird, and a couple of small demos
+
+Game Utilities
+--------------
 
 Ocr
 ---
@@ -302,15 +340,6 @@ them than solving!
 Crossword generation and word filling  is contained in Word_Games/crossword_create.py
 
 Entry point : Word_Games/general_crossword_create.py
-
-Crossword
----------
-A simple program to manually solve crosswords produced by the above Crossword Creator and 
-puzzles in crossword_puzzles.txt
-Select in a word to enter letters.
-Buttons 'Check' will check all words, and 'Hint' will fill a random word
-
-Entry point : Word_Games/Crossword.py
 
 
 Notes
