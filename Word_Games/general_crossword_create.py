@@ -8,7 +8,7 @@ import dialogs
 from scene import get_screen_size
 from itertools import zip_longest
 from textwrap import wrap
-import matplotlib.colors as mcolor
+import matplotlib.colors as mcolors
 from types import SimpleNamespace
 from time import time
 from pieceword_create import PieceWord

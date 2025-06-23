@@ -36,6 +36,8 @@ from ui import Image
 from scene import Texture
 import inspect
 from cv_codeword_solver_main.solver_tools import CodewordSolverDFS, WordDictionary
+import base_path
+base_path.add_paths(__file__)
 from Letter_game import LetterGame, Player
 from gui.gui_interface import Gui, Squares, Board
 from crossword_create import CrossWord

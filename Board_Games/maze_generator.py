@@ -87,8 +87,12 @@ class SelectableMaze():
            
   def can_move(self, dir_str, cell):
       """ return if cell in direction dir_str N,S,E,W is reachable"""
-      dy, dx = self.inv_dirn[dir_str]
-      r, c = cell
+      try:
+         dy, dx = self.inv_dirn[dir_str] 
+         r, c = cell[0], cell[1]
+      except  Exception as e:
+         print('cell=', cell, dir_str, e)
+         raise Exception
       
       if not (0 <= c + dx < self.width and 0 <= r + dy < self.height):
           return False
@@ -273,7 +277,7 @@ class SelectableMaze():
 if __name__ == '__main__':
     """ test all suitable generators """
     width, height = 50, 50
-    
+    np.set_printoptions(threshold=20000)
     for i in range(50):
       print(choices(list(MAZE_GENERATORS), weights=list(MAZE_GENERATORS.values()), k=1)[0])
       
@@ -288,10 +292,11 @@ if __name__ == '__main__':
         #g.showPNG(g.block_grid)
         #g.showPNG(display_grid)
         g.draw_maze()
-        print(fn_string, elapsed)
+        print(f'{fn_string}, {elapsed:.2f}secs')
         plt.close()
         path = g.solve_maze()
         #print(path)
+        #print(display_grid)
     #plt.close('all')
 
 

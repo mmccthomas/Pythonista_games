@@ -806,7 +806,7 @@ class Coord(tuple):
              scaled = coord * 3
     """
 
-    def __init__(self, val):
+    def __init__(self, val=(0,0)):
         self.val = val
         self.r = self.val[0]
         self.c = self.val[1]
@@ -868,7 +868,13 @@ class Coord(tuple):
     def in_board(self, coord, sizex, sizey):
         r, c = coord
         return (0 <= r < sizey) and (0 <= c < sizex)
-
+        
+    def clamp(self, sizex, sizey):
+      self.col  = min(sizex-1, max(0, self.col)) # clamp c
+      self.row  = min(sizey-1, max(0, self.row)) # clamp r
+      self.val = (self.row, self.col)
+      return self
+      
 
 class Squares():
     ''' holds parameters for coloured squares'''

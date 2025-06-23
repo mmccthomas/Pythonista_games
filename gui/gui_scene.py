@@ -151,6 +151,7 @@ class GameBoard(Scene):
     self.debug = False
     self.buttons = {}  # bbox: box _obj
     self.long_touch = False  # detects if touch for longer than 1 sec
+    self.animation = False
     self.setup_menus()
         
     if __name__ == "__main__":
@@ -185,49 +186,60 @@ class GameBoard(Scene):
       return device
       
   def grid_sizes(self, device, dimx, dimy):
+    """ fit best grid sizes """
     w, h = get_screen_size()
     match device:
       case 'ipad_landscape':
          GRID_POS = (50, 85)
-         grid_size = h - 150
+         vert_grid_size = h - 150
+         hor_grid_size = w - 200
          font_size = 24
          
       case 'ipad_portrait':
          GRID_POS = (35, 85)
-         grid_size = w - 50
+         vert_grid_size = h - 150
+         hor_grid_size = w - 50
          font_size = 24
          
       case 'iphone_landscape':
          GRID_POS = (30, 40)
-         grid_size = h - 80
+         vert_grid_size = h - 80
+         hor_grid_size = w - 150
          font_size = 16
          
       case 'iphone_portrait':
          GRID_POS = (30, 60)
-         grid_size = w - 50
+         vert_grid_size = h - 50
+         hor_grid_size = w - 50
          font_size = 12
          
       case 'ipad13_landscape':
          GRID_POS = (100, 85)
-         grid_size = h - 150
+         vert_grid_size = h - 150
+         hor_grid_size = w - 200
          font_size = 24
          
       case 'ipad13_portrait':
          GRID_POS = (30, 85)
-         grid_size = w - 50
+         vert_grid_size = h - 50
+         hor_grid_size = w - 50
          font_size = 24
          
       case 'ipad_mini_landscape':
          GRID_POS = (50, 85)
-         grid_size = h - 150
+         vert_grid_size = h - 150
+         hor_grid_size = w - 200
          font_size = 24
          
       case 'ipad_mini_portrait':
          GRID_POS = (35, 85)
-         grid_size = w - 50
+         vert_grid_size = h - 50
+         hor_grid_size = w - 50
          font_size = 24
-         
-    SQ_SIZE = grid_size // max(dimx, dimy)
+    if dimy >= dimx:    
+       SQ_SIZE = vert_grid_size // max(dimx, dimy)
+    else:
+       SQ_SIZE = hor_grid_size // max(dimx, dimy)
          
     return GRID_POS, SQ_SIZE, font_size
   
@@ -578,7 +590,7 @@ class GameBoard(Scene):
         # animation = False if piece == self.last_board[r][c] else True
         try:
           piece = self.get_piece(r, c)
-          animation = False
+          animation = self.animation
           k = fn_piece(piece)
           if self.debug:
               print('fnpiece', k)

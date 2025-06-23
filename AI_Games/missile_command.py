@@ -24,7 +24,7 @@ def blend_images(images, size=(128, 128)):
    # combine a set of images linearly in x
    imgs = [Image.open(img).resize(size) for img in images]        
    img_size = Size(*size)
-   blended = Image.new('RGB', (len(imgs) * int(img_size.w), int(img_size.h)), 'black')
+   blended = Image.new('RGBA', (len(imgs) * int(img_size.w), int(img_size.h)), 'black')
    # Paste the images (overlay)
    for i, img in enumerate(imgs):
       blended.paste(img, (i * int(img_size.w), 0))  # Paste img1 at the top-left
@@ -59,9 +59,10 @@ class Base(object):
         self.alive = True
         self.h = 5
         self.color = 'orange'
-        self.width = 50
+        self.width = 100
         self.height = 70
-        self.base_img = blend_images(['spc:Gun6', 'spc:Gun7', 'spc:Gun6'])
+        #self.base_img = blend_images(['spc:Gun6', 'spc:Gun7', 'spc:Gun6'])
+        self.base_img = ui.Image('emj:Red_Triangle_1')
         self.missiles_left = 10 # Example: each base has limited missiles
         
     def status(self):
@@ -241,7 +242,7 @@ class MissileCommandGame(ui.View):
         self.ground = GameObject(SCREEN_WIDTH/2, SCREEN_HEIGHT, SCREEN_WIDTH, 50, 'red')
     
         # Place bases (e.g., 3 bases)
-        base_y = SCREEN_HEIGHT - BASE_HEIGHT
+        base_y = SCREEN_HEIGHT - BASE_HEIGHT +25
         self.bases.append(Base(SCREEN_WIDTH * 0.05, base_y))
         self.bases.append(Base(SCREEN_WIDTH * 0.5, base_y))
         self.bases.append(Base(SCREEN_WIDTH * 0.95, base_y))

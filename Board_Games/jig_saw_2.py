@@ -2,6 +2,7 @@
 # creates jigsaw from selected image
 # creates random jigsaw each time, using bezier curves to change
 # appearance of tabs
+# Chris Thomas June 2025
 from PIL import Image, ImageFilter
 import ui
 import io
