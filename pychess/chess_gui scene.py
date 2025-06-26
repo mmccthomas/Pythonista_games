@@ -70,8 +70,7 @@ class ChessGame(gscene.GameBoard):
     self.DIMENSION_X = self.DIMENSION_Y = 8
     # load the gui interface
     self.q = Queue()
-    self.COLUMN_LABELS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'[:self.sizex]
-    self.column_labels = '8 7 6 5 4 3 2 1 '
+    self.column_labels = iter('87654321')
     self.use_alpha = True
     image = ui.Image.named('board_grey.jpg')
     self.grid_fill = 'clear'          

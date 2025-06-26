@@ -252,7 +252,6 @@ class BattleShip():
     self.q = Queue(maxsize=10)
     self.gui = Gui(self.game_board, Player())
     self.gui.gs.q = self.q # pass queue into gui
-    self.COLUMN_LABELS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'[:self.SIZE]
     self.gui.set_alpha(True) 
     self.gui.set_grid_colors(grid='lightgrey', highlight='lightblue')
     self.gui.require_touch_move(False)
@@ -871,7 +870,7 @@ class BattleShip():
     """Takes in the user's input and performs that move on the board, returns the coordinates of the move"""
     if board is None:
         board = self.game_board
-    prompt = (f"Select  position (A1 - {self.COLUMN_LABELS[-1]}{self.SIZE})")
+    prompt = (f"Select  position (A1 - {self.gui.gs.row_labels[-1]}{self.SIZE-1})")
     # sit here until piece place on board   
     while True:
       self.gui.set_prompt(prompt, font=('Avenir Next', 25))
@@ -879,7 +878,7 @@ class BattleShip():
       spot = self.wait_for_gui() 
       spot = spot.strip().upper()
       row = int(spot[1:]) - 1
-      col = self.COLUMN_LABELS.index(spot[0])
+      col = self.gui.gs.row_labels.index(spot[:2])
       if board[row][col] != EMPTY:
         prompt = f"{spot} is already taken, please choose another:"
       else:

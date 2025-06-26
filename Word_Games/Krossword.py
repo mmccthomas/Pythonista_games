@@ -47,9 +47,7 @@ class KrossWord(LetterGame):
     # load the gui interface
     self.q = Queue()
     self.gui = Gui(self.board, Player())
-    self.gui.gs.q = self.q  # pass queue into gui
-    self.COLUMN_LABELS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'[:self.sizex]
-    
+    self.gui.gs.q = self.q  # pass queue into gui   
     self.gui.set_alpha(True)
     self.gui.set_grid_colors(grid='lightgrey', highlight='lightblue')
     self.gui.require_touch_move(False)

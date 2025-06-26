@@ -1,13 +1,16 @@
 #
 # The GUI engine for several games
 #
-from scene import *
-from scene import Vector2 # , get_screen_size
+import scene
+from scene import Action, Node, SpriteNode, ShapeNode, Scene
+from scene import Vector2, LabelNode, Rect
+from scene import Point, LANDSCAPE, Texture
 try:
     from change_screensize import get_screen_size
 except ImportError:
     from scene import get_screen_size
 import sound
+import string
 from ui import Path, Image
 from copy import copy
 import console
@@ -24,25 +27,10 @@ try:
 except ModuleNotFoundError:
     from game_menu import MenuScene
 
-
-
-screen_width, screen_height = get_screen_size()
-
 logging.basicConfig(format='%(asctime)s  %(funcName)s %(message)s',
                     level=logging.INFO)
 logger = logging.getLogger(__name__)
 A = Action
-"""Variables"""
-if screen_width > screen_height:
-  WIDTH = HEIGHT = 512  # width and height of the board
-  GRID_POS = (100, 85)
-else:
-  WIDTH = HEIGHT = 360
-  GRID_POS = (30, 85)
-DIMENSION_X = 8
-DIMENSION_Y = 8  # the dimensions of the chess board
-SQ_SIZE = HEIGHT // DIMENSION_Y  # the size of each of the squares in the board
-MOVE_SPEED = 0.05
 
                                       
 class Player_test():
@@ -59,23 +47,17 @@ class Tile(SpriteNode):
   """
   A single tile on the grid.
   """
-  def __init__(self, tile, row=0, col=0, sq_size=None, dims=None, **kwargs):
+  def __init__(self, tile, row=0, col=0, sq_size=10, dims=(6,7), **kwargs):
+    # sq_size and dims are just reasonable defaults
     # put these at front with z_position
     SpriteNode.__init__(self, tile, z_position=10)
     for k, v in kwargs.items():
       setattr(self, k, v)
     self.offset = 0  # was 10
-    if sq_size is None:
-       self.SQ_SIZE = 10
-    else:
-       self.SQ_SIZE = sq_size
-     
-    if dims is None:
-       self.DIM_Y, self.DIM_X = 6, 7
-    else:
-       self.DIM_Y, self.DIM_X = dims
+    self.sq_size = sq_size
+    self.dim_y, self.dim_x = dims
        
-    self.size = (self.SQ_SIZE, self.SQ_SIZE)
+    self.size = (self.sq_size, self.sq_size)
     self.anchor_point = 0, 0
     self.number = 1
     self.name = ''
@@ -88,16 +70,16 @@ class Tile(SpriteNode):
     """
     if isinstance(row, tuple):
       row, col = row
-    if col < 0 or col >= self.DIM_X:
+    if col < 0 or col >= self.dim_x:
       return
-    if row < 0 or row >= self.DIM_Y:
+    if row < 0 or row >= self.dim_y:
       return
     self.col = int(col)
-    self.row = (self.DIM_Y - 1 - int(row))
+    self.row = (self.dim_y - 1 - int(row))
     
     pos = Vector2()
-    pos.x = col * self.SQ_SIZE + self.offset
-    pos.y = (self.DIM_Y - 1 - row) * self.SQ_SIZE + self.offset
+    pos.x = col * self.sq_size + self.offset
+    pos.y = (self.dim_y - 1 - row) * self.sq_size + self.offset
     
     
     if animation:
@@ -113,8 +95,6 @@ class Tile(SpriteNode):
     
         
 class GameBoard(Scene):
-  
-  global GRID_POS
 
   def __init__(self):  # board, player, response):
     ''' board is 2d list of characters
@@ -138,13 +118,13 @@ class GameBoard(Scene):
     self.grid_fill = 'lightgreen'
     self.grid_stroke_color = None
     self.grid_z_position = 10
-    self.row_labels = None
+    self.row_labels = None # an iterator
     self.highlight_fill = '#00bc10'
-    self.use_alpha = False
-    self.column_labels = None
+    self.use_alpha = True
+    self.column_labels = None # an iterator
     self.require_touch_move = False
     self.allow_any_square = False
-    self.last_board = list(map(list, self.board))
+    self.last_board =  [list(row) for row in self.board] # copy
     self.q = None
     self.device = self.device_size()
     self.log_moves = False
@@ -190,70 +170,71 @@ class GameBoard(Scene):
     w, h = get_screen_size()
     match device:
       case 'ipad_landscape':
-         GRID_POS = (50, 85)
+         grid_pos = (50, 85)
          vert_grid_size = h - 150
          hor_grid_size = w - 200
          font_size = 24
          
       case 'ipad_portrait':
-         GRID_POS = (35, 85)
+         grid_pos = (35, 85)
          vert_grid_size = h - 150
          hor_grid_size = w - 50
          font_size = 24
          
       case 'iphone_landscape':
-         GRID_POS = (30, 40)
+         grid_pos = (30, 40)
          vert_grid_size = h - 80
          hor_grid_size = w - 150
          font_size = 16
          
       case 'iphone_portrait':
-         GRID_POS = (30, 60)
+         grid_pos = (30, 60)
          vert_grid_size = h - 50
          hor_grid_size = w - 50
          font_size = 12
          
       case 'ipad13_landscape':
-         GRID_POS = (100, 85)
+         grid_pos = (100, 85)
          vert_grid_size = h - 150
          hor_grid_size = w - 200
          font_size = 24
          
       case 'ipad13_portrait':
-         GRID_POS = (30, 85)
+         grid_pos = (30, 85)
          vert_grid_size = h - 50
          hor_grid_size = w - 50
          font_size = 24
          
       case 'ipad_mini_landscape':
-         GRID_POS = (50, 85)
+         grid_pos = (50, 85)
          vert_grid_size = h - 150
          hor_grid_size = w - 200
          font_size = 24
          
       case 'ipad_mini_portrait':
-         GRID_POS = (35, 85)
+         grid_pos = (35, 85)
          vert_grid_size = h - 50
          hor_grid_size = w - 50
          font_size = 24
+    # assumes dimy is not very much greater than dimx
     if dimy >= dimx:    
-       SQ_SIZE = vert_grid_size // max(dimx, dimy)
+       sq_size = vert_grid_size // max(dimx, dimy)
     else:
-       SQ_SIZE = hor_grid_size // max(dimx, dimy)
+       sq_size = hor_grid_size // max(dimx, dimy)
          
-    return GRID_POS, SQ_SIZE, font_size
+    return grid_pos, sq_size, font_size
   
   def get_fontsize(self):
       # adjustable font sizes for screen
       fontsize = {'iphone_landscape': 16, 'iphone_portrait': 12, 
-                      'ipad_landscape': 24, 'ipad_portrait': 24,
-                      'ipad13_landscape': 24, 'ipad13_portrait': 24,
-                      'ipad_mini_landscape': 20, 'ipad_mini_portrait': 20}[self.device_size()]
+                  'ipad_landscape': 24, 'ipad_portrait': 24,
+                  'ipad13_landscape': 24, 'ipad13_portrait': 24,
+                  'ipad_mini_landscape': 20, 'ipad_mini_portrait': 20}[self.device_size()]
       return fontsize
           
   def setup_gui(self, **kwargs):
-    global GRID_POS
-    GRID_POS, self.SQ_SIZE, self.font_size = self.grid_sizes(self.device, self.DIMENSION_X, self.DIMENSION_Y)
+    
+    self.grid_pos, self.SQ_SIZE, self.font_size = self.grid_sizes(self.device, self.DIMENSION_X, self.DIMENSION_Y)
     
     for k, v in kwargs.items():
       setattr(self, k, v)
@@ -261,7 +242,7 @@ class GameBoard(Scene):
     self.smaller_tile = 0  # was 20
     self.current_player = self.Player.PLAYER_1
     # Root node for all game elements
-    self.game_field = Node(parent=self, position=GRID_POS)
+    self.game_field = Node(parent=self, position=self.grid_pos)
 
     self.IMAGES = {}
     self.highlights = [[]]
@@ -274,7 +255,7 @@ class GameBoard(Scene):
     
     self.load_images()
     self.setup_ui()
-    # self.redraw_board()
+    
   
   def setup_menus(self):
       self.pause_menu = {'Continue': self.dismiss_modal_scene,
@@ -332,36 +313,75 @@ class GameBoard(Scene):
       n.position = pos
       n.anchor_point = anchor
 
-    
+  def two_char_generator(self):
+    """
+    Generates two-character strings from "A " to "ZZ".
+    The first character iterates from 'A' to 'Z', and the second
+    character iterates from ' ' (space) to 'Z'.
+    """
+    first_chars = string.ascii_uppercase
+    second_chars = string.ascii_uppercase + ' ' # Include space as a second character
+
+    # Handle single-character strings first (e.g., "A ", "B ", ..., "Z ")
+    for char1 in first_chars:
+        yield char1 + ' '
+
+    # Handle two-character strings (e.g., "AA", "AB", ..., "AZ", "BA", ...)
+    for char1 in first_chars:
+        for char2 in second_chars:
+            if char2 == ' ': # Skip "A ", "B ", etc., as they're already yielded
+                continue
+            yield char1 + char2
+            
+  def two_digit_number_generator(self):
+    """
+    Generates two-character strings of numbers from "0 " to "99".
+    """
+    # First, handle single-digit numbers with a space, e.g., "0 ", "1 ", ..., "9 "
+    for i in range(10):
+        yield str(i) + ' '
+
+    # Then, handle two-digit numbers, e.g., "00", "01", ..., "99"
+    for i in range(1,10):  # First digit (0-9)
+        for j in range(10):  # Second digit (0-9)
+            yield str(i) + str(j)
+              
   def add_row_column_labels(self):
       font = ('Avenir Next', self.font_size)
       if self.use_alpha:
-          row_labels = 'A B C D E F G H I J K L M N O P Q R S T U V W X Y Z AAABACAD'
+          row_labels = self.two_char_generator()
+          self.row_labels = [] # store the values
       else:
           if self.row_labels:
               row_labels = self.row_labels
           else:
-              row_labels = '0 1 2 3 4 5 6 7 8 9 101112131415161718192021222324252627282930'
+              self.row_labels = []
+              row_labels = self.two_digit_number_generator()
+
       if self.column_labels:
           column_labels = self.column_labels
       else:
-          column_labels = '0 1 2 3 4 5 6 7 8 9 101112131415161718192021222324252627282930'
+          column_labels = self.two_digit_number_generator()
+          self.column_labels = []
+
       for i in range(self.DIMENSION_X):
           pos = Vector2(0 + i * self.SQ_SIZE, 0)
-          n = LabelNode(row_labels[2 * i: 2 * i + 2], parent=self.game_field)
+          n = LabelNode(next(row_labels), parent=self.game_field)
           n.position = (pos.x + self.SQ_SIZE / 2,
                     pos.y + self.DIMENSION_Y * self.SQ_SIZE + 20)
           n.color = self.grid_label_color
           n.font = font
+          self.row_labels.append(n.text)
           
       for i in range(self.DIMENSION_Y):
           pos = Vector2(0, 0 + i * self.SQ_SIZE)
           idx = self.DIMENSION_Y - 1 - i
-          n = LabelNode(column_labels[2 * idx: 2 * idx + 2],
-                        parent=self.game_field)
+          n = LabelNode(next(column_labels), parent=self.game_field)
+          
           n.position = (pos.x - 20, pos.y + self.SQ_SIZE/2)
           n.color = self.grid_label_color
           n.font = font
+          self.column_labels.append(n.text)
       
   def build_background_grid(self):
     parent = Node()
@@ -404,7 +424,7 @@ class GameBoard(Scene):
     return parent
     
   def setup_ui(self):
-    
+    # every gui has a pause button in top left of screen
     self.pause_button = SpriteNode('iow:pause_32', position=(32, self.size.h - 36),
                               parent=self)
     self.grid = self.build_background_grid()
@@ -465,15 +485,6 @@ class GameBoard(Scene):
                                  parent=self.game_field)
     self.msg_label_r.anchor_point = anchor_point
     
-    # self.enter_button = ShapeNode(ui.Path.rounded_rect(0, 0, 100, 32, 5),
-    #                               position=pos_button, parent=self)
-    # self.enter_button.anchor_point = (0, 0)
-    # self.enter_button.line_width = 2
-    # self.enter_button.fill_color = 'clear'
-    # self.enter_button.stroke_color = 'white'
-    # self.enter_label = LabelNode('Enter', position=(5,5), 
-    #.                             parent=self.enter_button)
-    # self.enter_label.anchor_point = (0, 0)
     self.enter_button = BoxedLabel('Hint', '', position=pos_button,
                                    min_size=(100, 32),
                                    parent=self.game_field)
@@ -501,7 +512,7 @@ class GameBoard(Scene):
     '''
     # if self.line is not None:
     #  self.line.remove_from_parent()
-    path = ui.Path()
+    path = Path()
     
     path.line_width = 2
     # modify path parameters
@@ -556,7 +567,7 @@ class GameBoard(Scene):
     return (0 <= r < self.DIMENSION_Y) and (0 <= c < self.DIMENSION_X)
 
   def load_images(self):
-    ''' Load images for the chess pieces '''
+    ''' Load images for the tiles '''
     if isinstance(self.Player.PIECES, dict):
       self.IMAGES = self.Player.PIECES
     else:
@@ -598,7 +609,7 @@ class GameBoard(Scene):
           t = Tile(Texture(self.IMAGES[k]), 0, 0,
                    sq_size=self.SQ_SIZE,
                    dims=(self.DIMENSION_Y, self.DIMENSION_X))
-          # t.DIM_Y, t.DIM_X = self.DIMENSION_Y, self.DIMENSION_X
+          
           
           t.size = (self.SQ_SIZE - self.smaller_tile,
                     self.SQ_SIZE - self.smaller_tile)
@@ -607,11 +618,12 @@ class GameBoard(Scene):
           t.position = t.position + (self.smaller_tile / 2, self.smaller_tile / 2)
           parent.add_child(t)
         except (AttributeError, KeyError, TypeError, IndexError) as e:
+          # dont display invalid images.
           if self.debug:
              print(k)
              print(traceback.format_exc())
           
-    self.last_board = list(map(list, self.board))
+    self.last_board = [list(row) for row in self.board] # copy
     
   def changed(self, board_update):
     ''' return first differnce '''
@@ -628,7 +640,7 @@ class GameBoard(Scene):
     self.hl = []
     for move in valid_moves:
       if True:
-        t = ShapeNode(ui.Path.rect(0, 0, self.SQ_SIZE, self.SQ_SIZE),
+        t = ShapeNode(Path.rect(0, 0, self.SQ_SIZE, self.SQ_SIZE),
                       fill_color=self.highlight_fill,
                       position=self.rc_to_pos(move[0], move[1]), alpha=alpha,
                       parent=self.game_field, )
@@ -723,7 +735,7 @@ class GameBoard(Scene):
            sqsize = self.SQ_SIZE
         r, c = item.position
         x, y = item.offset
-        t = ShapeNode(ui.Path.rounded_rect(0, 0, sqsize, sqsize, item.radius),
+        t = ShapeNode(Path.rounded_rect(0, 0, sqsize, sqsize, item.radius),
                       fill_color=item.color,
                       position=self.rc_to_pos(r + y, c + x),
                       stroke_color=item.stroke_color,
@@ -813,15 +825,6 @@ class GameBoard(Scene):
       
   def will_close(self):
     print('closing')
-         
-  '''def update(self):
-    # dt is provided by Scene t is time since start
-    self.line_timer -= self.dt
-    self.go = True
-    if self.line_timer <= 0:
-      self.line_timer = 0.5
-      # self.turn_status()
-      self.go = True'''
       
   def did_change_size(self):    
     try:
@@ -915,15 +918,11 @@ class GameBoard(Scene):
       self.q.put(-1)
       if self.debug:
           self.enter_label.text = 'End'
-      # self.clear_highlights()
-      # update gui
-      # self.redraw_board()
-      # self.board_print()
       
   def point_to_rc(self, point):
     """ covert touch point to rc tuple """
-    col = int((point.x - GRID_POS[0]) / (self.SQ_SIZE))
-    row = self.DIMENSION_Y - 1 - int((point.y - GRID_POS[1]) / (self.SQ_SIZE))
+    col = int((point.x - self.grid_pos[0]) / (self.SQ_SIZE))
+    row = self.DIMENSION_Y - 1 - int((point.y - self.grid_pos[1]) / (self.SQ_SIZE))
     return row, col
     
   def grid_to_rc(self, point):
@@ -1022,8 +1021,8 @@ class GameBoard(Scene):
   def restart(self, first_time=False):
     self.dismiss_modal_scene()
     self.menu = None
-    for o in self.game_field.children:
-      o.remove_from_parent()
+    for obj in self.game_field.children:
+      obj.remove_from_parent()
     self.setup(first_time=first_time)
     self.paused = False
     
@@ -1091,7 +1090,6 @@ class BoxedLabel():
       box follows text size
       text positions must follow box position
   """
-  global GRID_POS
   
   def __init__(self, text='text', title='boxed_label',
                min_size=(100, 50), position=(0, 0), parent=None):
@@ -1099,6 +1097,7 @@ class BoxedLabel():
       self.position = position
       self.parent = parent
       self.size = min_size
+      self.gridpos = parent.position
       self.font = ('Avenir Next', 24)
       self.title = title
       self.text = text
@@ -1122,7 +1121,7 @@ class BoxedLabel():
       radius = 5
       offset = 1
       w_, h_ = min_size
-      self.l_box_name = ShapeNode(ui.Path.rounded_rect(0, 0, w_, h_,  radius),
+      self.l_box_name = ShapeNode(Path.rounded_rect(0, 0, w_, h_,  radius),
                                   position=self.position,
                                   parent=self.parent)
       self.l_box_name.anchor_point = (0, 0)  # bottom left
@@ -1130,7 +1129,7 @@ class BoxedLabel():
       self.l_box_name.fill_color = 'clear'
       self.l_box_name.stroke_color = 'white'
       x, y, w, h = self.l_box_name.bbox
-      self.bounds = Rect(x + GRID_POS[0], y + GRID_POS[1], w, h)
+      self.bounds = Rect(x + self.gridpos[0], y + self.gridpos[1], w, h)
       self.l_box_title = LabelNode(self.title, position=(x + 5, y + h),
                                    anchor_point=(0, 0), font=self.font,
                                    parent=self.parent)
@@ -1140,7 +1139,7 @@ class BoxedLabel():
       # if key == 'position':
       # change text position and bounds
       x, y, w, h = self.l_box_name.bbox
-      self.bounds = Rect(x + GRID_POS[0], y + GRID_POS[1], w, h)
+      self.bounds = Rect(x + self.gridpos[0], y + self.gridpos[1], w, h)
       b_x, b_y = self.l_box_name.position
       self.l_name.position = position = (b_x + 5, b_y + 2)
       self.l_box_title.position = (b_x + 5, b_y + h)
@@ -1229,4 +1228,4 @@ if __name__ == "__main__":
   from gui_interface import Squares
   logging.basicConfig(format='%(asctime)s  %(funcName)s %(message)s',
                       level=logging.WARNING)
-  run(GameBoard(), LANDSCAPE, show_fps=True)
+  scene.run(GameBoard(), LANDSCAPE, show_fps=True)

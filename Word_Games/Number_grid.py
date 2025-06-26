@@ -59,7 +59,6 @@ class NumberGrid(LetterGame):
     self.hint_result = None
     # create game_board and ai_board
     self.SIZE = self.get_size(f'{SIZE},{SIZE}')
-    self.COLUMN_LABELS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'[:self.sizex]
     # load the gui interface
     self.q = Queue()
     self.gui = Gui(self.board, Player())

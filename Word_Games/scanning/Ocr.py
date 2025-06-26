@@ -85,7 +85,6 @@ class OcrCrossword(LetterGame):
         self.gui.setup_gui()
         self.board = np.array(self.board)
         self.board[self.board == '-'] = ' ' # replace '-' by ' '
-        self.COLUMN_LABELS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'[:self.sizex]
         self.gui.build_extra_grid(self.sizex, self.sizey,
                                   grid_width_x=1, grid_width_y=1,
                                   color='black', line_width=1)

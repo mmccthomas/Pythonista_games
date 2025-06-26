@@ -56,7 +56,6 @@ class App(LetterGame):
     self.q = Queue()
     self.gui = Gui(self.board, Player())
     self.gui.gs.q = self.q # pass queue into gui
-    self.COLUMN_LABELS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'[:9]
     self.gui.set_alpha(False) 
     self.gui.set_grid_colors(grid='black', highlight='lightblue')
     self.gui.require_touch_move(False)
@@ -295,7 +294,6 @@ class App(LetterGame):
   def get_player_move(self, board=None):
     """Takes in the user's input and performs that move on the board, returns the coordinates of the move
     """
-    #prompt = (f"Select  position (A1 - {self.COLUMN_LABELS[-1]}{self.sizey})")
     # sit here until piece place on board         
     move = self.wait_for_gui()  
     return move

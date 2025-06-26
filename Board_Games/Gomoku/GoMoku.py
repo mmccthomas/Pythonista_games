@@ -59,7 +59,6 @@ class UI:
         self.gui.set_alpha(True) 
         self.gui.set_grid_colors(grid=BACKGROUND, highlight='orange', z_position=5, grid_stroke_color='clear')
         self.gui.require_touch_move(False)
-        self.gui.gs.column_labels = '1 2 3 4 5 6 7 8 9 101112131415161718192021222324252627282930'
         self.gui.allow_any_move(True)
         self.gui.setup_gui(log_moves=False)
         self.gui.build_extra_grid(grids_x=SIZE-1, grids_y=SIZE-1, 
@@ -161,9 +160,6 @@ class UI:
         if items == 0: st = time()
         #print('items',items, move)
         try:
-          # spot = spot.strip().upper()
-          # row = int(spot[1:]) - 1
-          # col = self.COLUMN_LABELS.index(spot[0])
           if self.log_moves:
             coord_list.append(move)
             items += 1
@@ -208,7 +204,6 @@ class GomokuGame():
     self.gameBoard = None
     self.userPiece = BLACK
     self.board_dimension = self.ui.board_size-1
-    self.COLUMN_LABELS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
     opponentPiece = opponentOf(self.userPiece)
     self.players = {opponentPiece: GomokuStrategy(opponentPiece, self.board_dimension, self.ui), 
                     self.userPiece: HumanPlayer(self.userPiece, self.ui)}   
@@ -282,7 +277,7 @@ class GomokuGame():
         nameOfCurrentPlayer = self.playerNames[turn]
         self.currentPlayer = self.players[turn]
         self.player_time(turn, start=True)
-        self.ui.gui.set_prompt(f"Select  position (A1 - {self.COLUMN_LABELS[self.board_dimension-1]}{self.board_dimension})")
+        self.ui.gui.set_prompt(f"Select  position (A1 - {self.ui.gui.gs.row_labels[self.board_dimension-1]}{self.board_dimension-1})")
         row, col = self.currentPlayer.getMove(self.gameBoard)
         if row == None:
            # switched to AI vs AI
@@ -292,7 +287,7 @@ class GomokuGame():
         performMove(self.gameBoard, row, col, turn)
         
         self.printGameBoard( [[row, col]])
-        moveFormatted = self.COLUMN_LABELS[col] + str(row + 1)
+        moveFormatted = self.ui.gui.gs.row_labels[col] + str(row)
         self.ui.gui.set_message2("%s played in spot %s%s\n" % (nameOfCurrentPlayer, moveFormatted, time_taken))
         turn = opponentOf(turn)
         gameOver, winner = self.players[opponentPiece].isTerminal(self.gameBoard)

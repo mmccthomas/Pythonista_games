@@ -67,7 +67,6 @@ class Anagram(LetterGame):
     self.q = Queue()
     self.gui = Gui(self.board, Player())
     self.gui.gs.q = self.q # pass queue into gui
-    self.COLUMN_LABELS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'[:self.sizex]
     self.gui.set_alpha(True) 
     self.gui.set_grid_colors(grid='black', highlight='lightblue', z_position=30)
     self.gui.require_touch_move(False)

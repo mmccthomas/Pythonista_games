@@ -51,7 +51,6 @@ class DropWord(LetterGame):
     self.SIZE = self.get_size() 
     self.columns = list(range(self.sizex))
     random.shuffle(self.columns)
-    self.COLUMN_LABELS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'[:self.sizex] 
     # load the gui interface
     self.q = Queue()
     self.gui = Gui(self.board, Player())
@@ -325,30 +324,3 @@ if __name__ == '__main__':
     quit = g.wait()
     if quit:
       break
-  
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

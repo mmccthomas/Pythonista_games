@@ -27,7 +27,7 @@ class Gui():
         self.wh = get_screen_size()
         self.v.present('sheet')
         self.gs = self.v.scene
-        self.gs.board = list(map(list, board))  # board.copy()
+        self.gs.board = [list(row) for row in board] # board.copy()
         self.gs.Player = player
         self.player = player
         self.gs.DIMENSION_Y = len(self.gs.board)
@@ -479,7 +479,7 @@ class Gui():
 
     def update(self, board=None, fn_piece=None):
         ''' if board, it is a single [row,col] '''
-        self.gs.board = list(map(list, board))  # board.copy()
+        self.gs.board =  [list(row) for row in board] # board.copy()
         self.gs.redraw_board(fn_piece=fn_piece)
         
     def subset(self, board, loc, N=3):
@@ -596,6 +596,7 @@ class Gui():
 
     def print_board(self, board, which=None, highlight=None):
         # optionally make chars underlined
+        # unicode 0333 adds underline to any character
         # highlight is a list of r,c coordinates
         print('board:', which)
         for j, row in enumerate(board):
@@ -630,24 +631,9 @@ class Gui():
 
     def set_start_menu(self, menu_dict):
         self.gs.start_menu = menu_dict
-
-    def build_extra_grid(self,
-                         grids_x,
-                         grids_y,
-                         grid_width_x=None,
-                         grid_width_y=None,
-                         color=None,
-                         line_width=2,
-                         offset=None,
-                         z_position=100):
-        self.gs.build_extra_grid(grids_x,
-                                 grids_y,
-                                 grid_width_x=grid_width_x,
-                                 grid_width_y=grid_width_y,
-                                 color=color,
-                                 line_width=line_width,
-                                 offset=offset,
-                                 z_position=z_position)
+        
+    def build_extra_grid(self, *args, **kwargs):                         
+        self.gs.build_extra_grid(*args, **kwargs)
 
     def draw_line(self, coords, **kwargs):
         self.gs.draw_line(coords, **kwargs)
@@ -665,7 +651,8 @@ class Gui():
         return self.gs.rc_to_pos(coord[0], coord[1])
 
     def remove_labels(self):
-        """remove all labels"""
+        """remove all labels
+        TODO This is done by position, can we do better?"""
         labels = [
             label for label in self.game_field.children
             if isinstance(label, LabelNode)
@@ -687,7 +674,8 @@ class Gui():
                        label_list=None,
                        colors=None,
                        **kwargs):
-        """ replace row or column labels with custom set and colors"""
+        """ replace row or column labels with custom set and colors
+        TODO This is done by position, can we do better?"""
         labels = [
             label for label in self.game_field.children
             if isinstance(label, LabelNode)
@@ -870,10 +858,9 @@ class Coord(tuple):
         return (0 <= r < sizey) and (0 <= c < sizex)
         
     def clamp(self, sizex, sizey):
-      self.col  = min(sizex-1, max(0, self.col)) # clamp c
-      self.row  = min(sizey-1, max(0, self.row)) # clamp r
-      self.val = (self.row, self.col)
-      return self
+      col  = min(sizex-1, max(0, self.col)) # clamp c
+      row  = min(sizey-1, max(0, self.row)) # clamp r
+      return Coord(row, col)
       
 
 class Squares():

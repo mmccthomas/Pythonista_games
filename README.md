@@ -263,7 +263,7 @@ Entry point : Board_Games/caterpillar.py
 Space Shooter
 -------------
 Modified and improved(?)
-https://gist.github.com/anonymous/a03bfdab757c1d978061
+# https://gist.github.com/anonymous/a03bfdab757c1d978061
 Changed icons, added shields, and quite a bit of refactoring
 
 Entry point : AI_games/a_spaceShooter.py

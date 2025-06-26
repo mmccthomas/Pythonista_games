@@ -369,7 +369,6 @@ class LetterGame():
     self.q = Queue()
     self.gui = Gui(self.board, Player())
     self.gui.gs.q = self.q  # pass queue into gui
-    self.COLUMN_LABELS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'[:self.sizex]
     self.gui.set_alpha(True)
     self.gui.set_grid_colors(grid='lightgrey', highlight='lightblue')
     self.gui.require_touch_move(False)
@@ -1039,21 +1038,16 @@ class LetterGame():
     if board is None:
         board = self.game_board
     coord_list = []
-    # prompt = (f"Select  position (A1 - {self.COLUMN_LABELS[-1]}{self.sizey})")
     # sit here until piece place on board
     items = 0
     
     while items < 1000:  # stop lockup
-      # self.gui.set_prompt(prompt, font=('Avenir Next', 25))
       
       move = self.wait_for_gui()
       # if items == 0:
       #     st = time()
       # print('items',items, move)
       try:
-        # spot = spot.strip().upper()
-        # row = int(spot[1:]) - 1
-        # col = self.COLUMN_LABELS.index(spot[0])
         if self.log_moves:
           coord_list.append(move)
           items += 1
