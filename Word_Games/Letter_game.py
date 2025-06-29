@@ -8,6 +8,8 @@ from collections import Counter
 from collections import defaultdict
 from itertools import zip_longest
 from queue import Queue
+from glob import glob
+#Third party
 import console
 import dialogs
 import clipboard
@@ -15,19 +17,19 @@ import clipboard
 import matplotlib.colors as mcolors
 import numpy as np
 from objc_util import on_main_thread
-sys.path.append('../')
+#Local imports
+import base_path
+base_path.add_paths(__file__)
 from gui.gui_interface import Gui, Squares
 
 # Board characters
-DESTROY = "D"
 EMPTY = "-"
-HIT = "H"
-MISS = "^"
-POSSIBLE = "?"
-
 BLOCK = '#'
 SPACE = ' '
 FINISHED = (-10, -10)
+# this set of wordlists will be set in child class
+WORDLISTS = ['wordlists/5000-more-common.txt']
+  
 
 
 def add(a, b):
@@ -166,13 +168,21 @@ class Word():
     self.parent_node = None
     self.visited = False  # for searching
     self.fixed = False  # positively correct
-    self.set_coords()
+    
     self.child_index = 0
     self.max_depth = 3
     self.no_possibles = 0
     self.possibles = []
-    
-    
+ 
+    self.direction_deltas = {
+        'across': (0, 1), 'e': (0, 1),
+        'down': (1, 0), 's': (1, 0),
+        'n': (-1, 0),
+        'ne': (-1, 1), 'se': (1, 1),
+        'sw': (1, -1), 'w': (0, -1),
+        'nw': (-1, -1)
+    }
+    self.set_coords()
     for k, v in kwargs.items():
       setattr(self, k, v)
       
@@ -182,26 +192,12 @@ class Word():
     
   def set_coords(self):
     r, c = self.start
-    match self.direction.lower():
-      case 'across' | 'e':
-          self.coords = [(r, c + i) for i in range(self.length)]
-      case 'down' | 's':
-          self.coords = [(r + i, c) for i in range(self.length)]
-      case 'n':
-          self.coords = [(r - i, c) for i in range(self.length)]
-      case 'ne':
-          self.coords = [(r - i, c + i) for i in range(self.length)]
-      case 'se':
-          self.coords = [(r + i, c + i) for i in range(self.length)]
-      case 'sw':
-          self.coords = [(r + i, c - i) for i in range(self.length)]
-      case 'w':
-          self.coords = [(r, c - i) for i in range(self.length)]
-      case 'nw':
-          self.coords = [(r - i,  c - i) for i in range(self.length)]
-      case _:
-         raise ValueError(f'Direction {self.direction} not known')
-         
+    # In set_coords:
+    delta_r, delta_c = self.direction_deltas.get(self.direction.lower())
+    if delta_r is None: # handle unknown direction if not caught by init validation
+        raise ValueError(f'Direction {self.direction} not known')
+    self.coords = [(r + i * delta_r, c + i * delta_c) for i in range(self.length)]
+           
     # this is used to apply to board array    
     self.np_coords = tuple(np.array(self.coords).T)
     
@@ -221,7 +217,8 @@ class Word():
       return self.direction in ['NE', 'SE', 'SW', 'NW']
        
   def undo_word(self, coord, direction):
-    """ erase a word, except for intersection """
+    """ erase a word, except for intersection
+    Placeholder for inheritor """
     raise NotImplementedError
     
   def get_children(self):
@@ -279,15 +276,8 @@ class Word():
     return [i for i in self.intersections if i != coord]
 
   def set_length(self, rc, direction, board):
-     pass
-     """
-       delta = (0, 0)
-            length = 1
-            while self.check_in_board(add(rc, delta)) and self.get_board_rc(add(rc, delta), self.board) != BLOCK :
-                length += 1
-                delta = add(delta, d)
-            length -= 1
-            """
+      """Placeholder for inheritor """
+      raise NotImplementedError   
                         
   def update_match(self, board):
       """ update match_pattern from supplied numpy 2d board """
@@ -296,11 +286,8 @@ class Word():
       # try to get fastest.
       # assumes empty squares are dot
       b = board[self.np_coords]
-      # b[~np.char.isalpha(b)] = '.'
       self.match_pattern  = ''.join(b)
-      #self.match_pattern = ''.join([board[loc] if board[loc].isalpha() else '.' for loc in self.coords])
-      
-      
+          
   def get_child_coord(self, child_obj):
     '''returns key from children dictionary'''
     for coord, v in self.children.items():
@@ -310,8 +297,8 @@ class Word():
   def get_possibles(self, wordlist=None):
       # if specified, wordlist is set of words with correct length
       # it may also have correct start letter
-      if self._word_trie:
-          possibles = self._word_trie.get_possibles(self.match_pattern)
+      if Word._word_trie:
+          possibles = Word._word_trie.get_possibles(self.match_pattern)
       elif wordlist:
           m = re.compile(self.match_pattern)
           possibles = [w for w in wordlist if m.search(w)]
@@ -329,30 +316,23 @@ class Word():
 
                     
 class Player():
+  """ defines character/ image file lookup """
+  
   def __init__(self):
-    
-    # images = slice_image_into_tiles('Letters_blank.jpg', 6, 5)
-    # characters = '__abcd_efghijklmnopqrstuv wxyz*'
-    # IMAGES ={characters[j]:pil2ui(images[j]) for j in range(1,30)}
-    # test
-    # for d,i in IMAGES.items():
-    # print(d), i.show()
+    # base path is parent of current directory
+    base_path = os.path.dirname(os.path.dirname(__file__))
     self.PLAYER_1 = ' '
     self.PLAYER_2 = '@'
     self.EMPTY = ' '
     self.PIECE_NAMES = 'abcdefghijklmnopqrstuvwxyz0123456789. '
-    self.PIECES = [f'../gui/tileblocks/{k}.png' for k in self.PIECE_NAMES[:-2]]
-    self.PIECES.append('../gui/tileblocks/@.png')
-    self.PIECES.append('../gui/tileblocks/_.png')
+    self.PIECES = [os.path.join(base_path, 'gui', 'tileblocks', f'{k}.png') for k in self.PIECE_NAMES[:-2]]
+    self.PIECES.append(os.path.join(base_path, 'gui', 'tileblocks', '@.png'))
+    self.PIECES.append(os.path.join(base_path, 'gui', 'tileblocks', '_.png'))
     self.PLAYERS = None
-
+    
                                                      
-SOUND = True
-# WORDLISTS = [ 'wordlists/letters5.txt']
-WORDLISTS = ['wordlists/5000-more-common.txt']  # 'wordlists/letters3.txt', 'wordlists/letters10.txt']
-  
-
 class LetterGame():
+  """ Base Class for a series of letter based word games """
   
   def __init__(self, **kwargs):
     self.debug = False
@@ -360,7 +340,6 @@ class LetterGame():
     self.log_moves = True
     self.straight_lines_only = False
     self.word_dict = None
-    self.remaining_ships = [[]]
     self.column_labels_one_based = False
     # create game_board and ai_board
     self.SIZE = self.get_size()
@@ -373,10 +352,11 @@ class LetterGame():
     self.gui.set_grid_colors(grid='lightgrey', highlight='lightblue')
     self.gui.require_touch_move(False)
     self.gui.allow_any_move(True)
+    self.gui.gs.one_based_labels = self.column_labels_one_based
+    
     for k, v in kwargs.items():
       setattr(self, k, v)
-    if self.column_labels_one_based:
-      self.gui.gs.column_labels = '1 2 3 4 5 6 7 8 9 10111213141516171819202122232425262728293031'
+    
     self.gui.setup_gui(log_moves=True)
     
     # menus can be controlled by dictionary of labels and functions without parameters
@@ -387,10 +367,11 @@ class LetterGame():
     self.max_depth = 4
     self.word_counter = None
     self.all = [[j, i] for i in range(self.sizex) for j in range(self.sizey) if self.board[j][i] == EMPTY]
-    # self.gui.valid_moves(self.all, message=None)
-    # self.toggle_density_chart = False # each call to density chart will switch on and off
+    
     self.load_words(word_length=self.sizex)
     self.word_locations = []
+    self.length_matrix()
+    self.compute_intersections()
     
   #  Main Game loop #######s#
   
@@ -616,8 +597,7 @@ class LetterGame():
     # read the entire wordfile as text
     with open(f'{file_list}', "r", encoding='utf-8') as f:
       data = f.read()
-    # yaml read not working, so parse file,
-    # removing hyphens and spaces
+    
     data = data.replace('-', ' ')
     data_list = data.split('\n')
     w_dict = {}
@@ -763,19 +743,17 @@ class LetterGame():
       if self.debug:
           print(f'Wordlist length {length} is {len(self.all_word_dict[length])}')
       
-  def check_hit(self, rc):
-    pass
   
+  def uniquify(self, moves):
+      """ filters list into unique elements retaining order"""
+      return list(dict.fromkeys(moves))
+        
   def predict_direction(self, move):
       ''' take a asequence of coordinates and predict direction (N, S,E,W etc)'''
       def sign(x):
         return (x > 0) - (x < 0)
-        
-      def uniquify(moves):
-        """ filters list into unique elements retaining order"""
-        return list(dict.fromkeys(moves))
-      
-      move = uniquify(move)
+           
+      move = self.uniquify(move)
       start = move[0]
       st_r, st_c = start
       end = move[-1]
@@ -799,10 +777,7 @@ class LetterGame():
     """ process the turn
     """
     # self.delta_t('start process turn')
-    def uniquify(moves):
-      """ filters list into unique elements retaining order"""
-      return list(dict.fromkeys(moves))
-          
+    
    # try to deal with directions
     if isinstance(move, list):
         # lets count no of unique coordinates to see how long on each square
@@ -811,7 +786,7 @@ class LetterGame():
           move = self.predict_direction(move)
         else:
           pass
-          move = uniquify(move)
+          move = self.uniquify(move)
         
         try:
             word = ''.join([board[rc[0]][rc[1]] for rc in move if isinstance(rc, tuple)])
@@ -839,15 +814,6 @@ class LetterGame():
                      for rc in moves]
       self.gui.add_numbers(square_list, clear)
     return
-    # random colours for testing
-    square_list = []
-    for r in range(self.sizey):
-      for c in range(self.sizex):
-        rc = r, c
-        square_list.append(Squares(rc, '',
-                                   random.choice(['orange', 'green', 'clear', 'cyan', 'yellow']),
-                                   z_position=30, alpha=.5))
-    self.gui.add_numbers(square_list)
     
   def get_size(self, size=None):
     # size can override board size
@@ -966,9 +932,14 @@ class LetterGame():
       return None
       
   def dirs(self, board, y, x, length=None):
-      # fast finding of all directions from starting location
-      # optional masking of length
-      # TODO change to finding coordinates, then use those to slice
+      """fast finding of all directions from starting location
+      optional masking of length
+      TODO change to finding coordinates, then use those to slice
+      readability is sacrificed for speed
+      
+      """
+      # get all indices  of board 
+      #[[[r0, c0], [r1, c0].. ], [[r0, c1], [r1, c1] ]] etc
       a = np.array(board)
       a = np.indices(a.shape).transpose()
       e = a[y, x:]

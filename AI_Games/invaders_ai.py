@@ -1,8 +1,18 @@
 # Simple Galaxian game for Pythonista using the scene module
+# i am going to try to make this as accurate as possible
+# - add more accurate flight paths
+# - react to loss of flagship
+# flagship flees to next wave (max 2)
+# get more aggressive as wave increases.
+# get more chargers as wave increases ( max 7 at any one time)
 
 import scene
 import random
 import math
+from scene import Texture
+import ui
+from operator import attrgetter
+from time import sleep
 
 # --- Game Constants ---
 SCREEN_WIDTH = 768
@@ -10,41 +20,43 @@ SCREEN_HEIGHT = 1024
 PLAYER_SPEED = 300
 PLAYER_SHOOT_COOLDOWN = 0.5
 
-INVADER_FORMATION_SPEED = 60
-INVADER_DIVE_SPEED = 300
-INVADER_RETURN_SPEED = 150
-INVADER_BULLET_SPEED = 250
-INVADER_ROWS = 5
-INVADER_COLUMNS = 8
-INVADER_SPACING_X = 70 # Spacing between invaders in formation
-INVADER_SPACING_Y = 60 # Spacing between invaders in formation
-INVADER_START_Y = SCREEN_HEIGHT - 200 # Starting Y position for invader formation
-INVADER_FORMATION_MOVE_DIRECTION = 1 # 1 for right, -1 for left
-INVADER_FORMATION_MOVE_DOWN_AMOUNT = 30
-INVADER_FORMATION_MOVE_INTERVAL = 1.5 # Time before invaders change direction/move down
+CONVOY_SPEED = 60
+DIVE_SPEED = 300
+RETURN_SPEED = 150
+BULLET_SPEED = 250
+ROWS = 5
+COLUMNS = 10
+SPACING_X = 70 # Spacing between invaders in convoy
+SPACING_Y = 60 # Spacing between invaders in convoy
+START_Y = SCREEN_HEIGHT - 120 # Starting Y position for invader convoy
+CONVOY_MOVE_DIRECTION = 1 # 1 for right, -1 for left
+CONVOY_MOVE_DOWN_AMOUNT = 0 # the convoy does mot move down
+CONVOY_MOVE_INTERVAL = 1.5 # Time before invaders change direction/move down
+INVADER_MOVE_INTERVAL = 0.3 # Time before invaders change image
 
 BULLET_SIZE = 10
-BULLET_SPEED = 250
-PLAYER_SIZE = 60
-INVADER_SIZE = 40
+INVADER_BULLET_SPEED = 250
+PLAYER_SIZE = 80
+INVADER_SIZE = 70
 INVADER_BULLET_SIZE = 15
 
 # Invader states
-INVADER_STATE_FORMATION = 'formation'
-INVADER_STATE_DIVING = 'diving'
-INVADER_STATE_RETURNING = 'returning'
+STATE_CONVOY = 'convoy'
+STATE_CHARGER = 'charging'
+STATE_RETURNING = 'returning'
 
-
+LIVES = 3
   
 # --- Game Classes ---
 
 class Player(scene.SpriteNode):
-    def __init__(self, position=(SCREEN_WIDTH/2, 50), **kwargs):
+    def __init__(self, position=(SCREEN_WIDTH/2, 150), **kwargs):
         # Use a simple shape or color for the player (can replace with image)
-        super().__init__('spc:PlayerShip1Blue', position=position, color='#00ff00', size=(PLAYER_SIZE, PLAYER_SIZE), **kwargs)
+        super().__init__('ship.png', position=position, size=(PLAYER_SIZE, PLAYER_SIZE), **kwargs)
         self.speed = PLAYER_SPEED
         self.can_shoot = True
         self._shoot_timer = 0
+        self.lives = LIVES
 
     def update(self, dt):
         # Handle shooting cooldown
@@ -69,82 +81,163 @@ class Player(scene.SpriteNode):
         return None
 
 class Invader(scene.SpriteNode):
-    def __init__(self, position, formation_position, invader_type, **kwargs):
-        # Use a simple shape or color based on invader type (can replace with images)
-        colors = ['#ff0000', '#ffff00', '#00ffff', '#ff00ff'] # Red, Yellow, Cyan, Magenta
-        shapes = ['spc:EnemyRed2', 'spc:EnemyBlue2', 'spc:EnemyGreen1', 'spc:EnemyRed2'] # Circle, Square, Triangle, Star
-        color = colors[invader_type % len(colors)]
-        shape = shapes[invader_type % len(shapes)]
-
-        super().__init__(shape, position=position, color=color, size=(INVADER_SIZE, INVADER_SIZE), **kwargs)
-        self.formation_position = formation_position # Original position in formation
-        self.invader_type = invader_type
-        self.state = INVADER_STATE_FORMATION
-        self.dive_target = None # Player position when dive started
-        self.return_target = None # Position to return to in formation
-        self.score_value = (invader_type + 1) * 10 # Basic scoring based on type
+ 
+    def __init__(self, position, convoy_position, invader_type, location=None, **kwargs):
         
+        scores = {'Blue': 30, 'Purple': 40, 'Red': 50, 'Flagship': 60}
+        self.types = {'Blue': [Texture('galax1a.png'), Texture('galax1b.png')], 
+                      'Purple': [Texture('galax2a.png'), Texture('galax2b.png')], 
+                      'Red': [Texture('galax3a.png'), Texture('galax3b.png')], 
+                      'Flagship': [Texture('galax5.png'), Texture('galax5.png')]}
+        
+        
+        self.alien_type = random.randint(0,1)
+        shape = self.types[invader_type][self.alien_type]
+
+        super().__init__(shape, position=position,color='white', size=(INVADER_SIZE, INVADER_SIZE), **kwargs)
+        self.convoy_position = convoy_position # Original position in convoy
+        self.invader_type = invader_type
+        self.state = STATE_CONVOY
+        self.started_charge = False
+        self.alien_timer = INVADER_MOVE_INTERVAL 
+        self.charge_target = None # Player position when charge started
+        self.return_target = None # Position to return to in convoy
+        self.escort = 0 # escort 1, 2 or 0
+        self.score_value = scores[invader_type] # Basic scoring based on type
+
+           
     def normalize(self, a):
          # convert to -1, 0, 1
          return scene.Point(*tuple([0 if x == 0 else int(x/abs(x)) for x in a]))
          
-    def update(self, dt, formation_move_direction):
-        if self.state == INVADER_STATE_FORMATION:
-            # Move horizontally in formation
-            self.position = (self.position.x + formation_move_direction * INVADER_FORMATION_SPEED * dt, self.position.y)
-            # Update formation position based on horizontal movement
-            self.formation_position = (self.formation_position[0] + formation_move_direction * INVADER_FORMATION_SPEED * dt, self.formation_position[1])
-
-        elif self.state == INVADER_STATE_DIVING:
-            # Move towards the dive target (player position when dive started)
-            if self.dive_target:
-                move_vector = self.normalize(scene.Point(self.dive_target.x - self.position.x, self.dive_target.y - self.position.y))
-                self.position = (self.position.x + move_vector.x * INVADER_DIVE_SPEED * dt, self.position.y + move_vector.y * INVADER_DIVE_SPEED * dt)
-
+    def distance(self, point_a, point_b):
+        return math.hypot(*(point_a - point_b))
+        
+    def bezier_curve(self, p0, p1, p2, p3, p4,  t, pz=1.0):
+        """Quartic Bézier curve function.
+      Args:
+          all p are numpy array(x,y)
+          p0 and p4 are the start and end points of the curve.
+          p1 and p3 are the control points that define the shape and curvature of the line.          
+          p2 controls the flatness
+          t is a parameter that varies from 0 to 1, tracing the curve.
+             
+             p1
+                   p2      
+                          p3            
+           p0      |        p4
+        """
+        
+        return (1 - t)**4 * p0 + 4 * (1 - t)**3 *t * p1 + 6 * (1 - t)**2 * t**2 * p2 + 4*t**3 * (1-t) * p3 + t**4 * p4
+            
+    def charger_logic(self, dt):
+        # TODO Modify attack strategies for each type
+        # use bezier curves to mimic original
+        # original had some rotation also
+        escort_offset = {0: scene.Point(0, 0), 1: scene.Point(0, -SPACING_Y), 2: scene.Point(SPACING_X*.75, -SPACING_Y)}
+        # move vector is set at beginning only
+        if self.started_charge:
+            self.move_vector = self.normalize(self.charge_target - self.position)
+            self.started_charge = False
+        match self.invader_type:
+            case 'Blue':
+                # When they charge, their maneuvers tend to be fairly simple
+                # leave the convoy (takes roughly a second);
+                # orient themselves on your position *after* that;
+                # move in your direction at a set angle which isn't very wide;
+                # typically drop 3 or 4 shots, which move in the same direction the alien does;
+                # cannot turn around once their maneuver has begun;
+                self.position = self.position + self.move_vector * DIVE_SPEED * dt
+                #self.rotation = math.pi/2
+            case 'Purple':
+                # move at much wider angles and also tend to turn around during their descend,
+                #- slow down about halfway their maneuver and then turn in the other direction;
+                #- will always perform this turn regardless of where your craft is;
+                #- typically fire 4 shots, one or two of which fall during their turning point;
+                #- aim all their shots in the direction they initially turned in;
+                # - usually stop firing after they make their turn;
+                self.position = self.position + self.move_vector * DIVE_SPEED * dt
+                #print(self.invader_type, self.position)
+            case 'Red':
+                # on their own
+                # maneuvers which are not as wide as those of the purple Galaxians, but more erratic and harder to predict
+                # need know escort=1, escort=2 or single escort=0            
+                if self.parent.flagship: # formate on flagship                                       
+                    self.position = self.parent.flagship.position + escort_offset[self.escort]
+                else:
+                    self.position = self.position + self.move_vector * DIVE_SPEED * dt  
+            case 'Flagship':                
+                self.position = self.position + self.move_vector * DIVE_SPEED * dt
+                
+        
+    def gone_offscreen(self):
+       # trigger offscreen if charging and below convoy
+       if self.bbox.min_y > self.parent.convoy_base:
+          return False
+       if self.bbox.min_y <= INVADER_SIZE/2:
+          return True
+       if self.bbox.min_x <= 0 or self.bbox.max_x > SCREEN_WIDTH:
+          return True
+       return False
+                   
+        
+    def update(self, dt, convoy_move_direction):
+        # Update convoy position based on horizontal movement
+        self.convoy_position = (self.convoy_position[0] + convoy_move_direction * CONVOY_SPEED * dt, self.convoy_position[1])
+        if self.state == STATE_CONVOY:
+            # Move horizontally in convoy
+            self.position = (self.position.x + convoy_move_direction * CONVOY_SPEED * dt, self.position.y)
+            
+            
+        elif self.state == STATE_CHARGER:
+            # Move towards the charge target (player position when charge started)            
+            if self.charge_target:
+                self.charger_logic(dt)
                 # Check if invader is off-screen or passed the player
-                if self.position.y < -INVADER_SIZE or self.position.y > SCREEN_HEIGHT + INVADER_SIZE or \
-                   self.position.x < -INVADER_SIZE or self.position.x > SCREEN_WIDTH + INVADER_SIZE:
-                    # If off-screen after diving, remove it (or make it return)
-                    # For simplicity, let's remove for now. A real Galaxian would return.
-                    self.remove_from_parent()
+                if self.gone_offscreen():                    
+                    # If off-screen after charging, remove it (or make it return)
+                    self.start_return()
                     return True # Indicate removal
 
-        elif self.state == INVADER_STATE_RETURNING:
-            # Move back towards formation position
+        elif self.state == STATE_RETURNING:
+            # Move back towards convoy position
+            # appear at top and move down  to original position
             if self.return_target:
                 # Simple linear return for now
-                move_vector = self.normalize(scene.Point(self.return_target[0] - self.position.x, self.return_target[1] - self.position.y))
-                self.position = (self.position.x + move_vector.x * INVADER_RETURN_SPEED * dt, self.position.y + move_vector.y * INVADER_RETURN_SPEED * dt)
+                self.position = (self.position.x, self.position.y - RETURN_SPEED * dt)
 
-                # Check if invader is close to formation position
-                if self.position.distance(scene.Point(*self.return_target)) < 10: # Threshold
-                    self.position = scene.Point(*self.return_target) # Snap to position
-                    self.state = INVADER_STATE_FORMATION # Return to formation state
-                    self.return_target = None # Clear return target
-                    self.formation_position = scene.Point(*self.return_target) # Reset formation position
-
+                # Check if invader is close to convoy position
+                if self.distance(self.position, self.convoy_position) < INVADER_SIZE*2: # Threshold
+                    self.position = self.convoy_position # Snap to position
+                    self.state = STATE_CONVOY # Return to convoy state
+                    
+        self.alien_timer -= dt
+        if self.alien_timer <= 0:
+              self.alien_timer = INVADER_MOVE_INTERVAL 
+              self.alien_type = not self.alien_type
+              self.texture = self.types[self.invader_type][self.alien_type]
+              self.size=(INVADER_SIZE, INVADER_SIZE)
         return False # Indicate not removed
 
-    def move_down(self):
-        # Move the invader down in formation
-        self.position = (self.position.x, self.position.y - INVADER_FORMATION_MOVE_DOWN_AMOUNT)
-        self.formation_position = (self.formation_position[0], self.formation_position[1] - INVADER_FORMATION_MOVE_DOWN_AMOUNT)
+   
+    def start_charge(self, target_position):
+        # Start the charging attack
+        self.state = STATE_CHARGER
+        self.started_charge = True
+        self.charge_target = target_position
+        # Remove from the main invaders list in the game scene to avoid convoy logic
+        if self in self.parent.convoy:
+            self.parent.convoy.remove(self)
 
-    def start_dive(self, target_position):
-        # Start the diving attack
-        self.state = INVADER_STATE_DIVING
-        self.dive_target = target_position
-        # Remove from the main invaders list in the game scene to avoid formation logic
-        if self in self.parent.invaders:
-            self.parent.invaders.remove(self)
-
-    def start_return(self, target_position):
-        # Start returning to formation
-        self.state = INVADER_STATE_RETURNING
-        self.return_target = target_position
-        # Add back to the main invaders list in the game scene
-        if self not in self.parent.invaders:
-             self.parent.invaders.append(self)
+    def start_return(self):
+        # Start returning to convoy
+        self.state = STATE_RETURNING
+        self.return_target = scene.Point(*self.convoy_position)
+        # position at top of screen in line with convoy position
+        self.position = scene.Point(self.return_target.x, SCREEN_HEIGHT - 50)
+        # Add back to the main convoy list in the game scene
+        if self not in self.parent.convoy:
+             self.parent.convoy.append(self)
 
 
 class PlayerBullet(scene.SpriteNode):
@@ -172,9 +265,10 @@ class InvaderBullet(scene.SpriteNode):
 
 class Game(scene.Scene):
     def setup(self):
+        for child in self.children:
+          child.remove_from_parent()
         # Set up the game scene
         self.background_color = '#000000' # Black background
-
         # Add a starry background (simple dots)
         self.stars = []
         for _ in range(100):
@@ -189,27 +283,19 @@ class Game(scene.Scene):
         self.player = Player()
         self.add_child(self.player)
 
-        # Create invaders in formation
-        self.invaders = [] # Invaders currently in formation
-        self.diving_invaders = [] # Invaders currently diving/returning
-        self.invader_move_direction = INVADER_FORMATION_MOVE_DIRECTION
-        self.invader_formation_move_timer = 0 # Timer to control invader horizontal movement
-        self.invader_formation_move_interval = INVADER_FORMATION_MOVE_INTERVAL
+        # Create invaders in convoy
+        self.convoy = [] # Invaders currently in convoy
+        self.charging_invaders = [] # Invaders currently charging/returning
+        self.invader_move_direction = CONVOY_MOVE_DIRECTION
+        self.invader_convoy_move_timer = 0 # Timer to control invader horizontal movement
+        self.invader_convoy_move_interval = CONVOY_MOVE_INTERVAL
 
-        self.invader_dive_timer = 0 # Timer to control when invaders dive
-        self.invader_dive_interval = 3.0 # Time before an invader might dive
-
-        for row in range(INVADER_ROWS):
-            for col in range(INVADER_COLUMNS):
-                # Calculate formation position
-                formation_x = (col - INVADER_COLUMNS / 2 + 0.5) * INVADER_SPACING_X + SCREEN_WIDTH / 2
-                formation_y = INVADER_START_Y - row * INVADER_SPACING_Y
-                formation_position = (formation_x, formation_y)
-
-                invader = Invader(position=formation_position, formation_position=formation_position, invader_type=row)
-                self.add_child(invader)
-                self.invaders.append(invader)
-
+        self.invader_charge_timer = 0 # Timer to control when invaders charge
+        self.invader_charge_interval = 3.0 # Time before an invader might charge
+        self.reset_wave()
+                   
+        self.convoy_base = min(self.convoy, key=lambda inv: inv.position.y).position.y
+        self.flagship = None
         # List to hold active bullets
         self.player_bullets = []
         self.invader_bullets = []
@@ -226,10 +312,80 @@ class Game(scene.Scene):
         # Game state
         self.game_over = False
         self.game_over_label = None
-
+        
+        # Waves
+        self.wave = 1
+        self.wave_flags = [scene.SpriteNode('emj:Triangular_Flag', position=(800, 50), parent=self)]
         # Load sounds (replace with actual sound files if you have them)
         # scene.play_effect('arcade:Explosion_1') # Example sound effect
+        # lives
+        self.lives = LIVES
+        self.life_icon = [None] * LIVES
+        for life in range(self.lives):
+         self.life_icon[life] = scene.SpriteNode('ship.png', size=(50,50), position=(50+60*life, 50), parent=self)
+         
+    def reset_wave(self): 
+        for child in self.children:
+          if isinstance(child,  Invader):
+              child.remove_from_parent()  
+              
+        invader_locs = {'Blue': [(5-r, c) for c in range(COLUMNS) for r in range(3)], 
+                        'Purple': [(2, c+1) for c in range(COLUMNS-2)],
+                        'Red': [(1, c+2) for c in range(COLUMNS-4)],
+                        'Flagship': [(0, 3), (0, COLUMNS-4)]
+                        }
+        for type, locs in invader_locs.items():
+            for loc in locs:
+                row, col = loc            
+                # Calculate convoy position
+                convoy_x = (col - COLUMNS / 2 + 0.5) * SPACING_X + SCREEN_WIDTH / 2
+                convoy_y = START_Y - row * SPACING_Y
+                convoy_position = (convoy_x, convoy_y)
 
+                invader = Invader(position=convoy_position, convoy_position=convoy_position, invader_type=type)
+                self.add_child(invader)
+                self.convoy.append(invader)
+            
+    def select_invader_type(self, invader_type):
+        # return subset of convoy invaders which match invader_type
+        return [invader for invader in self.convoy if invader.invader_type == invader_type]   
+            
+    def select_charger(self):
+        # select either blue or purple or flagship
+        # find leftmost& backmost and rightmost& backmost                    
+        charger = random.choices(['Blue', 'Purple', 'Flagship'], weights=(10,10,3),  k=1)[0]
+        
+        if charger == 'Flagship' and self.select_invader_type(charger) is None:
+            self.flagship = None
+            charger = 'Red'
+        escorts = []
+        leftright = random.choice([False, True])
+        match charger:
+            case 'Blue' | 'Purple' | 'Red':
+                # Find the outside and rearmost invaders in convoy of selected type
+                invaders = sorted(self.select_invader_type(charger), key=attrgetter('position.y'), reverse=True)
+                invaders = sorted(invaders, key=attrgetter('position.x'), reverse=leftright)
+                if invaders:
+                   invader = invaders[0]
+                   invader.escort = 0 # just for Red
+                else:
+                  return None, []
+             
+            case 'Flagship':
+                invaders = self.select_invader_type(charger)
+                invaders = sorted(invaders, key=attrgetter('position.x'), reverse=leftright)
+                if invaders:
+                   invader = invaders[0]
+                   self.flagship = invader
+                   # escorts
+                   escorts = self.select_invader_type('Red')
+                   if escorts:
+                       # get max 2 escorts
+                       escorts = sorted(escorts, key=attrgetter('position.x'), reverse=leftright)[:2]
+                else:
+                  return None, []                               
+        return invader, escorts
+     
     def update(self):
         if self.game_over:
             return # Stop updating if game is over
@@ -243,55 +399,59 @@ class Game(scene.Scene):
             move_direction += 1
         self.player.move(move_direction, self.dt)
 
-        # --- Invader Formation Movement ---
-        self.invader_formation_move_timer += self.dt
-        if self.invader_formation_move_timer >= self.invader_formation_move_interval:
-            self.invader_formation_move_timer = 0
+        # --- Invader Convoy Movement ---
+        self.invader_convoy_move_timer += self.dt
+        if self.invader_convoy_move_timer >= self.invader_convoy_move_interval:
+            self.invader_convoy_move_timer = 0
 
-            # Check if invaders in formation hit screen edge
+            # Check if invaders in convoy hit screen edge
             hit_edge = False
-            if self.invaders: # Only check if there are invaders in formation
-                # Find the leftmost and rightmost invaders in formation
-                leftmost_invader = min(self.invaders, key=lambda inv: inv.position.x)
-                rightmost_invader = max(self.invaders, key=lambda inv: inv.position.x)
+            if self.convoy: # Only check if there are invaders in convoy
+                # Find the leftmost and rightmost invaders in convoy
+                leftmost_invader = min(self.convoy, key=lambda inv: inv.position.x)
+                rightmost_invader = max(self.convoy, key=lambda inv: inv.position.x)
 
                 if leftmost_invader.position.x <= INVADER_SIZE/2 or rightmost_invader.position.x >= SCREEN_WIDTH - INVADER_SIZE/2:
                     hit_edge = True
 
             if hit_edge:
                 self.invader_move_direction *= -1 # Reverse direction
-                # Move all invaders (including diving/returning ones) down
-                for invader in self.invaders + self.diving_invaders:
-                    invader.move_down() # Move down
 
-
-        # Update invaders (formation and diving/returning)
+        # Update invaders (convoy and charging/returning)
         invaders_to_remove = []
-        for invader in self.invaders + self.diving_invaders:
+      
+      
+        for invader in self.convoy + self.charging_invaders:
             removed = invader.update(self.dt, self.invader_move_direction)
             if removed:
                 invaders_to_remove.append(invader)
 
-        # Remove invaders that went off-screen after diving
+        # Remove invaders that went off-screen after charging
         for invader in invaders_to_remove:
-            if invader in self.diving_invaders:
-                self.diving_invaders.remove(invader)
+            if invader in self.charging_invaders:
+                self.charging_invaders.remove(invader)
 
 
         # --- Invader Diving Logic ---
-        self.invader_dive_timer += self.dt
-        if self.invader_dive_timer >= self.invader_dive_interval and self.invaders:
-            self.invader_dive_timer = 0
-            # Randomly select an invader from the formation to dive
-            diving_invader = random.choice(self.invaders)
-            diving_invader.start_dive(self.player.position) # Dive towards current player position
-            self.diving_invaders.append(diving_invader) # Add to diving list
-
+        self.invader_charge_timer += self.dt
+        if self.invader_charge_timer >= self.invader_charge_interval and self.convoy:
+            self.invader_charge_timer = 0
+            charging_invader, escorts = self.select_charger()
+            if charging_invader:
+                charging_invader.start_charge(self.player.position) # Dive towards current player position
+                self.charging_invaders.append(charging_invader) # Add to charging list
+            if escorts:
+               for i, escort in enumerate(escorts):
+                   escort.escort = i + 1
+                   escort.start_charge(self.player.position) # Dive towards current player position
+                   self.charging_invaders.append(escort) # Add to charging list
+                
         # --- Invader Shooting (Simple: Diving invaders shoot) ---
-        for invader in self.diving_invaders:
-            # Simple random chance to shoot while diving
+        for invader in self.charging_invaders:
+            # Simple random chance to shoot while charging
             if random.random() < 0.005: # Adjust probability
                 bullet = InvaderBullet(position=invader.position)
+                
                 self.add_child(bullet)
                 self.invader_bullets.append(bullet)
 
@@ -317,8 +477,8 @@ class Game(scene.Scene):
         hit_invaders = []
         hit_player_bullets = []
         for bullet in self.player_bullets:
-            # Check against invaders in formation
-            for invader in self.invaders:
+            # Check against invaders in convoy
+            for invader in self.convoy:
                 if bullet.frame.intersects(invader.frame):
                     hit_invaders.append(invader)
                     hit_player_bullets.append(bullet)
@@ -327,12 +487,12 @@ class Game(scene.Scene):
                     # scene.play_effect('arcade:Explosion_1') # Play hit sound
                     break # Bullet can only hit one invader
 
-            # Check against diving invaders
-            for invader in self.diving_invaders:
+            # Check against charging invaders
+            for invader in self.charging_invaders:
                  if bullet.frame.intersects(invader.frame):
                     hit_invaders.append(invader)
                     hit_player_bullets.append(bullet)
-                    self.score += invader.score_value * 2 # Maybe bonus for hitting diving invader
+                    self.score += invader.score_value * 2 # Maybe bonus for hitting charging invader
                     self.score_label.text = str(self.score)
                     # scene.play_effect('arcade:Explosion_1') # Play hit sound
                     break # Bullet can only hit one invader
@@ -344,17 +504,17 @@ class Game(scene.Scene):
             for bullet in self.invader_bullets:
                 if bullet.frame.intersects(self.player.frame):
                     hit_invader_bullets.append(bullet)
-                    self.end_game("Game Over!")
+                    self.end_wave("hit")
                     # scene.play_effect('arcade:Explosion_2') # Play player hit sound
                     break # Player hit by one bullet is enough
 
 
         # Remove hit invaders and bullets
         for invader in set(hit_invaders):
-            if invader in self.invaders:
-                self.invaders.remove(invader)
-            elif invader in self.diving_invaders:
-                 self.diving_invaders.remove(invader)
+            if invader in self.convoy:
+                self.convoy.remove(invader)
+            elif invader in self.charging_invaders:
+                 self.charging_invaders.remove(invader)
             invader.remove_from_parent()
 
         for bullet in set(player_bullets_to_remove + hit_player_bullets):
@@ -369,14 +529,9 @@ class Game(scene.Scene):
 
 
         # --- Check Game Over/Win Conditions ---
-        if not self.invaders and not self.diving_invaders: # Win if all invaders are gone
-            self.end_game("You Win!")
-        else:
-            # Check if invaders in formation reached player level
-            if self.invaders:
-                lowest_invader = min(self.invaders, key=lambda inv: inv.position.y)
-                if lowest_invader.position.y <= self.player.position.y + PLAYER_SIZE/2:
-                    self.end_game("Game Over!")
+        if not self.convoy and not self.charging_invaders: # Win if all invaders are gone
+            self.end_wave("complete")
+        
 
 
     def touch_began(self, touch):
@@ -422,12 +577,35 @@ class Game(scene.Scene):
            (self.moving_right and touch.location.x >= SCREEN_WIDTH / 2):
             self.moving_left = False
             self.moving_right = False
-
-
-    def end_game(self, message):
-        self.game_over = True
-        self.game_over_label = scene.LabelNode(message, font=('Press Start 2P', 50), position=(SCREEN_WIDTH/2, SCREEN_HEIGHT/2), color='#ffffff')
-        self.add_child(self.game_over_label)
+            
+    @ui.in_background     
+    def explosion(self, pos):
+      expl = scene.SpriteNode('shp:Explosion01', position=pos, parent=self)
+      for i in range(1,8):
+       sleep(.1)
+       imgname= f'shp:Explosion{i:02d}'
+       expl.texture = Texture(imgname)
+      expl.remove_from_parent()
+     
+    @ui.in_background
+    def end_wave(self, reason=None):
+        if reason == 'hit':
+           self.player.lives -= 1
+           self.explosion(self.player.position)
+           self.life_icon.pop().remove_from_parent()
+           if self.player.lives == 0:
+               self.game_over = True
+               self.game_over_label = scene.LabelNode('Game Over', font=('Press Start 2P', 50), position=(SCREEN_WIDTH/2, SCREEN_HEIGHT/2), color='#ffffff', parent=self)
+            
+        elif reason == 'complete':
+            self.wave += 1
+            self.wave_flags.append(scene.SpriteNode('emj:Triangular_Flag', position=(800+20*self.wave, 50), parent=self))
+            self.reset_wave()
+        
+        # add lives code
+        
+        
+        
         # You could add a restart button here
 
 # --- Run the game ---

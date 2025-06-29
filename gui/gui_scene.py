@@ -122,6 +122,7 @@ class GameBoard(Scene):
     self.highlight_fill = '#00bc10'
     self.use_alpha = True
     self.column_labels = None # an iterator
+    self.one_based_labels = False
     self.require_touch_move = False
     self.allow_any_square = False
     self.last_board =  [list(row) for row in self.board] # copy
@@ -333,12 +334,12 @@ class GameBoard(Scene):
                 continue
             yield char1 + char2
             
-  def two_digit_number_generator(self):
+  def two_digit_number_generator(self, one_based=False):
     """
     Generates two-character strings of numbers from "0 " to "99".
     """
     # First, handle single-digit numbers with a space, e.g., "0 ", "1 ", ..., "9 "
-    for i in range(10):
+    for i in range(int(one_based),10):
         yield str(i) + ' '
 
     # Then, handle two-digit numbers, e.g., "00", "01", ..., "99"
@@ -356,12 +357,12 @@ class GameBoard(Scene):
               row_labels = self.row_labels
           else:
               self.row_labels = []
-              row_labels = self.two_digit_number_generator()
+              row_labels = self.two_digit_number_generator(self.one_based_labels)
 
       if self.column_labels:
           column_labels = self.column_labels
       else:
-          column_labels = self.two_digit_number_generator()
+          column_labels = self.two_digit_number_generator(self.one_based_labels)
           self.column_labels = []
 
       for i in range(self.DIMENSION_X):

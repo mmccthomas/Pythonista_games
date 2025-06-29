@@ -1,0 +1,790 @@
+
+*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
+=                                  GALAXIAN                                   =
+*                               ARCADE VERSION                                *
+=                            FAQ / STRATEGY GUIDE                             =
+*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
+
+Author: Sashanan
+Date: 22 September 2005
+Version: 1.1
+
+DISCLAIMER
+This document is a copyright of Peter "Sashanan" Butter, 2004-2005. All
+rights reserved.
+
+You are granted permission to make copies of this FAQ (electronical or
+physical) for your own, personal use. Furthermore, non-commercial, freely
+accessible websites are allowed to upload a copy of this FAQ as long as it is
+posted in its full, original form (including this disclaimer) and credited
+to Sashanan.
+
+You are not authorized to upload this FAQ on a commercial website and/or
+charge for its viewing, or make money off it in any other imaginable way,
+without my explicit written permission. Furthermore, you are not allowed to
+edit this guide in any way, use it as a basis for your own guide, or post it
+without giving proper credit. This is considered plagiarism.
+
+This FAQ is protected by international copyright laws and failure to
+comply with the terms in this disclaimer will result in legal prosecution.
+
+
+===============================================================================
+TABLE OF CONTENTS
+===============================================================================
+
+[1] Introduction
+[2] Summary of terms
+[3] Overview
+[4] Controls
+[5] Basics
+ [5.1] Blue Galaxians
+ [5.2] Purple Galaxians
+ [5.3] Red Galaxians
+ [5.4] Flagships
+[6] Tactics
+ [6.1] Basic tactics
+ [6.2] Advanced tactics
+ [6.3] Expert tactics
+[7] Revision history
+[8] Final words
+
+===============================================================================
+[1] INTRODUCTION
+===============================================================================
+
+A direct successor to the famous Space Invaders, the 1979 arcade title Galaxian
+is a shooter that has received quite a bit of fame of its own, though it failed
+to receive the attention that either Space Invaders or its own successor,
+Galaga, did. This is a shame, because it's an awesome game. It is also very
+challenging - moreso than Galaga in my opinion - and for looking so simple,
+it takes quite a bit of skill to play properly.
+
+To help both newcoming and veteran players get used to Galaxian and find the
+kind of tactics that they, at their respective skill levels, would find useful,
+I have put together this guide and broken up the meat of it (the tactics
+section) into three parts each aimed at different skill levels. If you've
+already played Galaxian before and know the ropes, you can skip straight to the
+advanced or expert tactics, whereas if this is your first time playing it, you
+can start at the bottom and move up as your scores start to improve. I have
+done my best to be as complete as possible and make sure that everything you
+need to know is in there.
+
+This FAQ is dedicated to Andrew Schultz, tireless old school gamer, who has
+been an inspiration for both FAQ writing and reviewing in that regard for
+several years now. It's people like him who remind me that I'm not the only one
+who still has an interest in that kind of gaming, and without that reminder
+every now and then, I'd likely have stopped writing some time ago.
+
+
+===============================================================================
+[2] SUMMARY OF TERMS
+===============================================================================
+
+I'm using a couple of game specific terms throughout this FAQ, most coined by
+the game itself, some thought up by me. Each term is explained the first time
+it's used in the FAQ, but to save you needless searching if a term ever
+confuses you, here is an easy list:
+
+CHARGER: An enemy leaving the formation to attack you.
+
+CONVOY: The formation of enemies moving left and right in the top half of the
+screen.
+
+GALAXIAN: any one of the enemies in the formation. There are four types:
+Blue, Purple and Red Galaxians, and Flagships.
+
+MELEE: the phase at the end of a level during which the few remaining enemies
+all attack at once, and more aggressively than they did before.
+
+WAVE: one level of the game, which consists of one formation of 46 Galaxians.
+
+
+===============================================================================
+[3] OVERVIEW
+===============================================================================
+
+Your goal in Galaxian is to destroy formations of alien invaders. Each
+formation (referred to by the game as the 'convoy') consists of 46 Galaxians of
+four different kinds. Every level (or 'wave') of the game consists of cleaning
+up one convoy. When this task has been accomplished, a fresh formation appears
+and a new level starts. There is no end goal to accomplish; your objective is
+simply to stay alive as long as possible, clear as many waves as you can, and
+score as many points as you are able.
+
+In the meantime, the Galaxians do their best to destroy you as well. Every so
+often, one or more Galaxians leave the convoy to make a swooping attack on you,
+during which they will fire shots and often attempt to ram you as well. If they
+leave the screen at the sides or the bottom before you shoot them down, they
+will rejoin the convoy. The game refers to these attacking Galaxians as
+'chargers', and both the frequency with which they attack and the numbers in
+which they do it increase in later waves. In the first wave, you may
+occasionally see two or three attacking, and sometimes the formation just hangs
+there and lets itself be shot at. By the time you reach the tenth wave, on the
+other hand, you will constantly be under attack by at least five enemies, and
+frequently more. Up to 15 Galaxians may attack at one time in the later waves.
+
+You control a single spaceship against the enemy and have two replacements if
+you lose the first, for a total of 3 lives. A bonus life is added if you score
+at least 5000 points, but that's the only one you'll get. You lose a life
+whenever you are hit by a Galaxian's shot or rammed by their craft, and when
+you lose your last life, it's all over.
+
+
+===============================================================================
+[4] CONTROLS
+===============================================================================
+
+Galaxian has very simple controls, which is good, because you'll need to have
+your attention on the enemy. Your ship can be moved to the left and the right
+at a constant speed by pushing the stick in the right direction, and you can
+fire shots with the single fire button that the Galaxian machine has. You are
+allowed to have only one shot on the screen at a time, which means that you
+should shoot carefully and try to make every shot count. At close range you
+will be able to fire shots quickly after one another if you make sure they hit,
+but on the other hand, if you miss at close range you will likely not have time
+to fire again and will have to avoid being rammed by the Galaxian attacking
+you.
+
+
+===============================================================================
+[5] BASICS
+===============================================================================
+
+At the beginning of every level, you are presented with an entire formation
+of galaxians, which is set up as follows:
+
+                                     F  F
+                                    RRRRRR
+                                   PPPPPPPP
+                                  BBBBBBBBBB
+                                  BBBBBBBBBB
+                                  BBBBBBBBBB
+
+The column starts in the top middle of the screen and gradually moves to the
+left or right at a set pace. When the first Galaxians reach the edge of the
+screen, the convoy reverses direction and also changes speed. It might speed up
+or slow down, but once again its speed will remain constant until it reaches
+the other edge of the screen. The convoy tirelessly keeps up this constant move
+to the left and right in order to make it harder for you to shoot them down.
+But the only threat to you comes from aliens leaving the convoy to attack you -
+the so-called chargers. They leave the formation at randomly determined times to
+swoop down and attack you, and will both attempt to shoot you and to ram you.
+
+
+The four types of enemies are blue Galaxians, purple Galaxians, red Galaxians
+and Flagships, which will be described below.
+
+
+-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+[5.1] BLUE GALAXIANS
+-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+
+The underpaid, underappreciated and numerous grunts of the Galaxian army, these
+guys are basically cannon fodder and will be the first to be destroyed by your
+shots as you start attacking the convoy. When they charge, their maneuvers tend
+to be fairly simple and not so hard to avoid, though in numbers or combined
+with other Galaxians which move in a different manner, they can still be
+quite dangerous. A blue Galaxian is worth 30 points if shot as part of the
+convoy, and 60 when shot down during a charge.
+
+
+-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+[5.2] PURPLE GALAXIANS
+-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+
+Considerably more dangerous than their blue brothers, purple Galaxians move at
+much wider angles and also tend to turn around during their descend, which can
+really take a beginning player off guard. They are also good at taking out a
+player previously driven into a corner by the tireless attacks of blue
+Galaxians, and this is in fact the most common way to lose a ship. A purple
+Galaxian is worth 40 points while in the convoy, and 80 points during a charge.
+
+
+-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+[5.3] RED GALAXIANS
+-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+
+The enemy lieutenants, red Galaxians do not normally attack on their own, but
+act as escorts for the flagships. If no flagship remains for them to escort,
+they'll attack on their own, using maneuvers which are not as wide as those
+of the purple Galaxians, but more erratic and harder to predict. They also
+tend to fire more aggressively. A red Galaxian is worth 50 points in the
+convoy and 100 during a charge.
+
+
+-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+[5.4] FLAGSHIPS
+-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+
+Each convoy is commanded by two flagships, which hang well protected in the
+back of the formation and will not attack alone if they can help it. They will
+always take two red Galaxians along as escorts if they are still available, or
+at least one if they can. If previous attacks have robbed a flagship of all
+nearby red Galaxians, it will make one attack run alone, and if it leaves the
+screen before you destroy it, it will flee and not return at the top of the
+formation. You will, however, see it again, as it will join the next wave to
+get its revenge.
+
+The value of a flagship is 60 points in the convoy. During a charge, the value
+is determined by the number of escorts it had. A solo flagship gets you 150
+points, a flagship with one escort is worth 200, and a flagship with two
+escorts is worth 300 points. However, if you manage to destroy the two escorts
+first and the flagship last (a tricky and fairly dangerous maneuver), the
+flagship's value is boosted up to 800 points. That's 1000 points for the trio,
+a fair reward.
+
+A flagship with escorts is a very dangerous opponent, as the three ships will
+pool their firepower together and make it hazardous to pass under them; also,
+they cover a much wider area than a lone Galaxian would, thus increasing the
+risk of collision. The beginning player should be well aware of the danger as
+soon as a flagship with escorts swoops down to attack.
+
+When only a few ships remain in the enemy formation, the remaining enemies will
+typically all attack at once, no longer joining the formation but pressing the
+attack. They will also engage in more aggressive and complicated maneuvers at
+this point. I like to refer to this phase as the 'melee'.
+
+An entire formation of 46 Galaxians (30 blue, 8 purple, 6 red and 2 flagships)
+can theoretically net you 4640 points. This assumes you manage to get the full
+bonuses for both flagships and attack all enemies as they charge, without
+hitting any ships in the convoy. In practice, a score between 2500 and 3000 per
+wave is more likely, with the score typically increasing in later waves because
+you'll have more enemies charging you.
+
+
+===============================================================================
+[6] TACTICS
+===============================================================================
+
+Now that you know how the game works, it's time to learn about how to play it
+properly. I've divided this tactics section up into different skill levels. The
+reason for this is that a game like this (in fact, this goes for most games) is
+a laerning process. Tactics that work for experts are simply not viable for a
+new player to pursue. You need to have gotten your feet wet and get used to
+certain approaches before you are ready try something more advanced, even if
+that's contrary to what you learned before.
+
+My suggestion is to start with the basic tactics and stick with those until you
+can comfortably reach 10000 points. At that point, move on to the advanced
+tactics. The expert tactics - which aren't as step by step, but consist mostly
+of loose advice - will be of interest to you when you can score around 20000
+or 25000 somewhat consistently.
+
+The tactics described in these sections worked for me. If through playing you
+discover different approaches that work for you - or, especially, more clearly
+defined expert tactics - I would be very interested in hearing about them and
+happy to add them to the guide.
+
+
+-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+[6.1] BASIC TACTICS
+-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+
+The basic goal in Galaxian is simple enough: destroy enemy formations and don't
+get destroyed in return. The safest way to do this is to destroy as many
+Galaxians as you can while they are still in formation, and to avoid attackers
+when possible. After all, the convoy doesn't fire at you, nor attempts to ram
+with you; only the chargers can possibly kill you.
+
+This doesn't mean, however, that it's always safest to dodge the chargers. The
+one thing that you absolutely have to watch for is being driven into a corner.
+If this happens, sooner or later some Galaxian is going to come at you at an
+unavoidable angle, or land shots that you cannot dodge. As long as you are in
+the center of the screen, there is almost always a gap to escape through even
+if several Galaxians attack. When possible, always stay near the center. That's
+the single best thing you can do to prolong your life.
+
+For cleaning up the convoy, there are four basic approaches.
+
+
+------------------
+1) COLUMN CLEANING
+------------------
+
+This technique focuses on either the lefternmost of the righternmost column of
+the formation, and is meant to make the formation take longer to reach the edge
+of the screen and reverse direction. This has two advantages:
+
+- You won't have to pass under the formation as it turns around (which leaves
+you temporarily vulnerable) as often;
+- The formation has less opportunities to adapt its speed, so you don't have to
+keep adjusting.
+
+The risk of column cleaning is that it tends to get you stuck in a corner if
+you keep it up for too long; the thing to do is to switch to the other side of
+the formation as you get closed to the edge of the screen.
+
+Apart from that little thing to watch for, column cleaning is a simple matter of
+positioning yourself just a little to the left or the right of the formation, in
+such a way that the formation is moving toward you, firing at the right time to
+get the lowest alien in the outer column, then moving along with the formation
+a little bit to line up for the next shot. Repeat until the column is clear or
+it's time to get back to the other edge of the screen.
+
+If Galaxians swoop down to attack, stop clearing the formation and pay attention
+to the new threat. Either shoot them down or avoid them. If they're on the other
+side of the screen and they are blue Galaxians, you can safely ignore them, but
+watch for purple galaxians and flagship trios which tend to come at you at much
+wider angles. The absolute deathtrap while following the column clearing method
+is to get stuck in the corner and attacked there by either a purple Galaxian or
+a flagship with escorts.
+
+
+---------------
+2) ROW CLEANING
+---------------
+
+Row cleaning is meant to take out the Galaxians closest to you first, to ensure
+that they cannot catch you off guard with quick attacks. Another advantage is
+that you are focusing on the blue Galaxians, which aren't worth many points
+anyway, and you can leave the purple and red Galaxians until they actally
+charge you. However, row cleaning can be potentially dangerous because you are
+often stationary while doing so, and it's easy to forget to start moving when
+enemies swoop down to attack.
+
+For row cleaning, stick somewhat close to the middle of the screen (about
+halfway to the edge is good, at the edge is not), shoot down the Galaxian
+directly above you, wait, and time your next shot to get the next enemy. You
+will need some practice to get the timing right, and a lot of practice to be
+able to readjust your timing when the formation turns around and changes its
+speed. An experienced player will get a feel for the formation's speed and will
+be able to adapt in a split second when it changes. Remember, the closer you
+stay to the middle with this approach, the safer you are; just make sure you
+move to take out the Galaxians on the far ends when all the ones in the middle
+are gone. If you do not, you risk being boxed in if they decide to attack
+simultaneously, and that risk increases in later waves.
+
+
+-------------------------
+3) OPPORTUNISTIC CLEANING
+-------------------------
+
+Opportunistic cleaning foregoes the advantages of cleaning by colum or row, and
+focuses on just destroying whichever enemy is convenient. The advantage is that
+you'll be able to clean enemies more quickly - you shoot at whatever is in
+your sights - and you can stay in the middle where it's safe and actively avoid
+the edges. The disadvantage is that you expose yourself to the same risk that
+shows up if you are row cleaning and not taking enough care of the enemies on
+the outside. When you are doing opportunistic cleaning, you tend to make a big
+hole in the center of the formation, but the flanks remains intact and if the
+enemy decides to attack from both sides at once, you need to respond very
+quickly in order not to get boxed in. Best approach is usually to pick one of
+the attacking enemies and shoot him down quickly, thus creating a hole for you
+to escape through.
+
+
+--------------
+4) NO CLEANING
+--------------
+
+Well, technically it's not a convoy cleaning method at all, but it's an
+approach that deserves attention. With this method, you specifically avoid
+cleaning up the convoy at all; you hold your fire and wait for Galaxians to
+charge, at which point you move in and shoot them down, ideally without
+accidentally hitting anything in the convoy. There are two advantages to this
+approach: first, you get more points since every (or nearly every) enemy you
+destroy is charging and thus worth more, and it's an excellent way to get used
+to the patterns that the aliens follow and learn how to shoot them down
+properly during a charge. This is a skill you will have to develop, and
+following the no cleaning approach from time to time as a sort of experiment
+will help you do just that. However, for longer games, the no cleaning approach
+is a dangerous one to take. Enemies can come from anywhere in the formation,
+and you'll soon learn that certain combinations (usually involving one attack
+from each side, or purple Galaxians combined with a flagship and escorts) are
+very deadly. By refusing to clean the formation at all, you are basically
+inviting the Galaxians to attack in the way they prefer, and they will be sure
+to take you up on that in the later waves.
+
+No matter which convoy cleaning method you use, you will want to give priority
+to any attacking enemies. Pay particular attention to the purple Galaxians and
+their wide movement angles, and to flagship trios with their awesome firepower.
+Don't take too much risk yet trying to destroy escorts before the flagship for
+the bonus; you can start doing that when you're more experienced. For now,
+your purpose is to survive. Avoid confrontations that you're not sure you can
+win; any enemies you let slip past you appear at the top again anyway, with
+the exception of lone flagships (and those return in the next wave).
+
+When destroying charging enemies, it pays to take them out as soon as possible.
+They'll obviously stop shooting when you've destroyed them, which makes things
+that much safer for you, and they also tend to move slowly when they just left
+the formation. The longer you wait, the harder they will be to gun down. If
+you're having a hard time nailing an elusive Galaxian, evade him and try again
+on his next run.
+
+When the melee begins - usually when there are about five Galaxians left - be
+aware that they will no longer follow their normal patterns. All four kinds of
+Galaxians will be performing more aggressive maneuvers and attempt to ram you,
+at crazy angles sometimes. Focus on whichever enemy is closest, be ready to
+evade, and stay away from the corners at all costs. Whenever possible, dodge
+toward the center of the screen, not to the side.
+
+With these tactics, you should be able to clear several waves of Galaxians and
+score up to about 10000 points.
+
+
+-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+[6.2] ADVANCED TACTICS
+-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+
+When you have a little more experience - say, when you're able to clear three
+or four waves without too much trouble - it's time to start changing your
+tactics. Start learning the exact patterns of your enemies so you can respond
+properly to every charge, and start choosing convoy cleaning methods that suit
+the situation. You will frequently change approaches in midwave depending on
+how things develop.
+
+First, let's have a closer look at the exact behavior of each type of Galaxian.
+Note that most of this doesn't apply to the melee at the end of a wave (we'll
+get to that in a bit).
+
+Blue Galaxians:
+
+- leave the convoy (takes roughly a second);
+- orient themselves on your position *after* that;
+- move in your direction at a set angle which isn't very wide;
+- won't reach you at all if you're not too close;
+- typically drop 3 or 4 shots, which move in the same direction the alien does;
+- cannot turn around once their maneuver has begun;
+- can be easily defeated by firing a shot just to the side of them so they
+will fly into it;
+- are deadly if they trap you in a corner.
+
+Purple Galaxians:
+
+- leave the convoy;
+- orient themselves on your position *after* that;
+- move in your direction at a wide angle which can span almost the entire
+screen;
+- slow down about halfway their maneuver and then turn in the other direction;
+- will always perform this turn regardless of where your craft is;
+- typically fire 4 shots, one or two of which fall during their turning point;
+- aim all their shots in the direction they initially turned in;
+- usually stop firing after they make their turn;
+- are capable of flying off screen on the side and immediately returning when
+they make their turn, but this is rare;
+- are *very* deadly if they trap you in a corner;
+- frequently box you in between them and a random blue Galaxian.
+
+Red Galaxians:
+
+- only attack on their own if they are not directly below a flagship, otherwise
+act as escorts only;
+- follow a maneuver that's wider than that of the blue Galaxians, but not as
+wide as the purple, and do not turn around;
+- fire an easy 4 or 5 shots, and do not stop shooting quite as early;
+- tend to shoot at slightly more varying angles than the other Galaxians;
+- don't tend to ram you in a corner, but *do* trap you with their shots.
+
+Flagships:
+
+- only attack on their own if no touching Red Galaxians remain;
+- will take two escorts along when possible, one if no second is available;
+- return to the formation only if they had at least one escort when they
+started their charge, otherwise flee the battle and join the next wave instead;
+- will often, with help of two escorts, fire 7 or 8 shots;
+- are worth more points if you destroy the two escorts first (no point
+difference if there are no escorts or only one);
+- act like Red Galaxians if attacking alone;
+- cause a temporary drop in morale if they are destroyed during a charge,
+resulting in ALL Galaxians holding their fire for a few seconds when a flagship
+is lost (but not if it was destroyed while in the convoy).
+
+To live through more than just the few waves, you'll need to learn exactly how
+to position yourself to destroy various Galaxians during their charge. My
+suggestions would be:
+
+Blue Galaxians: anticipate if they'll be moving left or right (based on your
+position when they're done leaving the convoy), position your ship just a
+little to their side, and fire a shot that they'll fly into. Move out of the
+way after you fired so you can be sure to avoid their return fire. If they are
+too far away, don't bother; if they're close but you can't seem to hit them,
+position your ship right under them for a last second shot (make sure your last
+shot has left the screen or you can't fire at all). This is generally safe as
+they hold their fire during their last second or so on the screen, but it does
+take guts.
+
+Purple Galaxians: try to catch them either just as they leave the formation
+(fire a shot to the side of them, farther out than with a Blue Galaxian), or
+at their turning point. You'll learn with experience when that turning point is,
+so be there right under them, fire, and move out of the way (not in the
+direction they'll turn in now!). If you fail at both shots, let them go.
+Chasing after a purple Galaxian that just turned around is typically not a good
+idea; you won't catch up, you are more likely to collide than land a shot, and
+they *might* decide to fire one more late shot to hit you with. Don't take the
+risk. The one thing you really have to watch for with purple Galaxians is that
+you don't let them drive you into a corner. They'll nail you with a shot or ram
+you from the side without ever getting just above you where you can hit them.
+If you're near the side of the screen and a purple Galaxian leaves the convoy
+to swoop down on you, get out of that corner immediately.
+
+Red Galaxians/Flagships (solo): they're not so tough on their own. Treat them
+much like Blue Galaxians, aiming just to their side, but with two differences:
+aim a little (but only a little) farther out to compensate for their wider
+maneuver, and don't try for the last minute snap shot that you might do on a
+Blue Galaxian. Reds have the nasty habit of continuing to fire even if they
+are very close, and there's no way you'll be able to dodge at that distance.
+Simply put, they'll do to you what you're trying to do to them. Just let them
+go, better luck next pass.
+
+Flagship combos: you'll have learned by now that these are nasty, but also
+profitable. The best way to take out a flagship combo depends on what you want.
+If you wish to play it safe, try to snipe the flagship first. The Reds, as well
+as all other charging Galaxians, will stop shooting instantly, shaken by the
+loss of their leader. This allows you to easily gun down at least one of the
+Reds, maybe the second; but let him go if you're not sure, now that he's on his
+own he'll be easy enough to kill on his next charge. I myself like to take
+the opportunity to take out any Purple Galaxians currently on the attack, as
+they are not nearly as scary if they're not firing back. If on the other hand
+you want the points, you need to take out the flagship last. Easiest way to
+do that is to position yourself such that you can take out the outer Red
+Galaxian first (so that only the one directly under the flagship remains), then
+fire two very quick shots to take out the remaining escort and the flagship in
+a split second. Be ready to dodge out of the way very quickly if your first
+shot misses the Red, because you won't be able to fire the second shot in this
+case.
+
+The most important thing to keep in mind when attacking flagship combos is to
+pick your battles. If you're near the edge of the screen and won't have the
+room to dodge if your shots aren't flawless, or if you're being bothered by
+attacking Blues and/or Purples at the same time, don't do it. Move out of the
+way and try it another time. 1000 points for the three of them is nice, but
+not worth a life; you only have 4 of those including the bonus life, and by now
+you are probably aiming for a little more than 4000 points over the course of
+your game.
+
+Next, let's take a look at convoy cleaning methods. You know the four basic
+approaches by now; the question now is what order to apply them in. As I see
+it, the most dangerous enemies in the formation are the Purple Galaxians, and
+particularly the outer ones as they're most likely to pin you in a corner. I
+like to start with the column cleaning method to take out the outer Blue and
+Purple Galaxians, then switch to row cleaning for the lowest row of Blues
+(which are uncomfortably close), and go for Opportunistic Cleaning after that.
+When things clear up a bit - many Blues will fall in charges too - I prioritize
+Purples. The more Purples I can clear while they are harmlessly in the convoy,
+the better. They're not worth the extra 40 points to risk their attack;
+because their maneuvers are so different from all the other Galaxians, they are
+very deadly if they come down at the same time as the different colours. And
+they will, in the later waves.
+
+When you're comfortable with the movement patterns of all your enemies, and you
+have learned to pick your battles wisely, the tricky part of each wave will be
+the melee at the end. Fortunately, there are patterns to what your enemies do
+here as well. All four types act exactly the same now, and their approach is
+as follows:
+
+- They leave the convoy if they're still in there;
+- They will not rejoin the convoy anymore, but immediately attack again when
+they reappear at the top of the screen (but they *will* rejoin if you die);
+- They will steer toward your craft at all times, turning around if you pass
+under them;
+- They will spread out their shots more, firing one at a time, but starting
+earlier and not stopping;
+- They will try to ram you with a sudden wide swing near the end of their
+maneuver;
+- If you are close by when they reach the bottom of the screen, they will turn
+a loop just above you and *then* launch themselves at you in a straight line;
+- They will not fire on you while looping.
+
+There are a couple of things you can do to maximize your chances of surviving
+a melee:
+
+- Try to gun down the Galaxian with a long range shot when it's at the top of
+the screen. Chances aren't very good, but it's safe and it does work from time
+to time;
+- Keep moving your craft left and right to keep the Galaxian guessing where to
+go next;
+- Stay close to the Galaxian; if you try to flee to the other end of the
+screen, you are only inviting them to try a wide angle ram;
+- When the Galaxian has crossed to your half of the screen, hold your fire and
+try one more short range shot when he is almost upon you to maximize your
+chance of killing. Move out of the way while you fire so that if you miss
+(chances are you will), you won't crash into him;
+- If a Galaxian decides to loop, he's inviting you to kill him. Position your
+craft under him and shoot him down;
+- If at all possible, take out all enemy flagships, or all Red Galaxians,
+before the melee starts. The one thing you really don't need is a flagship
+combo going melee on you. If this means forfeiting the bonus, so be it.
+
+If you master these tactics, you should be able to clear about 8 waves and
+score between 20000 and 25000. This *will* take time and lots of practice.
+
+
+-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+[6.3] EXPERT TACTICS
+-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+
+When you get to or past the 10th wave, simple quick reflexes and basic tactics
+simply won't always work anymore. Enemies attack in such numbers that you
+will frequently get trapped, not just in the corners but in the middle of the
+screen as well. You'll rarely have enough time to do any serious convoy
+cleaning, and find yourself forced to go for opportunistic cleaning or even no
+cleaning at all as you are constantly under attack. The mark of an expert
+Galaxian player is that he can not just flawlessly shoot down any charger that
+threatens him, but he can also anticipate situations before they occur, and
+shoot down exactly those Galaxians he needs to have a hole to escape through.
+
+As long as you don't get stuck in a corner, there is never a situation that
+you can't escape from; *unless* you fail to recognize in time what you need
+to do. If they're almost upon you, you may well be too late to escape. But if
+you watch closely which Galaxians leave the formation at what time, and realize
+which one needs to die so that there'll be a spot where no shots or Galaxians
+come through, you'll always have a chance to escape.
+
+It's hard to put in words exactly what you need to watch for, but the most
+important thing to keep in mind is to avoid tunnel vision. If you're only
+watching your ship and what happens directly above you, you're making a
+mistake that many rookie drivers make as well. Driving a car is extremely hard
+if you're not anticipating things before they happen. Same for high levels of
+Galaxian. Keep your eyes on the formation; there you don't see what happens
+now, but what will happen in five seconds. Seconds that you need to decide what
+to do to survive, and to actually do it.
+
+That means, of course, that you must be one with your ship and the controls
+now, and no longer have to think about what you do. You must be able to gun
+down Galaxians without thinking, flawlessly choosing the right position for
+each colour depending on how they maneuver. You must be intuitively aware
+of how close you are to the edges, because you won't have time to think about
+staying away from the corners. As soon as a flagship with escorts leaves the
+formation, you must instantly decide if you'll risk it or let them go (and I
+recommend taking the latter course whenever you aren't sure). If you want to
+play conservatively, do try to take out one of the Reds whenever a flagship
+combo comes at you. You'll ruin your chances at getting the bonus, but this
+ensures that when the wave is almost complete, there won't be any Reds left
+to escort the flagships anymore, thus preventing the deadly situation of them
+going into melee mode together. That really is something you can barely
+defend against, so best to prevent it from happening.
+
+Keep in mind that destroying a flagship shakes Galaxian morale and keeps all
+charging enemies from firing for a couple of seconds. This only works if you
+destroy the flagship during a charge, though; this effect is not triggered when
+you destroy it in the convoy (which is a gross waste of points besides, never
+do it). Timing your attacks on the flagships well can increase your longevity
+considerably, though it will probably get in the way of getting the big
+bonuses. It's a judgment call; I'd sooner use this trick to live longer and
+get more points that way, but if you'd rather pursue the bonuses and take more
+risks, do so.
+
+If you ever do get a few seconds' break to fire at the convoy, aggressively
+pursue Purple Galaxians first. With them gone, all remaining enemies move
+basically the same, and you'll find it much easier to anticipate what's going
+to happen. Players of all skill levels lose most of their ships either to
+Purple Galaxians - directly, or indirectly if they fly into a Blue one because
+they had to dodge a Purple that came closer than they thought - or to taking
+too much risk trying to get the flagship bonus. And no matter how good you are,
+in the end staying alive is always better for your score than getting lots of
+bonuses but losing lives in the progress.
+
+Keep track of what you are losing lives to. There's no shame in keeping a
+little notebook where you put down notches in different categories, such as
+"stuck in corner", "boxed in", "risky attack on flagship combo", "melee death",
+"collision with purple", that kind of thing. The idea is that after 10 (or 20,
+or 30) games, you have a good idea of what you are dying to, and what you need
+to work on. You might be able to draw valuable conclusions about your playing
+style. Depending on what you're dying to, these are things you might want to
+work on:
+
+- Getting stuck in corners: be more aware of your absolute position on the
+screen, and get back to the middle when you drift away from it. When you have
+a choice of which way to dodge when a Galaxian attacks you, go toward the
+middle. When you need to dodge to a corner, get back to the middle immediately.
+If you need to squeeze yourself into a corner to take down a flagship combo,
+maybe you shouldn't be attacking it at all this time. If you're still using the
+column cleaning method against the convoy, switch to the other side of the
+convoy before it reaches the edge of the screen; don't let them lead you all
+the way there.
+
+- Being boxed in: you need to work on looking at the convoy and anticipating
+what's going to happen. (Don't worry; this is by far the hardest part of
+becoming a Galaxian expert.) Usually when you are boxed in, it feels like there
+was nothing you could do, but the truth is you should have done something five
+seconds ago.
+
+- Flagship combo deaths: just take less risk. It's better not to get the bonus
+than to die. If you are not fully confident that there's an excellent
+opportunity to take out the flagship combo, don't do it. And when making your
+decision, factor in other charging Galaxians as well. The last thing you need
+when you are trying to take down the flagship is a purple Galaxian suddenly
+swooping in from the side!
+
+- Melee deaths: melees are basically the same in every wave; they don't get
+harder. Just keep practicing them, and as long as you make sure you don't have
+flagships to worry about anymore by now, you shouldn't have any real problems.
+
+A final bit of advice that I would offer to expert players is to always keep
+moving, and switching directions. Just like you would in a melee. It is always
+possible to shake an enemy Galaxian at the last possible moment, and they
+rarely come down in such numbers that there isn't a little hole to squeeze
+through. If there isn't one, you can still force one with a well timed shot.
+As long as you keep moving, the risk of collisions is much lower than if you
+hold your ship steady. In later waves you simply can't afford to do that
+anymore. Forget row cleaning (like you really have time to do any serious
+cleaning at this point, anyway) and keep moving. Always.
+
+If you master these tactics - which will require a lot more than just reading
+the above, as you will have to get totally at ease with the controls and be
+able to focus all your attention on the formation instead of what's happening
+with your ship - you'll be able to clear 10 or more waves, break 30000 points,
+and depending on how much talent you have and how much time you are willing to
+invest, reach enormous scores. An old arcade guidebook I own identifies expert
+players (it refers to them as 'specialists') as anybody who can score 100.000
+or more, and an uncomfirmed report I've had suggests the world record as
+800.000. Either is well outside of my own reach; my current record is about
+35000, and I slip away from that quickly if I don't play daily.
+
+
+====================
+[7] REVISION HISTORY
+====================
+
+v1.0: (7 Sep '04) First version of the FAQ.
+
+v1.1: (22 Sep '05) Updated contact info.
+
+Updates may follow if I receive interesting reader input, or if I come up
+with new tactics myself (particularly for the expert section). Barring that,
+though, this FAQ is complete and finished.
+
+
+===============
+[8] FINAL WORDS
+===============
+
+ABOUT THIS FAQ
+After six Commodore 64 FAQs and a few for more recent games, here's my first
+FAQ for an actual arcade game. My love for Galaxian dates back to the days when
+I first played its Commodore port, more than fifteen years ago, but I only
+discovered relatively recently that rather than a true port, that version is a
+remake that is inferior to the original. Playing the real Galaxian - thanks to
+the Namco Museum collection on the Gameboy Advance - was like discovering gold.
+With a much higher pace and much tricker enemies to deal with, much needed
+challenge was injected compared to the Commodore version that is really just
+too easy, and I knew two things right from the start: I'd want to keep playing
+until I'd be able to match my old Commodore record of 50000, and I'd want to
+write a FAQ for this game.
+
+I've managed the latter but not yet the former at this point. Hopefully, by
+writing this document, I may be helping a fellow old school gamer out there
+somewhere, or inspiring somebody new to pick up this awesome game and see
+exactly what gaming was like twenty five years ago. If either objective is
+accomplished, writing this guide has been more than worth it.
+
+For questions, comments, suggestions, praise and criticism, please contact
+the author, Sashanan, at sashanan.faqs@gmail.com. This e-mail address is for
+FAQ feedback only. Whatever you wish to share about this document or
+Galaxian, chances are I'll want to hear it. Any serious mail will be answered.
+
+If you wish to do anything with this FAQ except for just reading it, check
+the Disclaimer section at the top of the FAQ to find out what you can and
+can't do. When in doubt, you can always mail me.
+
+ABOUT THE AUTHOR
+Sashanan was born in 1980 in the Netherlands and works as a freelance database
+software designer and programmer. In gaming, he is particularly fond of console
+RPGs and old Commodore 64 classics. His days are spent mostly trying to juggle
+way too many time wasting activities at once - from moderating forums to
+building a new website to trying to actually play games like gamers are
+supposed to - and usually neglecting one or the other.
+
+This document is a copyright of Peter "Sashanan" Butter, 2004-2005. All
+rights reserved. Disclaimer at top of document.
