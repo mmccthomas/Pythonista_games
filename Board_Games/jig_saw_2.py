@@ -7,6 +7,7 @@ from PIL import Image, ImageFilter
 import ui
 import io
 import math
+from time import sleep
 from scene import *
 import itertools
 from operator import attrgetter
@@ -394,7 +395,8 @@ class Jigsaw(Scene):
         
     @ui.in_background
     def game_over(self):      
-        self.paused = True          
+        self.paused = True      
+        sleep(1)    
         selection = dialogs.alert('New Puzzle?',
                                       '',
                                       button1='New',
