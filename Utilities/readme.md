@@ -21,7 +21,10 @@ Invoke with long press on Run putton, and enter
 skim_archive 
 ------------
 Utility to browse and search the Pythonista archive.
+Get the archive in json form at 
+https://github.com/omz/Pythonista/blob/main/forum_archive.json.zip
 
+Unzip it and rename to JSON.json
 
 call_tree
 ---------
@@ -32,8 +35,9 @@ place in Editor toolbar to invoke on current module
 Sync_pythonista_to_cloud
 ------------------------
 Compare the contents of two directories.
-i use this to sync a local folder in This Ipad with another in
+I use this to sync a local folder in This Ipad with another in
 On My Ipad/ Pythonista 3
+Can be modified to compare folders in other locations
 
 Ocr
 ---
