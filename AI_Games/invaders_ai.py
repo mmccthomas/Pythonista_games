@@ -15,11 +15,13 @@ import sound
 import ui
 import numpy as np
 from operator import attrgetter
+from collections import defaultdict
 from time import sleep
 import objc_util
 import ctypes
 from time import time
 import joystick
+import spritesheet
 from PIL import Image, ImageFont, ImageDraw
 # --- Game Constants ---
 # ADAPT to screen size
@@ -32,7 +34,7 @@ devices = {393: {'device': 'iphone_portrait', 'spc_x': 70, 'spc_y': 60, 'strt_y'
            1024: {'device': 'ipad13_portrait', 'spc_x': 70, 'spc_y': 60, 'strt_y': 120, 'ply_s': 80, 'inv_s': 70},
            1112: {'device': 'ipad_landscape',  'spc_x': 70, 'spc_y': 60, 'strt_y': 120, 'ply_s': 80, 'inv_s': 70},           
            1133: {'device': 'ipad_mini_landscape', 'spc_x': 70, 'spc_y': 60, 'strt_y': 120, 'ply_s': 80, 'inv_s': 70},
-           1366: {'device': 'ipad13_landscape', 'spc_x': 70, 'spc_y': 60, 'strt_y': 120, 'ply_s': 80, 'inv_s': 70}   
+           1366: {'device': 'ipad13_landscape', 'spc_x': 70, 'spc_y': 60, 'strt_y': 120, 'ply_s': 80, 'inv_s': 45}   
            }
   
 # device size adjustable sizes         
@@ -122,9 +124,10 @@ def load_custom_font(file):
 
 class Player(scene.SpriteNode):
     # player can shoot only one bullet at a time
-    def __init__(self, position=(SCREEN_WIDTH/2, PLAYER_Y), **kwargs):
+    def __init__(self, position=(SCREEN_WIDTH/2, PLAYER_Y), parent=None, **kwargs):
         # Use a simple shape or color for the player (can replace with image)
-        super().__init__('ship.png', position=position, size=(PLAYER_SIZE, PLAYER_SIZE), **kwargs)
+        super().__init__(parent.sprites['player'], position=position, size=(PLAYER_SIZE, PLAYER_SIZE), **kwargs)
+        #self.scale = .5
         self.speed = PLAYER_SPEED
         self.can_shoot = True
         self._shoot_timer = 0
@@ -171,19 +174,21 @@ class Invader(scene.SpriteNode):
       8E 10         ; $108E                  ; INFLIGHT_ALIEN_COMPLETE_LOOP
       91 10         ; $1091                  ; INFLIGHT_ALIEN_UNKNOWN_1091 set to INFLIGHT_ALIEN_FULL_SPEED_CHARGE
      """
-    def __init__(self, position, convoy_position, invader_type, location=None, **kwargs):
+    def __init__(self, position, convoy_position, invader_type, location=None, parent=None,**kwargs):
         
         scores = {'Blue': 30, 'Purple': 40, 'Red': 50, 'Flagship': 60}
-        self.types = {'Blue': [Texture('galax1a.png'), Texture('galax1b.png')], 
-                      'Purple': [Texture('galax2a.png'), Texture('galax2b.png')], 
-                      'Red': [Texture('galax3a.png'), Texture('galax3b.png')], 
-                      'Flagship': [Texture('galax5.png'), Texture('galax5.png')]}
+        sprites = parent.sprites
+        self.types = {'Blue': [sprites['blue1'], sprites['blue2']], 
+                      'Purple': [sprites['purple1'], sprites['purple2']], 
+                      'Red': [sprites['red1'], sprites['red2']],
+                      'Flagship': [sprites['flagship'], sprites['flagship']]}
         
         
         self.alien_type = random.randint(0,1)
         shape = self.types[invader_type][self.alien_type]
 
         super().__init__(shape, position=position,color='white', size=(INVADER_SIZE, INVADER_SIZE), **kwargs)
+        #self.scale = .5
         self.convoy_position = convoy_position # Original position in convoy
         self.invader_type = invader_type
         self.flank = None
@@ -690,6 +695,7 @@ class Invader(scene.SpriteNode):
               self.alien_type = not self.alien_type
               self.texture = self.types[self.invader_type][self.alien_type]
               self.size=(INVADER_SIZE, INVADER_SIZE)
+              # self.scale = .5
         return False # Indicate not removed
         
     # ui.in_background 
@@ -765,10 +771,11 @@ class Game(scene.Scene):
             star = scene.SpriteNode('spc:Star2', position=star_position, color='#ffffff', size=(star_size, star_size))
             self.add_child(star)
             self.stars.append(star)
-
-
+            
+        self.sprites = defaultdict()
+        self.get_sprites('galaxians_all.png')
         # Create player
-        self.player = Player()
+        self.player = Player(parent=self)
         self.add_child(self.player)
 
         # Create invaders in convoy
@@ -819,7 +826,7 @@ class Game(scene.Scene):
         # scene.play_effect('arcade:Explosion_1') # Example sound effect
         # lives
         self.lives = LIVES
-        self.life_icon = [scene.SpriteNode('ship.png',
+        self.life_icon = [scene.SpriteNode(self.sprites['player'],
                                            size=(icon_size, icon_size),
                                            position=(50+icon_size*life, 50),
                                            parent=self)
@@ -856,7 +863,7 @@ class Game(scene.Scene):
                 convoy_y = START_Y - row * SPACING_Y
                 convoy_position = (convoy_x, convoy_y)
 
-                invader = Invader(position=convoy_position, convoy_position=convoy_position, invader_type=type)
+                invader = Invader(position=convoy_position, convoy_position=convoy_position, invader_type=type, parent=self)
                 invader.flank = 'left' if col < COLUMNS / 2 else 'right'
                 invader.loc = loc
                 invader.clockwise = col >= COLUMNS / 2 
@@ -865,7 +872,21 @@ class Game(scene.Scene):
         self.paused = False     
         # .caf is a renamed mp3 file
         sound.play_effect('Galaxian1.caf')
-            
+    
+    def get_sprites(self, filename):
+       
+       sprite_names =['blue1', 'purple1', 'blue2', 'purple2', 'red1', 'flagship', 'player', 'red2']
+       sorted_boxes, sprite_names =  spritesheet.separate_irregular_sprites(filename,
+                               background_color=(0, 0, 0),
+                               use_alpha=False, sprite_names=sprite_names, display=False)
+       all_sprites = Texture(filename)
+       W, H = all_sprites.size
+       
+       for k, name in zip(sorted_boxes, sprite_names):
+           x1, y1, x2, y2 =  k         
+           img = all_sprites.subtexture((x1/ W, (H-y2) / H, (x2-x1)/ W, (y2-y1) / H))          
+           self.sprites[name] = img
+                  
     def list_invader_type(self, invader_type):
         # return subset of convoy invaders which match invader_type
         return [invader for invader in self.convoy if invader.invader_type == invader_type]   
@@ -1033,7 +1054,9 @@ class Game(scene.Scene):
                 self.invader_bullets.remove(bullet)
                 bullet.remove_from_parent()
         return player_bullets_to_remove, invader_bullets_to_remove 
-                          
+    
+    
+                                
     def update(self):
         """ from the ROM code, this implements:
          
@@ -1101,8 +1124,31 @@ class Game(scene.Scene):
         
         self.handle_aggression()       
 
+        # --- Bullet Updates ---
+        player_bullets_to_remove = []
+        for bullet in self.player_bullets:
+            bullet.update(self.dt)
+            # Remove bullets that go off-screen
+            if bullet.position.y > SCREEN_HEIGHT:
+                player_bullets_to_remove.append(bullet)
+
+        invader_bullets_to_remove = []
+        for bullet in self.invader_bullets:
+            bullet.update(self.dt)
+            # Remove bullets that go off-screen
+            if bullet.position.y < 0:
+                invader_bullets_to_remove.append(bullet)
+                
+        for bullet in set(player_bullets_to_remove + hit_player_bullets):
+            if bullet in self.player_bullets:
+                self.player_bullets.remove(bullet)
+                bullet.remove_from_parent()
+                self.player.can_shoot = True
+
         
-        player_bullets_to_remove, invader_bullets_to_remove = self.bullet_updates()
+        #return player_bullets_to_remove, invader_bullets_to_remove 
+    
+        #player_bullets_to_remove, invader_bullets_to_remove = self.bullet_updates()
         
         # --- Collision Detection ---                  
         # invader crashes into player        
@@ -1124,7 +1170,10 @@ class Game(scene.Scene):
                     # sound.play_effect('arcade:Explosion_2') # Play player hit sound
                     break # Player hit by one bullet is enough
 
-
+        for bullet in set(invader_bullets_to_remove + hit_invader_bullets):
+            if bullet in self.invader_bullets:
+                self.invader_bullets.remove(bullet)
+                bullet.remove_from_parent()
         # Remove hit invaders and bullets
         for invader in set(hit_invaders):
             if invader in self.convoy:

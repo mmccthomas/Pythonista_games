@@ -2,14 +2,22 @@
 # they are ordered in y then x
 # need to loose sort so that small differences in y do not affect order
 import os
-from PIL import Image, ImageDraw
+from PIL import Image, ImageDraw, UnidentifiedImageError
 import numpy as np
 from scene import Rect
 from collections import defaultdict
 from operator import itemgetter
+import zipfile
+import io
+import ui
+import pathlib
 #take a spritesheet and decode the sprites
 
-    
+def pil_to_ui(img):
+  with io.BytesIO() as bIO:
+    img.save(bIO, 'png')
+    return ui.Image.from_data(bIO.getvalue())
+        
 def flatten_to_strings(listOfLists):
     """Flatten a list of (lists of (lists of strings)) for any level 
     of nesting"""
@@ -161,7 +169,28 @@ def loose_sort(boxes, tolerance=4):
 
     return sorted(boxes, key=key_func)
     
-
+def sprites_from_zipfile(sprite_sheet_path,  display=False): 
+    # extract images from zipfile of png images
+    try:
+        zip = zipfile.ZipFile(sprite_sheet_path)     
+    except zipfile.BadZipfile:
+        return None
+    image_dict = defaultdict()
+    inflist = zip.namelist()                          
+    for f in inflist:
+        ifile = zip.open(f)
+        try:
+            ui_img = pil_to_ui(Image.open(ifile))
+            name = pathlib.Path(f).stem
+            image_dict[name] = ui_img            
+        except UnidentifiedImageError as e:
+             pass  
+    if display:
+        for name, image in image_dict.items():      
+            print(name, image.size)  
+            image.show() 
+    return image_dict                    
+                               
 def separate_irregular_sprites(sprite_sheet_path, 
                                               min_sprite_area=100, background_color=None,
                                               threshold_value=200, invert_threshold=True,
@@ -270,7 +299,8 @@ def separate_irregular_sprites(sprite_sheet_path,
         
 
 if __name__ == "__main__":
-    NAME = 'defender.png'
+    NAME = 'galaxians_all.png'
+    
     sprite_names = ['mutant1', 'mutant2',
     'podexpl','swarmexpl',  
     'pod1', 'pod2',
@@ -298,3 +328,6 @@ if __name__ == "__main__":
     separate_irregular_sprites(NAME,
                                background_color=(0, 0, 0),
                                use_alpha=False, sprite_names=sprite_names, display=True)
+                               
+    img_dict = sprites_from_zipfile('Metal_sprites.zip', display=True)
+
