@@ -1,5 +1,6 @@
 # ageneral purpose starting point for letter tile games -
-import sys
+import sys 
+import os
 from time import sleep, time
 import random
 import re

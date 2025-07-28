@@ -4,6 +4,8 @@ import traceback
 from time import sleep, time
 from queue import Queue
 import numpy as np
+import ui
+from scene import ShapeNode
 from Letter_game import LetterGame, Player
 import sudoko_solve
 from cages import Cages
@@ -15,7 +17,10 @@ from gui.gui_interface import Gui, Squares
 both standard and Killer type are supported
 You have to guess the number
 Chris Thomas June 2024
-
+Added Kropki mode. white circles between adjacent cells
+which contain consective numbers. Not all white circles are 
+given. Black circles between adjacent cell which are factor of 2
+Chris Thomas July 2025
 """
 BLOCK = '#'
 SPACE = ' '
@@ -120,6 +125,80 @@ class Sudoko(LetterGame):
             puzzles.append(line)
     return puzzles
     
+  def white_dots(self, values, number=10):
+    """ place white circles on itersection of consecutive numbers """
+    board = [[0] * SIZE for row_num in range(SIZE)]
+    [self.board_rc(self.board_dict[k], board, int(v)) for k, v in values.items()]
+    board = np.array(board)
+    path = ui.Path.oval(0, 0, 15, 15)
+    path.line_width = 2
+    for axis in range(2):
+       diff = np.diff(board, axis=axis)
+       diff[diff>1] = 0
+       diff[diff<-1] = 0
+       diff = np.abs(diff)
+       coords = np.argwhere(diff) 
+       if axis == 0:
+        coords = coords + np.array([0, 0.5])
+       else:
+         coords = coords + np.array([-0.5, 1])
+       np.random.shuffle(coords)
+       coords = coords[:number, :]
+       points = [self.gui.rc_to_pos(coord) for coord in coords]
+       for point in points:
+          circle = ShapeNode(
+                      path,
+                      position=point,
+                      z_position=1000,
+                      stroke_color='black',
+                      fill_color='white',
+                      parent=self.gui.game_field)
+           
+     
+  def black_dots(self, values, number=1):
+    """ place black circles on itersection of numbers with factor 2 """
+    board = [[0] * SIZE for row_num in range(SIZE)]
+    [self.board_rc(self.board_dict[k], board, int(v)) for k, v in values.items()]
+    board = np.array(board)
+    path = ui.Path.oval(0, 0, 15, 15)
+    path.line_width = 2
+    for axis in range(2):       
+       if axis: #x
+           ratios = board[:, 1:] / board[:, :-1]
+       else:
+           ratios = board[1:, :] / board[:-1, :]
+       #diff = np.diff(board, axis=axis)
+       ratios[ratios == 2] = 1
+       ratios[ratios == 0.5] = 1
+       ratios[ratios != 1] = 0
+       coords = np.argwhere(ratios)
+       np.random.shuffle(coords)
+       coords = coords[:number, :]
+       if axis == 0:
+        coords = coords + np.array([0, 0.5])
+       else:
+         coords = coords + np.array([-0.5, 1])
+       points = [self.gui.rc_to_pos(coord) for coord in coords]
+       for point in points:
+          circle = ShapeNode(
+                      path,
+                      position=point,
+                      z_position=1000,
+                      stroke_color='black',
+                      fill_color='black',
+                      parent=self.gui.game_field) 
+    
+  def kropki_setup(self, grid):
+    """ setup grid for kropki. white circle between some consecutive numbers"""
+    kropki_board = np.zeros((SIZE, SIZE), dtype=int)
+    self.display(sudoko_solve.grid_values(grid))
+    values = sudoko_solve.solve(grid)
+    if values:
+        self.calc_board(kropki_board, values)
+  
+    self.white_dots(values, number=9) # up to 18 white dots
+    self.black_dots(values, number=2) # up to 4 black dots
+    
   def killer_setup(self, grid, random_color=False, kenken=False):
     """ setup grid for killer sudoko """
     self.board = [[SPACE] * SIZE for row_num in range(SIZE)]
@@ -208,6 +287,8 @@ class Sudoko(LetterGame):
         elif self.puzzle == 'KenKen':
             self.killer_setup(grid, random_color=False, kenken=True)            
             self.board = [[SPACE for i in range(SIZE)] for j in range(SIZE)]
+        elif self.puzzle == 'Kropki':
+            self.kropki_setup(grid)            
         else:
             self.display(sudoko_solve.grid_values(grid))
         values = sudoko_solve.solve(grid)
@@ -237,7 +318,7 @@ class Sudoko(LetterGame):
   
   def select_list(self):
       '''Choose which category'''
-      items = [s.capitalize() for s in self.word_dict.keys()] + ['Killer', 'Killer_Harder', 'KenKen']
+      items = [s.capitalize() for s in self.word_dict.keys()] + ['Killer', 'Killer_Harder', 'KenKen', 'Kropki']
       self.gui.selection = ''
       selection = ''
       prompt = ' Select category'
@@ -262,6 +343,8 @@ class Sudoko(LetterGame):
         elif len(selection) > 1:
           if selection in [ 'Killer', 'Killer_Harder', 'KenKen']:
              self.wordlist = self.word_dict['Easy']
+          elif selection == 'Kropki':
+             self.wordlist = self.word_dict['Hard']
           else:
              self.wordlist = self.word_dict[selection]
           self.puzzle = selection
