@@ -1,0 +1,236 @@
+[
+  {
+    "nodes" : [
+      {
+        "nodes" : [
+
+        ],
+        "frame" : "{{1220, 363}, {127, 384}}",
+        "class" : "TableView",
+        "attributes" : {
+          "uuid" : "C227992C-6703-4CD1-8DAC-FF4E21941974",
+          "flex" : "",
+          "data_source_action" : "self.palette_action",
+          "corner_radius" : 0,
+          "background_color" : "RGBA(1.0, 1.0, 1.0, 1.0)",
+          "frame" : "{{412, 284}, {200, 200}}",
+          "data_source_items" : "Row 1\nRow 2\nRow 3",
+          "data_source_number_of_lines" : 10,
+          "border_width" : 1,
+          "border_color" : "RGBA(0.438679,0.438679,0.438679,1.000000)",
+          "data_source_delete_enabled" : false,
+          "data_source_font_size" : 18,
+          "row_height" : 44,
+          "class" : "TableView",
+          "name" : "icon_view",
+          "editing" : false
+        },
+        "selected" : false
+      },
+      {
+        "nodes" : [
+
+        ],
+        "frame" : "{{1272, 47}, {80, 32}}",
+        "class" : "Button",
+        "attributes" : {
+          "border_width" : 1,
+          "action" : "self.load_action",
+          "frame" : "{{472, 368}, {80, 32}}",
+          "title" : "Load",
+          "uuid" : "415DA0CB-6374-4403-A21B-92D5BC48246C",
+          "background_color" : "RGBA(0.997642,0.997642,0.997642,1.000000)",
+          "class" : "Button",
+          "border_color" : "RGBA(0.000000,0.000000,0.000000,1.000000)",
+          "corner_radius" : 0,
+          "name" : "load",
+          "font_size" : 15
+        },
+        "selected" : false
+      },
+      {
+        "nodes" : [
+
+        ],
+        "frame" : "{{1272, 87}, {80, 32}}",
+        "class" : "Button",
+        "attributes" : {
+          "border_width" : 1,
+          "action" : "self.save_action",
+          "frame" : "{{472, 368}, {80, 32}}",
+          "title" : "Save",
+          "class" : "Button",
+          "uuid" : "415DA0CB-6374-4403-A21B-92D5BC48246C",
+          "corner_radius" : 0,
+          "border_color" : "RGBA(0.188679,0.188679,0.188679,1.000000)",
+          "font_size" : 15,
+          "name" : "save"
+        },
+        "selected" : false
+      },
+      {
+        "nodes" : [
+
+        ],
+        "frame" : "{{1272, 127}, {80, 32}}",
+        "class" : "Button",
+        "attributes" : {
+          "border_width" : 1,
+          "action" : "self.undo_action",
+          "frame" : "{{472, 368}, {80, 32}}",
+          "title" : "Undo",
+          "class" : "Button",
+          "uuid" : "415DA0CB-6374-4403-A21B-92D5BC48246C",
+          "corner_radius" : 0,
+          "border_color" : "RGBA(0.000000,0.000000,0.000000,1.000000)",
+          "font_size" : 15,
+          "name" : "undo"
+        },
+        "selected" : false
+      },
+      {
+        "nodes" : [
+
+        ],
+        "frame" : "{{1272, 167}, {80, 32}}",
+        "class" : "Button",
+        "attributes" : {
+          "border_width" : 1,
+          "action" : "self.place_action",
+          "frame" : "{{472, 368}, {80, 32}}",
+          "title" : "Place",
+          "class" : "Button",
+          "uuid" : "415DA0CB-6374-4403-A21B-92D5BC48246C",
+          "corner_radius" : 0,
+          "border_color" : "RGBA(0.082547,0.082547,0.082547,1.000000)",
+          "font_size" : 15,
+          "name" : "place"
+        },
+        "selected" : false
+      },
+      {
+        "nodes" : [
+
+        ],
+        "frame" : "{{1272, 207}, {80, 32}}",
+        "class" : "Button",
+        "attributes" : {
+          "border_width" : 1,
+          "action" : "self.erase_action",
+          "frame" : "{{472, 368}, {80, 32}}",
+          "title" : "Erase",
+          "class" : "Button",
+          "uuid" : "415DA0CB-6374-4403-A21B-92D5BC48246C",
+          "corner_radius" : 0,
+          "border_color" : "RGBA(0.066038,0.066038,0.066038,1.000000)",
+          "font_size" : 15,
+          "name" : "erase"
+        },
+        "selected" : false
+      },
+      {
+        "nodes" : [
+
+        ],
+        "frame" : "{{13, 6}, {231, 32}}",
+        "class" : "Button",
+        "attributes" : {
+          "border_width" : 1,
+          "action" : "self.level_action",
+          "frame" : "{{472, 368}, {80, 32}}",
+          "title" : "Level",
+          "uuid" : "C63F89E5-6078-44BA-8B04-74B9F720172D",
+          "border_color" : "RGBA(0.117925,0.117925,0.117925,1.000000)",
+          "class" : "Button",
+          "corner_radius" : 0,
+          "name" : "level",
+          "font_size" : 15
+        },
+        "selected" : false
+      },
+      {
+        "nodes" : [
+
+        ],
+        "frame" : "{{1272, 255}, {80, 32}}",
+        "class" : "Button",
+        "attributes" : {
+          "border_width" : 1,
+          "action" : "self.zoomin_action",
+          "frame" : "{{472, 368}, {80, 32}}",
+          "title" : "Zoom In",
+          "border_color" : "RGBA(0.073113,0.073113,0.073113,1.000000)",
+          "class" : "Button",
+          "uuid" : "415DA0CB-6374-4403-A21B-92D5BC48246C",
+          "corner_radius" : 0,
+          "font_size" : 15,
+          "name" : "zoom_in"
+        },
+        "selected" : false
+      },
+      {
+        "nodes" : [
+
+        ],
+        "frame" : "{{1272, 295}, {80, 32}}",
+        "class" : "Button",
+        "attributes" : {
+          "border_width" : 1,
+          "action" : "self.zoomout_action",
+          "frame" : "{{472, 368}, {80, 32}}",
+          "title" : "Zoom Out",
+          "class" : "Button",
+          "uuid" : "415DA0CB-6374-4403-A21B-92D5BC48246C",
+          "corner_radius" : 0,
+          "border_color" : "RGBA(0.629717,0.629717,0.629717,1.000000)",
+          "font_size" : 15,
+          "name" : "zoom_out"
+        },
+        "selected" : false
+      },
+      {
+        "nodes" : [
+
+        ],
+        "frame" : "{{348, 7}, {150, 31}}",
+        "class" : "Label",
+        "attributes" : {
+          "name" : "zoom",
+          "frame" : "{{437, 368}, {150, 32}}",
+          "uuid" : "AAAE9E34-1B47-4CD2-9B4F-462450EAC9FC",
+          "class" : "Label",
+          "alignment" : "left",
+          "text" : "Zoom",
+          "font_size" : 18,
+          "font_name" : "<System>"
+        },
+        "selected" : false
+      },
+      {
+        "nodes" : [
+
+        ],
+        "frame" : "{{13, 46}, {1199, 876}}",
+        "class" : "View",
+        "attributes" : {
+          "name" : "editor_view",
+          "frame" : "{{462, 334}, {100, 100}}",
+          "custom_class" : "EditorView",
+          "class" : "View",
+          "uuid" : "2847F3BB-9C00-465F-9167-625B506EEF47"
+        },
+        "selected" : true
+      }
+    ],
+    "frame" : "{{0, 0}, {1366, 1024}}",
+    "class" : "View",
+    "attributes" : {
+      "enabled" : true,
+      "background_color" : "RGBA(1.000000,1.000000,1.000000,1.000000)",
+      "tint_color" : "RGBA(0.000000,0.478000,1.000000,1.000000)",
+      "border_color" : "RGBA(0.000000,0.000000,0.000000,1.000000)",
+      "flex" : ""
+    },
+    "selected" : false
+  }
+]

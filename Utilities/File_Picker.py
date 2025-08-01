@@ -305,7 +305,7 @@ def file_picker_dialog(title=None, root_dir=None, multiple=False,
 		root_dir = os.path.expanduser('~/Documents')
 	if title is None:
 		title = os.path.split(root_dir)[1]
-	root_node = FileTreeNode(os.path.expanduser('~/Documents'), show_size, select_dirs, file_pattern)
+	root_node = FileTreeNode(os.path.expanduser(root_dir), show_size, select_dirs, file_pattern)
 	root_node.title = title or ''
 	picker = TreeDialogController(root_node, allow_multi=multiple)
 	picker.view.present('sheet')
