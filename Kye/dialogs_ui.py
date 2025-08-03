@@ -20,15 +20,24 @@
 """kye.dialogs - classes for dialog boxes used by the interface."""
 
 from os.path import exists
-from common_cmt import kyepaths, version
+from common_cmt import kyepaths, version, image_dict, pil_image_dict
 import ui
 import dialogs
+import io
 
-
+def pil_to_ui(img):
+        with io.BytesIO() as bIO:
+            img.save(bIO, 'png')
+            return ui.Image.from_data(bIO.getvalue())
+            
 def getimage(image_name):
-	return ui.Image.named('images/' + image_name + '.png')
+  #return ui.Image.named('images/' + image_name + '.png')
+  img = pil_image_dict[image_name]
+  w, h = img.size
+  img = img.resize((w*2, h*2))
 
-		
+  return pil_to_ui(img)
+    
 class GotoDialog():
     """A dialog box for the player to select or type a level name to go to."""
     def __init__(self, parent=None, knownlevs=()):
@@ -42,18 +51,18 @@ class GotoDialog():
 class KyeHelpDialog(ui.View):
     """Help dialog box."""
     def __init__(self):
-
+      
       self.itemlist=[{'image': getimage("kye"), 'title': "You are Kye. Move by point-and-click with the mouse, or the arrow keys or numeric keypad on the keyboard (note that you can move diagonally, even using the keyboard)"},
         {'image': getimage("diamond_1"), 'title': "The object of the game is to collect all the diamonds." },
         {'image': getimage("wall5"), 'title':  "These are solid walls."},
         {'image': getimage("block"), 'title': "These are blocks, which you can push."},
         {'image': getimage("slider_right"), 'title': "Sliders move in the direction of the arrow until they hit"},
-        {'title': "		 an obstacle."},
+        {'title': "    an obstacle."},
         {'image': getimage("rocky_right"), 'title': "Rockies move like sliders, but they roll around round"},
-        {'title': "   		 objects, like rounded walls and other rockies."},
+        {'title': "        objects, like rounded walls and other rockies."},
         {'image': getimage("blocke"), 'title': "Soft blocks you can destroy by moving into them."},
         {'image': getimage("blob_1"), 'title': "Monsters kill you if they touch you."},
-        {'title': "				 You do have 3 lives, though."},
+        {'title': "        You do have 3 lives, though."},
         {'image': getimage("gnasher_1"), 'title': ".     Gnasher"},
         {'image': getimage("spike_1"),   'title': ".     Spike"},
         {'image': getimage("twister_1"), 'title': ".     Twister"},
@@ -122,3 +131,4 @@ def getopendialog():
 
 def KyeAboutDialog():
     pass
+

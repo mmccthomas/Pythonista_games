@@ -14,6 +14,13 @@ from sprite_manager import SpriteManager
 from pallette_view import PaletteView
 from File_Picker import file_picker_dialog
 
+# Added Run button.
+# to run the associated game with current file.
+# when you exit the game, return to editor at same point
+# e.g modify Kye.py to enter at main() with kwarg as file and level_name
+
+# this runs module "run_module" which is imported in config_file
+
 
 class MainEditor:
 
@@ -29,11 +36,13 @@ class MainEditor:
         self.pan_mode = False
         self.game_view.name = "Game Editor"
         self.game_view.present('full_screen')
+        self.run_module = self.sprite_manager.run_module 
+        if self.run_module is None:
+            self.game_view['run'].enabled = False
         sleep(1)
         self.setup_menu()
 
     def setup_menu(self):
-
         self.palette_setup()
         self.game_view['zoom'].text = f'Zoom: x1'
         # More menu items would be added here (Load, Zoom, Pan, Levels)
@@ -93,8 +102,9 @@ class MainEditor:
            level_name = dialogs.input_alert(title='Create new level', message='Enter level name')
            if level_name:
                level_name = level_name.upper()
-               level_data = {'table': [[' ' for _ in range(self.editor_view.grid_width)] for _ in range(self.editor_view.grid_height)],
-               'text1': 'New level', 'text2': ''}
+               level_data = {'table': [[' ' for _ in range(self.editor_view.grid_width)] 
+                                       for _ in range(self.editor_view.grid_height)],
+               'text1': 'New level', 'text2': 'Additional text'}
                self.level_manager.add_level(level_name, level_data)
                self.editor_view.set_level(level_name)
                
@@ -118,7 +128,7 @@ class MainEditor:
         self.highlight(self.game_view['pan'], False)
         
     def pan_action(self, sender):
-        # set pan mode
+        # set pan mode used in touch
         self.editor_view.pan_mode = True 
         self.highlight(self.game_view['place'], False)
         self.highlight(self.game_view['erase'], False)
@@ -132,11 +142,11 @@ class MainEditor:
             self.level_manager.levels[self.level]['text2'] = sender.text
         
     @ui.in_background    
-    def raw_file_action(self, sender):
+    def raw_file_action(self, sender, reason='File contents'):
         # view current file and allow raw modification
         with open(self.filepath, 'r', encoding='utf-8') as f:
             contents = f.read()
-        modified = dialogs.text_dialog(title='File contents', text=contents, font=('Courier', 20) )
+        modified = dialogs.text_dialog(title=reason, text=contents, font=('Courier', 20) )
         if modified and modified != contents:
             with open(self.filepath, 'w', encoding='utf-8') as f:
                 f.write(modified)
@@ -151,11 +161,38 @@ class MainEditor:
                                       select_dirs=False)
         if filepath:
             self.filepath = filepath
-            self.level_manager.load_levels(filepath)
-            self.editor_view.load_map()
-            self.level = self.level_manager.current_level_name
-            self.update_controls(filepath)
+            if self.level_manager.load_levels(filepath):
+               self.editor_view.load_map()
+               self.level = self.level_manager.current_level_name
+               self.update_controls(filepath)
+            else:
+                text = self.level_manager.error_text
+                self.raw_file_action(None, reason=text)
             
+    @ui.in_background      
+    def run_action(self, sender):       
+        # switch to program to run level. resume when program is closed
+        # check if any modications made. Save if so
+        existing_data = self.level_manager.levels[self.editor_view.current_level_name]['table']
+        current_data = ["".join(line) for line in self.editor_view.current_level_data]                           
+        if existing_data != current_data:           
+           self.level_manager.levels[self.editor_view.current_level_name]['table'] = current_data
+           self.level_manager.save_levels(self.filepath)
+           dialogs.hud_alert('File saved')
+           
+        # close the editor view and wait
+        self.game_view.close()
+        sleep(1)
+        
+        game = self.run_module.main(file=self.filepath, level_name=self.level)
+        # loop slowly until game closed
+        while game.on_screen:
+          sleep(1)
+        # now show editor again         
+        self.game_view.present('full_screen')
+        
+        #self.setup_menu()
+        
     def update_controls(self, filepath):
         self.game_view['level'].title = self.level       
         self.game_view['textfield1'].text = self.level_manager.levels[self.level]['text1']

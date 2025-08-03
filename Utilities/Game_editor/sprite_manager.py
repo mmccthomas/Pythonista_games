@@ -12,6 +12,7 @@ class SpriteManager:
         config = importlib.import_module(config_file)
         self.image_dict = getattr(config, 'image_dict')
         self.lookup = getattr(config, 'lookup')
+        self.run_module = getattr(config, 'run_module', None)
         self.sprite_map = {}
         self.load_sprites()  # Load sprites
         

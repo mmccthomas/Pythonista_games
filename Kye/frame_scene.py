@@ -32,6 +32,7 @@ from scene import *
 from input_ui import KMoveInput
 # from stbar_ui import StatusBar
 # from dialogs_ui import GotoDialog, KyeHelpDialog , KyeAboutDialog
+from dialogs_ui import KyeHelpDialog
 # from dialogs_ui import getopendialog
 # from queue import Queue
 from copy import deepcopy
@@ -167,8 +168,13 @@ class KFrame(Scene):
 
     def level_title(self, file_title, level_title):
         """Update the title of the level in the window title."""
-        file_title = file_title.split('.')[0]
-        self.__title[1] = f'File: {file_title}  ----- Level: {level_title}'
+        file_title = pathlib.Path(file_title)
+        parts = file_title.parts
+        try:
+            file_display = '/'.join([parts[-2],  str(file_title.stem)])
+        except IndexError:
+            file_display = str(file_title.stem)
+        self.__title[1] = f'File: {file_display}  ----- Level: {level_title}'
         self.__set_title()
         self.extra_title(f'      ( {self.app._KyeApp__game.levels} levels)')
 

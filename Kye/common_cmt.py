@@ -117,8 +117,23 @@ def load_images():
     # images2 = ['images/' + i for i in images]
     images = [i.split('.')[0] for i in images]
     # combine_images(10,0,images2)
-
-    # combined image
+    
+    #  produce dictionary of PIL Images
+    spritesheet = Image.open(IMAGE_NAME)
+    w, h = spritesheet.size
+    # now have images list and spritesheet
+    # 10 x 8 array gap of 0
+    pil_image_dict = {}
+    for i, image in enumerate(images):
+        x = (i % 10) * tsize 
+        y = int(i / 10) * tsize 
+        w1 = tsize 
+        h1 = tsize 
+        t = spritesheet.crop((x, y, x+w1, y+h1))
+        pil_image_dict.setdefault(image, t)    
+    
+    
+    # produce dictionary of Textures
     combined = Texture(ui.Image.named(IMAGE_NAME))
     w, h = combined.size
     # now have images list and image.png
@@ -132,7 +147,7 @@ def load_images():
         t = combined.subtexture(Rect(x, y, w1, h1))
         image_dict.setdefault(image, t)
     
-    return image_dict
+    return image_dict, pil_image_dict
 
 
 def tryopen(filename, paths):
@@ -152,8 +167,7 @@ def findfile(filename):
   return 'kye/images'
 
 
-image_dict = load_images()
-
+image_dict, pil_image_dict = load_images()
 
 class KyeImageDir():
     """Class for retrieving images from a tileset tar.gz."""

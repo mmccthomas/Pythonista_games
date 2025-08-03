@@ -36,6 +36,9 @@ game lines (20 for kye)
 
 from collections import defaultdict
 from PIL import Image
+import base_path
+base_path.add_paths(__file__)
+import Kye.Kye
 
 # this is the order in which sprites appear in the spritesheet
 imagelist = [
@@ -224,7 +227,7 @@ def load_images():
     return image_dict
 
 image_dict = load_images() 
- 
+run_module = Kye.Kye 
           
 if __name__ == '__main__':
    print(lookup)

@@ -32,8 +32,11 @@ class LevelManager:
         self.levels = {}
         self.current_level_name = None
         self.filepath = None
+        self.file_modified = False
+        self.error_text = None
 
     def load_levels(self, filepath):
+        # maybe return more suitable data
         try:
             self.levels = self.get_file(filepath)
             # check all levels valid
@@ -45,7 +48,8 @@ class LevelManager:
               # Find the item with a count of 1
               for number, count in counts.items():
                  if count == 1:         
-                    where = lengths.index(number)                                       
+                    where = lengths.index(number)         
+                    self.error_text = f'invalid line length  in section {k} on {where}th line'                              
                     raise ValueError(f'invalid line length  in section {k} on {where}th line')
                 
               
@@ -88,6 +92,7 @@ class LevelManager:
             self.levels[level_name] = level_data
             self.current_level_name = level_name
             print(f"Added new level: {level_name}")
+            self.file_modified = True
         else:
             print(f"Level '{level_name}' already exists.")
 
@@ -97,6 +102,7 @@ class LevelManager:
             print(f"Deleted level: {level_name}")
             if self.current_level_name == level_name:
                 self.current_level_name = list(self.levels.keys())[0] if self.levels else None
+            self.file_modified = True
         else:
             print(f"Level '{level_name}' not found.")
 
@@ -110,6 +116,7 @@ class LevelManager:
           game_data = f.read().splitlines()
         if not game_data:
             raise ValueError('File has Empty data')
+        #game_data = game_data[:-1] # dont count final CR
         no_levels = int(game_data[0])
         # catch extra blank line in middle or at end
         for index, line in enumerate(game_data):
@@ -128,6 +135,7 @@ class LevelManager:
           z, places, length_values = rle(lengths) 
           print(f'Incorrect structure. Table line length is {max_length}')
           print(f'length profile is {z}')
+          self.error_text = f'Incorrect structure. use the length profile to find line'
           raise ValueError(f'Incorrect structure. use the length profile to find line')
         
         level_dict = defaultdict()
@@ -147,6 +155,8 @@ class LevelManager:
           file_contents.append(f'{data["text1"]}')
           file_contents.append(f'{data["text2"]}')
           file_contents.extend([f'{"".join(line)}' for line in data["table"]])
+          
+       file_contents.append('\n')
        
        return '\n'.join(file_contents)
 
