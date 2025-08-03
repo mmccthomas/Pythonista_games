@@ -1,52 +1,64 @@
 # level_manager.py (Simplified)
 # Uses  file format used by Kye
 """
-number of levels (int) 
+number of levels (int)
 level name
 hint text
 completion text
 game lines (20 for kye)
-555555555555555555555555555555
-5T   e       K*  a    d e   E5
-5    b 455556        a  b    5
-5    b dvvvvd           b    5
-5    b dvvvvd          ab    5
-5ebbbe eeBBee       c   ebbbe5
-5               a            5
-5 8rre                a ell8 5
-5 5>>e      s  S        e<<5 5
-5 5>>B                  B<<5 5
-5 5>>B               b  B<<5 5
-5 5>>e      S  s     U  e<<5 5
-5 2rre               b  ell2 5
-5                 bRbb       5
-5ebbbe eeeeee  7555559  ebbbe5
-5    b u^^^^u  5     5  b    5
-5    b u^^^^u  5     5  b    5
-5    b 455556  5     5  b    5
-5C   e         e  [  e  e   ~5
-555555555555555555555555555555
 """
-from collections import defaultdict
+from collections import defaultdict, Counter
 import numpy as np
+import operator
+
+def rle(inarray):
+  """ run length encoding. Partial credit to R rle function.
+  Multi datatype arrays catered for including non Numpy
+  returns: tuple (runlengths, startpositions, values) """
+  ia = np.asarray(inarray)                # force numpy
+  n = len(ia)
+  if n == 0:
+      return (None, None, None)
+  else:
+      y = ia[1:] != ia[:-1]               # pairwise unequal (string safe)
+      i = np.append(np.where(y), n - 1)   # must include last element posi
+      z = np.diff(np.append(-1, i))       # run lengths
+      p = np.cumsum(np.append(0, z))[:-1]  # positions
+      return (z, p, ia[i])
 
 class LevelManager:
     def __init__(self):
-        # Dictionary to hold levels: level_name: {'hint': level_hint, 'finish': level_finish, 'table': [chars, chars..]}
-        self.levels = {} 
+        # Dictionary to hold levels: level_name: {'text1': level_hint, 'text2': level_finish, 'table': [chars, chars..]}
+        self.levels = {}
         self.current_level_name = None
         self.filepath = None
 
     def load_levels(self, filepath):
         try:
-            self.levels = self.get_file(filepath)        
-            self.filepath = filepath    
-            #print(f"Loaded levels from {filepath}")
+            self.levels = self.get_file(filepath)
+            # check all levels valid
+            # size of  table should all be identical
+            for k, v in self.levels.items():
+              table = v['table']
+              lengths = [len(row) for row in table]
+              counts = Counter(lengths)
+              # Find the item with a count of 1
+              for number, count in counts.items():
+                 if count == 1:         
+                    where = lengths.index(number)                                       
+                    raise ValueError(f'invalid line length  in section {k} on {where}th line')
+                
+              
+            self.filepath = filepath
+            # print(f"Loaded levels from {filepath}")
             if self.levels:
-                self.current_level_name = list(self.levels.keys())[0] # Set first level as current
+                self.current_level_name = list(self.levels.keys())[0]  # Set first level as current
             return True
+        except ValueError as e:
+            print(f"Error loading levels in file {filepath} {e}")
+            return False
         except Exception as e:
-            print(f"Error loading levels: {e}")
+            print(f"Error loading levels in file {filepath} {e}")
             return False
 
     def save_levels(self, filepath):
@@ -54,7 +66,7 @@ class LevelManager:
             formatted_data = self.format_file()
             with open(filepath, 'w') as f:
                 f.write(formatted_data)
-            #print(f"Saved levels to {filepath}")
+            # print(f"Saved levels to {filepath}")
             return True
         except Exception as e:
             print(f"Error saving levels: {e}")
@@ -91,28 +103,40 @@ class LevelManager:
     def get_current_level_text_representation(self):
         if self.current_level_name and self.current_level_name in self.levels:
             return "\n".join(["".join(row) for row in self.levels[self.current_level_name]['table']])
-        return "No level selected or level data empty."            
+        return "No level selected or level data empty."
 
     def get_file(self, filename):
         with open(filename, 'r', encoding='utf-8') as f:
           game_data = f.read().splitlines()
+        if not game_data:
+            raise ValueError('File has Empty data')
         no_levels = int(game_data[0])
+        # catch extra blank line in middle or at end
+        for index, line in enumerate(game_data):
+            if line == "":
+                 raise ValueError(f'Blank line at line {index}')
+        # find if remaining file is divisble by number of levels
+        n, modulo = divmod(len(game_data)-1 , no_levels)
+        if  modulo != 0:
+          lengths = [len(row) for row in game_data]
+          z, p, ia = rle(lengths)
+          counts = Counter(lengths)
+          # the tables will have the maximum count
+          max_length = max(counts.items(), key=operator.itemgetter(1))[0]
+          # use Run Length Encoding to get lengths of each line, grouped
+          # by same length
+          z, places, length_values = rle(lengths) 
+          print(f'Incorrect structure. Table line length is {max_length}')
+          print(f'length profile is {z}')
+          raise ValueError(f'Incorrect structure. use the length profile to find line')
+        
         level_dict = defaultdict()
         index = 1
         for level in range(no_levels):
-          level_name, level_hint, level_finish  = game_data[index: index + 3]
-          index += 3
-          row = game_data[index] # we know this is table data
-          table = [row]
-          index += 1
-          # assume that level name does NOT have length of data
-          while len(game_data[index]) == len(row):
-             table.append(game_data[index])
-             index += 1
-             if index == len(game_data):
-                break
-                
-          level_dict[level_name] = {'hint': level_hint, 'finish': level_finish, 'table': table}
+          level_name, level_hint, level_finish = game_data[index: index + 3]
+          table = game_data[index + 3: index + n]
+          index += n   
+          level_dict[level_name] = {'text1': level_hint, 'text2': level_finish, 'table': table}
         return level_dict
           
     def format_file(self):
@@ -120,13 +144,18 @@ class LevelManager:
        file_contents = [f'{no_sections}']
        for name, data in self.levels.items():
           file_contents.append(f'{name}')
-          file_contents.append(f'{data["hint"]}')
-          file_contents.append(f'{data["finish"]}')
-          file_contents.extend([f'{line}' for line in data['table']])
+          file_contents.append(f'{data["text1"]}')
+          file_contents.append(f'{data["text2"]}')
+          file_contents.extend([f'{"".join(line)}' for line in data["table"]])
+       
        return '\n'.join(file_contents)
+
 
 if __name__ == '__main__':
   level = LevelManager()
-  level.load_levels('DEFAULT.KYE')
-  print(level.levels)
+  f= '/private/var/mobile/Containers/Data/Application/24BEC035-C28E-496A-A41A-CEC669E05513/Documents/Pythonista_games/Kye/levels/cmt.KYE'
+  level.load_levels(f)
+  #print(level.levels)
+  new_data=  {'text1': 'Stay out of the road.', 'text2': "If you're this good - design some new levels.", 'table': ['555555555555555555555555555555', '5K   5553  1553 15c5         5', '5   c              155e5555e55', '55e55 7a55e5555e5a        c  5', '5   5 5           a55c5ll    5', '5   5 a               5U 5  75', '5   5 15e55555e55 759 5  e  55', '5   5           a 5 5 5  5  15', '5   1c55e555e55 5 e 5 5555   5', '5             5d5 5 e 1c55   5', '5555e55e555e555 5 5 a    5   5', '5c              5 e 159  5  75', '55 75e5555e5555a5 5   e  e  55', '55 c              5   5  5  15', '55 5 45e555555e55a55e53  5   5', '55 5      >             c5   5', '53 1c55e55555e55555e55  Ru v 5', '5            r            c5 5', '55c555559   75555559   75555*5', '555555555555555555555555555555']}
+  level.add_level('ABC', new_data)
   level.save_levels('temp.txt')

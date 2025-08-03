@@ -36,6 +36,7 @@ class EditorView(ui.View):
         self.initial_touch_location = None
         self.moved = False
         self.multitouch_enabled = True
+        self.pan_mode = False
         self.touches = {}
         self.initial_dist = None
         self.initial_center = None
@@ -55,11 +56,14 @@ class EditorView(ui.View):
         self.current_level_data = self.level_manager.get_level_data(self.level_manager.current_level_name)
         self.current_level_name = self.level_manager.current_level_name
         # print(f'{self.current_level_name=}, {self.current_level_data=}')
-        self.grid_height, self.grid_width = self.current_level_data.shape   
-        # print(f'{self.grid_width=}, {self.grid_height=}')
-        self.layout()
-        self.add_history()
-        self.set_needs_display()
+        if self.current_level_data is not None:
+            self.grid_height, self.grid_width = self.current_level_data.shape   
+            # print(f'{self.grid_width=}, {self.grid_height=}')
+            self.layout()
+            self.add_history()
+            self.set_needs_display()
+        else:
+            console.hud_alert('File is empty')
         
         
     def add_history(self):
@@ -103,6 +107,7 @@ class EditorView(ui.View):
              self.offset_y = (self.drawing_area_height - grid_total_height) / 2
         else:
             self.offset_y = max(min(self.offset_y, 0), self.drawing_area_height - grid_total_height)
+        # print('display_ssize', self.display_size)
             
     def update(self):        
      self.draw()
@@ -114,7 +119,7 @@ class EditorView(ui.View):
 
             clip_path = ui.Path.rect(0, 0, self.width, self.height)
             clip_path.add_clip()
-            self.display_size = 40
+            #self.display_size = 40
             # --- Drawing Sprites (instead of pixels) ---
             if self.current_level_data is not None:
               for r_idx, row in enumerate(self.current_level_data):
@@ -166,7 +171,7 @@ class EditorView(ui.View):
         # ... (multi-touch handling for zoom/pan - copy from PixelEditor)
         
         self.x_grid_initial, self.y_grid_initial = self.touch_to_grid(touch.location)
-        if self.current_level_data[self.y_grid_initial, self.x_grid_initial] != ' ':
+        if not self.pan_mode and self.current_level_data[self.y_grid_initial, self.x_grid_initial] != ' ':
           self.selected_existing = True
           self.char_to_move = self.current_level_data[self.y_grid_initial, self.x_grid_initial]
           self.stored = np.copy(self.current_level_data)
@@ -181,7 +186,7 @@ class EditorView(ui.View):
            
            self.layout()
            self.set_needs_display()
-        elif self.current_scale > self.min_scale and len(self.touches) == 1: # Single finger pan only if zoomed in
+        elif self.pan_mode and self.current_scale > self.min_scale : # Single finger pan only if zoomed in
             self.moved = True
             delta_x = touch.location.x - self.initial_touch_location.x
             delta_y = touch.location.y - self.initial_touch_location.y
@@ -223,6 +228,7 @@ class EditorView(ui.View):
         self.moved = False
         self.layout()
         self.set_needs_display()
+        
     # --- Tool Modes for Sprite Editor ---
     def place_sprite(self, x_grid, y_grid):
         char_to_place = self.selected_sprite_char
