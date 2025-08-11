@@ -354,13 +354,13 @@ class GameBoard(Scene):
           self.row_labels = [] # store the values
       else:
           if self.row_labels:
-              row_labels = self.row_labels
+              row_labels = iter(self.row_labels)
           else:
               self.row_labels = []
               row_labels = self.two_digit_number_generator(self.one_based_labels)
 
       if self.column_labels:
-          column_labels = self.column_labels
+          column_labels = iter(self.column_labels)
       else:
           column_labels = self.two_digit_number_generator(self.one_based_labels)
           self.column_labels = []

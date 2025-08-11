@@ -40,10 +40,10 @@ class Gui():
         self.dismiss_menu = self.gs.dismiss_modal_scene
         self.device = self.gs.device
         self.long_touch = self.gs.long_touch
-        try:
-            self.number_panel = ui.load_view('Number_panel.pyui')
-        except FileNotFoundError:
-            self.number_panel = None
+        #try:
+        #    self.number_panel = ui.load_view('Number_panel.pyui')
+        #except FileNotFoundError:
+        #    self.number_panel = None
 
         # menus can be controlled by dictionary of labels
         # and functions without parameters
@@ -182,13 +182,14 @@ class Gui():
         '@type sender: ui.Button'
         # Get the button's title for the following logic:
         t = sender.title
-        # get calling item
-        if hasattr(self, 'number_panel'):
-            self._panel = self.number_panel
-            self._itemlist = self.number_items
+        # get calling item are we in number panel or letter panel
+        print(sender.superview.name)
+        if sender.superview.name == 'Letters':
+           self._panel = self.letter_panel
+           self._itemlist = self.letter_items
         else:
-            self._panel = self.letter_panel
-            self._itemlist = self.letter_items
+            self._panel = self.number_panel
+            self._itemlist = self.number_items           
 
         # Get the labels:
         label = sender.superview['label1']
