@@ -5,12 +5,12 @@
         "nodes" : [
 
         ],
-        "frame" : "{{1220, 363}, {127, 384}}",
+        "frame" : "{{1133, 402}, {219, 384}}",
         "class" : "TableView",
         "attributes" : {
           "uuid" : "C227992C-6703-4CD1-8DAC-FF4E21941974",
+          "data_source_action" : "self.palette_action",
           "editing" : false,
-          "flex" : "",
           "corner_radius" : 0,
           "background_color" : "RGBA(1.0, 1.0, 1.0, 1.0)",
           "frame" : "{{412, 284}, {200, 200}}",
@@ -23,7 +23,7 @@
           "row_height" : 44,
           "class" : "TableView",
           "name" : "icon_view",
-          "data_source_action" : "self.palette_action"
+          "flex" : ""
         },
         "selected" : false
       },
@@ -152,7 +152,7 @@
         "nodes" : [
 
         ],
-        "frame" : "{{550, 7}, {80, 32}}",
+        "frame" : "{{550, 6}, {80, 32}}",
         "class" : "Button",
         "attributes" : {
           "border_width" : 1,
@@ -192,7 +192,7 @@
         "nodes" : [
 
         ],
-        "frame" : "{{348, 7}, {150, 31}}",
+        "frame" : "{{252, 6}, {107, 31}}",
         "class" : "Label",
         "attributes" : {
           "font_size" : 18,
@@ -262,13 +262,13 @@
         "nodes" : [
 
         ],
-        "frame" : "{{13, 87}, {1206, 867}}",
+        "frame" : "{{13, 100}, {1112, 867}}",
         "class" : "View",
         "attributes" : {
-          "custom_class" : "EditorView",
-          "frame" : "{{633, 462}, {100, 100}}",
-          "class" : "View",
           "name" : "editor_view",
+          "frame" : "{{633, 462}, {100, 100}}",
+          "custom_class" : "EditorView",
+          "class" : "View",
           "uuid" : "8297A4F0-0B16-40A8-ADA5-956A6B82E611"
         },
         "selected" : false
@@ -277,7 +277,7 @@
         "nodes" : [
 
         ],
-        "frame" : "{{750, 7}, {80, 32}}",
+        "frame" : "{{750, 6}, {80, 32}}",
         "class" : "Button",
         "attributes" : {
           "border_width" : 1,
@@ -333,7 +333,63 @@
           "name" : "run",
           "font_size" : 15
         },
+        "selected" : false
+      },
+      {
+        "nodes" : [
+
+        ],
+        "frame" : "{{845, 6}, {374, 32}}",
+        "class" : "Label",
+        "attributes" : {
+          "border_width" : 1,
+          "name" : "spritename",
+          "alignment" : "left",
+          "frame" : "{{608, 496}, {150, 32}}",
+          "border_color" : "RGBA(0.150943,0.150943,0.150943,1.000000)",
+          "text" : "Label",
+          "corner_radius" : 0,
+          "uuid" : "8BE380A5-BD77-4A5E-87A9-C74F1527E529",
+          "class" : "Label",
+          "font_size" : 18,
+          "font_name" : "<System>"
+        },
         "selected" : true
+      },
+      {
+        "nodes" : [
+
+        ],
+        "frame" : "{{1133, 354}, {62, 32}}",
+        "class" : "Button",
+        "attributes" : {
+          "action" : "self.back_action",
+          "frame" : "{{643, 496}, {80, 32}}",
+          "title" : "Back",
+          "uuid" : "373EC1B4-E666-49A7-8FE1-EF69179A8F36",
+          "class" : "Button",
+          "name" : "back",
+          "font_size" : 15
+        },
+        "selected" : false
+      },
+      {
+        "nodes" : [
+
+        ],
+        "frame" : "{{376, 6}, {150, 32}}",
+        "class" : "Label",
+        "attributes" : {
+          "name" : "sprite_size",
+          "frame" : "{{608, 496}, {150, 32}}",
+          "uuid" : "93F691AF-2111-40E5-976D-843308C6E1FC",
+          "class" : "Label",
+          "alignment" : "left",
+          "text" : "Label",
+          "font_size" : 18,
+          "font_name" : "<System>"
+        },
+        "selected" : false
       }
     ],
     "frame" : "{{0, 0}, {1366, 1024}}",

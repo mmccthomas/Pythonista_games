@@ -1,7 +1,11 @@
 # editor_view.py (Refactored to include Pan/Zoom/Undo)
+# TODO refactor to use SceneView for the editor
+# this would allow SpriteNode for objects, which allow z 
+# editor view deals with display and changes to grid
 import ui
 import math
 import console
+import scene
 from collections import deque
 import numpy as np
 
@@ -16,17 +20,13 @@ class EditorView(ui.View):
         self.grid_height = 15 # Default level height
         self.base_sprite_size = 16 # Ideal size of one sprite cell at zoom 1.0
 
-        self.current_level_name = "Level 1"
         self.current_level_data = None
-        #if not self.current_level_data:
-        #    # Initialize a new empty level if it doesn't exist
-        #    self.current_level_data = [[' ' for _ in range(self.grid_width)] for _ in range(self.grid_height)]
-        #    self.level_manager.levels[self.current_level_name] = self.current_level_data
+
             
         #self.selected_sprite_char = list(self.sprite_manager.sprite_map)[0] # Default selected sprite for placement
         self.selected_sprite_char = ' '
-        # --- Pan/Zoom/Undo from PixelEditor ---
         
+        # --- Pan/Zoom/Undo ---        
         self.current_scale = 1.0
         self.min_scale = 0.5 # Allow slight zoom out
         self.max_scale = 8.0 # Max zoom in for sprite details
@@ -48,14 +48,13 @@ class EditorView(ui.View):
         # --- Editor Tools/Modes ---
         # Instead of `self.mode = self.pencil`, you'd have:
         self.tool_mode = self.place_sprite # Default tool: placing sprites
-        # You'd have other modes like self.erase_sprite, self.pan_tool, etc.
         
         self.layout() # Initial layout calculation
+        self.build_background_grid()
         
     def load_map(self):
-        self.current_level_data = self.level_manager.get_level_data(self.level_manager.current_level_name)
-        self.current_level_name = self.level_manager.current_level_name
-        # print(f'{self.current_level_name=}, {self.current_level_data=}')
+        self.current_level_data = self.level_manager.get_level_data(self.level_manager.level_name)
+        # print(f'{self.level_manager.level_name}, {self.current_level_data=}')
         if self.current_level_data is not None:
             self.grid_height, self.grid_width = self.current_level_data.shape   
             # print(f'{self.grid_width=}, {self.grid_height=}')
@@ -93,7 +92,10 @@ class EditorView(ui.View):
 
         base_display_scale = min(scale_x, scale_y)
         self.display_size = effective_base_sprite_size * base_display_scale * self.current_scale
-        
+        if hasattr(self, 'sprite_manager'):
+           self.draw_ratio = self.display_size / self.sprite_manager.most_sizes.x
+        else:
+           self.draw_ratio = 1
         # Centering and clamping logic (copied from PixelEditor)
         grid_total_width = self.grid_width * self.display_size
         grid_total_height = self.grid_height * self.display_size
@@ -107,7 +109,6 @@ class EditorView(ui.View):
              self.offset_y = (self.drawing_area_height - grid_total_height) / 2
         else:
             self.offset_y = max(min(self.offset_y, 0), self.drawing_area_height - grid_total_height)
-        # print('display_ssize', self.display_size)
             
     def update(self):        
      self.draw()
@@ -121,16 +122,22 @@ class EditorView(ui.View):
             clip_path.add_clip()
             #self.display_size = 40
             # --- Drawing Sprites (instead of pixels) ---
+            scene.blend_mode(scene.BLEND_ADD)
             if self.current_level_data is not None:
               for r_idx, row in enumerate(self.current_level_data):
                   for c_idx, char in enumerate(row):
                       if char != ' ': # Only draw if there's a sprite
                           sprite_image = self.sprite_manager.get_sprite_image(char)
+                          try:
+                              sprite_size = sprite_image.size * self.draw_ratio
+                          except AttributeError:
+                              sprite_size = ui.Size(self.display_size, self.display_size)
                           if sprite_image:
                               x = c_idx * self.display_size + self.offset_x
                               y = r_idx * self.display_size + self.offset_y
-                              #print(f'{r_idx},{c_idx}:{x:.1f}, {y:.1f}, {self.display_size:.1f}')
-                              sprite_image.draw(x, y, self.display_size, self.display_size)
+                              # make lower left on x, y
+                              y = y - sprite_size.y + self.display_size
+                              sprite_image.draw(x, y, *sprite_size) #self.display_size, self.display_size)
             
             # --- Drawing Grid Lines (copied from PixelEditor) ---
             ui.set_color('gray')
@@ -151,9 +158,6 @@ class EditorView(ui.View):
                 path.line_to(self.display_size * self.grid_width + self.offset_x, y * self.display_size + self.offset_y)
                 path.stroke()
 
-            # --- Drawing selection/paste preview (adapt as needed for sprites) ---
-            # ... (similar logic as PixelEditor, but for sprites/characters)
-
     def touch_to_grid(self, touch_location):
         # Convert touch location to grid coordinates, considering pan offset
         x_grid = int((touch_location.x - self.offset_x) / self.display_size)
@@ -167,9 +171,7 @@ class EditorView(ui.View):
     def touch_began(self, touch):
         self.selected_existing = False
         self.initial_touch_location = touch.location
-        self.moved = False        
-        # ... (multi-touch handling for zoom/pan - copy from PixelEditor)
-        
+        self.moved = False                
         self.x_grid_initial, self.y_grid_initial = self.touch_to_grid(touch.location)
         if not self.pan_mode and self.current_level_data[self.y_grid_initial, self.x_grid_initial] != ' ':
           self.selected_existing = True
@@ -196,8 +198,7 @@ class EditorView(ui.View):
             
             self.layout()
             self.set_needs_display()
-            self.initial_touch_location = touch.location # Update for continuous pan
-        
+            self.initial_touch_location = touch.location # Update for continuous pan        
          
         else: # Drawing/Placing Sprites mode
             current_x_grid, current_y_grid = self.touch_to_grid(touch.location)
@@ -266,7 +267,6 @@ class EditorView(ui.View):
 
         self.layout() 
         self.set_needs_display()
-        # Update UI for scale display (e.g., in toolbar)
 
     def reset_zoom(self):
         self._apply_zoom(1.0)
@@ -275,11 +275,11 @@ class EditorView(ui.View):
         self.layout()
         self.set_needs_display()
 
-    def set_level(self, level_name):
+    def get_level_data(self, level_name):
         # Update grid dimensions based on the loaded level
         level_data = self.level_manager.get_level_data(level_name)
         if level_data is not None:
-            self.current_level_name = level_name
+            
             self.current_level_data = level_data
             self.grid_height, self.grid_width = level_data.shape
             self.add_history() # Add new level to history
@@ -288,6 +288,33 @@ class EditorView(ui.View):
             # Update main_view name with new level dimensions
         else:
             console.hud_alert(f"Level '{level_name}' not found.", 'error', 0.8)
-
-    # ... (Other methods for selection, cut, copy, paste, etc., adapted for sprites)
-
+            
+    def build_background_grid(self):
+          parent = scene.Node()                              
+          # Parameters to pass to the creation of ShapeNode
+          params = {
+            "path": ui.Path.rect(0, 0, self.display_size, self.display_size * self.grid_height),
+            "fill_color": 'white',
+            "stroke_color": "grey",
+            "z_position": 1
+          }
+          anchor = scene.Vector2(0, 0)
+          # Building the columns
+          for i in range(self.grid_width):
+            n = scene.ShapeNode(**params)
+            pos = scene.Vector2(0 + i * self.display_size, 0)
+            n.position = pos
+            n.anchor_point = anchor
+            parent.add_child(n)
+            
+          # Building the rows
+          params["path"] = ui.Path.rect(0, 0, self.display_size * self.grid_width,
+                                     self.display_size)
+          params['fill_color'] = 'clear'
+          for i in range(self.grid_height):
+            n = scene.ShapeNode(**params)
+            pos = scene.Vector2(0, 0 + i * self.display_size)
+            n.position = pos
+            n.anchor_point = anchor
+            parent.add_child(n)            
+          return parent

@@ -3,23 +3,6 @@
     "nodes" : [
       {
         "nodes" : [
-
-        ],
-        "frame" : "{{250, 6}, {502, 512}}",
-        "class" : "View",
-        "attributes" : {
-          "flex" : "WH",
-          "border_width" : 1,
-          "enabled" : true,
-          "custom_class" : "PixelEditor",
-          "border_color" : "RGBA(0.000000,0.000000,0.000000,1.000000)",
-          "uuid" : "C0DF6FB2-7849-4BE2-ACF4-E5D6C597111C",
-          "name" : "editor"
-        },
-        "selected" : true
-      },
-      {
-        "nodes" : [
           {
             "nodes" : [
 
@@ -104,13 +87,13 @@
             "class" : "Label",
             "attributes" : {
               "flex" : "",
-              "name" : "label1",
+              "font_size" : 24,
               "enabled" : true,
               "border_color" : "RGBA(0.000000,0.000000,0.000000,1.000000)",
               "text" : "Colors",
               "alignment" : "center",
               "uuid" : "0AB528B6-2405-48FB-8765-679F8562DA60",
-              "font_size" : 24,
+              "name" : "label1",
               "text_color" : "RGBA(0.000000,0.000000,0.000000,1.000000)"
             },
             "selected" : false
@@ -455,7 +438,7 @@
             "class" : "TextField",
             "attributes" : {
               "flex" : "",
-              "name" : "color_input",
+              "font_size" : 17,
               "enabled" : true,
               "border_style" : 3,
               "border_color" : "RGBA(0.000000,0.000000,0.000000,1.000000)",
@@ -463,7 +446,7 @@
               "alignment" : "center",
               "background_color" : "RGBA(0.785714,0.785714,0.785714,0.000000)",
               "uuid" : "BE7A8C25-07D4-4BDB-8913-61CF129FF3E5",
-              "font_size" : 17,
+              "name" : "color_input",
               "text_color" : "RGBA(0.000000,0.000000,0.000000,1.000000)"
             },
             "selected" : false
@@ -493,13 +476,13 @@
             "class" : "Label",
             "attributes" : {
               "flex" : "",
-              "name" : "label1",
+              "font_size" : 24,
               "enabled" : true,
               "border_color" : "RGBA(0.000000,0.000000,0.000000,1.000000)",
               "text" : "Toolbar",
               "alignment" : "center",
               "uuid" : "99677570-0BD6-4708-9070-C349244F9CC6",
-              "font_size" : 24,
+              "name" : "label1",
               "text_color" : "RGBA(0.000000,0.000000,0.000000,1.000000)"
             },
             "selected" : false
@@ -535,13 +518,13 @@
             "class" : "Label",
             "attributes" : {
               "flex" : "",
-              "name" : "label2",
+              "font_size" : 17,
               "enabled" : true,
               "border_color" : "RGBA(0.000000,0.000000,0.000000,1.000000)",
               "text" : "Pixels",
               "alignment" : "center",
               "uuid" : "AC6B17A8-AEEF-4385-8C15-20434795F310",
-              "font_size" : 17,
+              "name" : "label2",
               "text_color" : "RGBA(0.000000,0.000000,0.000000,1.000000)"
             },
             "selected" : false
@@ -559,12 +542,12 @@
                   "border_width" : 1,
                   "enabled" : true,
                   "tint_color" : "RGBA(0.000000,0.000000,0.000776,1.000000)",
-                  "name" : "undo",
+                  "font_size" : 15,
                   "title" : "",
                   "border_color" : "RGBA(0.000000,0.000000,0.000000,1.000000)",
                   "font_bold" : false,
                   "uuid" : "91BC0ADC-8874-4E6A-8F75-E4813CB4FBB4",
-                  "font_size" : 15,
+                  "name" : "undo",
                   "image_name" : "ionicons-ios7-undo-32"
                 },
                 "selected" : false
@@ -580,12 +563,12 @@
                   "border_width" : 1,
                   "enabled" : true,
                   "tint_color" : "RGBA(0.000000,0.000000,0.000776,1.000000)",
-                  "name" : "trash",
+                  "font_size" : 15,
                   "title" : "",
                   "border_color" : "RGBA(0.000000,0.000000,0.000000,1.000000)",
                   "font_bold" : false,
                   "uuid" : "FBAB3AB0-3385-456E-988A-C2512634B15E",
-                  "font_size" : 15,
+                  "name" : "trash",
                   "image_name" : "ionicons-ios7-trash-32"
                 },
                 "selected" : false
@@ -601,12 +584,12 @@
                   "border_width" : 1,
                   "enabled" : true,
                   "tint_color" : "RGBA(0.000000,0.000000,0.000776,1.000000)",
-                  "name" : "save",
+                  "font_size" : 15,
                   "title" : "",
                   "border_color" : "RGBA(0.000000,0.000000,0.000000,1.000000)",
                   "font_bold" : false,
                   "uuid" : "EA522AA9-53A0-438C-8985-3350F2FBEEC4",
-                  "font_size" : 15,
+                  "name" : "save",
                   "image_name" : "ionicons-archive-32"
                 },
                 "selected" : false
@@ -622,12 +605,12 @@
                   "border_width" : 1,
                   "enabled" : true,
                   "tint_color" : "RGBA(1.000000,1.000000,1.000000,1.000000)",
-                  "name" : "eraser",
+                  "font_size" : 15,
                   "title" : "",
                   "border_color" : "RGBA(0.000000,0.000000,0.000000,1.000000)",
                   "font_bold" : false,
                   "uuid" : "C9827D26-4D41-42D8-B67E-FC4C2D045E63",
-                  "font_size" : 15,
+                  "name" : "eraser",
                   "image_name" : "ionicons-stop-32"
                 },
                 "selected" : false
@@ -702,12 +685,12 @@
                   "border_width" : 1,
                   "enabled" : true,
                   "tint_color" : "RGBA(0.000000,0.000000,0.000776,1.000000)",
-                  "name" : "crop",
+                  "font_size" : 15,
                   "title" : "",
                   "border_color" : "RGBA(0.000000,0.000000,0.000000,1.000000)",
                   "font_bold" : false,
                   "uuid" : "CE9B3A4C-2E4D-437B-8CBA-A582C36DE7CF",
-                  "font_size" : 15,
+                  "name" : "crop",
                   "image_name" : "iob:arrow_expand_256"
                 },
                 "selected" : false
@@ -720,7 +703,7 @@
                 "class" : "Button",
                 "attributes" : {
                   "border_width" : 1,
-                  "font_size" : 15,
+                  "name" : "load_image",
                   "frame" : "{{72, 34}, {80, 32}}",
                   "tint_color" : "RGBA(0.021329,0.021329,0.061321,1.000000)",
                   "title" : "",
@@ -728,7 +711,7 @@
                   "class" : "Button",
                   "border_color" : "RGBA(0.386792,0.386792,0.386792,1.000000)",
                   "corner_radius" : 0,
-                  "name" : "load_image",
+                  "font_size" : 15,
                   "image_name" : "iob:ios7_cloud_download_outline_32"
                 },
                 "selected" : false
@@ -741,14 +724,14 @@
                 "class" : "Button",
                 "attributes" : {
                   "border_width" : 1,
-                  "font_size" : 15,
+                  "name" : "zoomin",
                   "frame" : "{{72, 61}, {80, 32}}",
                   "tint_color" : "RGBA(0.061321,0.061321,0.061321,1.000000)",
                   "title" : "",
                   "uuid" : "4C793E54-F405-430C-976D-D0138AA6B5A4",
                   "class" : "Button",
                   "corner_radius" : 0,
-                  "name" : "zoomin",
+                  "font_size" : 15,
                   "image_name" : "iob:arrow_shrink_32"
                 },
                 "selected" : false
@@ -761,14 +744,14 @@
                 "class" : "Button",
                 "attributes" : {
                   "border_width" : 1,
-                  "font_size" : 15,
+                  "name" : "zoomout",
                   "frame" : "{{72, 61}, {80, 32}}",
                   "tint_color" : "RGBA(0.028302,0.028302,0.028302,1.000000)",
                   "title" : "",
                   "uuid" : "F81836BA-33CD-41B8-9452-A02E715E65F0",
                   "class" : "Button",
                   "corner_radius" : 0,
-                  "name" : "zoomout",
+                  "font_size" : 15,
                   "image_name" : "iob:arrow_expand_32"
                 },
                 "selected" : false
@@ -800,13 +783,13 @@
                 "frame" : "{{186, 105}, {32, 32}}",
                 "class" : "Button",
                 "attributes" : {
-                  "font_size" : 15,
+                  "name" : "circle",
                   "frame" : "{{72, 61}, {80, 32}}",
                   "tint_color" : "RGBA(0.002358,0.002358,0.002358,1.000000)",
                   "title" : "",
                   "uuid" : "AFA9E3AD-0809-499F-8CA6-CAA264EECC30",
                   "class" : "Button",
-                  "name" : "circle",
+                  "font_size" : 15,
                   "image_name" : "iob:ios7_circle_outline_32"
                 },
                 "selected" : false
@@ -895,12 +878,12 @@
             "frame" : "{{6, 117}, {224, 190}}",
             "class" : "View",
             "attributes" : {
+              "uuid" : "922E13B9-6F8D-4D82-808E-A3380A309CAB",
               "border_width" : 1,
-              "flex" : "",
               "enabled" : true,
               "border_color" : "RGBA(0.000000,0.000000,0.000000,1.000000)",
               "name" : "tools",
-              "uuid" : "922E13B9-6F8D-4D82-808E-A3380A309CAB"
+              "flex" : ""
             },
             "selected" : true
           },
@@ -911,13 +894,13 @@
             "frame" : "{{105, 50}, {43, 46}}",
             "class" : "Label",
             "attributes" : {
-              "font_size" : 18,
+              "name" : "scale",
               "frame" : "{{43, 140}, {150, 32}}",
               "uuid" : "F4C13976-5DCA-4FCD-AA45-4CDC670E903D",
               "class" : "Label",
               "alignment" : "left",
               "text" : "x1",
-              "name" : "scale",
+              "font_size" : 18,
               "font_name" : "<System>"
             },
             "selected" : false
@@ -935,7 +918,7 @@
           "uuid" : "064BEC5B-A9A1-432F-B6BB-58CBCCFFA6F9",
           "name" : "toolbar"
         },
-        "selected" : false
+        "selected" : true
       },
       {
         "nodes" : [
@@ -944,12 +927,29 @@
         "frame" : "{{8, 720}, {234, 234}}",
         "class" : "ImageView",
         "attributes" : {
+          "uuid" : "76648CDF-D913-4BE5-B9B7-18DF118351D4",
           "border_width" : 1,
-          "flex" : "",
           "enabled" : true,
           "border_color" : "RGBA(0.000000,0.000000,0.000000,1.000000)",
           "name" : "preview",
-          "uuid" : "76648CDF-D913-4BE5-B9B7-18DF118351D4"
+          "flex" : ""
+        },
+        "selected" : false
+      },
+      {
+        "nodes" : [
+
+        ],
+        "frame" : "{{250, 6}, {502, 512}}",
+        "class" : "View",
+        "attributes" : {
+          "flex" : "WH",
+          "border_width" : 1,
+          "enabled" : true,
+          "custom_class" : "PixelEditor",
+          "border_color" : "RGBA(0.000000,0.000000,0.000000,1.000000)",
+          "uuid" : "C0DF6FB2-7849-4BE2-ACF4-E5D6C597111C",
+          "name" : "editor"
         },
         "selected" : false
       }

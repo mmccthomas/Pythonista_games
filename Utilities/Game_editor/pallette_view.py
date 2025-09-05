@@ -3,21 +3,19 @@
 import ui
 import io
 from PIL import Image
+import traceback
 
 
 class PaletteView(ui.View):
  
-    def __init__(self, sprite_manager, editor_view, main_view, *args, **kwargs):
+    def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.sprite_manager = sprite_manager
-        self.editor_view = editor_view  # To notify the editor of selection
-        self.main_view = main_view
+        
         self.name = "Sprite Palette"
         self.background_color = '#333333'       
-        self.data = self.sprite_manager.image_dict
         self.history = []
-        self.current_data = self.data
-        self.update_list_view()
+        self.current_data = None
+        self.used_icons = []
         
     def pil_to_ui(self, img):
         with io.BytesIO() as bIO:
@@ -27,9 +25,17 @@ class PaletteView(ui.View):
     def ui_to_pil(self, img):
         return Image.open(io.BytesIO(img.to_png()))
          
-    def scale(self, image, scale=2):
-        img = self.ui_to_pil(image)
+    def scale(self, image, scale=None):
+        # make 32pixel high
+        ITEM_SIZE = 32
+
+        if isinstance(image, ui.Image):
+           img = self.ui_to_pil(image)
+        else:
+           img = image
         w, h = img.size
+        if scale is None:
+            scale = ITEM_SIZE / max(w,h)
         img = img.resize((int(scale * w), int(scale * h)))
         return self.pil_to_ui(img)
 
@@ -44,13 +50,15 @@ class PaletteView(ui.View):
             self.current_data = self.history.pop()
             self.update_list_view()
             self.set_backbutton()
-       
+     
     #@ui.in_background
     def item_selected(self, sender):
         """Called when an item in the list view is selected."""
         selected_index = sender.selected_row        
         selected_key = list(self.current_data.keys())[selected_index]
-        selected_value = self.current_data[selected_key]
+        
+        self.main_view.gui['spritename'].text = f'{selected_key} {selected_index}'
+        selected_value = self.current_data[selected_key]              
         if isinstance(selected_value, dict):
             # If the selected item is a dictionary, navigate into it
             self.history.append(self.current_data)
@@ -63,28 +71,33 @@ class PaletteView(ui.View):
                 selected = selected_value                         
                 size = selected.size               
                 selected = self.sprite_manager.rev_lookup[selected_key]
-                self.main_view.game_view['spritename'].text = selected_key
+                self.main_view.gui['spritename'].text = f'{selected_key.split(".")[0]}'
             except Exception as e:
+                print(traceback.format_exc())
                 selected = selected_value
                 size = None
             return selected, size                
         
     def set_backbutton(self):        
-        self.main_view.game_view['back'].enabled = self.history is not None
+        self.main_view.gui['back'].enabled = self.history is not None
             
     def update_list_view(self):
         """Updates the list view with the current level of dictionary keys."""
+        scaled = 2
         items = []
-        for key in self.current_data.keys():
-            value = self.current_data[key]
+        for key, value in self.current_data.items():
+            # print(key, value)
             if isinstance(value, dict):
                 # This item is a nested dictionary, so it can be "expanded"
                 items.append(key)
             else:
                 # This item is a simple value
                 try:
-                    items.append({'image': self.scale(self.pil_to_ui(value),2), 'title': f'{self.sprite_manager.rev_lookup[key]} {value.size}'} )
-                except  (AttributeError, KeyError):
-                    pass
+                    #print(value, value.size, self.sprite_manager.rev_lookup[key])
+                    ui_img = self.scale(value)
+                    items.append({'image': ui_img, 'title': f'{self.sprite_manager.rev_lookup[key]} {value.size}'} )
+                except  (AttributeError, KeyError) as e:
+                    print(traceback.format_exc())
+                    print(e, value, key)
         self.main_view.icon_view.data_source = ui.ListDataSource(items) 
         self.main_view.icon_view.reload_data()            

@@ -38,18 +38,18 @@ from collections import defaultdict
 from PIL import Image
 import base_path
 base_path.add_paths(__file__)
-import Kye.Kye
+#import Kye.Kye
 
 
 class Config():
   def __init__(self):
       self.get_lookup()
       self.image_dict = self.load_images('image.png') 
-      self.imagelist = [item[0] for item in self.lookup.values()]
+      self.imagelist = [item for item in self.lookup.values()]
       # filter the images
       self.image_dict = {image: self.image_dict[image] for image in self.imagelist}
       
-      self.run_module = Kye.Kye 
+      self.run_module = 'Kye.Kye' 
   
   def load_images(self, image_name):    
       # combined image
@@ -101,56 +101,56 @@ class Config():
       ] 
            
       self.lookup = {
-              'K' : ("kye",'K'),
-              '1' : ("wall1", ''),
-              '2' : ("wall2", ''),
-              '3' : ("wall3", ''),
-              '4' : ("wall4", ''),
-              '5' : ("wall5", '5'),
-              '6' : ("wall6", ''),
-              '7' : ("wall7", ''),
-              '8' : ("wall8", ''),
-              '9' : ("wall9", ''),
-              'b' : ("block", 'B'),
-              'B' : ("blockr", 'b'),
-              'e' : ("blocke", 'e'),
-              '*' : ("diamond_1",'*'),
-              'a' : ("turner_clockwise", 'c'),
-              'c' : ("turner_anticlockwise", 'a'),
-              'D' : ("sentry_down", 'L'),
-              'U' : ("sentry_up", 'R'),
-              'L' : ("sentry_left", 'U'),
-              'R' : ("sentry_right", 'D'),
-              '[' : ("spike_1", 'E'),
-              'E' : ("gnasher_1", 'T'),
-              'T' : ("twister_1", '~'),
-              '~' : ("snake_1", 'C'),
-              'C' : ("blob_1", '['),
-              's' : ("sticky_vertical", 'S'),
-              'S' : ("sticky_horizontal", 's'),
-              'u' : ("slider_up", 'r'),
-              'd' : ("slider_down", 'l'),
-              'l' : ("slider_left", 'u'),
-              'r' : ("slider_right", 'd'),
-              '^' : ("rocky_up", '>'),
-              'v' : ("rocky_down", '<'),
-              '<' : ("rocky_left", '^'),
-              '>' : ("rocky_right", 'v'),
-              'H' : ("black_hole_1", 'H'),
-              '}' : ("block_timer_3", '|'), 
-              '|' : ("block_timer_4", '{'), 
-              '{' : ("block_timer_5", 'z'), 
-              'z' : ("block_timer_6", 'y'), 
-              'y' : ("block_timer_7", 'x'), 
-              'x' : ("block_timer_8", 'w'), 
-              'w' : ("block_timer_9", '}'), 
-              'h' : ("oneway_down_1", 'g'),
-              'i' : ("oneway_up_1", 'f'),
-              'f' : ("oneway_right_1", 'h'),
-              'g' : ("oneway_left_1", 'i'),
-              'A' : ("slider_shooter_up", 'F'),
-              'F' : ("rocky_shooter_up", 'A'),
-              ' ' : ("blank", '')
+              'K' : "kye",
+              '1' : "wall1",
+              '2' : "wall2",
+              '3' : "wall3",
+              '4' : "wall4",
+              '5' : "wall5",
+              '6' : "wall6",
+              '7' : "wall7",
+              '8' : "wall8",
+              '9' : "wall9",
+              'b' : "block",
+              'B' : "blockr",
+              'e' : "blocke",
+              '*' : "diamond_1",
+              'a' : "turner_clockwise",
+              'c' : "turner_anticlockwise",
+              'D' : "sentry_down",
+              'U' : "sentry_up",
+              'L' : "sentry_left",
+              'R' : "sentry_right",
+              '[' : "spike_1",
+              'E' : "gnasher_1",
+              'T' : "twister_1",
+              '~' : "snake_1",
+              'C' : "blob_1",
+              's' : "sticky_vertical",
+              'S' : "sticky_horizontal",
+              'u' : "slider_up",
+              'd' : "slider_down",
+              'l' : "slider_left",
+              'r' : "slider_right",
+              '^' : "rocky_up",
+              'v' : "rocky_down",
+              '<' : "rocky_left",
+              '>' : "rocky_right",
+              'H' : "black_hole_1",
+              '}' : "block_timer_3",
+              '|' : "block_timer_4",
+              '{' : "block_timer_5",
+              'z' : "block_timer_6", 
+              'y' : "block_timer_7", 
+              'x' : "block_timer_8", 
+              'w' : "block_timer_9", 
+              'h' : "oneway_down_1",
+              'i' : "oneway_up_1",
+              'f' : "oneway_right_1",
+              'g' : "oneway_left_1",
+              'A' : "slider_shooter_up",
+              'F' : "rocky_shooter_up",
+              ' ' : "blank"
               }
       
       

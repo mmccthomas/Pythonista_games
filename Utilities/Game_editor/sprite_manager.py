@@ -11,18 +11,25 @@ class SpriteManager:
     def __init__(self, config_file):
         # get configuration file
         config_module = importlib.import_module(config_file)
-        config = config_module.Config()
-        self.image_dict = config.image_dict
-        self.lookup = config.lookup
-        self.rev_lookup = {v[0]: k for k, v in self.lookup.items()}
-        self.run_module = getattr(config, 'run_module', None)
+        self.config = config_module.Config()
+        self.image_dict = self.config.image_dict
+        self.lookup = self.config.lookup
+        self.rev_lookup = {v: k for k, v in self.lookup.items()}
+        self.run_module = getattr(self.config, 'run_module', None)
         self.sprite_map = {}
         self.load_sprites()  # Load sprites
         sprite_sizes = [img.size for img in self.sprite_map.values()]
-        counter = Counter(sprite_sizes)
+        sprint_size_str = [f'{int(sprite_size.x)}x{int(sprite_size.y)}' for sprite_size in sprite_sizes]
+        
+        # TODO this is not robust can end up with smallest size
+        counter = Counter(sprint_size_str)
         self.most_sizes = max(counter, key=lambda key: counter[key])
-        
-        
+        s = self.most_sizes.split('x')
+        self.most_sizes = ui.Size(int(s[0]), int(s[1]))
+        # allow config to set own gridsize
+        if hasattr(self.config, 'min_size'):
+           self.most_sizes = self.config.min_size            
+               
         
     def pil_to_ui(self, img):
         with io.BytesIO() as bIO:
@@ -53,7 +60,7 @@ class SpriteManager:
 
     def load_sprites(self):
         for k, v in self.lookup.items():
-            img = self.find_key(self.image_dict, v[0])            
+            img = self.find_key(self.image_dict, v)            
             if img:
                self.add_sprite(k, self.pil_to_ui(img))
                

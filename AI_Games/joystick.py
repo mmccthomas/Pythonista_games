@@ -9,7 +9,9 @@ class Joystick(Node):
     Node is positioned, SpriteNodes and LabelNode are positioned 
     relative to this
     """
-    def __init__(self, position, color='red', alpha=0.8, show_xy=True, msg='', limit=None):
+    def __init__(self, position, color='black', 
+                 alpha=0.8, show_xy=True, msg='', 
+                 deadzone_x=0.5, deadzone_y=0.5):
         # --- Configuration ---
         self.position = position
         self.joystick_radius = 100.0
@@ -19,32 +21,23 @@ class Joystick(Node):
         self.x = 0
         self.y = 0
         self.scale=1
-        if limit=='lr':
-           self.limit = 'horizontal'
-           icon = 'joystick_leftright 3.png'
-        elif limit == 'ud':
-           self.limit = 'vertical'
-           icon = 'joystick_updown 3.png'
-        else:
-             self.limit = None             
-             icon = 'joystick_all 3.png'
-        
+        self.keys_pressed = set()
+        self.deadzone_x = deadzone_x
+        self.deadzone_y = deadzone_y
         # --- Private State ---
         self._is_touched = False
         
         # --- Create Nodes ---
         # The background for the joystick
         self.outer_joystick = SpriteNode(
-            Texture(icon), #ui.Image.named(icon).with_rendering_mode(ui.RENDERING_MODE_TEMPLATE)),
+            'iow:disc_256',
             size=(self.joystick_radius * 2,
             self.joystick_radius * 2),
             position = (0, 0),
             color=self.joystick_color,
             alpha=alpha,
-            z_position=10,
             parent=self           
         )
-        self.outer_joystick.color = self.joystick_color
 
         # The movable inner circle (thumbstick)
         self.inner_joystick = SpriteNode('emj:Black_Circle',            
@@ -52,7 +45,6 @@ class Joystick(Node):
             self.thumbstick_radius * 2),
             position = (0, 0),
             color=self.thumbstick_color,
-            z_position=12,
             parent=self
         )
         # A label to display the output
@@ -89,10 +81,7 @@ class Joystick(Node):
         # Calculate vector from center to touch
         offset = touch.location - self.position
         distance = math.hypot(offset.x, offset.y)
-        if self.limit == 'horizontal':
-           offset.y = 0
-        elif self.limit == 'vertical':
-           offset.x = 0
+        
         # Calculate the maximum allowed distance for the inner joystick's center
         # to ensure it stays within the outer joystick's boundary.
         # This is the outer radius minus the inner radius.
@@ -105,6 +94,26 @@ class Joystick(Node):
             self.inner_joystick.position = (clamped_x, clamped_y)
         else:
             self.inner_joystick.position = offset
+        
+    def emit_text(self):
+        if self.x < -self.deadzone_x:
+            self.keys_pressed.add('left')
+            self.keys_pressed.discard('right')
+        elif self.x > self.deadzone_x:
+            self.keys_pressed.add('right')
+            self.keys_pressed.discard('left')
+        else:
+            self.keys_pressed.discard('left')
+            self.keys_pressed.discard('right')
+        if self.y > self.deadzone_y:
+            self.keys_pressed.add('up')
+            self.keys_pressed.discard('down')      
+        elif self.y < -self.deadzone_y:
+            self.keys_pressed.add('down')
+            self.keys_pressed.discard('up')
+        else:
+            self.keys_pressed.discard('up')        
+            self.keys_pressed.discard('down')      
 
     def touch_ended(self, touch):
         """Called when a touch ends."""
@@ -128,12 +137,14 @@ class Joystick(Node):
         
         self.x = normalized_x
         self.y = normalized_y
+        
+        self.emit_text()
 
 # use case               
 class MyScene(Scene):
   def setup(self):
      self.background_color='green'
-     self.joystick = Joystick(position=Point(500, 200), limit='lr', color='red')
+     self.joystick = Joystick(position=Point(500, 200))
      self.add_child(self.joystick)
      
   def update(self):
