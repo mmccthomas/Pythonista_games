@@ -375,8 +375,8 @@ class GameBoard(Scene):
           self.row_labels.append(n.text)
           
       for i in range(self.DIMENSION_Y):
-          pos = Vector2(0, 0 + i * self.SQ_SIZE)
-          idx = self.DIMENSION_Y - 1 - i
+          pos = Vector2(0, (self.DIMENSION_Y - i - 1) * self.SQ_SIZE)
+          
           n = LabelNode(next(column_labels), parent=self.game_field)
           
           n.position = (pos.x - 20, pos.y + self.SQ_SIZE/2)

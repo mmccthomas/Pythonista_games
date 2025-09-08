@@ -353,11 +353,11 @@ class LetterGame():
     self.gui.set_grid_colors(grid='lightgrey', highlight='lightblue')
     self.gui.require_touch_move(False)
     self.gui.allow_any_move(True)
-    self.gui.gs.one_based_labels = self.column_labels_one_based
+    
     
     for k, v in kwargs.items():
       setattr(self, k, v)
-    
+    self.gui.gs.one_based_labels = self.column_labels_one_based
     self.gui.setup_gui(log_moves=True)
     
     # menus can be controlled by dictionary of labels and functions without parameters

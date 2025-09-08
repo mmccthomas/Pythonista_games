@@ -299,7 +299,7 @@ class DropWord(LetterGame):
       if move[0] < 0 and move[1] < 0:
           return (None, None), self.gui.gs.buttons[-move[0]].text, None  
               
-      point = self.gui.gs.start_touch - gs.GRID_POS
+      point = self.gui.gs.start_touch - self.gui.gs.grid_pos
       # touch on board
       # Coord is a tuple that can support arithmetic
       rc_start = Coord(self.gui.gs.grid_to_rc(point))      

@@ -482,7 +482,7 @@ class PieceWord(LetterGame):
                 print(self.gui.gs.buttons[-move[0]].text)
             return (None, None), self.gui.gs.buttons[-move[0]].text, None
         # Coord is a tuple that can support arithmetic
-        point = self.gui.gs.start_touch - gscene.GRID_POS
+        point = self.gui.gs.start_touch - self.gui.gs.grid_pos
         try:
             rc_start = Coord(self.gui.gs.grid_to_rc(point))
             if self.check_in_board(rc_start):

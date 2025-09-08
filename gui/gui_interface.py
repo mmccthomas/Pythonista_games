@@ -266,8 +266,8 @@ class Gui():
                       panel='Number_panel.pyui',
                       **kwargs):
         """ pop up a number panel """
-        if panel != 'Number_panel.pyui':
-            self.number_panel = ui.load_view(panel)
+        # if panel != 'Number_panel.pyui':
+        self.number_panel = ui.load_view(panel)
         self.buttons = [
             button for button in self.number_panel.subviews
             if isinstance(button, ui.Button)

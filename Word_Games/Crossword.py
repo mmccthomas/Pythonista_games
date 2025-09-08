@@ -232,7 +232,7 @@ class CrossWord(LetterGame):
         # deal with buttons. each returns the button text
         if move[0][0] < 0 and move[0][1] < 0:
             return (None, None), self.gui.gs.buttons[-move[0][0]].text, None
-        point = self.gui.gs.start_touch - gscene.GRID_POS
+        point = self.gui.gs.start_touch - self.gui.gs.grid_pos
         # touch on board
         # Coord is a tuple that can support arithmetic
         try:

@@ -147,7 +147,7 @@ class QuoteWord(LetterGame):
     if move[0] == (-1, -1):
        return (None, None), 'Enter', None  # pressed enter button
       
-    point = self.gui.gs.start_touch - gscene.GRID_POS
+    point = self.gui.gs.start_touch - self.gui.gs.grid_pos
     # touch on board
     # Coord is a tuple that can support arithmetic
     rc_start = Coord(self.gui.gs.grid_to_rc(point)) # // TILESIZE

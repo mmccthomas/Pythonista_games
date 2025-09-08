@@ -230,6 +230,7 @@ class WordSearch(LetterGame):
       move = self.get_player_move(self.board)
       if move[0] == HINT:
         self.hint()
+        continue
       move = self.process_turn(move, self.board)
       
       self.print_square(move, clear=False, alpha=0.2)
