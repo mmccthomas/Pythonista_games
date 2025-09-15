@@ -529,6 +529,7 @@ class Gui():
         msg = [self.ident(move) for move in validmoves]
         if message:
             self.set_message2('valid:  ' + ', '.join(msg))
+        self.gs.clear_highlights()
         self.gs.highlight_squares(validmoves, alpha=alpha)
 
     def get_board(self):
@@ -581,7 +582,34 @@ class Gui():
         else:
             # print('changed' , self.changed(board), coord)
             return coord
-
+            
+    def get_move(self):
+        # loop until dat received over queue
+        while True:
+          # if view gets closed, quit the program
+          if not self.v.on_screen:
+            print('View closed, exiting')
+            sys.exit()
+            break
+          #  wait on queue data, either rc selected or function to call
+          time.sleep(0.01)
+          if not self.q.empty():
+            data = self.q.get(block=False)
+            
+            # self.delta_t('get')
+            # self.q.task_done()
+            if isinstance(data, (tuple, list, int)):
+              coord = data  # self.gui.ident(data)
+              break
+            else:
+              try:
+                # print(f' trying to run {data}')
+                data()
+              except (Exception) as e:
+                print(traceback.format_exc())
+                print(f'Error in received data {data}  is {e}')
+        return coord
+        
     def dump(self):
         tiles = [t.name for t in self.gs.get_tiles()]
         print('gui:', tiles)

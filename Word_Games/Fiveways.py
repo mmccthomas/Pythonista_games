@@ -6,7 +6,6 @@
 import numpy as np
 from Krossword import KrossWord
 from gui.gui_interface import Squares, Coord
-import generate_five
  
  
 class FiveWays(KrossWord):

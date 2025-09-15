@@ -234,7 +234,10 @@ class KrossWord(LetterGame):
           except (ValueError):
             pass
           except (KeyError):
-            self.wordlist[None].remove(word)
+            #try:
+                self.wordlist[None].remove(word)
+            #except ValueError:
+            # pass
           self.placed += 1          
       else:
           # board has already reverted
@@ -245,7 +248,7 @@ class KrossWord(LetterGame):
               
           except (KeyError, ValueError) as e:
              pass
-             # self.wordlist['None'].append(word)
+             self.wordlist[None].append(word)
           self.placed -= 1
           
       if self.debug:
@@ -399,31 +402,36 @@ class KrossWord(LetterGame):
     def split_text(s):
          for k, g in groupby(s, str.isalpha):
              yield ''.join(g)
-             
+    """        
     if self.selection == "New":
-        cx = generate_fiveways.Cross()
-        cx.all_start_coords = cx.get_starts(self.wordfile)
-        word_dict, _ = cx.load_words(filename=WORDLIST)  
-        cx.board = np.full(self.SIZE, ' ')
-        best = cx.create_krossword_dfs(word_dict, self.sizey, None, None, iterations=3)
-        kross = cx.decode_krossword(best.word_locs)
-        self.board = np.full(self.SIZE, '  ')
-        #self.board = cx.board
-        numbers = cx.start_locs
-        self.gui.add_numbers([Squares(number, no+1, 'yellow', z_position=30,
-                                      alpha=0.5, font=('Avenir Next', 18),
-                                      text_anchor_point=(-1.1, 1.2))
-                              for no, number in enumerate(numbers)])
-        self.start_dict = {}                     
-         
-        w_dict = kross  
-        for (no, words), coord in zip(kross.items(), numbers):
-          self.start_dict[str(no)] = {'words': words, 'coords': {coord: ['' for word in words]}}    
-
-        self.letter_board = self.board.copy()
-        self.letter_board[self.ix(numbers)] = cx.board[self.ix(numbers)]
-        
+        try:
+            cx = generate_fiveways.Cross()
+            cx.all_start_coords = cx.get_starts(self.wordfile)
+            word_dict, _ = cx.load_words(filename=WORDLIST)  
+            cx.board = np.full(self.SIZE, ' ')
+            best = cx.create_krossword_dfs(word_dict, self.sizey, None, None, iterations=3)
+            kross = cx.decode_krossword(best.word_locs)
+            self.board = np.full(self.SIZE, '  ')
+            #self.board = cx.board
+            numbers = cx.start_locs
+            self.gui.add_numbers([Squares(number, no+1, 'yellow', z_position=30,
+                                          alpha=0.5, font=('Avenir Next', 18),
+                                          text_anchor_point=(-1.1, 1.2))
+                                  for no, number in enumerate(numbers)])
+            self.start_dict = {}                     
+             
+            w_dict = kross  
+            for (no, words), coord in zip(kross.items(), numbers):
+              self.start_dict[str(no)] = {'words': words, 'coords': {coord: ['' for word in words]}}    
+    
+            self.letter_board = self.board.copy()
+            self.letter_board[self.ix(numbers)] = cx.board[self.ix(numbers)]
+        except NameError:
+           pass
+           
     else:
+    """
+    if True:
         board = [row.replace("'", "") for row in self.table]
         board = [row.split('/') for row in board]
         self.board = np.array(board)

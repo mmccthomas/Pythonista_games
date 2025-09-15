@@ -217,11 +217,12 @@ class GameBoard(Scene):
          vert_grid_size = h - 50
          hor_grid_size = w - 50
          font_size = 24
-    # assumes dimy is not very much greater than dimx
-    if dimy >= dimx:    
-       sq_size = vert_grid_size // max(dimx, dimy)
-    else:
-       sq_size = hor_grid_size // max(dimx, dimy)
+
+    # smaller of vertical or horizontal grid
+    sq_size_v = vert_grid_size // dimy
+    sq_size_h = hor_grid_size // dimx
+    sq_size = min(sq_size_v, sq_size_h)
+   
          
     return grid_pos, sq_size, font_size
   
@@ -1053,6 +1054,7 @@ class GameBoard(Scene):
   def show_pause_menu(self, **kwargs):
     self.menu = MyMenu('Paused', '', [i for i in self.pause_menu], **kwargs)
     self.present_modal_scene(self.menu)
+    
     self.paused = True
 
   def show_start_menu(self, **kwargs):
