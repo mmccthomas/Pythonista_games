@@ -110,6 +110,7 @@ class Futoshiki(LetterGame):
         # selected = self.select_list()
         
         self.gui.gs.DIMENSION_X = self.gui.gs.DIMENSION_Y = 2*self.N -1
+        self.gui.gs.column_labels = self.gui.gs.row_labels = None
         for c in self.gui.game_field.children:
           c.remove_from_parent()
         self.gui.setup_gui(log_moves=False, grid_fill='white')
@@ -327,12 +328,12 @@ class Futoshiki(LetterGame):
                   else:
                     return False
                   
-        else:  # we've  got a list
-            # add notes to square
-            self.notes[coord] = letter
-            if self.debug:
-                print('add note', coord, self.notes)
-            self.add_note(coord, letter)
+            else:  # we've  got a list
+                # add notes to square
+                self.notes[coord] = letter
+                if self.debug:
+                    print('add note', coord, self.notes)
+                self.add_note(coord, letter)
                
         return True
                     

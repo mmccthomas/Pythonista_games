@@ -349,41 +349,51 @@ class GameBoard(Scene):
             yield str(i) + str(j)
               
   def add_row_column_labels(self):
+      # TODO this is too complicated
+      # if self.column_labels is specified
+      
       font = ('Avenir Next', self.font_size)
       if self.use_alpha:
-          row_labels = self.two_char_generator()
-          self.row_labels = [] # store the values
+          column_labels = self.two_char_generator()
+          self.column_labels = [] # store the values
+          column_specified = False
       else:
-          if self.row_labels:
-              row_labels = iter(self.row_labels)
+          if self.column_labels:
+              column_labels = iter(self.column_labels)
+              column_specified = True
           else:
-              self.row_labels = []
-              row_labels = self.two_digit_number_generator(self.one_based_labels)
+              self.column_labels = []
+              column_specified = False
+              column_labels = self.two_digit_number_generator(self.one_based_labels)
 
-      if self.column_labels:
-          column_labels = iter(self.column_labels)
+      if self.row_labels:
+          row_labels = iter(self.row_labels)
+          row_specified = True
       else:
-          column_labels = self.two_digit_number_generator(self.one_based_labels)
-          self.column_labels = []
+          row_labels = self.two_digit_number_generator(self.one_based_labels)
+          self.row_labels = []
+          row_specified = False
 
       for i in range(self.DIMENSION_X):
           pos = Vector2(0 + i * self.SQ_SIZE, 0)
-          n = LabelNode(next(row_labels), parent=self.game_field)
+          n = LabelNode(str(next(column_labels)), parent=self.game_field)
           n.position = (pos.x + self.SQ_SIZE / 2,
                     pos.y + self.DIMENSION_Y * self.SQ_SIZE + 20)
           n.color = self.grid_label_color
           n.font = font
-          self.row_labels.append(n.text)
+          if not column_specified:
+              self.column_labels.append(n.text)
           
       for i in range(self.DIMENSION_Y):
           pos = Vector2(0, (self.DIMENSION_Y - i - 1) * self.SQ_SIZE)
           
-          n = LabelNode(next(column_labels), parent=self.game_field)
+          n = LabelNode(str(next(row_labels)), parent=self.game_field)
           
           n.position = (pos.x - 20, pos.y + self.SQ_SIZE/2)
           n.color = self.grid_label_color
           n.font = font
-          self.column_labels.append(n.text)
+          if not row_specified:
+              self.row_labels.append(n.text)
       
   def build_background_grid(self):
     parent = Node()
