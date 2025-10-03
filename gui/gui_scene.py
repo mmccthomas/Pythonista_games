@@ -348,31 +348,23 @@ class GameBoard(Scene):
         for j in range(10):  # Second digit (0-9)
             yield str(i) + str(j)
               
-  def add_row_column_labels(self):
-      # TODO this is too complicated
-      # if self.column_labels is specified
+  def add_row_column_labels(self, columns=None, rows=None):
+      # if specified, columns and rows are lists, tuples or iterators
       
       font = ('Avenir Next', self.font_size)
-      if self.use_alpha:
-          column_labels = self.two_char_generator()
-          self.column_labels = [] # store the values
-          column_specified = False
+      self.column_labels = [] # store the values
+      if columns:
+          column_labels = iter(columns)
       else:
-          if self.column_labels:
-              column_labels = iter(self.column_labels)
-              column_specified = True
-          else:
-              self.column_labels = []
-              column_specified = False
+          if self.use_alpha:
+              column_labels = self.two_char_generator()            
+          else:                            
               column_labels = self.two_digit_number_generator(self.one_based_labels)
-
-      if self.row_labels:
-          row_labels = iter(self.row_labels)
-          row_specified = True
+      self.row_labels = []
+      if rows:
+          row_labels = iter(rows)
       else:
-          row_labels = self.two_digit_number_generator(self.one_based_labels)
-          self.row_labels = []
-          row_specified = False
+          row_labels = self.two_digit_number_generator(self.one_based_labels)          
 
       for i in range(self.DIMENSION_X):
           pos = Vector2(0 + i * self.SQ_SIZE, 0)
@@ -380,20 +372,16 @@ class GameBoard(Scene):
           n.position = (pos.x + self.SQ_SIZE / 2,
                     pos.y + self.DIMENSION_Y * self.SQ_SIZE + 20)
           n.color = self.grid_label_color
-          n.font = font
-          if not column_specified:
-              self.column_labels.append(n.text)
+          n.font = font          
+          self.column_labels.append(n.text)
           
       for i in range(self.DIMENSION_Y):
-          pos = Vector2(0, (self.DIMENSION_Y - i - 1) * self.SQ_SIZE)
-          
-          n = LabelNode(str(next(row_labels)), parent=self.game_field)
-          
+          pos = Vector2(0, (self.DIMENSION_Y - i - 1) * self.SQ_SIZE)          
+          n = LabelNode(str(next(row_labels)), parent=self.game_field)          
           n.position = (pos.x - 20, pos.y + self.SQ_SIZE/2)
           n.color = self.grid_label_color
           n.font = font
-          if not row_specified:
-              self.row_labels.append(n.text)
+          self.row_labels.append(n.text)
       
   def build_background_grid(self):
     parent = Node()
@@ -435,13 +423,13 @@ class GameBoard(Scene):
       
     return parent
     
-  def setup_ui(self):
+  def setup_ui(self, rows=None, columns=None):
     # every gui has a pause button in top left of screen
     self.pause_button = SpriteNode('iow:pause_32', position=(32, self.size.h - 36),
                               parent=self)
     self.grid = self.build_background_grid()
     self.game_field.add_child(self.grid)
-    self.add_row_column_labels()
+    self.add_row_column_labels(columns, rows)
     x, y, w, h = self.grid.bbox  # was game_field
     font = ('Avenir Next', self.font_size)
     # all location relative to grid

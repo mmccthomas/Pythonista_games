@@ -43,7 +43,7 @@ class Gui():
         self.button_index = 2
         self.dismiss_menu = self.gs.dismiss_modal_scene
         self.device = self.gs.device
-        self.long_touch = self.gs.long_touch
+        #self.long_touch = self.gs.long_touch
         #try:
         #    self.number_panel = ui.load_view('Number_panel.pyui')
         #except FileNotFoundError:
@@ -93,6 +93,33 @@ class Gui():
         # get letter_panel from gui_panel
         return self.gui_panel.letter_panel
         
+    @property   
+    def DIMENSION_X(self):
+       return self.gs.DIMENSION_X
+       
+    @DIMENSION_X.setter
+    def DIMENSION_X(self, value):
+        self.gs.DIMENSION_X = value
+        
+    @property   
+    def DIMENSION_Y(self):
+       return self.gs.DIMENSION_Y
+       
+    @DIMENSION_Y.setter
+    def DIMENSION_Y(self, value):
+        self.gs.DIMENSION_Y = value
+
+    @property   
+    def q(self):
+       return self.gs.q
+       
+    @q.setter
+    def q(self, value):
+        self.gs.q = value
+        
+    @property   
+    def long_touch(self):
+       return self.gs.long_touch
     
     def set_grid_colors(self,
                         grid=None,
@@ -374,8 +401,8 @@ class Gui():
             break
           #  wait on queue data, either rc selected or function to call
           time.sleep(0.01)
-          if not self.q.empty():
-            data = self.q.get(block=False)
+          if not self.gs.q.empty():
+            data = self.gs.q.get(block=False)
             
             # self.delta_t('get')
             # self.q.task_done()
@@ -423,7 +450,10 @@ class Gui():
 
     def clear_squares(self, squares_list=None):
         self.gs.clear_squares(squares_list)
-
+        
+    def clear_highlights(self):
+        self.gs.clear_highlights()
+        
     def clear_messages(self):
         self.set_message2('')
         self.set_message('')
@@ -431,7 +461,10 @@ class Gui():
         self.set_prompt('')
         self.set_enter('')
         self.set_moves('')
-
+        
+    def close(self):
+        self.gs.close()
+        
     def show_start_menu(self, **kwargs):
         # pass start_menu call to gs_scene
         self.gs.show_start_menu(**kwargs)

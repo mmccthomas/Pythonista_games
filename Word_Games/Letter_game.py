@@ -346,9 +346,8 @@ class LetterGame():
     self.SIZE = self.get_size()
      
     # load the gui interface
-    self.q = Queue()
     self.gui = Gui(self.board, Player())
-    self.gui.gs.q = self.q  # pass queue into gui
+    self.gui.q = Queue()
     self.gui.set_alpha(True)
     self.gui.set_grid_colors(grid='lightgrey', highlight='lightblue')
     self.gui.require_touch_move(False)
@@ -357,8 +356,7 @@ class LetterGame():
     
     for k, v in kwargs.items():
       setattr(self, k, v)
-    self.gui.gs.one_based_labels = self.column_labels_one_based
-    self.gui.setup_gui(log_moves=True)
+    self.gui.setup_gui(log_moves=True, one_based_labels = self.column_labels_one_based)
     
     # menus can be controlled by dictionary of labels and functions without parameters
     self.gui.set_pause_menu({'Continue': self.gui.dismiss_menu,
@@ -517,7 +515,7 @@ class LetterGame():
     while True:
       # for debug
       
-      self.gui.gs.clear_highlights()
+      self.gui.clear_highlights()
       
       # human play
       # self.gui.set_top('Human turn')
@@ -532,7 +530,7 @@ class LetterGame():
         break
      
       self.print_board()
-      self.gui.gs.clear_highlights()
+      self.gui.clear_highlights()
        
     self.print_board()
     self.gui.set_message2(f'{self.game_over()} WON!')
@@ -826,7 +824,6 @@ class LetterGame():
     elif hasattr(self, 'board') and self.board is not None:
         selection = f'{len(self.board[0])},{len(self.board)}'
         self.sizey, self.sizex = len(self.board), len(self.board[0])
-        # self.gui.gs.DIMENSION_Y, self.gui.gs.DIMENSION_X = self.sizey, self.sizex
         return len(self.board), len(self.board[0])
     else:
         selection = console.input_alert("What is the dimension of the board (X, Y)? (Default is 5x5)\nEnter 2 numbers:")
@@ -844,7 +841,6 @@ class LetterGame():
        self.sizex = self.sizey = 5
        board_dimension = (5, 5)
        print("Invalid input. The board will be 5x5!")
-    # self.gui.gs.DIMENSION_Y, self.gui.gs.DIMENSION_X = board_dimension
     self.create_game_board(board_dimension)
     return board_dimension
       
@@ -967,7 +963,7 @@ class LetterGame():
     # self.update_board()
     # This skips the wait for new location and induces Finished boolean to
     # halt the run loop
-    self.q.put(FINISHED)
+    self.gui.q.put(FINISHED)
 
   def game_over(self):
     """
@@ -985,11 +981,11 @@ class LetterGame():
         break
       #  wait on queue data, either rc selected or function to call
       sleep(0.01)
-      if not self.q.empty():
-        data = self.q.get(block=False)
+      if not self.gui.q.empty():
+        data = self.gui.q.get(block=False)
         
         # self.delta_t('get')
-        # self.q.task_done()
+        # self.gui.q.task_done()
         if isinstance(data, (tuple, list, int)):
           coord = data  # self.gui.ident(data)
           break
@@ -1036,11 +1032,11 @@ class LetterGame():
     return move
 
   def quit(self):
-    self.gui.gs.close()
+    self.gui.close()
     sys.exit()
   
   def restart(self):
-    self.gui.gs.close()
+    self.gui.close()
     self.__init__()
     self.run()
         
@@ -1053,8 +1049,8 @@ class LetterGame():
         
       if self.finished:  # skip if in game
         try:
-          if not self.q.empty():
-            item = self.q.get(block=False)
+          if not self.gui.q.empty():
+            item = self.gui.q.get(block=False)
             if item == self.quit:
               return True
             item()

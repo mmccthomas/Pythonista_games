@@ -56,9 +56,9 @@ class Futoshiki(LetterGame):
         # create game_board and ai_board
         self.SIZE = self.get_size(f'{SIZE},{SIZE}')
         # load the gui interface
-        self.q = Queue()
+        
         self.gui = Gui(self.board, Player())
-        self.gui.gs.q = self.q  # pass queue into gui
+        self.gui.q = Queue()
         self.gui.set_alpha(False)
         self.gui.set_grid_colors(grid='black', highlight='lightblue')
         self.gui.require_touch_move(False)
@@ -107,13 +107,11 @@ class Futoshiki(LetterGame):
       self.solution_board = self.copy_board(self.board)
       
     def resize_grid(self):
-        # selected = self.select_list()
-        
-        self.gui.gs.DIMENSION_X = self.gui.gs.DIMENSION_Y = 2*self.N -1
-        self.gui.gs.column_labels = self.gui.gs.row_labels = None
+        # selected = self.select_list()        
+        self.gui.DIMENSION_X = self.gui.DIMENSION_Y = 2*self.N -1
         for c in self.gui.game_field.children:
           c.remove_from_parent()
-        self.gui.setup_gui(log_moves=False, grid_fill='white')
+        self.gui.setup_gui(log_moves=False, grid_fill='white', rows=None, columns=None)
         return 5 # selected            
     
     def prepare_board(self):
@@ -339,7 +337,7 @@ class Futoshiki(LetterGame):
                     
     def select(self, moves, board, text_list=True):
         
-        long_press = self.gui.gs.long_touch
+        long_press = self.gui.long_touch
         # toggle hint button
         if moves == NOTE:
           self.hint = not self.hint
@@ -422,7 +420,7 @@ class Futoshiki(LetterGame):
         self.gui.update(self.solution_board[:2*self.N, :2*self.N])
         # This skips the wait for new location and induces Finished boolean to
         # halt the run loop
-        self.q.put(FINISHED)
+        self.gui.q.put(FINISHED)
         sleep(4)
         self.gui.show_start_menu()
       
@@ -435,12 +433,12 @@ class Futoshiki(LetterGame):
         letter = self.get_board_rc(coord, self.solution_board)
         self.hint_result = (coord, letter)
         self.hints += 2
-        self.q.put(HINT)
+        self.gui.q.put(HINT)
       
     def restart(self):
         print('restarting')
-        # self.q.put(FINISHED)
-        self.gui.gs.close()
+        # self.gui.q.put(FINISHED)
+        self.gui.close()
         # self.finished = True
         self.__init__()
         self.run()
