@@ -45,18 +45,17 @@ class KrossWord(LetterGame):
     self.straight_lines_only = True
     self.get_size()  # just to provide board and sizex
     # load the gui interface
-    self.q = Queue()
     self.gui = Gui(self.board, Player())
-    self.gui.gs.q = self.q  # pass queue into gui   
+    self.gui.q = Queue()
     self.gui.set_alpha(True)
     self.gui.set_grid_colors(grid='lightgrey', highlight='lightblue')
     self.gui.require_touch_move(False)
     self.gui.allow_any_move(True)
     self.SIZE = self.get_size()
-    self.gui.gs.DIMENSION_Y, self.gui.gs.DIMENSION_X = self.SIZE
+    self.gui.DIMENSION_Y, self.gui.DIMENSION_X = self.SIZE
     self.gui.setup_gui(log_moves=True)
     self.gui.orientation(self.display_setup)
-    self.gui.build_extra_grid(self.gui.gs.DIMENSION_X, self.gui.gs.DIMENSION_Y,
+    self.gui.build_extra_grid(self.gui.DIMENSION_X, self.gui.DIMENSION_Y,
                               grid_width_x=1, grid_width_y=1,
                               color='grey', line_width=1)
     # menus can be controlled by dictionary of labels and functions without parameters
@@ -351,10 +350,10 @@ class KrossWord(LetterGame):
       msg += self.format_cols(v, columns=3, width=max_len+1)
       #msg += '\t'.join(v)
     
-    #if self.gui.gs.device.endswith('_landscape'):
+    #if self.gui.device.endswith('_landscape'):
     #msg = self.format_cols(display_words, columns=2, width=)
     #    self.gui.set_moves(msg, font=('Avenir Next', 25))
-    #elif self.gui.gs.device.endswith('_portrait'):
+    #elif self.gui.device.endswith('_portrait'):
     #    msg = self.format_cols(display_words, columns=5, width=max_len)
     self.gui.set_moves(msg, font=('Avenir Next', 18))
     self.gui.update(self.board)
@@ -638,7 +637,7 @@ class KrossWord(LetterGame):
       
   def restart(self):
     """ reinitialise """
-    self.gui.gs.close()
+    self.gui.close()
     self.__init__()
     self.run()
             

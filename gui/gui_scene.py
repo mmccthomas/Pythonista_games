@@ -237,11 +237,11 @@ class GameBoard(Scene):
   def setup_gui(self, **kwargs):
     
     self.grid_pos, self.SQ_SIZE, self.font_size = self.grid_sizes(self.device, self.DIMENSION_X, self.DIMENSION_Y)
+    self.smaller_tile = 0  # was 20
     
     for k, v in kwargs.items():
-      setattr(self, k, v)
-      
-    self.smaller_tile = 0  # was 20
+      setattr(self, k, v)      
+    
     self.current_player = self.Player.PLAYER_1
     # Root node for all game elements
     self.game_field = Node(parent=self, position=self.grid_pos)
@@ -649,7 +649,7 @@ class GameBoard(Scene):
         self.hl.append(t)
         
   # #########################################################################
-  # NUMBERS 
+  # NUMBERS #
         
   def get_numbers(self, coords):
     """ get color and text of number square objects for temporary storage

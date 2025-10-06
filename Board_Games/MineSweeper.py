@@ -53,9 +53,8 @@ class App(LetterGame):
     #self.SIZE = self.get_size('9x9') 
     self.board = [['-' for col in range(9)]for row in range(9)] # initial size, change later
     # load the gui interface
-    self.q = Queue()
     self.gui = Gui(self.board, Player())
-    self.gui.gs.q = self.q # pass queue into gui
+    self.gui.q = Queue()
     self.gui.set_alpha(False) 
     self.gui.set_grid_colors(grid='black', highlight='lightblue')
     self.gui.require_touch_move(False)
@@ -64,8 +63,8 @@ class App(LetterGame):
       self.quit()
     self.setup(self.puzzle)
     
-    self.gui.gs.DIMENSION_X, self.gui.gs.DIMENSION_Y  = self.BSIZEX, self.BSIZEY
-    #self.gui.gs.board=self.board
+    self.gui.DIMENSION_X, self.gui.DIMENSION_Y  = self.BSIZEX, self.BSIZEY
+
     self.gui.setup_gui(log_moves=False, board=self.board) #, grid_label_color='black')
     
     
@@ -224,7 +223,7 @@ class App(LetterGame):
       item = self.get_board_rc(move, self.board)
       sound.play_effect('8ve:8ve-beep-shinymetal')
           
-      if self.gui.gs.long_touch:
+      if self.gui.long_touch:
            self.long_touch(move)
                    
       elif item in '#XB':

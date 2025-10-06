@@ -308,14 +308,14 @@ class Recognise():
       return img.resize((w, h), Image.ANTIALIAS)
     
     def draw_box(self,rect_, **kwargs):
-          W, H = self.gui.gs.DIMENSION_X, self.gui.gs.DIMENSION_Y
+          W, H = self.gui.DIMENSION_X, self.gui.DIMENSION_Y
           x, y, w, h = rect_
           x1, y1 = x+w, y+h                 
-          box = [self.gui.gs.rc_to_pos(H-y*H-1, x*W), 
-                 self.gui.gs.rc_to_pos(H-y1*H-1, x*W), 
-                 self.gui.gs.rc_to_pos(H-y1*H-1, x1*W), 
-                 self.gui.gs.rc_to_pos(H-y*H-1, x1*W), 
-                 self.gui.gs.rc_to_pos(H-y*H-1, x*W)]                                                  
+          box = [self.gui.rc_to_pos(H-y*H-1, x*W), 
+                 self.gui.rc_to_pos(H-y1*H-1, x*W), 
+                 self.gui.rc_to_pos(H-y1*H-1, x1*W), 
+                 self.gui.rc_to_pos(H-y*H-1, x1*W), 
+                 self.gui.rc_to_pos(H-y*H-1, x*W)]                                                  
           self.gui.draw_line(box, **kwargs)      
         
     def read_characters(self, asset, rectangles):

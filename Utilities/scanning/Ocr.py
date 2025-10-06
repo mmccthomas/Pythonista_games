@@ -69,11 +69,10 @@ class OcrCrossword(LetterGame):
         self.load(autoload=autoload) # attempt to load temp file
         self.SIZE = self.get_size(board=self.board, board_size=board_size)
         self.asset = asset
-        self.q = Queue()
         self.log_moves = False
         self.gui = Gui(self.board, Player())
         self.gui.set_grid_colors(grid='black') # background is classic board
-        self.gui.gs.q = self.q
+        self.gui.q = Queue()
         self.words = []
         self.letters_mode = False
         self.direction_mode = False
@@ -133,11 +132,11 @@ class OcrCrossword(LetterGame):
         for rect in rectangles:
             x, y, w, h = rect
             x1, y1 = x+w, y+h
-            box = [self.gui.gs.rc_to_pos(H-y*H-1, x*W),
-                   self.gui.gs.rc_to_pos(H-y1*H-1, x*W),
-                   self.gui.gs.rc_to_pos(H-y1*H-1, x1*W),
-                   self.gui.gs.rc_to_pos(H-y*H-1, x1*W),
-                   self.gui.gs.rc_to_pos(H-y*H-1, x*W)]
+            box = [self.gui.rc_to_pos(H-y*H-1, x*W),
+                   self.gui.rc_to_pos(H-y1*H-1, x*W),
+                   self.gui.rc_to_pos(H-y1*H-1, x1*W),
+                   self.gui.rc_to_pos(H-y*H-1, x1*W),
+                   self.gui.rc_to_pos(H-y*H-1, x*W)]
             self.gui.draw_line(box, **kwargs)
 
     def add_indexes(self):
@@ -184,7 +183,7 @@ class OcrCrossword(LetterGame):
         global MSG
         """ add non responsive decoration boxes"""
         x, y, w, h = self.gui.grid.bbox
-        tsize = self.posn.rackscale * self.gui.gs.SQ_SIZE
+        tsize = self.posn.rackscale * self.gui.SQ_SIZE
         #self.wordsbox = self.gui.add_button(text='', title='Words',
         #                    position=self.posn.box1,
         #                    min_size=(5 * tsize+10, tsize+10),
@@ -294,11 +293,11 @@ class OcrCrossword(LetterGame):
         x, y = min(st_x, end_x), max(st_y, end_y)
         x1, y1 = max(st_x, end_x), min(st_y, end_y)
 
-        box = [self.gui.gs.rc_to_pos(y, x),
-               self.gui.gs.rc_to_pos(y1-1, x),
-               self.gui.gs.rc_to_pos(y1-1, x1+1),
-               self.gui.gs.rc_to_pos(y, x1+1),
-               self.gui.gs.rc_to_pos(y, x)]
+        box = [self.gui.rc_to_pos(y, x),
+               self.gui.rc_to_pos(y1-1, x),
+               self.gui.rc_to_pos(y1-1, x1+1),
+               self.gui.rc_to_pos(y, x1+1),
+               self.gui.rc_to_pos(y, x)]
         params = {'line_width': 4, 'line_cap_style': LINE_CAP_ROUND,
                   'stroke_color': 'blue', 'z_position':1000}
         self.gui.remove_lines(z_position=1000)
@@ -321,12 +320,12 @@ class OcrCrossword(LetterGame):
 
         # deal with buttons. each returns the button text
         if move[0] < 0 and move[1] < 0:
-            return (None, None), self.gui.gs.buttons[-move[0]].text, None
+            return (None, None), self.gui.buttons[-move[0]].text, None
 
-        point = self.gui.gs.start_touch - gs.GRID_POS
+        point = self.gui.start_touch - self.gui.grid_pos
         # touch on board
         # Coord is a tuple that can support arithmetic
-        rc_start = Coord(self.gui.gs.grid_to_rc(point))
+        rc_start = Coord(self.gui.grid_to_rc(point))
 
         if self.check_in_board(rc_start):
             rc = Coord(move)
@@ -379,7 +378,7 @@ class OcrCrossword(LetterGame):
             coord, letter, origin = move
             match letter:
                 case 'Quit':
-                    self.gui.gs.close()
+                    self.gui.close()
                     #sys.exit()
                     return 0
 
@@ -584,7 +583,7 @@ class OcrCrossword(LetterGame):
 
                 MSG = (self.words, self.lines, self.indexes)
                 # force quit
-                self.q.put([-1,-1])
+                self.gui.q.put([-1,-1])
 
     def convert_text_to_dataframe(self, text_dict, existing_df=None):
         """ take text_dict with form [{label, confidence, cg_box}]

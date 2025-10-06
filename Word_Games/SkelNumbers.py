@@ -91,7 +91,7 @@ class SkelNumbers(CrossNumbers):
         CrossNumbers.create_number_board(self)
       
     def restart(self):
-        self.gui.gs.close()
+        self.gui.close()
         self.finished = False
         g = SkelNumbers()
         g.run()

@@ -38,9 +38,8 @@ class DotAndBox():
                               for r in range(BOARDSIZE)]
         self.empty_board = self.display_board.copy()
         self.board = None
-        self.q = Queue()
         self.gui = Gui(self.display_board, Player())
-        self.gui.gs.q = self.q  # pass queue into gui
+        self.gui.q = Queue()
         self.gui.set_alpha(False)
         self.gui.set_grid_colors(grid='lightgrey',
                                  highlight='lightblue',
@@ -52,10 +51,10 @@ class DotAndBox():
         self.gui.setup_gui(log_moves=False, grid_fill='lightgrey')
         # menus can be controlled by dictionary of labels and functions without parameters
         #self.gui.pause_menu = {'Continue': self.gui.dismiss_menu,  'Save': save,
-        #                 'Load': load,  'Quit': self.gui.gs.close}
+        #                 'Load': load,  'Quit': self.gui.close}
         self.gui.start_menu = {
             'New Game': self.restart,
-            'Quit': self.gui.gs.close
+            'Quit': self.gui.close
         }
         self.size = (BOARDSIZE + 1) // 2
         self.gameplay = game('Human', "alphabeta", self.size, self.size)
@@ -87,7 +86,7 @@ class DotAndBox():
                 ix += 1
         self.gui.add_numbers(self.square_list)
 
-        self.sq = self.gui.gs.SQ_SIZE // 2
+        self.sq = self.gui.SQ_SIZE // 2
         self.boxes = []
 
     def wait_for_gui(self):
@@ -100,8 +99,8 @@ class DotAndBox():
                 break
             #  wait on queue data, either rc selected or function to call
             sleep(0.01)
-            if not self.q.empty():
-                data = self.q.get(block=False)
+            if not self.gui.q.empty():
+                data = self.gui.q.get(block=False)
                 if isinstance(data, (tuple, list, int)):
                     coord = data
                     break
@@ -234,7 +233,7 @@ class DotAndBox():
         self.gui.show_start_menu()
 
     def restart(self):
-        self.gui.gs.close()
+        self.gui.close()
         self.__init__()
         self.run()
 

@@ -103,7 +103,7 @@ class PieceWord(LetterGame):
         self.load_words_from_file(PUZZLELIST, no_strip=True)
         self.selection = self.select_list()
         if self.selection is False:
-            self.gui.gs.show_start_menu()
+            self.gui.show_start_menu()
             return
         self.gui.build_extra_grid(5,
                                   7,
@@ -479,12 +479,12 @@ class PieceWord(LetterGame):
         # deal with buttons. each returns the button text
         if move[0] < 0 and move[1] < 0:
             if self.debug:
-                print(self.gui.gs.buttons[-move[0]].text)
-            return (None, None), self.gui.gs.buttons[-move[0]].text, None
+                print(self.gui.buttons[-move[0]].text)
+            return (None, None), self.gui.buttons[-move[0]].text, None
         # Coord is a tuple that can support arithmetic
-        point = self.gui.gs.start_touch - self.gui.gs.grid_pos
+        point = self.gui.start_touch - self.gui.grid_pos
         try:
-            rc_start = Coord(self.gui.gs.grid_to_rc(point))
+            rc_start = Coord(self.gui.grid_to_rc(point))
             if self.check_in_board(rc_start):
                 rc = Coord(move)
                 return rc_start, None, rc
@@ -704,7 +704,7 @@ class PieceWord(LetterGame):
 
         sleep(2)
         self.game_over()
-        self.gui.gs.show_start_menu()
+        self.gui.show_start_menu()
 
     def game_over(self):
         # compare placement with solution
@@ -724,7 +724,7 @@ class PieceWord(LetterGame):
         return False
 
     def restart(self):
-        self.gui.gs.close()
+        self.gui.close()
         PieceWord().run()
 
 

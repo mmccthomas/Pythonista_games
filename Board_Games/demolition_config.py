@@ -3,8 +3,8 @@ screen_width, screen_height = get_screen_size()
 GRID_POS = Vector2(10, 40)
 GRID_SIZE= 20
 
-COLUMNS = int(screen_width / GRID_SIZE) - 5 # 20
-ROWS = int(screen_height / GRID_SIZE) - 4 #30
+COLUMNS = int((screen_width -300) / GRID_SIZE)
+ROWS = int((screen_height-300) / GRID_SIZE)
 STARTROW = ROWS - 1
 STARTCOL = 3
 

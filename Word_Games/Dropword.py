@@ -52,9 +52,8 @@ class DropWord(LetterGame):
     self.columns = list(range(self.sizex))
     random.shuffle(self.columns)
     # load the gui interface
-    self.q = Queue()
     self.gui = Gui(self.board, Player())
-    self.gui.gs.q = self.q # pass queue into gui
+    self.gui.q = Queue()
     self.gui.set_alpha(True) 
     self.gui.set_grid_colors(grid='white', highlight='lightblue')
     self.gui.require_touch_move(False)
@@ -273,14 +272,14 @@ class DropWord(LetterGame):
         self.gui.update(self.board)
     except (IndexError):
       self.game_over()
-      self.q.put((-10, -10))       
+      self.gui.q.put((-10, -10))       
 
   def reveal(self):
     ''' skip to the end and reveal the board '''
     self.gui.update(self.solution)
     # This skips the wait for new location and induces Finished boolean to 
     # halt the run loop
-    self.q.put((-10, -10)) 
+    self.gui.q.put((-10, -10)) 
 
   def get_player_move(self, board=None):
       """Takes in the user's input and performs that move on the board,
@@ -297,19 +296,19 @@ class DropWord(LetterGame):
           return (None, None), 'Finish', None 
       # deal with buttons. each returns the button text    
       if move[0] < 0 and move[1] < 0:
-          return (None, None), self.gui.gs.buttons[-move[0]].text, None  
+          return (None, None), self.gui.buttons[-move[0]].text, None  
               
-      point = self.gui.gs.start_touch - self.gui.gs.grid_pos
+      point = self.gui.start_touch - self.gui.grid_pos
       # touch on board
       # Coord is a tuple that can support arithmetic
-      rc_start = Coord(self.gui.gs.grid_to_rc(point))      
+      rc_start = Coord(self.gui.grid_to_rc(point))      
       if self.check_in_board(rc_start):
           rc = Coord(move)
           return rc, self.get_board_rc(rc, self.board), rc_start                             
       return (None, None), None, None
 
   def restart(self):
-    self.gui.gs.close()
+    self.gui.close()
     self.finished = False
     g = DropWord()
     g.run()

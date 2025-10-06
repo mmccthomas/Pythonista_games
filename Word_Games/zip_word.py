@@ -41,9 +41,8 @@ class ZipWord(LetterGame):
     self.SIZE = self.get_size()
      
     # load the gui interface
-    self.q = Queue()
     self.gui = Gui(self.board, Player())
-    self.gui.gs.q = self.q  # pass queue into gui
+    self.gui.q = Queue()
     self.gui.set_alpha(False)
     self.gui.set_grid_colors(grid='white', highlight='lightblue')
     self.gui.require_touch_move(False)
@@ -165,7 +164,7 @@ class ZipWord(LetterGame):
     # self.check_words()
     self.create_number_board()
     if self.test is None:
-        self.gui.build_extra_grid(self.gui.gs.DIMENSION_X, self.gui.gs.DIMENSION_Y,
+        self.gui.build_extra_grid(self.gui.DIMENSION_X, self.gui.DIMENSION_Y,
                               grid_width_x=1, grid_width_y=1,
                               color='grey', line_width=1)
         self.gui.reset_waiting(wait)
@@ -346,7 +345,7 @@ class ZipWord(LetterGame):
        
   def restart(self):
     # TODO this does not always work. Find why
-    self.gui.gs.close()
+    self.gui.close()
     g = ZipWord()
     g.run()
 

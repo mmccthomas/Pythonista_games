@@ -70,14 +70,13 @@ class Connect4(Game):
     self.printAsciiTitleArt()      
     self.gameBoard = copyOfBoard(gameBoard_init)   
     # load the gui interface
-    self.q = Queue(maxsize=10)
     self.gui = Gui(self.gameBoard, Player())
     self.gui.set_alpha(False) 
     self.gui.set_grid_colors(grid='othello.jpg', highlight='clear')
     self.gui.require_touch_move(False)
     self.gui.allow_any_move(True)
     self.gui.setup_gui()
-    self.gui.gs.q = self.q
+    self.gui.q = Queue(maxsize=10)
     
     self.turn = None
     self.userPiece = YELLOW
@@ -86,12 +85,12 @@ class Connect4(Game):
     self.loaded_file = False # used to skip player selection
     
     # menus can be controlled by dictionary of labels and functions without parameters
-    self.gui.gs.pause_menu = {'Continue': self.gui.gs.dismiss_modal_scene, 
+    self.gui.set_pause_menu({'Continue': self.gui.dismiss_modal_scene, 
                               'Show Game': self.getBoardHistory,
-                              'Quit': self.quit}
-    self.gui.gs.start_menu = {'New Game': self.run, 
+                              'Quit': self.quit})
+    self.gui.set_start_menu({'New Game': self.run, 
                               'Replay': self.getBoardHistory,  
-                              'Quit': self.quit}
+                              'Quit': self.quit})
      
     if "-d" in sys.argv or "-aiDuel" in sys.argv:
           self.UserPlayerClass = get_dueling_ai_class(Connect4Player, "Connect4Strategy")
@@ -116,7 +115,7 @@ class Connect4(Game):
       for game, col in self.board_history:
         self.gui.update(game)
         time.sleep(1) 
-      self.gui.gs.show_start_menu()
+      self.gui.show_start_menu()
            
   def highlight_winning(self):
         NUM_COLS = len(self.gameBoard[0])
@@ -167,7 +166,7 @@ class Connect4(Game):
       self.gui.set_grid_colors(None, "orange")
       self.gui.valid_moves(self.highlight_winning(), False)        
       time.sleep(3)
-      self.gui.gs.clear_highlights()     
+      self.gui.clear_highlights()     
   
   def printAsciiTitleArt(self):
       """Prints the fancy text when you start the program"""
@@ -265,10 +264,10 @@ class Connect4(Game):
       self.win(winningPiece)
       self.loaded_file = False
       time.sleep(3)
-      self.gui.gs.show_start_menu()
+      self.gui.show_start_menu()
       
   def quit(self):
-    self.gui.gs.close()
+    self.gui.close()
     sys.exit() 
        
   def wait(self):
@@ -278,8 +277,8 @@ class Connect4(Game):
         print('View closed, exiting')
         break
       try:
-        if not self.q.empty():
-          item = self.q.get(block=False)
+        if not self.gui.q.empty():
+          item = self.gui.q.get(block=False)
           print('item', item)
           item()
       except (Exception) as e:

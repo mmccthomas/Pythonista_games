@@ -48,9 +48,9 @@ class Suguru(LetterGame):
     # create game_board and ai_board
     self.SIZE = self.get_size(f'{SIZE},{SIZE}')
     # load the gui interface
-    self.q = Queue()
+    
     self.gui = Gui(self.board, Player())
-    self.gui.gs.q = self.q  # pass queue into gui
+    self.gui.q = Queue()  # pass queue into gui
     self.gui.set_alpha(False)
     self.gui.set_grid_colors(grid='black', highlight='lightblue')
     self.gui.require_touch_move(False)
@@ -114,7 +114,7 @@ class Suguru(LetterGame):
            self.num_position = (x+w+50, h / 2)
            position_puzzles = (w+10, h/4)
            
-    self.gui.gs.pause_button.position = (32, H - 36)
+    self.gui.pause_button.position = (32, H - 36)
     self.gui.set_enter(NOTE_text, color='red', fill_color='lightgrey',
                        font=('Avenir Next', 50),
                        position=position_hint)
@@ -454,7 +454,7 @@ class Suguru(LetterGame):
       self.gui.set_moves(self.msg)
               
       if self.debug or self.test:
-          self.gui.gs.close()
+          self.gui.close()
       self.suguru_setup(random_color=False)
       
       self.gui.set_message2('')
@@ -682,7 +682,7 @@ class Suguru(LetterGame):
       open number panel to select number
       or numbers
       """
-      long_press = self.gui.gs.long_touch
+      long_press = self.gui.long_touch
       # toggle hint button
       if moves == NOTE:
           self.hint = not self.hint
@@ -757,7 +757,7 @@ class Suguru(LetterGame):
       self.gui.update(self.solution_board.astype('U1'))
       # This skips the wait for new location and induces Finished boolean to
       # halt the run loop
-      self.q.put(FINISHED)
+      self.gui.q.put(FINISHED)
       sleep(4)
       self.gui.show_start_menu()
     
@@ -774,10 +774,10 @@ class Suguru(LetterGame):
       self.board_rc(coord, self.board, letter)
       self.hint_result = (coord, letter)
       self.hints += 2
-      self.q.put(HINT)
+      self.gui.q.put(HINT)
     
   def restart(self):
-      self.gui.gs.close()
+      self.gui.close()
       self.finished = False
       self.__init__()
       self.run()

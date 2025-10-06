@@ -262,9 +262,9 @@ def run():
     gui.require_touch_move(False)
     gui.setup_gui() 
     # menus can be controlled by dictionary of labels and functions without parameters
-    gui.gs.pause_menu = {'Continue': gui.gs.dismiss_modal_scene, 'Save': save, 
-                         'Load': load, 'Show Game': getBoardHistory, 'Quit': gui.gs.close}
-    gui.gs.start_menu = {'New Game': run, 'Quit': gui.gs.close}
+    gui.set_pause_menu({'Continue': gui.dismiss_modal_scene, 'Save': save, 
+                         'Load': load, 'Show Game': getBoardHistory, 'Quit': gui.close})
+    gui.set_start_menu({'New Game': run, 'Quit': gui.close})
                          
                         
     turn = YELLOW
@@ -322,7 +322,7 @@ def run():
         performMove(gameBoard, column, turn)
         BOARD_HISTORY.append([copyOfBoard(gameBoard), column])
         
-        gui.gs.clear_highlights()
+        gui.clear_highlights()
         printBoard(gui, gameBoard)
         
         gui.set_message(f"{nameOfCurrentPlayer} played in spot {column + 1}")
@@ -339,7 +339,7 @@ def run():
         gui.set_message2(f"YELLOW wins!")
     
     endGame(gui)
-    gui.gs.show_start_menu()
+    gui.show_start_menu()
     
 if __name__ == '__main__':
   run()

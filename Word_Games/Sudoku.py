@@ -48,9 +48,8 @@ class Sudoko(LetterGame):
     # create game_board and ai_board
     self.SIZE = self.get_size(f'{SIZE},{SIZE}')
     # load the gui interface
-    self.q = Queue()
     self.gui = Gui(self.board, Player())
-    self.gui.gs.q = self.q  # pass queue into gui
+    self.gui.q = Queue()
     self.gui.set_alpha(False)
     self.gui.set_grid_colors(grid='black', highlight='lightblue')
     self.gui.require_touch_move(False)
@@ -482,7 +481,7 @@ class Sudoko(LetterGame):
                   
   def select(self, moves, board, text_list=True):
       
-      long_press = self.gui.gs.long_touch
+      long_press = self.gui.long_touch
       # toggle hint button
       if moves == NOTE:
         self.hint = not self.hint
@@ -523,7 +522,7 @@ class Sudoko(LetterGame):
             else:
                 position = (x + w, h / 2)
                 
-            select_method = self.gui.input_text_list if text_list else self.gui.input_numbers
+            select_method = self.gui.input_text_list if text_list else self.gui.input_numbers 
                      
             panel = select_method(prompt=prompt, items=items, position=position,
                                       allows_multiple_selection = (long_press or self.hint))             
@@ -561,7 +560,7 @@ class Sudoko(LetterGame):
     self.gui.update(self.solution_board)
     # This skips the wait for new location and induces Finished boolean to
     # halt the run loop
-    self.q.put(FINISHED)
+    self.gui.q.put(FINISHED)
     sleep(4)
     self.gui.show_start_menu()
     
@@ -577,10 +576,10 @@ class Sudoko(LetterGame):
     self.board_rc(coord, self.board, letter)
     self.hint_result = (coord, letter)
     self.hints += 2
-    self.q.put(HINT)
+    self.gui.q.put(HINT)
     
   def restart(self):
-    self.gui.gs.close()
+    self.gui.close()
     self.finished = False
     self.__init__()
     self.run()

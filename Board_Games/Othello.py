@@ -280,15 +280,14 @@ def play_game():
     # boiler plate to create gui as recipient for board array
     gui = Gui(board, Player())
     gui.setup_gui()
-    q = Queue()
-    gui.q = gui.gs.q = q  # pass queue into gui
+    gui.q = Queue()
     gui.replace_labels('row', list(range(0,BOARD_SIZE)))
     gui.replace_labels('col', list(range(0,BOARD_SIZE)))
     # menus can be controlled by dictionary of labels and functions without parameters
-    gui.gs.pause_menu = {
-              'Continue': gui.gs.dismiss_modal_scene,
-              'Quit': gui.gs.close}
-    gui.gs.start_menu = {'New Game': play_game, 'Quit': gui.gs.close}
+    gui.set_pause_menu({
+              'Continue': gui.dismiss_modal_scene,
+              'Quit': gui.close})
+    gui.set_start_menu({'New Game': play_game, 'Quit': gui.close})
     gui.clear_messages()
     
     

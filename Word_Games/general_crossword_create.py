@@ -54,7 +54,7 @@ class Cross(PieceWord):
         # self.load_words_from_file(PUZZLELIST, no_strip=True)
 
         if self.selection is False:
-            self.gui.gs.show_start_menu()
+            self.gui.show_start_menu()
             return
 
         x, y, w, h = self.gui.grid.bbox
@@ -308,7 +308,7 @@ class Cross(PieceWord):
         pass
     
     def restart(self):
-        self.gui.gs.close()
+        self.gui.close()
         self.finished = False
         g = Cross()
         g.run()

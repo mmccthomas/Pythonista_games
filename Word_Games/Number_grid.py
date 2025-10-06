@@ -60,9 +60,9 @@ class NumberGrid(LetterGame):
     # create game_board and ai_board
     self.SIZE = self.get_size(f'{SIZE},{SIZE}')
     # load the gui interface
-    self.q = Queue()
+   
     self.gui = Gui(self.board, Player())
-    self.gui.gs.q = self.q  # pass queue into gui
+    self.gui.q = Queue()
     self.gui.set_alpha(False)
     self.gui.set_grid_colors(grid='black', highlight='lightblue')
     self.gui.require_touch_move(False)
@@ -111,7 +111,7 @@ class NumberGrid(LetterGame):
   def resize_grid(self):
     selected = self.select_list()
     self.N = int(self.puzzle[0])  
-    self.gui.gs.DIMENSION_X = self.gui.gs.DIMENSION_Y = 2*self.N +1
+    self.gui.DIMENSION_X = self.gui.DIMENSION_Y = 2*self.N +1
     for c in self.gui.game_field.children:
       c.remove_from_parent()
     self.gui.setup_gui(log_moves=False, grid_fill='white')
@@ -130,7 +130,7 @@ class NumberGrid(LetterGame):
       
       self.gui.add_numbers([Squares(loc, self.board[tuple(loc)] ,'black', z_position=30, 
                                     alpha=0,
-                                    font=('Arial Rounded MT Bold', self.gui.gs.SQ_SIZE/2),
+                                    font=('Arial Rounded MT Bold', self.gui.SQ_SIZE/2),
                                     text_anchor_point=(-0.75, 0.6))
                             for loc in locs])           
       [self.board_rc(loc, self.board, ' ') for loc in locs]                                     
@@ -303,7 +303,7 @@ class NumberGrid(LetterGame):
                   
   def select(self, moves, board, text_list=True):
       
-      long_press = self.gui.gs.long_touch
+      long_press = self.gui.long_touch
       # toggle hint button
       if moves == NOTE:
         self.hint = not self.hint
@@ -385,7 +385,7 @@ class NumberGrid(LetterGame):
     self.gui.update(self.solution_board[:2*self.N, :2*self.N])
     # This skips the wait for new location and induces Finished boolean to
     # halt the run loop
-    self.q.put(FINISHED)
+    self.gui.q.put(FINISHED)
     sleep(4)
     self.gui.show_start_menu()
     
@@ -398,12 +398,12 @@ class NumberGrid(LetterGame):
     letter = self.get_board_rc(coord, self.solution_board)
     self.hint_result = (coord, letter)
     self.hints += 2
-    self.q.put(HINT)
+    self.gui.q.put(HINT)
     
   def restart(self):
     print('restarting')
-    #self.q.put(FINISHED)
-    self.gui.gs.close()    
+
+    self.gui.close()    
     # self.finished = True
     self.__init__()
     self.run()

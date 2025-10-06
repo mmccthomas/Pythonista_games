@@ -54,8 +54,7 @@ class UI:
         self.display_board = [[' ' for c in range(SIZE)] for r in range(SIZE)]
         self.board = None        
         self.gui = Gui(self.display_board, Player())
-        self.q = Queue()  
-        self.gui.gs.q = self.q
+        self.gui.q = Queue()  
         self.gui.set_alpha(True) 
         self.gui.set_grid_colors(grid=BACKGROUND, highlight='orange', z_position=5, grid_stroke_color='clear')
         self.gui.require_touch_move(False)
@@ -63,14 +62,14 @@ class UI:
         self.gui.setup_gui(log_moves=False)
         self.gui.build_extra_grid(grids_x=SIZE-1, grids_y=SIZE-1, 
                                   grid_width_x=1, grid_width_y=1, color='black', 
-                                  line_width=2, offset=(self.gui.gs.SQ_SIZE/2, self.gui.gs.SQ_SIZE/2), 
+                                  line_width=2, offset=(self.gui.SQ_SIZE/2, self.gui.SQ_SIZE/2), 
                                   z_position=5) 
         # menus can be controlled by dictionary of labels and functions without parameters
         # menus can be controlled by dictionary of labels and functions without parameters
-        self.gui.gs.pause_menu = {'Continue': self.gui.gs.dismiss_modal_scene,
+        self.gui.set_pause_menu({'Continue': self.gui.dismiss_modal_scene,
                                   'Complete': self.complete,
-                                  'Quit': self.gui.gs.close}
-        #self.gui.gs.start_menu = {'New Game': run, 'Quit': self.gui.gs.close} 
+                                  'Quit': self.gui.close})
+
         self.game = None
       
                      
@@ -105,7 +104,7 @@ class UI:
         opponentPiece = opponentOf(self.game.userPiece)
         self.game.players = {opponentPiece: GomokuStrategy(opponentPiece, self.game.board_dimension, self), 
                              self.game.userPiece: GomokuStrategy(self.game.userPiece, self.game.board_dimension, self)}  
-        self.q.put((-1, -1))
+        self.gui.q.put((-1, -1))
       
     def human_move(self):
         while True:
@@ -125,11 +124,10 @@ class UI:
           break   
         #  wait on queue data, either rc selected or function to call
         sleep(0.01)
-        if not self.q.empty():
-          data = self.q.get(block=False)
+        if not self.gui.q.empty():
+          data = self.gui.q.get(block=False)
           
           #self.delta_t('get')
-          #self.q.task_done()
           if isinstance(data, (tuple, list, int)):
             coord = data # self.gui.ident(data)
             break
@@ -218,7 +216,7 @@ class GomokuGame():
       if board is a single list just update that item"""
       self.ui.gui.update(self.gameBoard)
       if highlightCoordinates:
-        self.ui.gui.gs.clear_highlights()
+        self.ui.gui.clear_highlights()
         self.ui.gui.valid_moves(highlightCoordinates)  
         
   def player_time(self, turn, start=True):
@@ -277,7 +275,7 @@ class GomokuGame():
         nameOfCurrentPlayer = self.playerNames[turn]
         self.currentPlayer = self.players[turn]
         self.player_time(turn, start=True)
-        self.ui.gui.set_prompt(f"Select  position (A1 - {self.ui.gui.gs.row_labels[self.board_dimension-1]}{self.board_dimension-1})")
+        self.ui.gui.set_prompt(f"Select  position (A1 - {self.ui.gui.row_labels[self.board_dimension-1]}{self.board_dimension-1})")
         row, col = self.currentPlayer.getMove(self.gameBoard)
         if row == None:
            # switched to AI vs AI
@@ -287,7 +285,7 @@ class GomokuGame():
         performMove(self.gameBoard, row, col, turn)
         
         self.printGameBoard( [[row, col]])
-        moveFormatted = self.ui.gui.gs.row_labels[col] + str(row)
+        moveFormatted = self.ui.gui.row_labels[col] + str(row)
         self.ui.gui.set_message2("%s played in spot %s%s\n" % (nameOfCurrentPlayer, moveFormatted, time_taken))
         turn = opponentOf(turn)
         gameOver, winner = self.players[opponentPiece].isTerminal(self.gameBoard)

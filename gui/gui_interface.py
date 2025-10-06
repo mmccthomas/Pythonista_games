@@ -43,6 +43,7 @@ class Gui():
         self.button_index = 2
         self.dismiss_menu = self.gs.dismiss_modal_scene
         self.device = self.gs.device
+        
         #self.long_touch = self.gs.long_touch
         #try:
         #    self.number_panel = ui.load_view('Number_panel.pyui')
@@ -59,6 +60,8 @@ class Gui():
             'New Game': self.gs.dismiss_modal_scene,
             'Quit': self.gs.close
         }
+   # ###################################################
+   # gui_panels
         # moved popup panels to gui_panels module
         # define functions to allow unchanged interface
         self.gui_panel = GuiPanel(self)
@@ -93,6 +96,9 @@ class Gui():
         # get letter_panel from gui_panel
         return self.gui_panel.letter_panel
         
+    # ###########################6###########    
+    # pass mutable proprties down to gscene level
+    # to avoid referencing gui.gs at application level
     @property   
     def DIMENSION_X(self):
        return self.gs.DIMENSION_X
@@ -108,6 +114,14 @@ class Gui():
     @DIMENSION_Y.setter
     def DIMENSION_Y(self, value):
         self.gs.DIMENSION_Y = value
+        
+    @property   
+    def SQ_SIZE(self):
+       return self.gs.SQ_SIZE
+       
+    @SQ_SIZE.setter
+    def SQ_SIZE(self, value):
+        self.gs.SQ_SIZE= value
 
     @property   
     def q(self):
@@ -120,7 +134,29 @@ class Gui():
     @property   
     def long_touch(self):
        return self.gs.long_touch
+       
+    @property   
+    def start_touch(self):
+       return self.gs.start_touch
     
+    @property
+    def grid_pos(self):
+      return self.gs.grid_pos
+      
+    @property
+    def buttons(self):
+        return self.gs.buttons
+        
+    @property
+    def row_labels(self):
+        return self.gs.row_labels
+        
+    @property
+    def column_labels(self):
+        return self.gs.column_labels
+            
+        
+    # #########################################
     def set_grid_colors(self,
                         grid=None,
                         highlight=None,
@@ -451,6 +487,9 @@ class Gui():
     def clear_squares(self, squares_list=None):
         self.gs.clear_squares(squares_list)
         
+    def highlight_squares(self, valid_moves, alpha=1):
+        self.gs.highlight_squares(valid_moves=valid_moves, alpha=alpha)
+        
     def clear_highlights(self):
         self.gs.clear_highlights()
         
@@ -464,6 +503,9 @@ class Gui():
         
     def close(self):
         self.gs.close()
+        
+    def dismiss_modal_scene(self):
+        self.gs.dismiss_modal_scene()
         
     def show_start_menu(self, **kwargs):
         # pass start_menu call to gs_scene
@@ -493,6 +535,9 @@ class Gui():
     def rc_to_pos(self, coord):
         return self.gs.rc_to_pos(coord[0], coord[1])
 
+    def grid_to_rc(self, point):
+        return self.gs.grid_to_rc(point)
+        
     def remove_labels(self):
         """remove all labels
         TODO This is done by position, can we do better?"""

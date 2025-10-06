@@ -41,9 +41,8 @@ class TrainTracks():
         self.display_board = np.zeros((size, size), dtype=int)
         self.board = None
         self.log_moves = True  # allows us to get a list of rc locations
-        self.q = Queue()
         self.gui = Gui(self.display_board, Player())
-        self.gui.gs.q = self.q  # pass queue into gui
+        self.gui.q = Queue()
         self.gui.set_alpha(False)
         self.gui.set_grid_colors(grid='black', z_position=5,
                                  grid_stroke_color='black')
@@ -59,10 +58,10 @@ class TrainTracks():
         self.gui.set_pause_menu({'Continue': self.gui.dismiss_menu,
                                  'New Game': self.restart,
                                  'Reveal': self.reveal,
-                                 'Quit': self.gui.gs.close})
+                                 'Quit': self.gui.close})
       
         self.gui.start_menu = {'New Game': self.restart,
-                               'Quit': self.gui.gs.close}
+                               'Quit': self.gui.close}
         self.size = size
         self.solution_board = np.full((size, size), '-', dtype='U1')
         self.empty_board = np.full((size, size), '-', dtype='U1')
@@ -84,7 +83,7 @@ class TrainTracks():
         """
         parent = self.gui.game_field
         _, _, w, h = self.gui.grid.bbox
-        sqsize = self.gui.gs.SQ_SIZE
+        sqsize = self.gui.SQ_SIZE
         x, y = (50, h - sqsize)
         offx, offy = self.posn.rackpos
         x = x + offx
@@ -111,8 +110,8 @@ class TrainTracks():
             break
           #  wait on queue data, either rc selected or function to call
           sleep(0.01)
-          if not self.q.empty():
-            data = self.q.get(block=False)
+          if not self.gui.q.empty():
+            data = self.gui.q.get(block=False)
             # self.delta_t('get')
             # self.q.task_done()
             if isinstance(data, (tuple, list, int)):
@@ -166,9 +165,9 @@ class TrainTracks():
            
         # deal with buttons. each returns the button text
         elif move[0][0] < 0 and move[0][1] < 0:
-          return (None, None), self.gui.gs.buttons[-move[0][0]].text, None
+          return (None, None), self.gui.buttons[-move[0][0]].text, None
           
-        point = self.gui.gs.start_touch - gscene.GRID_POS
+        point = self.gui.start_touch - self.gui.grid_pos
         # get letter from rack
         for index, k in enumerate(rack):
             if k.contains_point(point):
@@ -287,7 +286,7 @@ class TrainTracks():
         params = {'color': 'cyan', 'text_color': 'blue',
                   'z_position': 1000, 'stroke_color': 'clear',
                   'alpha': 0.25, 'radius': 5,
-                  'sqsize': self.gui.gs.SQ_SIZE, 'offset': (0.0, 0.0),
+                  'sqsize': self.gui.SQ_SIZE, 'offset': (0.0, 0.0),
                   'font': ('Arial Rounded MT Bold', 30),
                   'text_anchor_point': (-1, 1)}
         self.gui.add_numbers([Squares(coord, text, **params)], clear_previous=False)
@@ -620,13 +619,13 @@ class TrainTracks():
         return False
               
     def restart(self):
-       self.gui.gs.close()
+       self.gui.close()
        g = TrainTracks()
        g.run()
        
     def box_positions(self):
         x, y, w, h = self.gui.grid.bbox
-        sqsize = self.gui.gs.SQ_SIZE
+        sqsize = self.gui.SQ_SIZE
         # positions of all objects for all devices
         position_dict = {
         'ipad13_landscape': {'rackpos': (0, -45), 'rackscale': 1.0,
@@ -686,7 +685,7 @@ class TrainTracks():
       x, y, w, h = self.gui.grid.bbox
       r = self.posn.rackoff
       t = self.posn.rackscale
-      tsize = self.gui.gs.SQ_SIZE
+      tsize = self.gui.SQ_SIZE
       # position bottomleft of 1st tile w+x, y
       # position of topright last tile w + x + t *(t*tsize+20)
       #position = (w + x + (n % r * (20 + sqsize * self.posn.rackscale)),

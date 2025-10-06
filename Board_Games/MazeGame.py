@@ -43,9 +43,8 @@ class MazeTrial():
         self.display_board = np.zeros((self.size, self.size), dtype=int)
         self.log_moves = True  # allows us to get a list of rc locations
         self.straight_lines_only = False
-        self.q = Queue()
         self.gui = Gui(self.display_board, Player())
-        self.gui.gs.q = self.q  # pass queue into gui
+        self.gui.q = Queue()
         self.gui.set_alpha(False)
         self.gui.set_grid_colors(grid='white', z_position=5,
                                  grid_stroke_color='white')
@@ -59,10 +58,10 @@ class MazeTrial():
         self.gui.set_pause_menu({'Continue': self.gui.dismiss_menu,
                                  'New Game': self.restart,
                                  'Reveal': self.reveal,
-                                 'Quit': self.gui.gs.close})
+                                 'Quit': self.gui.close})
       
         self.gui.start_menu = {'New Game': self.restart,
-                               'Quit': self.gui.gs.close}
+                               'Quit': self.gui.close}
                                
         self.gui.replace_labels('row', ['' for n in range(self.size)][::-1])
         self.gui.replace_labels('col', ['' for n in range(self.size)])
@@ -82,8 +81,8 @@ class MazeTrial():
           break
         #  wait on queue data, either rc selected or function to call
         sleep(0.001)
-        if not self.q.empty():
-          data = self.q.get(block=False)
+        if not self.gui.q.empty():
+          data = self.gui.q.get(block=False)
           if isinstance(data, (tuple, list, int)):
             coord = data  # self.gui.ident(data)
             break
@@ -131,13 +130,13 @@ class MazeTrial():
            
         # deal with buttons. each returns the button text
         #elif move[0][0] < 0 and move[0][1] < 0:
-        #  return (None, None), self.gui.gs.buttons[-move[0][0]].text, None
+        #  return (None, None), self.gui.buttons[-move[0][0]].text, None
         else:
           return move, None, None
         return (None, None), None, None
         
     def highlight(self, coords, text, color, rel_size=0.9):
-      sqsize = self.gui.gs.SQ_SIZE
+      sqsize = self.gui.SQ_SIZE
       self.gui.add_numbers([Squares(coord, text, color, z_position=30, sqsize=rel_size * sqsize,
                              alpha=0.5, font=('Avenir Next', sqsize),
                              offset=((1.0 - rel_size) / 2, -(1.0 - rel_size) / 2),
@@ -307,7 +306,7 @@ class MazeTrial():
             return True
                     
     def restart(self):
-       self.gui.gs.close()
+       self.gui.close()
        g = MazeTrial()
        g.run()
     

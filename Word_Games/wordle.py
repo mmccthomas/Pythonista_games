@@ -72,7 +72,7 @@ class Wordle(LetterGame):
   def print_square(self, moves, color=None):
     #
     try: 
-      self.gui.gs.clear_numbers()
+      self.gui.clear_numbers()
     except (AttributeError):
       pass
     
@@ -108,10 +108,15 @@ class Wordle(LetterGame):
     #return selection
     while self.gui.selection == '':
       self.gui.input_letters(prompt=prompt, position=(w+150, h/4), items=None, allows_multiple_selection=True)
-      self.gui.text_box = self.gui.letter_panel
+      
       #self.gui.input_text_list(prompt=prompt, items=items, position=(w+250, 0))
-      while self.gui.text_box.on_screen:
+      while self.gui.gui_panel.letter_panel.on_screen:
           sleep(.2)
+          # deal with pause menu displayed          
+          if self.gui.scene.presented_scene:
+              self.gui.gui_panel.letter_panel.send_to_back()
+          else:
+              self.gui.gui_panel.letter_panel.bring_to_front()
           try:
               selection = self.gui.selection.lower()
               selection_row = self.gui.selection_row                
@@ -122,7 +127,7 @@ class Wordle(LetterGame):
               print(e)
               print(traceback.format_exc())              
       self.gui.selection = ''              
-      print('letter ', selection)
+      # print('letter ', selection)
       if len(selection) == self.sizex:
          return selection #, selection_row
       
@@ -184,7 +189,7 @@ class Wordle(LetterGame):
       return True  
       
   def restart(self):
-    self.gui.gs.close()
+    self.gui.close()
     self.finished = False
     g = Wordle()
     g.run()

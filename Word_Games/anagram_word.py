@@ -64,9 +64,8 @@ class Anagram(LetterGame):
     self.SIZE = self.get_size() 
      
     # load the gui interface
-    self.q = Queue()
     self.gui = Gui(self.board, Player())
-    self.gui.gs.q = self.q # pass queue into gui
+    self.gui.Queue()
     self.gui.set_alpha(True) 
     self.gui.set_grid_colors(grid='black', highlight='lightblue', z_position=30)
     self.gui.require_touch_move(False)
@@ -196,7 +195,7 @@ class Anagram(LetterGame):
     self.check_words()
     self.generate_word_anagram_pairs()
     self.create_anagram_board()
-    self.gui.build_extra_grid(self.gui.gs.DIMENSION_X, self.gui.gs.DIMENSION_Y, grid_width_x=1, grid_width_y=1,color='grey', line_width=1)
+    self.gui.build_extra_grid(self.gui.DIMENSION_X, self.gui.DIMENSION_Y, grid_width_x=1, grid_width_y=1,color='grey', line_width=1)
     if self.debug:
       print(self.anagrams())
       [print(word, count) for word, count in self.word_counter.items() if count > 1]
@@ -387,7 +386,7 @@ class Anagram(LetterGame):
           return (None, None), None, None     
                  
   def restart(self):
-    self.gui.gs.close()
+    self.gui.close()
     self.finished = False
     self.__init__()
     self.run() 

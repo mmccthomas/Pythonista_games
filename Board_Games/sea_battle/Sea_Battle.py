@@ -249,9 +249,8 @@ class BattleShip():
     self.SIZE = self.get_size() 
      
     # load the gui interface
-    self.q = Queue(maxsize=10)
     self.gui = Gui(self.game_board, Player())
-    self.gui.gs.q = self.q # pass queue into gui
+    self.gui.q = Queue(maxsize=10)
     self.gui.set_alpha(True) 
     self.gui.set_grid_colors(grid='lightgrey', highlight='lightblue')
     self.gui.require_touch_move(False)
@@ -259,10 +258,10 @@ class BattleShip():
     self.gui.setup_gui()
     
     # menus can be controlled by dictionary of labels and functions without parameters
-    self.gui.gs.pause_menu = {'Continue': self.gui.gs.dismiss_modal_scene, 
+    self.gui.set_pause_menu({'Continue': self.gui.dismiss_modal_scene, 
                               'Show Densities': self.print_space_densities, 
-                              'Quit': self.quit}
-    self.gui.gs.start_menu = {'New Game': self.restart, 'Quit': self.quit}
+                              'Quit': self.quit})
+    self.gui.set_start_menu({'New Game': self.restart, 'Quit': self.quit})
     
     self.all = [[j,i] for i in range(self.SIZE) for j in range(self.SIZE) if self.game_board[j][i] == EMPTY]
     #self.gui.valid_moves(self.all, message=None)
@@ -307,7 +306,7 @@ class BattleShip():
     while True:
       # for debug
       #self.gui.print_board(self.ai_board, 'ai')
-      self.gui.gs.clear_highlights()
+      self.gui.clear_highlights()
       
       # human play
       self.gui.set_top('Human turn')
@@ -325,7 +324,7 @@ class BattleShip():
         break 
      
       self.print_board(move, best_move_coordinates_list)
-      self.gui.gs.clear_highlights()
+      self.gui.clear_highlights()
       
         
       # ai play
@@ -343,7 +342,7 @@ class BattleShip():
       self.process_strike(hit, move, self.ai_board, self.ships)
       if self.game_over():
         break
-      self.gui.gs.clear_highlights()     
+      self.gui.clear_highlights()     
        
     self.print_board()
     self.gui.set_message2(f'{self.game_over()} WON!')
@@ -351,7 +350,7 @@ class BattleShip():
     self.gui.set_prompt('')
     sleep(4)
     self.finished = True
-    self.gui.gs.show_start_menu()
+    self.gui.show_start_menu()
     
     
       
@@ -381,7 +380,7 @@ class BattleShip():
   def print_ships(self, whose_ships, color=None):
     #
     try: 
-      self.gui.gs.clear_numbers()
+      self.gui.clear_numbers()
     except (AttributeError):
       
       pass
@@ -492,7 +491,7 @@ class BattleShip():
     """
     print('toggle', self.toggle_density_chart)
     if self.toggle_density_chart:
-      self.gui.gs.clear_numbers()
+      self.gui.clear_numbers()
       self.print_ships(self.ships)
       self.toggle_density_chart = not self.toggle_density_chart
       return
@@ -851,9 +850,9 @@ class BattleShip():
         break   
       #  wait on queue data, either rc selected or function to call
       sleep(0.2)
-      if not self.q.empty():
-        data = self.q.get(block=False)
-        self.q.task_done()
+      if not self.gui.q.empty():
+        data = self.gui.q.get(block=False)
+        self.gui.q.task_done()
         #print(f'got {data} from queue')
         if isinstance(data, tuple) or isinstance(data, list):
           coord = self.gui.ident(data)
@@ -870,7 +869,7 @@ class BattleShip():
     """Takes in the user's input and performs that move on the board, returns the coordinates of the move"""
     if board is None:
         board = self.game_board
-    prompt = (f"Select  position (A1 - {self.gui.gs.row_labels[-1]}{self.SIZE-1})")
+    prompt = (f"Select  position (A1 - {self.gui.row_labels[-1]}{self.SIZE-1})")
     # sit here until piece place on board   
     while True:
       self.gui.set_prompt(prompt, font=('Avenir Next', 25))
@@ -878,7 +877,7 @@ class BattleShip():
       spot = self.wait_for_gui() 
       spot = spot.strip().upper()
       row = int(spot[1:]) - 1
-      col = self.gui.gs.row_labels.index(spot[:2])
+      col = self.gui.row_labels.index(spot[:2])
       if board[row][col] != EMPTY:
         prompt = f"{spot} is already taken, please choose another:"
       else:
@@ -897,11 +896,11 @@ class BattleShip():
    """)
 
   def quit(self):
-    self.gui.gs.close()
+    self.gui.close()
     sys.exit() 
   
   def restart(self):
-    self.gui.gs.close()
+    self.gui.close()
     self.finished = False
     self.__init__() 
     self.run()
@@ -915,8 +914,8 @@ class BattleShip():
         break
       if self.finished: # skip if in game
         try:
-          if not self.q.empty():
-            item = self.q.get(block=False)
+          if not self.gui.q.empty():
+            item = self.gui.q.get(block=False)
             # print('item', item)
             if item is self.quit:
               return True

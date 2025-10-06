@@ -58,9 +58,8 @@ class Scrabble(LetterGame):
     self.SIZE = self.get_size('15,15') 
      
     # load the gui interface
-    self.q = Queue()
     self.gui = Gui(self.board, PPlayer())
-    self.gui.gs.q = self.q # pass queue into gui
+    self.gui.q = Queue()
     self.gui.set_alpha(True) 
     self.gui.set_grid_colors(grid='Scrabble.jpg') # background is classic board
     self.gui.require_touch_move(False)
@@ -147,7 +146,7 @@ class Scrabble(LetterGame):
   def add_boxes(self):
       """ add non responsive decoration boxes"""
       x, y, w, h = self.gui.grid.bbox 
-      tsize = self.posn.rackscale * self.gui.gs.SQ_SIZE
+      tsize = self.posn.rackscale * self.gui.SQ_SIZE
       box = self.gui.add_button(text='', title='Computer', position=self.posn.box1, 
                           min_size=(7 * tsize+10, tsize+10), 
                           fill_color='red')
@@ -200,8 +199,8 @@ class Scrabble(LetterGame):
     y = y + y_off
     rack = {}
     for n, tile in enumerate(tiles):    
-      t = Tile(Texture(Image.named(f'../gui/tileblocks/s_{tile}.png')), 0,  0, sq_size=self.gui.gs.SQ_SIZE*self.posn.rackscale)   
-      t.position = (w + x + n * self.gui.gs.SQ_SIZE*self.posn.rackscale, y)
+      t = Tile(Texture(Image.named(f'../gui/tileblocks/s_{tile}.png')), 0,  0, sq_size=self.gui.SQ_SIZE*self.posn.rackscale)   
+      t.position = (w + x + n * self.gui.SQ_SIZE*self.posn.rackscale, y)
       rack[t.bbox] = tile
       parent.add_child(t)     
             
@@ -336,9 +335,9 @@ class Scrabble(LetterGame):
        
     # deal with buttons. each returns the button text    
     elif move[0][0] < 0 and move[0][1] < 0:
-      return (None, None), self.gui.gs.buttons[-move[0][0]].text, None
+      return (None, None), self.gui.buttons[-move[0][0]].text, None
       
-    point = self.gui.gs.start_touch - self.gui.gs.grid_pos
+    point = self.gui.start_touch - self.gui.grid_pos
     # get letter from rack
     for index, k in enumerate(rack):
         if k.contains_point(point):
@@ -349,7 +348,7 @@ class Scrabble(LetterGame):
     
   def restart(self):
     """ reinitialise """ 
-    self.gui.gs.close()
+    self.gui.close()
     self.__init__()
     self.run() 
     

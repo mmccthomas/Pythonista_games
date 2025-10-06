@@ -289,7 +289,6 @@ class CrossWord():
             if self.debug:
                 print('number hints', len(self.hints))
                 try:
-                    # self.gui.gs.highlight_squares(word.coords)
                     self.gui.update(self.board)
                     sleep(0.25)
                 except (AttributeError):
@@ -405,7 +404,6 @@ class CrossWord():
 
                 if self.debug:
                     try:
-                        # self.gui.gs.highlight_squares(word.coords)
                         self.gui.print_board(self.board, which=index)
                         self.gui.update(self.board)
                         sleep(0.25)

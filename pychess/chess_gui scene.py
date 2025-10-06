@@ -8,11 +8,8 @@
 import os
 import sys
 from queue import Queue
-current = os.path.dirname(os.path.realpath(__file__))
-parent = os.path.dirname(current)
-sys.path.append(parent)
-grandparent = os.path.dirname(parent)
-sys.path.append(grandparent)
+import base_path
+base_path.add_paths(__file__)
 import chess_engine
 import ai_engine
 from scene import *
@@ -23,9 +20,6 @@ import copy
 from scene import Vector2, get_screen_size
 screen_width, screen_height = get_screen_size()
  
-current = os.path.dirname(os.path.realpath(__file__))
-parent = os.path.dirname(current)
-sys.path.append(parent)
 from gui.game_menu import MenuScene
 import logging
 import gui.gui_scene as gscene
@@ -70,7 +64,7 @@ class ChessGame(gscene.GameBoard):
     self.DIMENSION_X = self.DIMENSION_Y = 8
     # load the gui interface
     self.q = Queue()
-    self.column_labels = iter('87654321')
+    self.row_labels = list(range(8, 0, -1))
     self.use_alpha = True
     image = ui.Image.named('board_grey.jpg')
     self.grid_fill = 'clear'          
@@ -81,6 +75,7 @@ class ChessGame(gscene.GameBoard):
     self.Player = Player()
     self.i = 0
     self.setup_gui(log_moves=True)
+    
     
     
     # menus can be controlled by dictionary of labels and functions without parameters

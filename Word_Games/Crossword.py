@@ -26,7 +26,7 @@ class CrossWord(LetterGame):
         self.load_words_from_file(PUZZLELIST, no_strip=True)
         self.selection = self.select_list(self.test)
         if self.selection is False:
-            self.gui.gs.show_start_menu()
+            self.gui.show_start_menu()
             return
 
         self.images = None
@@ -231,12 +231,12 @@ class CrossWord(LetterGame):
             return (None, None), 'Enter', None  # pressed enter button
         # deal with buttons. each returns the button text
         if move[0][0] < 0 and move[0][1] < 0:
-            return (None, None), self.gui.gs.buttons[-move[0][0]].text, None
-        point = self.gui.gs.start_touch - self.gui.gs.grid_pos
+            return (None, None), self.gui.buttons[-move[0][0]].text, None
+        point = self.gui.start_touch - self.gui.grid_pos
         # touch on board
         # Coord is a tuple that can support arithmetic
         try:
-            rc_start = Coord(self.gui.gs.grid_to_rc(point))
+            rc_start = Coord(self.gui.grid_to_rc(point))
 
             if self.check_in_board(rc_start):
                 rc = Coord(move[-2])
@@ -339,7 +339,7 @@ class CrossWord(LetterGame):
             return True
 
     def restart(self):
-        self.gui.gs.close()
+        self.gui.close()
         CrossWord().run()
 
 

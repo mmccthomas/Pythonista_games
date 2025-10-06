@@ -86,7 +86,7 @@ class WordCircle(LetterGame):
         msg =[m for m in msg_list if len(m) == i]
         self.gui.set_text(b, '\n'.join(msg), font=('Avenir Next', 25))        
             
-    if self.gui.gs.device.endswith('_landscape'):
+    if self.gui.device.endswith('_landscape'):
       pass
     self.gui.update(self.board)  
     
@@ -127,11 +127,11 @@ class WordCircle(LetterGame):
         self.board_rc(rc, self.board, letters.pop())
     
     self.word_selection = selected_words
-    if self.gui.gs.device.endswith('_landscape'):
+    if self.gui.device.endswith('_landscape'):
       pass
     x, y, w, h = self.gui.grid.bbox
     for i in range(self.min_length, self.max_length+1):
-      if self.gui.gs.device.endswith('_landscape'):
+      if self.gui.device.endswith('_landscape'):
           position = (10 + w +  (i-self.min_length)*90, h/2)
       else:
           position = (w/4+ (i-self.min_length)*90, h)
@@ -220,7 +220,7 @@ class WordCircle(LetterGame):
       
   def restart(self):
       """ reinitialise """ 
-      self.gui.gs.close()
+      self.gui.close()
       self.__init__()
       self.run()
             

@@ -70,9 +70,8 @@ class CrossNumbers(LetterGame):
         self.SIZE = self.get_size()
          
         # load the gui interface
-        self.q = Queue()
         self.gui = Gui(self.board, Player())
-        self.gui.gs.q = self.q  # pass queue into gui
+        self.gui.q = Queue()
         self.gui.set_alpha(False)
         self.gui.set_grid_colors(grid='white', highlight='lightblue')
         self.gui.require_touch_move(False)
@@ -161,9 +160,9 @@ class CrossNumbers(LetterGame):
         _, _, w, h = self.gui.grid.bbox
         if self.gui.device.endswith('_landscape'):
             if self.sizey < max_items:
-              size = self.gui.gs.SQ_SIZE * 13 / max_items
+              size = self.gui.SQ_SIZE * 13 / max_items
             else:
-              size = self.gui.gs.SQ_SIZE
+              size = self.gui.SQ_SIZE
             x, y = 5, 0
             x = x + off*size
             for n, tile in enumerate(tiles):
@@ -171,7 +170,7 @@ class CrossNumbers(LetterGame):
               t.position = (w + x + 3*int(n/max_items)*size , h - (n % max_items + 1)*size + y)
               parent.add_child(t)
         else:
-            size = self.gui.gs.SQ_SIZE * 0.9
+            size = self.gui.SQ_SIZE * 0.9
             x, y = 30, 40
             y = y + off * size
             for n, tile in enumerate(tiles):
@@ -636,7 +635,7 @@ class CrossNumbers(LetterGame):
         self.gui.update(self.board)
         # This skips the wait for new location and induces Finished boolean to
         # halt the run loop
-        self.q.put((-10, -10))
+        self.gui.q.put((-10, -10))
           
     def get_player_move(self, board=None):
         """Takes in the user's input and performs that move on the board,
@@ -687,7 +686,7 @@ class CrossNumbers(LetterGame):
               return (None, None), None
          
     def restart(self):
-        self.gui.gs.close()
+        self.gui.close()
         self.finished = False
         g = CrossNumbers()
         g.run()
