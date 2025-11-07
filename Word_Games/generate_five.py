@@ -34,6 +34,7 @@ import base_path
 base_path.add_paths(__file__)
 from Letter_game import Word
 import word_square_gen
+from setup_logging import logger, is_debug_level
 # from Krossword import KrossWord
 
 WORDLIST = "wordlists/words_10000.txt"
@@ -63,7 +64,6 @@ def set_board(board, loc, val):
 class Cross():
 
     def __init__(self):
-        self.debug = False
         self.debug2 = False
         self.debug3 = False
         self.min_word_length = 4
@@ -212,8 +212,7 @@ class Cross():
         # use stats to get word lengths
         word_numbers = {k: round(no_start * v / 100) for k, v in STATS.items()}
 
-        if self.debug:
-            print(f'Initial words lengths {word_numbers}')
+        logger.debug(f'Initial words lengths {word_numbers}')
         wordlist = []
         for length, number in word_numbers.items():
             selected = 0
@@ -252,8 +251,7 @@ class Cross():
 
         for i in range(4, 2, -1):
             self.min_word_length = i
-            if self.debug:
-                print('MIN LENGTH', self.min_word_length)
+            logger.debug(f'MIN LENGTH {self.min_word_length}')
             index = 20
             random.shuffle(unfilled_locs)
             while unfilled_locs:
@@ -262,11 +260,9 @@ class Cross():
                 loc = unfilled_locs[-1]
                 placed = self.find_possibles(loc=loc)
                 unfilled_locs = self.locs_unfilled()
-                if self.debug:
-                    pass
-                    print('unfilled', len(unfilled_locs), unfilled_locs)
+                logger.debug(f'unfilled {len(unfilled_locs)}, {unfilled_locs}')
                 if placed:
-                    if self.debug:
+                    if is_debug_level():
                         self.print_board(
                             self.board,
                             highlight=[w.start for w in self.word_locations])
@@ -325,8 +321,7 @@ class Cross():
         placed_words = [word.word for word in self.word_locations]
         word_to_place = ''.join(possibles)
         if word_to_place in placed_words:
-            if self.debug:
-                print(f'{word_to_place} already placed')
+            logger.debug(f'{word_to_place} already placed')
             return False
         coords = [
             tuple(start_loc + self.direction_lookup[self.dir_str[dirn]] * x)
@@ -657,7 +652,7 @@ class Cross():
                              word=word,
                              index=index))
                     index += 1
-            if self.debug:
+            if is_debug_level():
                 self.print_board(
                     self.board,
                     highlight=[w.start for w in self.word_locations])
@@ -668,7 +663,7 @@ class Cross():
             self.print_board(self.board,
                              highlight=[w.start for w in self.word_locations])
 
-        if self.debug:
+        if is_debug_level():
             self.print_board(self.board,
                              highlight=[w.start for w in self.word_locations])
             # print(len(words_placed), sorted(self.word_locations, key=attrgetter('index')))

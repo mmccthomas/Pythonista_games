@@ -19,6 +19,7 @@ from Letter_game import LetterGame, Player
 from gui.gui_interface import Gui
 from crossword_create import CrossWord
 from crossword_solve_2 import AlternativeSolve
+from  setup_logging import logger
 WordList = 'wordpuzzles.txt'
 BLOCK = '#'
 SPACE = ' '
@@ -28,7 +29,6 @@ FINISHED = (-10, -10)
 class ZipWord(LetterGame):
   
   def __init__(self, test=None):
-    self.debug = False
     self.test = test
     # allows us to get a list of rc locations
     self.log_moves = True
@@ -199,8 +199,7 @@ class ZipWord(LetterGame):
       if selection is None:
           return random.choice(items) 
       if len(selection):
-          if self.debug:   
-            print(f'{selection=}')
+          logger.debug(f'{selection=}')
           return selection
           
   def prepare_word_lists(self):
@@ -335,8 +334,7 @@ class ZipWord(LetterGame):
             
         if selection in items:
           self.gui.selection = ''
-          if self.debug:
-              print('letter ', selection, 'row', selection_row)
+          logger.debug(f'letter {selection} row {selection_row}')
           return rc, selection, selection_row
         elif selection == "Cancelled_":
           return (None, None), None, None

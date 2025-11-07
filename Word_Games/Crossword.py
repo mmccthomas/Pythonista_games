@@ -11,7 +11,7 @@ from scene import get_screen_size
 from Letter_game import LetterGame
 import gui.gui_scene as gscene
 from gui.gui_interface import Coord, Squares
-
+from setup_logging import logger, is_debug_level
 PUZZLELIST = "crossword_puzzles.txt"
 
 
@@ -21,7 +21,6 @@ class CrossWord(LetterGame):
         LetterGame.__init__(self, column_labels_one_based=True)
         self.first_letter = False
         self.tiles = None
-        self.debug = False
         self.test = test
         self.load_words_from_file(PUZZLELIST, no_strip=True)
         self.selection = self.select_list(self.test)
@@ -167,8 +166,7 @@ class CrossWord(LetterGame):
                 if selection == 'cancelled_':
                     return False
                 if len(selection):
-                    if self.debug:
-                        print(f'{selection=}')
+                    logger.debug(f'{selection=}')
         else:
             selection = select if select else items[0]
 
@@ -178,7 +176,7 @@ class CrossWord(LetterGame):
         if selection + '_frame' in self.word_dict:
             
             frame = self.word_dict[selection + '_frame']
-            if self.debug:
+            if is_debug_level():
                 [print(row, len(row)) for row in frame]  # for debug
 
             # convert to numpy

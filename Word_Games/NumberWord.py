@@ -42,7 +42,7 @@ from Letter_game import LetterGame, Player
 from gui.gui_interface import Gui, Squares, Board
 from crossword_create import CrossWord
 from gui.gui_scene import Tile
-
+from setup_logging import logger, is_debug_level
 #  First item is huge list for solving existing grid,
 # and common lists when computing  grid
 WordleList = ['wordlists/words_alpha.txt',
@@ -59,7 +59,6 @@ class CrossNumbers(LetterGame):
     def __init__(self, test=None):
         # test overrides manual selections
         self.test = test
-        self.debug = False
         self.use_np = False
         self.word_trie = None
         # allows us to get a list of rc locations
@@ -331,7 +330,7 @@ class CrossNumbers(LetterGame):
       
     def finish_population_of_grid(self):
         """complete board population after generating with random words """
-        if self.debug:
+        if is_debug_level():
             print([word.word for word in self.word_locations])
     
         self.solution_board = self.board.copy()
@@ -400,14 +399,14 @@ class CrossNumbers(LetterGame):
         print(f'time to prepare {time()-t:.2f}s')
         solver = CodewordSolverDFS(all_encoded_words, code_dict,
                                    self.word_trie, self.all_word_dict,  use_heuristics=True, use_np=self.use_np)                          
-        solver.debug = self.debug        
+        solver.debug = is_debug_level()     
         t=time()                
         solver.solve()
         print(f'time to solve {time()-t:.2f}s')
         decoded_words = solver.decode_words_in_list(all_encoded_words)
         result = check_results(self.word_trie, decoded_words)
-        if self.debug:
-           print(f"Decoded words:\n{decoded_words}")
+        logger.debug(f"Decoded words:\n{decoded_words}")
+        if is_debug_level():
            solver.print_decoded_letters()
         if result:
             self.solution_dict = solver.code_dict.copy()
@@ -415,7 +414,7 @@ class CrossNumbers(LetterGame):
             [self.board_rc(loc, self.solution_board, self.solution_dict[self.number_board[tuple(loc)]])
              for loc in nonzero]
         else:
-            if self.debug:
+            if is_debug_level():
               print('='*20,'DEBUG', '='*20)
               try:
                   max_percent = max(solver.word_missing_dict)
@@ -572,7 +571,7 @@ class CrossNumbers(LetterGame):
         #print(self.board), len(self.board[0]))
         
         # [print(word.coords) for word in self.word_locations]
-        if self.debug:
+        if is_debug_level():
             print('frame ', [len(y) for y in self.board])
             print(len(self.word_locations), 'words', self.min_length, self.max_length)
         self.filled_board = np.any(np.char.isdigit(np.array(self.board, dtype='U3')))

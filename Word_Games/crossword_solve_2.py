@@ -11,6 +11,7 @@ import re
 import numpy as np
 import inspect
 from Letter_game import LetterGame
+from setup_logging import logger, is_debug_level
 BLOCK = '#'
 SPACE = ' '
 
@@ -22,7 +23,6 @@ class AlternativeSolve(LetterGame):
     """
     
     def __init__(self, gui, board, word_locations, wordlist):
-        self.debug = False
         self.gui = gui
         self.word_locations = word_locations
         self.wordlist = wordlist
@@ -104,7 +104,7 @@ class AlternativeSolve(LetterGame):
         if len(all_possibles) == 0:
             return None, 0
         if any(nil_matches):
-            if self.debug:
+            if is_debug_level():
                 print(f'{nil_matches=}')
                 word_obj = nil_matches.pop(0)
                 print(f'No Possibles for {word_obj} {word_obj.match_pattern}')
@@ -113,7 +113,7 @@ class AlternativeSolve(LetterGame):
         fewest_possibles = all_possibles[-1]
         fewest_matches = len(fewest_possibles)
             
-        if self.debug:
+        if is_debug_level():
             [print(f'{possible[0]}, match {possible[0][0].match_pattern}, len {len(possible)},score {score(possible)}')
              for possible in all_possibles[-5:]]
             print('Selecting', fewest_possibles[0])
@@ -125,7 +125,7 @@ class AlternativeSolve(LetterGame):
         if previous is True, fill with match """
         word_obj, word = possible
          
-        if self.debug:
+        if is_debug_level():
             msg = f'{"Removed" if previous else "Placed"} {word_obj}'
             if self.gui:
                 self.gui.set_message(msg)
@@ -147,7 +147,7 @@ class AlternativeSolve(LetterGame):
             word_obj.fixed = False
             self.placed -= 1
               
-        if self.debug:
+        if is_debug_level():
             self.print_board(self.board, f'stack depth= {len(inspect.stack(0))}')
             if self.gui:
                 self.gui.update(self.board)
@@ -166,8 +166,7 @@ class AlternativeSolve(LetterGame):
         possibles, num_matches = self.fewest_matches()
             
         if num_matches == 0:
-            if self.debug:
-                print('no matches, backing up')
+            logger.debug('no matches, backing up')
               
             return False
             
@@ -179,8 +178,7 @@ class AlternativeSolve(LetterGame):
         # can solve failures
         random.shuffle(possibles)
         for i, possible in enumerate(possibles):
-            if self.debug:
-                print(f'trying no {i} {possible[1]} in choices {[w[1] for w in possibles]}')
+            logger.debug(f'trying no {i} {possible[1]} in choices {[w[1] for w in possibles]}')
             self.place_word(possible)
             # now proceed to next fewest match
             if self.fill():
@@ -204,7 +202,7 @@ class AlternativeSolve(LetterGame):
             #if iteration == n - 1:
             #    self.debug = True
             self.fill()
-            if self.debug:
+            if is_debug_level():
                 print()
                 self.print_board(self.board, which=f'final board {filepath},\n\t\t{self.iteration_counter} iterations for {self.placed} words')
             if self.board_is_full():

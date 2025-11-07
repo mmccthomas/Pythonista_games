@@ -16,6 +16,7 @@ from ui import Image, Path, LINE_JOIN_ROUND, LINE_JOIN_MITER
 from gui.gui_scene import Tile, BoxedLabel
 from scene import Texture, Point
 from gui.gui_interface import Gui, Coord
+from setup_logging import logger
 #from scrabble_ai_main.UI import scrabble_renderer
 import scrabble_ai_main.Game.scrabble_game as scrabble_game
 import scrabble_ai_main.Game.scrabble_objects as scrabble_objects
@@ -52,7 +53,6 @@ class PPlayer():
 class Scrabble(LetterGame):
   
   def __init__(self):
-    self.debug = False
     # allows us to get a list of rc locations
     self.log_moves = True
     self.SIZE = self.get_size('15,15') 

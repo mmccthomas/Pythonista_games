@@ -15,6 +15,7 @@ from pieceword_create import PieceWord
 from crossword_create import CrossWord
 from Letter_game import LetterGame
 from gui.gui_interface import Squares, Coord
+from setup_logging import logger, is_debug_level
 PUZZLELIST = "crossword_puzzles.txt"
 OUTPUTFILE = "crossword_puzzles.txt"
 
@@ -42,7 +43,6 @@ class Cross(PieceWord):
         LetterGame.__init__(self, column_labels_one_based=True)
         self.first_letter = False
         self.tiles = None
-        self.debug = False
         self.lookup_free = False
         self.across_only = False
         self.INIT_COLOR = 'white'
@@ -98,7 +98,7 @@ class Cross(PieceWord):
 
         cx = CrossWord(self.gui, None, self.all_words)
         cx.max_cycles = 5000
-        cx.debug = self.debug
+        cx.debug = is_debug_level()
         type = random.randint(0, 3)
         for i in range(10):
             self.board = cx.create_grid(type=type,

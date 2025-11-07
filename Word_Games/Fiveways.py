@@ -6,13 +6,12 @@
 import numpy as np
 from Krossword import KrossWord
 from gui.gui_interface import Squares, Coord
- 
+from setup_logging import logger
  
 class FiveWays(KrossWord):
   
   def __init__(self):
     KrossWord.__init__(self)   # same as KrossWord
-    self.debug = False
     self.max_iteration = 2000
     self.wordfile = 'fiveways.txt'
     self.strikethru = False 

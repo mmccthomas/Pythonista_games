@@ -9,7 +9,7 @@ import random
 from Letter_game import LetterGame
 import gui.gui_scene as gscene
 from gui.gui_interface import Coord
-
+from setup_logging import logger, is_debug_level
 PUZZLELIST = "pieceword.txt"
 TILESIZE = 3
 
@@ -20,7 +20,6 @@ class PieceWord(LetterGame):
         LetterGame.__init__(self, column_labels_one_based=True)
         self.first_letter = False
         self.tiles = None
-        self.debug = False
         self.test = test
         self.load_words_from_file(PUZZLELIST, no_strip=True)
         self.selection = self.select_list(self.test)
@@ -89,8 +88,7 @@ class PieceWord(LetterGame):
                 if selection == 'cancelled_':
                     selection = random.choice(items).lower()
                 if len(selection):
-                    if self.debug:
-                        print(f'{selection=}')
+                    logger.debug(f'{selection=}')
         else:
             selection = select if select else items[0]
 
@@ -101,12 +99,12 @@ class PieceWord(LetterGame):
             self.image_dims = [int(st) for st in self.wordlist[1].split(',')]
             self.solution = self.wordlist[2]
             if len(self.solution) < 70:
-                self.debug = True
+                pass # set debug?
 
         if selection + '_frame' in self.word_dict:
             # rearrange frame text into N 3x3 tiles
             frame = self.word_dict[selection + '_frame']
-            if self.debug:
+            if is_debug_level():
                 [print(row, len(row)) for row in frame]  # for debug
             lengths = [len(row) == len(frame[0]) for row in frame]
             assert all(
@@ -236,8 +234,7 @@ class PieceWord(LetterGame):
             for c in range(self.span):
                 no = f'{self.rack[(r, c)]:02d}'
                 state += no
-        if self.debug:
-            print(state)
+        logger.debugi=(f'{state}')
         if state == self.solution:
             self.gui.set_message('Game over')
             return True

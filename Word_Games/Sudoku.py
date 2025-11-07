@@ -11,7 +11,7 @@ import sudoko_solve
 from cages import Cages
 
 from gui.gui_interface import Gui, Squares
-
+from setup_logging import logger, is_debug_level
 
 """ This game is the Sudoko grid puzzle
 both standard and Killer type are supported
@@ -33,7 +33,6 @@ SIZE = 9  # fixed for Sudoko
 class Sudoko(LetterGame):
   
   def __init__(self):
-    self.debug = False
     self.sleep_time = 0.1
     self.hints = 0
     self.cage_colors = ['teal', 'salmon', 'dark turquiose', 'yellow']
@@ -223,8 +222,7 @@ class Sudoko(LetterGame):
     self.cage_board = cg.cage_board_view()
     # store coord and total for later display
     self.totals = {k[0]: v for v, k in cg.cages}
-    if self.debug:
-        print('cage board\n', self.cage_board)
+    logger.debug(f'cage board\n {self.cage_board}')
     self.adj_matrix = cg.calc_adj_matrix(self.cage_board)
     color_map_dict = cg.color_4colors(colors=self.cage_colors)
     self.delta_t('calculate cages')
@@ -387,8 +385,7 @@ class Sudoko(LetterGame):
            self.notes[(r + r_off, c + c_off)].remove(known_value)
          except (KeyError, ValueError):
            pass
-     if self.debug:
-         print('removed note', coord, known_value, self.notes)
+     logger.debug(f'removed note {coord}, {known_value}, {self.notes}')
      
      # now update squares
      for pos, item in self.notes.items():
@@ -411,8 +408,7 @@ class Sudoko(LetterGame):
     """
     if move:
       coord, letter, row = move
-      if self.debug:
-        print('received move', move)
+      logger.debug(f'received move {move}')
       r, c = coord
       if not isinstance(letter, list):
           if coord == (None, None):
@@ -422,16 +418,14 @@ class Sudoko(LetterGame):
             
           elif letter != '':
             # if Killer mode, need to always display totals
-            if self.debug:
-              print('processing', letter, coord)
+            logger.debug(f'processing {letter}, {coord}')
             if self.get_board_rc(coord, self.board) != BLOCK:
               self.board_rc(coord, self.board, letter)
               self.gui.update(self.board)
               
               # test if correct
               if self.get_board_rc(coord, self.board) != self.get_board_rc(coord, self.solution_board):
-                if self.debug:
-                   print('testing', letter, coord)
+                logger.debug(f'testing {letter}, {coord}')
                 # make square flash yellow
                 temp = self.gui.get_numbers(coord)
                 data = temp[coord]
@@ -473,8 +467,7 @@ class Sudoko(LetterGame):
       else:  # we've  got a list
         # add notes to square
         self.notes[coord] = letter
-        if self.debug:
-            print('add note', coord, self.notes)
+        logger.debug(f'add note  {coord}, {self.notes}')
         self.add_note(coord, letter)
            
       return True
@@ -540,8 +533,7 @@ class Sudoko(LetterGame):
    
             if selection in items:
               self.gui.selection = ''
-              if self.debug:
-                  print('letter ', selection, 'row', selection_row)
+              logger.debug(f'letter {selection}, row {selection_row}')
               return rc, selection, selection_row
               
             elif selection == "Cancelled_":
@@ -549,8 +541,7 @@ class Sudoko(LetterGame):
               
             elif all([sel in items for sel in selection]):
               self.gui.selection = ''
-              if self.debug:
-                  print('letters ', selection, 'rows', selection_row)
+              logger.debug(f'letters {selection}, rows {selection_row}')
               return rc, selection, selection_row
             else:
               return (None, None), None, None

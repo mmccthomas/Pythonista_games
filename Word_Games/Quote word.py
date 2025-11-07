@@ -19,6 +19,7 @@ from Letter_game import LetterGame
 import gui.gui_scene as gscene
 from gui.gui_scene import Tile
 from gui.gui_interface import Coord
+from setup_logging import logger
 PUZZLELIST = "quoteword.txt"
 TILESIZE = 3
 
@@ -29,7 +30,6 @@ class QuoteWord(LetterGame):
     LetterGame.__init__(self, column_labels_one_based=True)
     self.first_letter = False
     self.tiles = None
-    self.debug = True
     self.load_words_from_file(PUZZLELIST, no_strip=True) 
     self.selection = self.select_list()
     if self.selection is False:
@@ -87,8 +87,7 @@ class QuoteWord(LetterGame):
         if selection == 'cancelled_':
           return False 
         if len(selection):
-          if self.debug:   
-            print(f'{selection=}')
+          logger.debug(f'{selection=}')
           self.wordlist = self.word_dict[selection]   
           self.gui.selection = ''
           return selection

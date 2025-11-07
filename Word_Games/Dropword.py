@@ -17,6 +17,7 @@ from Letter_game import LetterGame, Player
 from gui.gui_interface import Gui, Squares, Coord
 from crossword_create import CrossWord
 import gui.gui_scene as gs
+from setup_logging import logger
 WordleList = [ 'wordlists/5000-more-common.txt', 'wordlists/words_20000.txt'] 
 BLOCK = '#'
 SPACE = ' '
@@ -144,8 +145,7 @@ class DropWord(LetterGame):
     wait = self.gui.set_waiting('Generating Puzzle')   
     self.partition_word_list() 
     self.compute_intersections()
-    if self.debug:
-        print(self.word_locations)
+    logger.debug(f'{self.word_locations}')
     self.fill_crossword()
     self.drop_words()
     self.gui.set_message('')

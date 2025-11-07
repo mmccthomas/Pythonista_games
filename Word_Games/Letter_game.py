@@ -21,6 +21,7 @@ from objc_util import on_main_thread
 #Local imports
 import base_path
 base_path.add_paths(__file__)
+from  setup_logging import logger
 from gui.gui_interface import Gui, Squares
 
 # Board characters
@@ -336,7 +337,6 @@ class LetterGame():
   """ Base Class for a series of letter based word games """
   
   def __init__(self, **kwargs):
-    self.debug = False
     # allows us to get a list of rc locations
     self.log_moves = True
     self.straight_lines_only = False
@@ -567,8 +567,7 @@ class LetterGame():
       if selection is None:  # 'cancelled_':
           return None
       if len(selection):
-          if self.debug:
-            print(f'{selection=}')
+          logger.debug(f'{selection=}')
           return selection.split(' ')[0]
             
   def initialise_board(self):
@@ -739,8 +738,7 @@ class LetterGame():
     self.all_word_dict = {}
     for length in range(self.min_length, self.max_length + 1):
       self.all_word_dict[length] = {w for w in words if len(w) == length}
-      if self.debug:
-          print(f'Wordlist length {length} is {len(self.all_word_dict[length])}')
+      logger.debug(f'Wordlist length {length} is {len(self.all_word_dict[length])}')
       
   
   def uniquify(self, moves):
@@ -789,16 +787,14 @@ class LetterGame():
         
         try:
             word = ''.join([board[rc[0]][rc[1]] for rc in move if isinstance(rc, tuple)])
-            if self.debug:
-                print(word)
+            logger.debug(word)
             valid = word in self.all_words
             check = '\t\tValid word' if valid else '\t\tNot valid'
             self.gui.set_message(f'Word= {word} {check}')
             # self.delta_t('end process_turn')
         except (IndexError, AttributeError):
           """ all_words may not exist or clicked outside box"""
-          if self.debug:
-            print(traceback.format_exc())
+          logger.debug(f'{traceback.format_exc()}')
         return move
         
     else:

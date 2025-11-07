@@ -44,6 +44,7 @@ from io import BytesIO
 from  recognise import Recognise
 # import testgrid
 from time import sleep
+from setup_logging import logger, is_debug_level
 savefile= 'Ocr_save'
 tmp_directory = '///private/var/mobile/Containers/Data/Application/BF0000C4-73CE-4920-B411-8C8662899F1B/tmp'
 MSG = ('','')
@@ -64,7 +65,6 @@ class Player():
 
 class OcrCrossword(LetterGame):
     def __init__(self, all_text, board=None, board_size=None, asset=None, autoload=False):
-        self.debug = True
         self.board = board
         self.load(autoload=autoload) # attempt to load temp file
         self.SIZE = self.get_size(board=self.board, board_size=board_size)
@@ -606,8 +606,7 @@ class OcrCrossword(LetterGame):
             df3 = pd.merge(existing_df, df2,
                            how='outer', on=['y', 'x'],left_on=None, right_on=None,
                            left_index=False, right_index=False, sort=False)
-            if self.debug:
-                print(df3.to_string())
+            logger.debug(df3.to_string())
             # change NaN values to space for label, and 0 for confidence
             df3['confidence'] = df3['confidence'].fillna(0.0)
             df3['label'] = df3['label'].fillna(' ')
@@ -634,7 +633,7 @@ class OcrCrossword(LetterGame):
 
         df['group'] = np.array(labels)
         data = np.array(df[['x','y']])
-        if self.debug:
+        if is_debug_level():
             plt.close()
             x, y = data.T
             colorset = plt.cm.rainbow(np.linspace(0, 1, cluster_count))
@@ -653,8 +652,7 @@ class OcrCrossword(LetterGame):
             #self.create_grid(self.board)
             df = np.round(df, 2)
             df.sort_values(by=['r','c'], ascending=[True,True], inplace=True, ignore_index=True)
-        if self.debug:
-            print(df.to_string())
+        logger.debug(df.to_string())
         try:
             self.all_text = list(df.label)
             self.draw_rectangles(df)
@@ -716,12 +714,11 @@ class OcrCrossword(LetterGame):
             params = {'line_width': 5, 'stroke_color': 'green', 'z_position':1000}
             self.draw_rectangles(df, **params)
             self.gui.set_message2(f'Grid x={self.recognise.Nx}, y={self.recognise.Ny}, {len(total_rects)} squares found')
-            if self.debug:
-                print(total_rects.to_string())
+            logger.debug(total_rects.to_string())
 
             # at this point we have all the valid rectangles
             try:
-                if self.debug:
+                if is_debug_level():
                     data = np.array(total_rects[['x','y']])
                     #plt.close()
                     x, y = data.T
@@ -810,8 +807,7 @@ class OcrCrossword(LetterGame):
             df_all = np.round(df_all, 4).reset_index(drop=True)
             # remove the large boxes
             df_all.drop(df_all[df_all.areax1000 > box_area/8].index, inplace=True)
-            if self.debug:
-               print(df_all.to_string())
+            logger.debug(df_all.to_string())
             # now we know X and Y
             # we have subrects
             return df_all
@@ -854,7 +850,7 @@ class OcrCrossword(LetterGame):
             d_aspect = np.digitize(aspects, aspect_span, right=True)
 
             #find greatest number of items  in area
-            if self.debug:
+            if is_debug_level():
                     # TODO should we also use aspect?
                 print('digitized', d_area)
                 print('areas', areas)
@@ -866,9 +862,8 @@ class OcrCrossword(LetterGame):
             self.draw_rectangles(df)
             filtered = df
             filtered = df[d_area[df.index] == most]
-            if self.debug:
-                print('unique, counts', unique, counts)
-                print('filtered', len(filtered))
+            logger.debug(f'unique, counts, {unique}, {counts}')
+            logger.debug(f'filtered, {len(filtered)}')
             return filtered
         return None
 

@@ -62,8 +62,7 @@ from Letter_game import LetterGame
 import gui.gui_scene as gscene
 from gui.gui_interface import Coord, BoxedLabel, Squares
 from crossword_create import CrossWord
-
-
+from setup_logging import logger, is_debug_level
 PUZZLELIST = "pieceword_templates.txt"
 OUTPUTFILE = "pieceword.txt"
 TILESIZE = 3
@@ -91,7 +90,6 @@ class PieceWord(LetterGame):
         LetterGame.__init__(self, column_labels_one_based=True)
         self.first_letter = False
         self.tiles = None
-        self.debug = False
         self.lookup_free = False
         self.across_only = True
         self.INIT_COLOR = 'yellow'
@@ -173,7 +171,7 @@ class PieceWord(LetterGame):
         if missing_words:
            dialogs.hud_alert(f'Found {missing_words} in 2nd dictionary', duration=4)
 
-        if self.debug:
+        if is_debug_level():
             for word in self.wordset:
                 print()
                 print(word, self.word_defs[word])
@@ -356,8 +354,9 @@ class PieceWord(LetterGame):
 
         cx = CrossWord(self.gui, self.word_locations, self.all_words)
         cx.set_props(**transfer_props(
-            ['board', 'empty_board', 'all_word_dict', 'max_depth', 'debug']))
+            ['board', 'empty_board', 'all_word_dict', 'max_depth']))
         cx.max_cycles = 5000
+        cx.debug = is_debug_level()
         try:
             wait = self.gui.set_waiting('Generating')
             for i in range(10):
@@ -395,8 +394,7 @@ class PieceWord(LetterGame):
             if selection == 'cancelled_':
                 selection = choice(items).lower()
             if len(selection):
-                if self.debug:
-                    print(f'{selection=}')
+                logger.debug(f'{selection=}')
                 # self.wordlist = self.word_dict[selection]
 
                 if selection + '_text' in self.word_dict:
@@ -406,13 +404,11 @@ class PieceWord(LetterGame):
                         int(st) for st in self.wordlist[1].split(',')
                     ]
                     self.solution = self.wordlist[2]
-                    if len(self.solution) < 70:
-                        self.debug = True
-
+          
                 if selection.capitalize() + '_frame' in self.word_dict:
                     # rearrange frame text into N 3x3 tiles
                     frame = self.word_dict[selection.capitalize() + '_frame']
-                    if self.debug:
+                    if is_debug_level():
                         [print(row, len(row)) for row in frame]  # for debug
                     assert all([len(row) == len(frame[0])
                                 for row in frame]), 'Error in string lengths'
@@ -474,12 +470,10 @@ class PieceWord(LetterGame):
         """Takes in the user's input which is only interacting with buttons,
     """
         move = LetterGame.get_player_move(self, self.board)[0]
-        if self.debug:
-            print(move)
+        logger.debug(f'{move}')
         # deal with buttons. each returns the button text
         if move[0] < 0 and move[1] < 0:
-            if self.debug:
-                print(self.gui.buttons[-move[0]].text)
+            logger.debug(f'{self.gui.buttons[-move[0]].text}')
             return (None, None), self.gui.buttons[-move[0]].text, None
         # Coord is a tuple that can support arithmetic
         point = self.gui.start_touch - self.gui.grid_pos
@@ -533,8 +527,7 @@ class PieceWord(LetterGame):
         
         if self.word_defs[word]['def'] and 'clue' not in self.word_defs[word]:
             try:
-                if self.debug:
-                    print(word, self.word_defs[word])
+                logger.debug(f'{word}, {self.word_defs[word]}')
                 # flatten and append contents of word_defs
                 flat_list = ['DEFINITIONS']
                 flat_list.extend(self.word_defs[word]['def'])
@@ -544,7 +537,7 @@ class PieceWord(LetterGame):
                 flat_list.extend(['SYNONYMS'])
                 flat_list.extend(
                     [x for xs in self.word_defs[word]['synonyms'] for x in xs])
-                if self.debug: print(flat_list)
+                logger.debug(f'{flat_list}')
                 while self.gui.selection == '':
                     self.gui.input_text_list(
                         prompt=f'Select definition for {word}',
@@ -561,8 +554,7 @@ class PieceWord(LetterGame):
                         if selection in ['definitions', 'synonyms']:
                             return False
                         if len(selection):
-                            if self.debug:
-                                print(f'{selection=}')
+                            logger.debug(f'{selection=}')
                         sleep(0.2)
 
                 clue = selection
@@ -716,8 +708,7 @@ class PieceWord(LetterGame):
                 else:
                     no = f'{self.rack[(r, c)]:02d}'
                 state += no
-        if self.debug:
-            print(state)
+        logger.debug(f'{state}')
         if state == self.solution:
             self.gui.set_message('Game over')
             return True

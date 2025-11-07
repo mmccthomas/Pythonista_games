@@ -25,6 +25,7 @@ from copy import deepcopy
 from word_square_gen import create_word_search
 from Letter_game import LetterGame, Player, Word
 from gui.gui_interface import Gui, Squares, Coord
+from setup_logging import logger, is_debug_level
 BLOCK = '#'
 SPACE = ' '
 WORDLIST = "wordlists/words_10000.txt"
@@ -39,7 +40,6 @@ class KrossWord(LetterGame):
     # allows us to get a list of rc locations
     self.strikethru = True
     self.log_moves = True
-    self.debug = False
     self.max_iteration = 1000
     self.table = None
     self.straight_lines_only = True
@@ -162,8 +162,8 @@ class KrossWord(LetterGame):
     board_full = np.all(np.char.isalpha(self.board))
     wordlist = [word for words in self.wordlist.values() for word in words]
     wordlist_empty = len(wordlist)== 0
-    if wordlist_empty and self.debug:
-      print(f'All words used, {board_full=}')
+    if wordlist_empty:
+      logger.debug(f'All words used, {board_full=}')
     return board_full or wordlist_empty
   
   def word_is_full(self, possibles):
@@ -217,7 +217,7 @@ class KrossWord(LetterGame):
       
       
       dirn =  Coord([start.all_dirs[i]  for i in self.valid_dirns][index])
-      if self.debug:
+      if is_debug_level():
          msg = f'{"Removed" if previous else "Placed"} {word}@{start}_{compass[tuple(dirn)]}'
          self.gui.set_message(msg)
          print(msg)
@@ -250,7 +250,7 @@ class KrossWord(LetterGame):
              self.wordlist[None].append(word)
           self.placed -= 1
           
-      if self.debug:
+      if is_debug_level():
          
          self.gui.print_board(self.board, f'stack depth= {len(inspect.stack(0))} iteration {self.iteration_counter}')        
          self.gui.update(self.board)
@@ -274,8 +274,7 @@ class KrossWord(LetterGame):
         possibles, num_matches = self.fewest_matches()
         
         if num_matches == 0:
-          if self.debug:
-            print('no matches, backing up')
+          logger.debug('no matches, backing up')
           return False
         
         # iterate through all possible matches in the fewest-match slot
@@ -287,12 +286,11 @@ class KrossWord(LetterGame):
             self.best_filled_board = self.board.copy()
             
         previous_letter_board = self.letter_board.copy()
-        if self.debug:
-            print('remaining words', self.wordlist)
-            print(f'{possibles=}')
+        
+        logger.debug(f'remaining words {self.wordlist}')
+        logger.debug(f'{possibles=}')
         for i, possible in enumerate(possibles):
-            if self.debug:
-                print('iteration', i)
+            logger.debug(f'iteration {i}')
             self.place_word(possible)
             # now proceed to next fewest match
             if self.fill():
@@ -588,8 +586,7 @@ class KrossWord(LetterGame):
                 # store board and wordlist before this move
                 self.moves.append((self.board.copy(), deepcopy(self.wordlist)))
                 
-                if self.debug:
-                    print('letter ', selection, 'row', selection_row)
+                logger.debug(f'letter {selection}, row {selection_row}')
                 for coord, letter in zip(move, selection):
                   self.board[coord] = letter
                 self.move = move   
@@ -615,8 +612,7 @@ class KrossWord(LetterGame):
                 return            
         except (Exception):
               """ all_words may not exist or clicked outside box"""
-              if self.debug:
-                print(traceback.format_exc())
+              logger.debug(f'{traceback.format_exc()}')
               return
               
   

@@ -53,6 +53,7 @@ from Letter_game import Word
 from gui.gui_interface import Gui
 import word_square_gen
 import crossword_create
+from setup_logging import logger
 #from Krossword import KrossWord
 sys.path.append(os.path.expanduser('~/Documents/site-packages/pyconstraint'))
 from constraint import Problem, Domain, Constraint, AllDifferentConstraint

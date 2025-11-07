@@ -20,6 +20,7 @@ from Letter_game import LetterGame, Player, Word
 import gui.gui_scene as gscene
 from gui.gui_interface import Gui, Squares
 from crossword_create import CrossWord
+from  setup_logging import logger, is_debug_level
 
 WordleList = [ 'wordlists/5000-more-common.txt', 'wordlists/words_20000.txt'] 
 BLOCK = '#'
@@ -54,7 +55,6 @@ def lprint(seq, n):
 class Anagram(LetterGame):
   
   def __init__(self):
-    self.debug = False
     # allows us to get a list of rc locations
     self.log_moves = True
     #self.word_locations = []
@@ -184,11 +184,10 @@ class Anagram(LetterGame):
     self.print_square(None) 
     self.partition_word_list() 
     self.compute_intersections()
-    if self.debug:
-        print(self.word_locations)
-        
+    logger.debug(f'{self.word_locations}')
+    cx.debug =  is_debug_level()  
     cx.set_props(**transfer_props(['board', 'empty_board', 'all_word_dict', 
-                                   'max_depth', 'debug']))
+                                   'max_depth']))
     self.board = cx.populate_words_graph(max_iterations=200, length_first=False, max_possibles=100, swordsmith_strategy='dfs')  
     self.populate_order = cx.populate_order
     # self.print_board()
@@ -196,7 +195,7 @@ class Anagram(LetterGame):
     self.generate_word_anagram_pairs()
     self.create_anagram_board()
     self.gui.build_extra_grid(self.gui.DIMENSION_X, self.gui.DIMENSION_Y, grid_width_x=1, grid_width_y=1,color='grey', line_width=1)
-    if self.debug:
+    if is_debug_level():
       print(self.anagrams())
       [print(word, count) for word, count in self.word_counter.items() if count > 1]
     self.gui.set_message('')
@@ -377,8 +376,7 @@ class Anagram(LetterGame):
             
         if selection in items:
           self.gui.selection =''
-          if self.debug:
-              print('letter ', selection, 'row', selection_row)
+          logger.debug(f)'letter {selection}, row {selection_row}')
           return rc, selection, selection_row
         elif selection == "Cancelled_":
           return (None, None), None, None

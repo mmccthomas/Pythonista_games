@@ -14,6 +14,7 @@ from Letter_game import LetterGame, Word
 import Letter_game as lg
 import gui.gui_scene as gscene
 from gui.gui_interface import Gui, Squares
+from setup_logging import logger, is_debug_level
 BLOCK = '#'
 SPACE = ' '
 WORDLIST = ["wordlists/letters3_common.txt", "wordlists/5000-more-common.txt"]
@@ -187,8 +188,7 @@ class WordCircle(LetterGame):
         
         word = [self.get_board_rc(rc, self.board) for rc in vals  if self.check_in_board(rc)]
         word = ''.join(word)
-        if self.debug:
-            print(word)
+        logger.debug(f'{word}')
         word = word.replace(' ', '')
         valid = word in self.all_possible_words
         in_list = word in self.display_words
@@ -196,8 +196,7 @@ class WordCircle(LetterGame):
         self.gui.set_message(f'Word= {word} {check}\t\t {in_list =}')
     except(IndexError, AttributeError):
         """ all_words may not exist or clicked outside box"""
-        if self.debug:
-            print(traceback.format_exc())
+        logger.debug(f'{traceback.format_exc()}')
     return vals        
                   
   def match_word(self, move):

@@ -7,6 +7,7 @@ import console
 from Letter_game import LetterGame
 import latin_squares
 from gui.gui_interface import Gui, Squares
+from setup_logging import logger, is_debug_level
 
 """ This game is a number grid puzzle
 You have to guess the numbers
@@ -43,7 +44,6 @@ class Player():
 class Futoshiki(LetterGame):
   
     def __init__(self):
-        self.debug = False
         self.N = SIZE
         self.sleep_time = 0.1
         self.hints = 0
@@ -264,8 +264,7 @@ class Futoshiki(LetterGame):
                self.notes[(r + r_off, c + c_off)].remove(known_value)
              except (KeyError, ValueError):
                pass
-         if self.debug:
-             print('removed note', coord, known_value, self.notes)
+         logger.debug(f'removed note {coord}, {known_value}, {self.notes}')
          
          # now update squares
          for pos, item in self.notes.items():
@@ -293,8 +292,7 @@ class Futoshiki(LetterGame):
         """
         if move:
             coord, letter, row = move
-            if self.debug:
-                print('received move', move)
+            logger.debug(f'received move {move}')
             r, c = coord
             if not isinstance(letter, list):
                 if coord == (None, None):
@@ -303,16 +301,14 @@ class Futoshiki(LetterGame):
                   return True
                   
                 elif letter != '':
-                  if self.debug:
-                    print('processing', letter, coord)
+                  logger.debug(f'processing {letter}, {coord}')
                   if self.get_board_rc(coord, self.board) != BLOCK:
                     self.board_rc(coord, self.board, letter)
                     self.gui.update(self.board)
                     
                     # test if correct
                     if self.get_board_rc(coord, self.board) != self.get_board_rc(coord, self.solution_board):
-                      if self.debug:
-                         print('testing', letter, coord)
+                      logger.debug(f'testing {letter}, {coord}')
                       self.flash_square(coord, color='yellow')
                       # clear the guess
                       self.board_rc(coord, self.board, ' ')            
@@ -329,8 +325,7 @@ class Futoshiki(LetterGame):
             else:  # we've  got a list
                 # add notes to square
                 self.notes[coord] = letter
-                if self.debug:
-                    print('add note', coord, self.notes)
+                logger.debug(f'add note {coord}, {self.notes}')
                 self.add_note(coord, letter)
                
         return True
@@ -400,8 +395,7 @@ class Futoshiki(LetterGame):
                     print(traceback.format_exc())
               if selection in items:
                 self.gui.selection = ''
-                if self.debug:
-                    print('letter ', selection, 'row', selection_row)
+                logger.debug(f'letter {selection}, row {selection_row}')
                 return rc, selection, selection_row
                 
               elif selection == "Cancelled_":
@@ -409,8 +403,7 @@ class Futoshiki(LetterGame):
                 
               elif all([sel in items for sel in selection]):
                 self.gui.selection = ''
-                if self.debug:
-                    print('letters ', selection, 'rows', selection_row)
+                logger.debug(f'letters  {selection}, rows {selection_row}')
                 return rc, selection, selection_row
               else:
                 return (None, None), None, None
