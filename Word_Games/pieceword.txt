@@ -6469,3 +6469,68 @@ S W C CK DBAIND
  E A LE   T  F 
 ID IVE ACCASCAG
  R N AS H T  R 
+
+puzzle40:
+""
+7, 5
+2429172319112732301202152503081816342810312026330400130622092105140701
+
+puzzle40_text:
+ 1 assimilate • appearance to the eye or
+   the mind
+ 2 computation using letters or other
+   symbols
+ 3 the savory fruit of this plant, red
+   when ripe • a bed or cot for a baby
+ 4 to come out of a liquid solution into
+   solid form.
+ 5 a structure built by a bird •
+   Messenger Ribonucleic Acid
+ 6 the quality or qualities that make a
+   thing what it is
+ 7 as in retained, possessed • Early
+   internet call system
+ 8 rising straight up
+ 9 of or relating to sound. • to leave
+   one's bed
+10 having a low or subnormal temperature
+11 Of Asia • Large city in Florida, home
+   to Disneyworld
+12 the receding movement of the tide.
+13 Calculator company • a fine, gentle,
+   dispersed mist of liquid.
+14 sustain
+15 a rib. • first-class
+16 set in a particular spot or position.
+17 once more • a pointed hand-thrown
+   missile weapon
+18 reducing in size
+19 a gold coin worth twenty-one
+   shillings • lowest grade of USN
+   commissioned officer
+20 appearing to be true
+21 to dwell for a considerable time •
+   very tall buildings
+
+puzzle40_frame:
+H PIGNOWN SKRAY
+ANEN D H HT  P 
+R CERSSON ARITE
+NEACATENSYPEM X
+ EV M NT  E ART
+IDERACTOWISEG E
+N BO PE N LO N 
+NDONESRNAW CIDE
+E NI OL GONT A 
+ED  A  T P AECT
+ UPATIGEBASIL E
+IC  I  M R LDLE
+IO GUIED ASPABS
+ NOE EX DRA N I
+TA RESTINCRATOM
+I O A REC B ORB
+RIGURIT KRLA AL
+ R P S ES I ATO
+TATCASIPI SPICY
+I M G  L SH C O
+CE COSSEN ELEBB

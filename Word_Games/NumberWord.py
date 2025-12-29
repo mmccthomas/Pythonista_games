@@ -157,7 +157,8 @@ class CrossNumbers(LetterGame):
         """
         parent = self.gui.game_field
         _, _, w, h = self.gui.grid.bbox
-        if self.gui.device.endswith('_landscape'):
+        W, H = self.gui.get_device_screen_size()
+        if W > H:        
             if self.sizey < max_items:
               size = self.gui.SQ_SIZE * 13 / max_items
             else:
@@ -239,7 +240,7 @@ class CrossNumbers(LetterGame):
                if letter == ' ':
                  letter = '_'
                list_of_known_letters[no-1] = letter
-        
+        W, H = self.gui.get_device_screen_size()
         # now set up text string
         for i, v in enumerate(list_known):
             no, l = v
@@ -247,9 +248,9 @@ class CrossNumbers(LetterGame):
             letter = letter.upper()
             if no != ' ' and no != '.':
               msg.append(f'{no:>2} = {letter:<2} ')
-            if self.gui.device in ['ipad_landscape', 'ipad13_landscape']:
+            if W > H:
                 msg.append('\n' if i % 2 == 0 else ' ' * 2)
-            elif self.gui.device == 'ipad_portrait':
+            else:
                 msg.append('\n' if i % 5 == 0 else ' ' * 2)
         msg = ''.join(msg)
         
@@ -458,7 +459,8 @@ class CrossNumbers(LetterGame):
         # self.copy_board(self.empty_board)
         cx = CrossWord(self.gui, self.word_locations, self.all_words)
         cx.set_props(**transfer_props(['board', 'empty_board', 'all_word_dict',
-                                       'max_depth', 'debug']))
+                                       'max_depth']))
+        cx.debug = is_debug_level()                               
         if self.filled_board:
            # try cv_codeword_solver first. if it fails try crossword_create solver
            if self.test is None:

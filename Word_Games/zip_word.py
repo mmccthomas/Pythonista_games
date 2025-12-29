@@ -19,7 +19,7 @@ from Letter_game import LetterGame, Player
 from gui.gui_interface import Gui
 from crossword_create import CrossWord
 from crossword_solve_2 import AlternativeSolve
-from  setup_logging import logger
+from  setup_logging import logger, is_debug_level
 WordList = 'wordpuzzles.txt'
 BLOCK = '#'
 SPACE = ' '
@@ -81,6 +81,7 @@ class ZipWord(LetterGame):
     words_placed = [word.word for word in self.word_locations if word.fixed]
     words = []
     x, y, width, height = self.gui.grid.bbox
+    W, H = self.gui.get_device_screen_size()
     scr_w, scr_h = self.gui.wh
     
     # iterate over word lengths
@@ -103,7 +104,7 @@ class ZipWord(LetterGame):
                w = sorted([word for word in wordlist])
          filtered_dict[k] = w 
          fontsize = self.gui.get_fontsize() * 0.8
-         if self.gui.device.endswith('landscape'):             
+         if W > H:       
              position = (width + 10, -20)
              font = 'Fira Mono'
              anchor = (0, 0)
@@ -113,7 +114,7 @@ class ZipWord(LetterGame):
              # extra CR for landscape
              words.extend('\n'.join(wrap(' '.join(word_block), no_characters)) + '\n\n')
                           
-         else:  # self.gui.device == 'ipad_portrait':            
+         else:  
              #words.extend([f'{word}\n' if i % 10 == 2 else f'{word}  '
              #             for i, word in enumerate(w)])
              anchor = (0, 0)
@@ -124,7 +125,7 @@ class ZipWord(LetterGame):
              no_characters = (scr_w - position[0]) // (fontsize*.75)
              words.extend('\n'.join(wrap(' '.join(word_block), no_characters)) + '\n')
          
-    if self.gui.device.endswith('_portrait'):          
+    if H > W:          
       # format into columns if it fits
       w_cols, s, no_lines = self.format_for_portrait(filtered_dict) 
       if no_lines <10:
@@ -153,13 +154,15 @@ class ZipWord(LetterGame):
     self.compute_intersections()
     self.max_depth = 3
     cx.set_props(**transfer_props(['board', 'empty_board', 'all_word_dict', 
-                                   'max_depth', 'debug']))
+                                   'max_depth']))
+    cx.debug = is_debug_level()
     # strategy options 'dfs', 'dfsb',  'minlook', 'mlb'  
     self.board = cs.try_multiple(self.puzzle, self.board.copy(), 10)                 
     #self.board = cx.populate_words_graph(swordsmith_strategy='dfs')
     if np.argwhere(self.board==' ').size > 0:
        print('board from AlternativeSolve', np.argwhere(self.board==' ').size)
        # failed, so use original
+       raise RuntimeError
        self.board = cx.populate_words_graph(max_iterations=1000, length_first=False)
     # self.check_words()
     self.create_number_board()

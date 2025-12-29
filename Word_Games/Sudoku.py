@@ -71,22 +71,11 @@ class Sudoko(LetterGame):
     
     self.display_squares(color='red')
     x, y, w, h = self.gui.grid.bbox
-    match  self.gui.device:
-       case'ipad_landscape':
-           position = (w+10, 8*h/9)
-       case'ipad_portrait':
-           position = (7*w/9, h+50)
-       case 'iphone_portrait':
-           position = (180, 470)
-       case 'ipad13_landscape':
-           position = (w+10, 8*h/9)
-       case 'ipad13_portrait':
-           position = (8*w/9, h+50)
-       case'ipad_mini_landscape':
-           position = (w+10, 8*h/9)
-       case'ipad_mini_portrait':
-           position = (7*w/9, h+50)
-           
+    W, H = self.gui.get_device_screen_size()                     
+    if W > H:
+        position = (w+10, 8*h/9)       
+    else:
+        position = (7*w/9, h+50)
     self.gui.set_enter('Note ', fill_color='clear', font=('Avenir Next', 50),position=position)
     self.gui.set_top('', position=(0, h+30))
         
@@ -473,7 +462,7 @@ class Sudoko(LetterGame):
       return True
                   
   def select(self, moves, board, text_list=True):
-      
+      W, H = self.gui.get_device_screen_size()
       long_press = self.gui.long_touch
       # toggle hint button
       if moves == NOTE:
@@ -506,15 +495,11 @@ class Sudoko(LetterGame):
           selection = ''
           x, y, w, h = self.gui.grid.bbox
           while self.gui.selection == '':
-            if self.gui.device in ['ipad13_landscape']:
-                position = (950, h / 2)       
-            elif self.gui.device == 'ipad_landscape':
-                position = (x+w+50, h / 2)    
-            elif self.gui.device.endswith('_portrait'):               
+            if W > H:
+                position = (x+w+50, h / 2)                    
+            else:                                 
                 position = (x, y)
-            else:
-                position = (x + w, h / 2)
-                
+            
             select_method = self.gui.input_text_list if text_list else self.gui.input_numbers 
                      
             panel = select_method(prompt=prompt, items=items, position=position,

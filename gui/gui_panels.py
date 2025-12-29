@@ -203,7 +203,7 @@ class GuiPanel():
         elif t == 'Return':
             # send selected items
             self.selection = self._itemlist.copy()
-            if hasattr(self, 'letter_panel'):
+            if hasattr(self._panel, 'letter_panel'):
                 self.selection_row = self._panel.direction
             self.v.remove_subview(self._panel)
 
@@ -235,12 +235,36 @@ class GuiPanel():
             self._panel[f'button_down'].background_color = 'yellow'
             self._panel[f'button_across'].background_color = 'white'
         return direction
-
+        
+    def align_frame(self, number_panel, position, align):
+        x, y = position
+        match align:
+            case (0, 0): # TL
+                return (x, y,
+                        number_panel.frame.w,
+                        number_panel.frame.h)
+            case (1, 0): #TR
+                return (x-number_panel.frame.w, y,
+                        number_panel.frame.w,
+                        number_panel.frame.h)
+            case (0, 1): #BL
+                return (x, y-number_panel.frame.h,
+                        number_panel.frame.w,
+                        number_panel.frame.h)
+            case (1, 1): #BR
+                return (x-number_panel.frame.w, y-number_panel.frame.h,
+                        number_panel.frame.w,
+                        number_panel.frame.h)
+            case (0.5, 0.5): #CENTRE
+                return (x-number_panel.frame.w/2, y-number_panel.frame.h/2,
+                        number_panel.frame.w,
+                        number_panel.frame.h)
     def input_numbers(self,
                       prompt='',
                       position=None,
                       items=None,
                       panel='Number_panel.pyui',
+                      align = (0,0),
                       **kwargs):
         """ pop up a number panel """
         # if panel != 'Number_panel.pyui':
@@ -253,9 +277,8 @@ class GuiPanel():
         self.prompt.text = prompt
         self.prompt.font = ('Avenir Next', 30)
         self.position = position
-        self.number_panel.frame = (self.position[0], self.position[1],
-                                   self.number_panel.frame.w,
-                                   self.number_panel.frame.h)
+        self.align = align
+        self.number_panel.frame = self.align_frame(self.number_panel, self.position, self.align)
         self.number_panel.allows_multiple_selection = False
         for k, v in kwargs.items():
             setattr(self.number_panel, k, v)

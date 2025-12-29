@@ -216,8 +216,8 @@
           "title" : "Return",
           "action" : "self.button_tapped",
           "class" : "Button",
-          "image_name" : "iob:arrow_left_a_256",
-          "name" : "button10"
+          "name" : "button10",
+          "image_name" : "iob:arrow_left_a_256"
         },
         "selected" : false
       },
@@ -247,11 +247,11 @@
     "frame" : "{{0, 0}, {352, 306}}",
     "class" : "View",
     "attributes" : {
-      "name" : "Numbers",
+      "border_color" : "RGBA(0.000000,0.000000,0.000000,1.000000)",
       "enabled" : true,
       "tint_color" : "RGBA(0.000000,0.478000,1.000000,1.000000)",
+      "name" : "Numbers",
       "background_color" : "RGBA(1.000000,1.000000,1.000000,1.000000)",
-      "border_color" : "RGBA(0.000000,0.000000,0.000000,1.000000)",
       "flex" : ""
     },
     "selected" : false

@@ -70,55 +70,30 @@ class Suguru(LetterGame):
     """set positions of display
     elements for different device
     sizes
-    This is called also when devis is rotated
+    This is called also when device is rotated or resized
     """
+    print('called display setup')
+    try:
+       self.gui.replace_grid(*self.board.shape)
+    except AttributeError:
+       pass
     W, H = self.gui.get_device_screen_size()
-    self.gui.device = self.gui.get_device()
-    x, y, w, h = self.gui.grid.bbox
-    match  self.gui.device:
-       case'ipad_landscape':
-           position_hint = (w+10, 8*h/9)
-           self.num_position = (x+w+50, h / 2)
-           position_puzzles = (w+10, h/4)
-       case'ipad_portrait':
-           position_hint = (7*w/9, h+50)
-           self.num_position = (w/3, y)
-           position_puzzles = (w/2, h)
-       case 'iphone_portrait':
-           position_hint = (200, 420)
-           self.num_position = (x, y)
-           position_puzzles = (x+30, h+50)
-       case 'ipad13_landscape':
-           position_hint = (w+10, 8*h/9)
-           self.num_position = (w+100, h / 2)
-           position_puzzles = (w+10, h/4)
-       case 'ipad13_portrait':
-           position_hint = (7*w/9, h+50)
-           self.num_position = (w/3, y)
-           position_puzzles = (w/2, h)
-       case'ipad_mini_landscape':
-           position_hint = (w+10, 8*h/9)
-           self.num_position = (x+w+50, h / 2)
-           position_puzzles = (w+10, h/4)
-       case'ipad_mini_portrait':
-           position_hint = (8*w/9, h+50)
-           self.num_position = (w/3, 30)
-           position_puzzles = (w/2, h+50)
-       case'iphone_landscape':
-           position_hint = (w+10, 8*h/9)
-           self.num_position = (x+w+50, h / 2)
-           position_puzzles = (w+10, h/4)
-       case _:
-           position_hint = (w+10, 8*h/9)
-           self.num_position = (x+w+50, h / 2)
-           position_puzzles = (w+10, h/4)
-           
+    x, y, w, h = self.gui.grid.bbox    
+    portrait = H > W
+    if portrait:
+        position_hint = (8 * w / 9, (1 + self.gui.gs.spacing) * h)              
+        position_puzzles = (w / 2, (1 + 2*self.gui.gs.spacing) * h)
+    else:
+         position_hint = (1.01 * w, 8 * h / 9)     
+         position_puzzles = (1.01 * w, h / 4)
+         
+    self.num_position = W, 2 * self.gui.gs.spacing * H #nearly top on right
     self.gui.gs.pause_button.position = (32, H - 36)
     self.gui.set_enter(NOTE_text, color='red', fill_color='lightgrey',
-                       font=('Avenir Next', 50),
-                       position=position_hint)
-    self.gui.set_top(self.gui.get_top(),
-                     position=(0, h))
+                       font=('Avenir Next', 50))
+                       #position=position_hint)
+    self.gui.set_top(self.gui.get_top())
+                     #position=(0, (1 + self.gui.gs.spacing) * h))
     self.gui.set_moves(self.gui.get_moves(),
                        anchor_point=(0, 0),
                        position=position_puzzles)
@@ -369,7 +344,7 @@ class Suguru(LetterGame):
       self.cg = Cages('Full', size=self.board.shape[0])
       self.cg.suguru = True
       self.gui.replace_grid(*self.board.shape)
-      # self.gui.remove_labels()
+      #self.gui.remove_labels()
       self.sizey, self.sizex = self.board.shape
       self.cage_coords = sorted([[Coord((r, c)) for r, c, _ in cage]
                                  for cage in cages], key=len)
@@ -410,7 +385,7 @@ class Suguru(LetterGame):
     self.cg.color_map = list(color_map_dict.values())
         
     delta = 0.45
-    linewidth = 2 if self.gui.device.startswith('ipad') else 1
+    linewidth = 2 #if self.gui.device.startswith('ipad') else 1
     linedash = [10, 10]
     for coords in self.cage_coords:
         # add dotted lines around cages
@@ -449,7 +424,7 @@ class Suguru(LetterGame):
       self.display_setup()
       self.gui.set_moves(self.msg)
               
-      if is_debug_level() or self.test:
+      if self.test:
           self.gui.close()
       self.suguru_setup(random_color=False)
       
@@ -713,7 +688,8 @@ class Suguru(LetterGame):
               panel = self.gui.input_numbers(
                          prompt=prompt, items=items,
                          position=self.num_position,
-                         allows_multiple_selection=(long_press or self.hint))
+                         allows_multiple_selection=(long_press or self.hint),
+                         align=(1,0))
               while panel.on_screen:
                   sleep(.01)
                   try:

@@ -1,14 +1,19 @@
 #
 # The GUI engine for several games
 #
+# TODO Size computation is fragile. it does not cope with 
+# all device sizes or Ios 26 variable window sizes.
+# i would like to compute positions of objects relative
+# to window size and not device type
+# need only orientation
 import scene
 from scene import Action, Node, SpriteNode, ShapeNode, Scene
-from scene import Vector2, LabelNode, Rect
+from scene import Vector2, LabelNode, Rect, Size
 from scene import Point, LANDSCAPE, Texture
-try:
-    from change_screensize import get_screen_size
-except ImportError:
-    from scene import get_screen_size
+#try:
+#    from change_screensize import get_screen_size
+#except ImportError:
+#    from scene import get_screen_size
 import sound
 import string
 from ui import Path, Image
@@ -16,7 +21,9 @@ from copy import copy
 import console
 from collections import defaultdict
 from time import sleep, time
+from objc_util import ObjCClass
 import sys
+import math
 from queue import Queue
 import logging
 import traceback
@@ -27,11 +34,20 @@ try:
 except ModuleNotFoundError:
     from game_menu import MenuScene
 
-logging.basicConfig(format='%(asctime)s  %(funcName)s %(message)s',
+logging.basicConfig(format='%(name)s %(asctime)s  %(funcName)s %(message)s',
                     level=logging.INFO)
 logger = logging.getLogger(__name__)
 A = Action
 
+
+def get_screen_size(): 
+    # get current screen size, allows for screen resize     
+    UIApplication = ObjCClass('UIApplication')        
+    for window in UIApplication.sharedApplication().windows():
+        ws = window.bounds().size.width
+        hs = window.bounds().size.height
+        break
+    return Size(ws,hs)
                                       
 class Player_test():
   def __init__(self):
@@ -104,7 +120,7 @@ class GameBoard(Scene):
     Scene.__init__(self)
     self.board = [[]]
     self.Player = None
-    
+    self.spacing = 0.0293
     # this is just for test
     self.board = [['.'] * 10 for i in range(10)]
     self.board[3][4] = self.board[4][3] = 'o'
@@ -133,6 +149,7 @@ class GameBoard(Scene):
     self.buttons = {}  # bbox: box _obj
     self.long_touch = False  # detects if touch for longer than 1 sec
     self.animation = False
+    self.orientation = self.print_screen_size            
     self.setup_menus()
         
     if __name__ == "__main__":
@@ -140,15 +157,57 @@ class GameBoard(Scene):
       self.setup_gui()
       self.test_lines()
   
-  
+  def print_screen_size(self):
+      W, H = get_screen_size()        
+      # print(f'\t\t\t\t{int(W)}  x {int(H)}') 
+      fontsize = self.get_fontsize()
+      self.msg_label_prompt.text = f'W {int(W)}  x H {int(H)} fontsize: {fontsize}'
           
   def device_size(self):
-      """ return the device type and orientation """
+      """ return the device type and orientation
+      TODO This is not complete, and omits different devices
+      consider getting screen size and computing all parameters as percentage
+      of screen size. this is big job """
       size = tuple(get_screen_size())
+      """
+      H x W for all iphone, ipad devices
+      iPhone 16 Pro Max	6.9"	440 × 956
+      iPhone 15 Pro and 15 and 16 and 14 Pro	6.1"	393 × 852
+      iPhone 15 Pro Max and 15 Plus and 16 Plus and 14 Pro Max	6.7"	430 × 932
+      iPhone 14 Plus and 13 Pro Max and 12 Pro Max	428 × 926
+      iPhone 16e and 14and 13 / 13 Pro and 12 / 12 Pro	6.1"	390 × 844
+      iPhone 13 mini and 12 mini	5.4"	375 × 812
+      iPhone 11 Pro Max and XS Max	6.5"	414 × 896
+      iPhone 11 Pro and XS, X	5.8"	375 × 812
+      iPhone 11 and XR	6.1"	414 × 896
+      iPhone 8+ and 7+, 6s+, 6+	5.5"	414 × 736
+      iPhone SE (gen 3) and SE (gen 2), 8, 7, 6s, 6	4.7"	375 × 667
+      iPhone SE (gen 1) and 5s, 5c, 5	4"	320 × 568
+      iPhone 4s and 4	3.5"	320 × 480
+      iPhone 3GS and 3G, gen 1	320 × 480
+      
+      iPad Pro 13"	13"	1032 × 1376
+      iPad Pro 12.9" (gen 6, 5, 4, 3, 2, 1) and iPad Air 13" (gen 6)	12.9"	1024 × 1366
+      iPad Pro 11" (gen 6)	11"	834 × 1210
+      iPad Pro 11" (gen 4, 3, 2, 1)	834 × 1194
+      iPad (gen 11, 10)	10.9"	810 × 1080
+      iPad Air (gen 5, 4) and iPad Air 11" (gen 6)	820 × 1180
+      iPad (gen 9, 8, 7)	10.2"	810 × 1080
+      iPad mini (gen 7, 6)	8.3"	744 × 1133
+      iPad Air (gen 3) and iPad Pro 10.5"	10.5"	834 × 1112
+      iPad (gen 6, 5) and iPad Pro 9.7", Air 2, Air (gen 1), iPad 4, iPad (gen 3)	9.7"	768 × 1024
+      iPad mini (gen 5, 4, 3, 2)	7.9" iPad mini (gen 1) iPad (gen 2, 1)	9.7" 768 x 1024"""
+      
+      iphones = [(956, 440), (932, 440), (926, 428), (896, 414), 
+                 (852, 393),  (844, 390), (812, 375), (736, 414), 
+                 (667, 375), (568, 320), (480, 320)]
+      ipads = [(1376, 1032), (1366, 1024), (1210, 834), (1180, 820), 
+               (1112, 834), (1080, 810), (1024, 768)]
+      ipads_mini = [(1133, 744)]
       match size:
-        case (1366.00, 1024.00):
+        case (1366.00, 1024.00) | (1376.0, 1032.0):
           device = 'ipad13_landscape'
-        case (1024.00, 1366.00):
+        case (1024.00, 1366.00) | (1032.0, 1376.0):
           device = 'ipad13_portrait'
         case (1112.00, 834.00):
           device = 'ipad_landscape'
@@ -158,80 +217,40 @@ class GameBoard(Scene):
           device = 'iphone_landscape'
         case (393.00, 852.00):
           device = 'iphone_portrait'
-        case (1133.0, 744.0):
+        case (1133.0, 744.0) | (1024.0, 768.0):
           device = 'ipad_mini_landscape'
-        case (744.0, 1133.0):
+        case (744.0, 1133.0) | (768.0, 1024.0):
           device = 'ipad_mini_portrait'
         case _:
           device = 'ipad_landscape'
       return device
       
   def grid_sizes(self, device, dimx, dimy):
-    """ fit best grid sizes """
+    """ fit best grid sizes 
+    """
     w, h = get_screen_size()
-    match device:
-      case 'ipad_landscape':
-         grid_pos = (50, 85)
-         vert_grid_size = h - 150
-         hor_grid_size = w - 200
-         font_size = 24
-         
-      case 'ipad_portrait':
-         grid_pos = (35, 85)
-         vert_grid_size = h - 150
-         hor_grid_size = w - 50
-         font_size = 24
-         
-      case 'iphone_landscape':
-         grid_pos = (30, 40)
-         vert_grid_size = h - 80
-         hor_grid_size = w - 150
-         font_size = 16
-         
-      case 'iphone_portrait':
-         grid_pos = (30, 60)
-         vert_grid_size = h - 50
-         hor_grid_size = w - 50
-         font_size = 12
-         
-      case 'ipad13_landscape':
-         grid_pos = (100, 85)
-         vert_grid_size = h - 150
-         hor_grid_size = w - 200
-         font_size = 24
-         
-      case 'ipad13_portrait':
-         grid_pos = (30, 85)
-         vert_grid_size = h - 50
-         hor_grid_size = w - 50
-         font_size = 24
-         
-      case 'ipad_mini_landscape':
-         grid_pos = (50, 85)
-         vert_grid_size = h - 150
-         hor_grid_size = w - 200
-         font_size = 24
-         
-      case 'ipad_mini_portrait':
-         grid_pos = (35, 85)
-         vert_grid_size = h - 50
-         hor_grid_size = w - 50
-         font_size = 24
-
+    orientation = 'landscape' if w / h > 1 else 'portrait'
+    grid_pos = (self.spacing * w, 3 * self.spacing * h)
+    vert_grid_size = (1 - 6 * self.spacing) * h
+    hor_grid_size = (1 - 2 * self.spacing) * w
+    font_size = self.get_fontsize()
+            
     # smaller of vertical or horizontal grid
     sq_size_v = vert_grid_size // dimy
     sq_size_h = hor_grid_size // dimx
-    sq_size = min(sq_size_v, sq_size_h)
-   
+    sq_size = min(sq_size_v, sq_size_h)   
          
     return grid_pos, sq_size, font_size
   
   def get_fontsize(self):
       # adjustable font sizes for screen
-      fontsize = {'iphone_landscape': 16, 'iphone_portrait': 12, 
-                  'ipad_landscape': 24, 'ipad_portrait': 24,
-                  'ipad13_landscape': 24, 'ipad13_portrait': 24,
-                  'ipad_mini_landscape': 20, 'ipad_mini_portrait': 20}[self.device_size()]
+      w, h = get_screen_size()    
+      # fit font to self.spacing height. use approximation h = 1.2 * em_height
+      if h > w:
+          fontsize = math.floor(self.spacing * w / 1.2) 
+      else:
+          fontsize = math.floor(self.spacing * h / 1.2)
+      logger.debug(f'{fontsize=}')      
       return fontsize
           
   def setup_gui(self, **kwargs):
@@ -370,17 +389,21 @@ class GameBoard(Scene):
           pos = Vector2(0 + i * self.SQ_SIZE, 0)
           n = LabelNode(str(next(column_labels)), parent=self.game_field)
           n.position = (pos.x + self.SQ_SIZE / 2,
-                    pos.y + self.DIMENSION_Y * self.SQ_SIZE + 20)
+                    pos.y + self.DIMENSION_Y * self.SQ_SIZE)
           n.color = self.grid_label_color
           n.font = font          
+          n.anchor_point = (0, 0)
+          n.row_col = 'col'
           self.column_labels.append(n.text)
           
       for i in range(self.DIMENSION_Y):
           pos = Vector2(0, (self.DIMENSION_Y - i - 1) * self.SQ_SIZE)          
           n = LabelNode(str(next(row_labels)), parent=self.game_field)          
-          n.position = (pos.x - 20, pos.y + self.SQ_SIZE/2)
+          n.position = (pos.x, pos.y + self.SQ_SIZE/2)
           n.color = self.grid_label_color
           n.font = font
+          n.row_col = 'row'
+          n.anchor_point = (1, 0.5) # right aligned
           self.row_labels.append(n.text)
       
   def build_background_grid(self):
@@ -431,62 +454,43 @@ class GameBoard(Scene):
     self.game_field.add_child(self.grid)
     self.add_row_column_labels(columns, rows)
     x, y, w, h = self.grid.bbox  # was game_field
+    # grid is 8.3% of window height
     font = ('Avenir Next', self.font_size)
     # all location relative to grid
-    self.msg_label_t = LabelNode("top", font=font, position=(0, h + 30),
+    
+    self.msg_label_t = LabelNode("top", font=font, position=(35, (1 + self.spacing) * h),
                                  parent=self.game_field)
     self.msg_label_t.anchor_point = (0, 0)
     
-    self.msg_label_b = LabelNode("bottom", font=font, position=(0, -30),
+    self.msg_label_b = LabelNode("bottom", font=font, position=(0, 0 * self.spacing * h),
                                  parent=self.game_field)
-    self.msg_label_b.anchor_point = (0, 0)
-    self.msg_label_b2 = LabelNode("bottom2", font=font, position=(0, -60),
+    self.msg_label_b.anchor_point = (0, 1)
+    self.msg_label_b2 = LabelNode("bottom2", font=font, position=(0,  -1 * self.spacing * h),
                                   parent=self.game_field)
-    self.msg_label_b2.anchor_point = (0, 0)
-    self.msg_label_prompt = LabelNode("prompt", font=font, position=(0, -90),
+    self.msg_label_b2.anchor_point = (0, 1)
+    self.msg_label_prompt = LabelNode("prompt", font=font, position=(0,  -2 * self.spacing * h),
                                       parent=self.game_field)
-    self.msg_label_prompt.anchor_point = (0, 0)
+    self.msg_label_prompt.anchor_point = (0, 1)
     # position right hand message text and enter button
-    match self.device:
-      case 'ipad_landscape':
-        position = (w + 10, h / 2)
-        anchor_point = (0, 0.5)
-        pos_button = (800, 0)
-      case 'ipad_portrait':
-        position = (150, h + 30)
-        anchor_point = (0, 0)
-        pos_button = (600, 600)
-      case 'ipad13_landscape':
-        position = (w + 10, h / 2)
-        anchor_point = (0, 0.5)
-        pos_button = (w, 0)
-      case 'ipad13_portrait':
-        position = (150, h + 30)
-        anchor_point = (0, 0)
-        pos_button = (870, h+50)
-      case 'iphone_portrait':
-        position = (150, h + 20)
-        anchor_point = (0, 0)
-        pos_button = (350, 350)
-      case 'ipad_mini_landscape':
-        position = (w + 10, h / 2)
-        anchor_point = (0, 0.5)
-        pos_button = (800, 0)
-      case 'ipad_mini_portrait':
-        position = (150, h + 30)
-        anchor_point = (0, 0)
-        pos_button = (600, 600)
-      case _:
-        position = (150, h + 20)
-        anchor_point = (0, 0)
-        pos_button = (350, 0)
-    
-    self.msg_label_r = LabelNode("right", font=font, position=position,
+    W, H = get_screen_size()
+    portrait = H > W
+    if portrait:
+        pos_button = (x +w-3*self.spacing *w, 
+                      y + h + 2*self.spacing*h)
+        anchor_point = (0.5, 0)
+        r_position = (x + w/2,
+                      h + 3*self.spacing*h)
+    else:
+         pos_button = (1.01*w, 0)
+         anchor_point = (0, 0.5)
+         r_position = (x+w + self.spacing*w, h/2)
+         
+    self.msg_label_r = LabelNode("right", font=font, position=r_position,
                                  parent=self.game_field)
     self.msg_label_r.anchor_point = anchor_point
     
     self.enter_button = BoxedLabel('Hint', '', position=pos_button,
-                                   min_size=(100, 32),
+                                   min_size=(4*self.spacing *w, self.spacing*h),
                                    parent=self.game_field)
     self.buttons[1] = self.enter_button
     self.buttons[1].set_index(1)
@@ -829,7 +833,9 @@ class GameBoard(Scene):
   def did_change_size(self):    
     try:
       self.orientation()
+      
     except AttributeError as e:
+      print(e)
       pass
       
   # #########################################################################
@@ -1177,6 +1183,7 @@ class BoxedLabel():
       for k, v in kwargs.items():
           try:
               setattr(self.l_name, k, v)
+              setattr(self.l_box_title, k, v)
           except (AttributeError):
               print(traceback.format_exc())
       if 'font' in kwargs:

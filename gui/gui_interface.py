@@ -3,16 +3,17 @@
 # moved panel code (scroll_view, input_text_list etc) to new module
 # to reduce complexity of this class
 from scene import *
+from operator import attrgetter
 import ui
 import sys
 import time
 import console
 from queue import Queue
 import numpy as np
-try:
-    from change_screensize import get_screen_size
-except ImportError:
-    from scene import get_screen_size
+#try:
+#    from change_screensize import get_screen_size
+#except ImportError:
+#    from scene import get_screen_size
 sys.path.append('../')
 
 import gui.gui_scene as gscene
@@ -28,7 +29,7 @@ class Gui():
 
         self.v = SceneView()
         self.v.scene = gscene.GameBoard()
-        self.wh = get_screen_size()
+        self.wh = gscene.get_screen_size()
         self.v.present('sheet')
         self.gs = self.v.scene
         self.gs.board = [list(row) for row in board] # board.copy()
@@ -182,13 +183,11 @@ class Gui():
         if highlight is not None:
             self.gs.highlight_fill = highlight
 
-    def get_device(self):
-        # returns string ipad_landscape, ipad_portrait,
-        #                iphone_landscape, iphone_portrait
+    def get_device(self):               
         return self.gs.device_size()
         
     def get_device_screen_size(self):
-        return get_screen_size()
+        return gscene.get_screen_size()
            
     def get_fontsize(self):
         return self.gs.get_fontsize()
@@ -532,30 +531,28 @@ class Gui():
         for line in lines:
             line.remove_from_parent()
 
-    def rc_to_pos(self, coord):
-        return self.gs.rc_to_pos(coord[0], coord[1])
-
+    def rc_to_pos(self, coord, y=None):
+        # allow tuple or list  of points
+        if isinstance(coord, (tuple, list, np.ndarray)) and len(coord) == 2:
+            return self.gs.rc_to_pos(coord[0], coord[1])
+        if y is not None:
+            return self.gs.rc_to_pos(coord, y)
+        else:
+            raise ValueError('x and y must be specified if coord is not a tuple')
+                                    
     def grid_to_rc(self, point):
-        return self.gs.grid_to_rc(point)
-        
+        return self.gs.grid_to_rc(point)        
+    
     def remove_labels(self):
         """remove all labels
-        TODO This is done by position, can we do better?"""
-        labels = [
-            label for label in self.game_field.children
-            if isinstance(label, LabelNode)
-        ]
-        x, y, w, h = self.grid.bbox
-        labels_ = [
-                label for label in labels if x - 25 < label.position[0] < x
-            ]
-        labels_.extend([
-                label for label in labels if h < label.position[1] < (h + 25) and label.position[0] < w
-            ])
+        assumes property row_col has been added to LabelNode
+        """ 
+        labels = [label
+                  for label in self.game_field.children
+                  if isinstance(label, LabelNode) and hasattr(label, 'row_col')]  
 
-        for label in labels_:
+        for label in labels :
             label.remove_from_parent()
-            # label.text = ''
             
     def replace_labels(self,
                        which='row',
@@ -563,20 +560,26 @@ class Gui():
                        colors=None,
                        **kwargs):
         """ replace row or column labels with custom set and colors
-        TODO This is done by position, can we do better?"""
-        labels = [
-            label for label in self.game_field.children
-            if isinstance(label, LabelNode)
-        ]
+        assumes property row_col has been added to LabelNode
+        label_list is sequence from top to bottom or left to right
+        This assumes that existing labels are sorted, need to do
+        explicitly
+        ylabels have been numbered from the bottom"""
+        
+        labels = [label
+                  for label in self.game_field.children
+                  if isinstance(label, LabelNode) and hasattr(label, 'row_col')]
         x, y, w, h = self.grid.bbox
         if which == 'row':
-            labels = [
-                label for label in labels if x - 25 < label.position[0] < x
-            ]
+            labels = [label
+                      for label in labels 
+                      if label.row_col == which]            
+            labels = sorted(labels, key=attrgetter('position.y'), reverse=True)
         else:
-            labels = [
-                label for label in labels if h < label.position[1] < (h + 25)
-            ]
+            labels = [label
+                      for label in labels
+                      if label.row_col == which]            
+            labels = sorted(labels, key=attrgetter('position.x'))
 
         for label, listitem in zip(labels, label_list):
             label.text = str(listitem)

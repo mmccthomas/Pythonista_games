@@ -18,8 +18,8 @@ from scene import Texture, Point
 from gui.gui_interface import Gui, Coord
 from setup_logging import logger
 #from scrabble_ai_main.UI import scrabble_renderer
-import scrabble_ai_main.Game.scrabble_game as scrabble_game
-import scrabble_ai_main.Game.scrabble_objects as scrabble_objects
+from scrabble_ai_main import Game
+from scrabble_ai_main.Game import scrabble_game, scrabble_objects
 wordlists =['wordlists/scrabble.txt', # official scrabble dict
             'scrabble_ai_main/Data/lang/en/3000_oxford_words.txt',
             'wordlists/5000-more-common.txt',
@@ -77,88 +77,60 @@ class Scrabble(LetterGame):
                               'Quit': self.quit})
     self.gui.set_start_menu({'New Game': self.restart, 'Quit': self.quit})    
     x, y, w, h = self.gui.grid.bbox    
-    
+    W, H = self.gui.get_device_screen_size()
     # positions of all objects for all devices
+    # convert to scaled positions
+    orientation = 'portrait' if H > W else 'landscape'
+    fontsize = self.gui.get_fontsize()
+    spc = self.gui.gs.spacing
     position_dict = {
-    'ipad13_landscape': {'rackpos': (10, 200), 'rackscale': 0.9, 'rackoff': h/8, 
-    'button1': (w+20, h/6), 'button2': (w+250, h/6), 'button3': (w+140, h/6),
-    'button4': (w+250, h/6-50), 'button5': (w+140, h/6-50),
-    'box1': (w+5, 200+h/8-6), 'box2': (w+5, 200-6), 'box3': (w+5, 2*h/3),
-    'box4': (w+5, h-50), 'font': ('Avenir Next', 24) },
-                                       
-    'ipad13_portrait': {'rackpos': (50-w, h+50), 'rackscale': 0.9, 'rackoff': h/8,
-    'button1': (w/2, h+200), 'button2': (w/2, h+50), 'button3': (w/2, h+250),
-    'button4': (w/2, h+100), 'button5': (w/2, h+150),
-    'box1': (45, h+h/8+45), 'box2': (45, h+45), 'box3': (2*w/3, h+45),
-    'box4': (2*w/3, h+200), 'font': ('Avenir Next', 24) },
+     # 1366, 1024
+     # all positions are relatve to grid size, so scale with screen size
+     # only need to select on portrait
+     'landscape': {'rackpos': (0.75*spc*w, h/4), 'rackscale': 0.9, 'rackoff': h/8, 
+                   'button1': (w+spc*w, h/6), 
+                   'button2': (w+12*spc*w, h/6), 
+                   'button3': (w+6*spc*w, h/6),
+                   'button4': (w+12*spc*w, h/10), 
+                   'button5': (w+6*spc*w, h/10),
+                   'box1': (w+0.5*spc*w, h/4+h/8-0.25*spc*h), 
+                   'box2': (w+0.5*spc*w, h/4-0.25*spc*h), 
+                   'box3': (w+0.5*spc*w, 2*h/3),
+                   'box4': (w+0.5*spc*w, h-50), 'font': ('Avenir Next', fontsize)},
     
-    'ipad_landscape': {'rackpos': (10, 200), 'rackscale': 1.0, 'rackoff': h/8,
-    'button1': (w+10, h/6), 'button2': (w+230, h/6), 'button3': (w+120, h/6),
-    'button4': (w+230, h/6-50), 'button5': (w+120, h/6-50),
-    'box1': (w+5, 200+h/8-6), 'box2': (w+5, 200-6), 'box3': (w+5, 2*h/3),
-    'box4': (w+5, h-50), 'font': ('Avenir Next', 20) },
-    
-    'ipad_portrait': {'rackpos': (50-w, h+50), 'rackscale': 1.0, 'rackoff': h/8,
-    'button1': (9*w/15, h+190), 'button2': (9*w/15, h+30), 'button3': (9*w/15, h+150),
-    'button4': (9*w/15, h+70), 'button5': (9*w/15, h+110),
-    'box1': (45,h+h/8+45), 'box2': (45, h+45),'box3': (3*w/4, h+35),
-    'box4': (3*w/4, h+160), 'font': ('Avenir Next', 20)},
-    
-    'iphone_landscape': {'rackpos': (10, 200), 'rackscale': 1.5, 'rackoff': h/4,
-    'button1': (w+10, h/6), 'button2': (w+230, h/6), 'button3': (w+120, h/6),
-    'button4': (w+230, h/6-50), 'button5': (w+120, h/6-50),
-    'box1': (w+5, 200+h/8-6), 'box2': (w+5, 200-6), 'box3': (w+5, 2*h/3),
-    'box4': (w+5, h-50), 'font': ('Avenir Next', 15) },
+    'portrait':  {'rackpos': (2*spc*w-w, h+2*spc*h), 'rackscale': 0.9, 'rackoff': h/8,
+                  'button1': (w/2, h+8*spc*h), 
+                  'button2': (w/2, h+2*spc*h), 
+                  'button3': (w/2, h+10*spc*h),
+                  'button4': (w/2, h+4*spc*h), 
+                  'button5': (w/2, h+6*spc*h),
+                  'box1': (1.75*spc*w, h+h/8+1.75*spc*h), 
+                  'box2': (1.75*spc*w, h+1.75*spc*h), 
+                  'box3': (2*w/3, h+2*spc*h),
+                  'box4': (2*w/3, h+9*spc*h), 
+                  'font': ('Avenir Next', fontsize)}}        
 
-    'ipad_mini_landscape': {'rackpos': (10, 200), 'rackscale': 1.0, 'rackoff': h/8,
-    'button1': (w+10, h/6), 'button2': (w+230, h/6), 'button3': (w+120, h/6),
-    'button4': (w+230, h/6-50), 'button5': (w+120, h/6-50),
-    'box1': (w+5, 200+h/8-6), 'box2': (w+5, 200-6), 'box3': (w+5, 2*h/3),
-    'box4': (w+5, h-50), 'font': ('Avenir Next', 20) },
-    
-    'ipad_mini_portrait': {'rackpos': (50-w, h+50), 'rackscale': 1.0, 'rackoff': h/8,
-    'button1': (9*w/15, h+190), 'button2': (9*w/15, h+30), 'button3': (9*w/15, h+150),
-    'button4': (9*w/15, h+70), 'button5': (9*w/15, h+110),
-    'box1': (45,h+h/8+45), 'box2': (45, h+45),'box3': (3*w/4, h+35),
-    'box4': (3*w/4, h+160), 'font': ('Avenir Next', 20)},
-    #'iphone_landscape': {'rackpos': (10, 0), 'rackscale': 1.5, 'rackoff': h/4,
-    #'button1': (w+5, h), 'button2': (w+300, h-50), 'button3': (w+300, h-100),
-    #'button4': (w+300, h-150), 'button5': (w+300, h-200),
-    # 'box1': (w+5, h/4-6), 'box2': (w+5, -6), 'box3': (w+5, h/2),
-    # 'box4': (w+5, h), 'font': ('Avenir Next', 15)},
-    
-    #'iphone_portrait': {'rackpos': (10, 200), 'rackscale': 1.5, 'rackoff': h/8,
-    #'button1': (w, h/6), 'button2': (w+250, h/6), 'button3': (w+140, h/6),
-    #'button4': (w/2, h+100), 'button5': (w/2, h+150),
-    #'box1': (5, h+h/8-6), 'box2': (5, h-6), 'box3': (5, h),
-    #'box4': (5, h-50),  'font': ('Avenir Next', 15)}
-    'iphone_portrait': {'rackpos': (50-w, h+50), 'rackscale': 1.5, 'rackoff': h/8,
-    'button1': (9*w/15, h+190), 'button2': (9*w/15, h+30), 'button3': (9*w/15, h+150),
-    'button4': (9*w/15, h+70), 'button5': (9*w/15, h+110),
-    'box1': (45,h+h/8+45), 'box2': (45, h+45),'box3': (3*w/4, h+35),
-    'box4': (3*w/4, h+160), 'font': ('Avenir Next', 15)},
-     }
-    self.posn = SimpleNamespace(**position_dict[self.gui.device])
-    self.time_delay = 1
-
-    
+    self.posn = SimpleNamespace(**position_dict[orientation])
+    self.time_delay = 1    
     
   def add_boxes(self):
       """ add non responsive decoration boxes"""
       x, y, w, h = self.gui.grid.bbox 
       tsize = self.posn.rackscale * self.gui.SQ_SIZE
+      
+      spc = self.gui.gs.spacing
+      tspc = 8 * spc * tsize
       box = self.gui.add_button(text='', title='Computer', position=self.posn.box1, 
-                          min_size=(7 * tsize+10, tsize+10), 
+                          min_size=(7 * tsize+tspc, tsize+tspc), 
                           fill_color='red')
       self.gui.set_props(box, font=self.posn.font)
       box = self.gui.add_button(text='', title='Player', position=self.posn.box2, 
-                          min_size=(7 * tsize+10, tsize+10), 
+                          min_size=(7 * tsize+tspc, tsize+tspc), 
                           fill_color='blue')
       self.gui.set_props(box, font=self.posn.font)
       self.scores = self.gui.add_button(text='', title='Scores', position=self.posn.box3, 
                                         min_size=(50, 50),
-                                        fill_color='clear',
-                                        font=self.posn.font)
+                                        fill_color='clear')
       self.gui.set_props(self.scores, font=self.posn.font)
       self.turn = self.gui.add_button(text='Your Turn', title='Turn', position=self.posn.box4, 
                                         min_size=(50, 50), 
@@ -167,24 +139,30 @@ class Scrabble(LetterGame):
     
   def set_buttons(self):
     """ install set of active buttons """ 
-    x, y, w, h = self.gui.grid.bbox       
+    x, y, w, h = self.gui.grid.bbox 
+    fontsize = self.gui.get_fontsize()      
     button = self.gui.set_enter('Play', position=self.posn.button1,
+                                min_size=(2*fontsize, fontsize),
                                 stroke_color='black', fill_color='yellow',
                                 color='black', font=self.posn.font)   
     button = self.gui.add_button(text='Autoplay', title='', position=self.posn.button2, 
-                                 min_size=(80, 32), reg_touch=True,
+                                 min_size=(2*fontsize, fontsize), 
+                                 reg_touch=True,
                                  stroke_color='black', fill_color='yellow',
                                  color='black', font=self.posn.font) 
     button = self.gui.add_button(text='Shuffle', title='', position=self.posn.button3,
-                                 min_size=(100, 32), reg_touch=True,
+                                 min_size=(2*fontsize, fontsize), 
+                                 reg_touch=True,
                                  stroke_color='black', fill_color='yellow',
                                  color='black', font=self.posn.font)
     button = self.gui.add_button(text='Swap', title='', position=self.posn.button4,
-                                 min_size=(100, 32), reg_touch=True,
+                                 min_size=(2*fontsize, fontsize),  
+                                 reg_touch=True,
                                  stroke_color='black', fill_color='orange',
                                  color='black', font=self.posn.font)
     button = self.gui.add_button(text='Options', title='', position=self.posn.button5,
-                                 min_size=(100, 32), reg_touch=True,
+                                 min_size=(2*fontsize, fontsize), 
+                                 reg_touch=True,
                                  stroke_color='black', fill_color='orange',
                                  color='black', font=self.posn.font)
 

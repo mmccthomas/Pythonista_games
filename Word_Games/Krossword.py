@@ -81,19 +81,15 @@ class KrossWord(LetterGame):
     W, H = self.gui.get_device_screen_size()
     self.gui.device = self.gui.get_device()
     x, y, w, h = self.gui.grid.bbox
-    match  self.gui.device:
-       case'ipad_landscape' | 'ipad13_landscape'| 'ipad_mini_landscape' | 'iphone_landscape':
+    if W > H:    
            self.gui.set_enter('Undo', position=(w + 50, -50))
            self.start_menu_pos = (w+250, h)
            position_puzzles = (w+10, 0)
-       case'ipad_portrait' | 'iphone_portrait' | 'ipad13_portrait' | 'ipad_mini_portrait' :
+    else:       
            self.gui.set_enter('Undo', position=(w - 50, h + 50))
            self.start_menu_pos = (w-50, h+50)
            position_puzzles = (w/2, h)
-       case _:
-           self.gui.set_enter('Undo', position=(w + 50, -50))
-           self.start_menu_pos = (w+250, h)
-           position_puzzles = (w+10, 0)          
+       
     self.gui.gs.pause_button.position = (32, H - 36)   
     self.gui.set_top(self.gui.get_top(),
                      position=(0, h+25))

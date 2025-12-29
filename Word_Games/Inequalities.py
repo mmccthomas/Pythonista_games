@@ -80,24 +80,10 @@ class Futoshiki(LetterGame):
                                  'Quit': self.quit})
             
         x, y, w, h = self.gui.grid.bbox
-        match  self.gui.device:
-            case'ipad_landscape':
-                position = (w+10, 8*h/9)
-            case'ipad_portrait':
-                position = (7*w/9, h+50)
-            case 'iphone_portrait':
-                position = (180, 470)
-            case 'ipad13_landscape':
-                position = (w+10, 8*h/9)
-            case 'ipad13_portrait':
-                position = (8*w/9, h+50)
-            case'ipad_mini_landscape':
-                position = (w+10, 8*h/9)
-            case'ipad_mini_portrait':
-                position = (7*w/9, h+50)
+        
         self.gui.set_enter('Note ', fill_color='clear',
-                           font=('Avenir Next', 50),
-                           position=position)
+                           font=('Avenir Next', 50))
+                           #position=position)
         self.gui.set_top('', position=(0, h+30))
           
     def create_number_board(self):
@@ -363,25 +349,18 @@ class Futoshiki(LetterGame):
               raise (IndexError, "possible list is empty")
                  
             self.gui.selection = ''
-            selection = ''
-            x, y, w, h = self.gui.grid.bbox
-            while self.gui.selection == '':
-              if self.gui.device in ['ipad13_landscape']:
-                  position = (950, h / 2)
-              elif self.gui.device == 'ipad_landscape':
-                  position = (x+w+50, h / 2)
-              elif self.gui.device.endswith('_portrait'):
-                  position = (x, y)
-              else:
-                  position = (x + w, h / 2)
-                  
+            selection = ''            
+            W, H = self.gui.get_device_screen_size()
+            while self.gui.selection == '':              
+              position = W, 2 * self.gui.gs.spacing * H #nearly top on right    
               select_method = self.gui.input_text_list if text_list else self.gui.input_numbers
               panel_choice = {3: '../gui/Number_panel.pyui',
                               4: '../gui/Number_panel16.pyui',
                               5: '../gui/Number_panel25.pyui'}
               panel = select_method(prompt=prompt, items=items,
                                     position=position, panel='../gui/Number_panel.pyui',
-                                    allows_multiple_selection = (long_press or self.hint))
+                                    allows_multiple_selection = (long_press or self.hint),
+                                    align=(1,0))
               while panel.on_screen:
                   sleep(.1)
                   try:

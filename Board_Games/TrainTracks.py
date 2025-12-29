@@ -35,7 +35,6 @@ class Player():
 class TrainTracks():
     def __init__(self):
         """Create, initialize and draw an empty board."""
-        self.debug = False
         self.puzzle_select = None
         self.game_item, size = self.load_words_from_file(TRAINS)
         self.display_board = np.zeros((size, size), dtype=int)
@@ -62,6 +61,7 @@ class TrainTracks():
       
         self.gui.start_menu = {'New Game': self.restart,
                                'Quit': self.gui.close}
+        self.debug = False
         self.size = size
         self.solution_board = np.full((size, size), '-', dtype='U1')
         self.empty_board = np.full((size, size), '-', dtype='U1')
@@ -72,7 +72,8 @@ class TrainTracks():
         self.letter = 'x'
         self.constraints = self.game_item
         self.error = self.initialize()
-                
+        
+      
     def update_board(self, board):
       self.gui.update(board)
       self.display_rack(self.gui.player.PIECE_NAMES)
@@ -84,7 +85,8 @@ class TrainTracks():
         parent = self.gui.game_field
         _, _, w, h = self.gui.grid.bbox
         sqsize = self.gui.SQ_SIZE
-        x, y = (50, h - sqsize)
+        spc = self.gui.gs.spacing
+        x, y = (2*spc*w, h - sqsize)
         offx, offy = self.posn.rackpos
         x = x + offx
         y = y + offy
@@ -93,8 +95,8 @@ class TrainTracks():
         for n, tile in enumerate(tiles):
           t = Tile(Texture(Image.named(f'../gui/tileblocks/{tiles[tile]}.png')),
                    0,  0, sq_size=sqsize * self.posn.rackscale)
-          t.position = (w + x + (n % r * (20 + sqsize * self.posn.rackscale)),
-                        y - n // r * (20 + sqsize * self.posn.rackscale))
+          t.position = (w + x + (n % r * (spc*w + sqsize * self.posn.rackscale)),
+                        y - n // r * (spc*h + sqsize * self.posn.rackscale))
           rack[t.bbox] = tile
           parent.add_child(t)
         
@@ -297,7 +299,7 @@ class TrainTracks():
         # Numbers across the top
         self.gui.replace_labels('col', self.board_obj.col_constraints, colors=None)
         # Numbers down left side
-        self.gui.replace_labels('row', reversed(self.board_obj.row_constraints), colors=None)
+        self.gui.replace_labels('row', self.board_obj.row_constraints, colors=None)
         
     def run(self):
         """
@@ -468,7 +470,7 @@ class TrainTracks():
           return x in list(self.gui.player.PIECE_NAMES.keys())[:-2]
           
       col_sums = np.sum(contained(self.board), axis=0).astype('U1')
-      row_sums = np.flip(np.sum(contained(self.board), axis=1)).astype('U1')
+      row_sums = np.sum(contained(self.board), axis=1).astype('U1')
       constraintrc = ''.join(col_sums) + ''.join(row_sums)
       
       if self.permanent.known:
@@ -596,8 +598,8 @@ class TrainTracks():
              
        col_known = np.array(self.board_obj.col_constraints)
        col_sums = np.sum(contained(self.board), axis=0)
-       row_known = np.flip(np.array(self.board_obj.row_constraints))
-       row_sums = np.flip(np.sum(contained(self.board), axis=1))
+       row_known = np.array(self.board_obj.row_constraints)
+       row_sums = np.sum(contained(self.board), axis=1)
        
        return all([compute_check(col_known, col_sums, 'col'),
                    compute_check(row_known, row_sums, 'row')])
@@ -625,60 +627,40 @@ class TrainTracks():
        
     def box_positions(self):
         x, y, w, h = self.gui.grid.bbox
-        sqsize = self.gui.SQ_SIZE
+        W, H = self.gui.get_device_screen_size()
         # positions of all objects for all devices
-        position_dict = {
-        'ipad13_landscape': {'rackpos': (0, -45), 'rackscale': 1.0,
-                             'rackoff': 2,  'edit_size': (280, 150),
-                             'button1': (w + 40, h / 12), 'button2': (w + 40, 220),
-                             'button3': (w + 200, 220), 'button4': (w + 200, 170),
-                             'button5': (w + 40, 120), 'button6': (w+40, 170),
-                             'box1': (w + 38, h - 39 - 4 * (sqsize + 20)), 'box2': (w + 30, 120 - 6),
-                             'box3': (w + 5, 2 * h / 3),
-                             'box4': (w + 5, h - 50), 'font': ('Avenir Next', 20)},
-                                           
-        'ipad13_portrait':{'rackpos': (-w, 305), 'rackscale': 0.7, 'rackoff': 4, 'edit_size': (235, 150),
-                          'button1': (750, h + 100), 'button2': (480, h + 200), 'button3': (600 , h + 200),
-                          'button4': (600, h + 150), 'button5': (480, h + 100), 'button6': (480, h + 150),
-                          'box1': (42, h + 68), 'box2': (475, h + 90), 'box3': (3 * w / 4, h + 35),
-                          'box4': (3 * w / 4, h + 160), 'font': ('Avenir Next', 20)},
+        # all positions are relatve to grid size, so scale with screen size
+        orientation = 'portrait' if H > W else 'landscape'
+        fontsize = self.gui.get_fontsize()
+        spc = self.gui.gs.spacing
+        sqsize = self.gui.SQ_SIZE
+        position_dict = {                  
+         # only need to select on portrait
+         'landscape': {'rackpos': (0, -2*spc*h), 'rackscale': 1.0, 'rackoff': 2, 
+                       'edit_size': (11*spc*w, 6*spc*h),
+                       'button1': (w+2*spc*w, h/12), 
+                       'button2': (w+2*spc*w, 9*spc*h), 
+                       'button3': (w+8*spc*w, 9*spc*h),
+                       'button4': (w+8*spc*w, 7*spc*h), 
+                       'button5': (w+2*spc*w, 5*spc*h),
+                       'button6': (w+2*spc*w, 7*spc*h),                                  
+                       'box1': (w + 1.75*spc*w, h - 1.75*spc*h - 4 * (sqsize + spc*h)), 
+                       'box2': (w + 1.5*spc*w, 4.75*spc*h),                     
+                       'font': ('Avenir Next', fontsize)},
         
+        'portrait':  {'rackpos': (-w, 4*h/8), 'rackscale': 0.5, 'rackoff': 2,
+                      'edit_size': (11.25*spc*w, 6.5*spc*h),
+                      'button1': (7*w/8, h + 4*spc*h), 
+                      'button2': (w/2, h + 8*spc*h), 
+                      'button3': (5.5*w/8 , h + 8*spc*h),
+                      'button4': (5.5*w/8, h + 6*spc*h), 
+                      'button5': (w/2, h + 4*spc*h), 
+                      'button6': (w/2, h + 6*spc*h),
+                      'box1': (1.5*spc*w, h + 3*spc*h), 
+                      'box2': (4*w/8 - 0.25*spc*w, h + 3.5*spc*h),                    
+                      'font': ('Avenir Next', fontsize)}}                                  
         
-        'ipad_landscape': {'rackpos': (0, -10), 'rackscale': 1.0, 'rackoff': 2, 'edit_size': (230, 140),
-                           'button1': (w + 35, 20), 'button2': (w + 35, 190), 'button3': (w + 150, 190),
-                           'button4': (w + 150, 140), 'button5': (w + 35, 90), 'button6': (w + 35, 140), 
-                           'box1': (w + 38, h -2 - 4 * (sqsize + 20)), 'box2': (w + 30, 90-6), 'box3': (w + 5, 2 * h / 3),
-                           'box4': (w + 5, h - 50), 'font': ('Avenir Next', 20)},
-        
-        'ipad_portrait': {'rackpos': (-w, 350), 'rackscale': 0.7, 'rackoff': 4, 'edit_size': (250, 110),
-                          'button1': (690, h + 100), 'button2': (430, h +150), 'button3': (550 , h + 150),
-                          'button4': (550, h + 100), 'button5': (430, h + 100), 'button6': (430, h + 100),
-                          'box1': (45, h + 55), 'box2': (420, h + 90), 'box3': (3 * w / 4, h + 35),
-                          'box4': (3 * w / 4, h + 160), 'font': ('Avenir Next', 20)},
-        'ipad_mini_landscape': {'rackpos': (0, -10), 'rackscale': 1.0, 'rackoff': 2, 'edit_size': (230, 140),
-                           'button1': (w + 35, 20), 'button2': (w + 35, 165), 'button3': (w + 150, 165),
-                           'button4': (w + 150, 115), 'button5': (w + 35, 65), 'button6': (w + 35, 115), 
-                           'box1': (w + 40, h -5 - 4 * (sqsize + 20)), 'box2': (w + 30, 62), 'box3': (w + 5, 2 * h / 3),
-                           'box4': (w + 5, h - 50), 'font': ('Avenir Next', 20)},
-        
-        'ipad_mini_portrait': {'rackpos': (-w, 249), 'rackscale': 0.7, 'rackoff': 4, 'edit_size': (250, 110),
-                          'button1': (690, h + 100), 'button2': (430, h +150), 'button3': (550 , h + 150),
-                          'button4': (550, h + 100), 'button5': (430, h + 100), 'button6': (430, h + 100),
-                          'box1': (45, h + 55), 'box2': (420, h + 90), 'box3': (3 * w / 4, h + 35),
-                          'box4': (3 * w / 4, h + 160), 'font': ('Avenir Next', 20)},
-        'iphone_landscape': {'rackpos': (0, -50), 'rackscale': 1.5, 'rackoff': 2, 'edit_size': (255, 130),
-                             'button1': (w + 215, h / 6), 'button2': (w + 215, 245), 'button3': (w + 330, 245),
-                             'button4': (w + 330, 180), 'button5': (w + 215, 180), 'button6': (9 * w / 15, h + 150),
-                             'box1': (w + 37, -20), 'box2': (w + 210, 165 - 6), 'box3': (w + 5, 2 * h / 3),
-                             'box4': (w + 5, h - 50), 'font': ('Avenir Next', 20)},
-            
-        'iphone_portrait': {'rackpos': (-w -30, h + 10), 'rackscale': 1.5, 'rackoff': 2, 'edit_size': (135, 190),
-                            'button1': (9 * w / 15, h + 100), 'button2': (9 * w / 15, h + 300), 'button3': (9 * w / 15, h + 250),
-                            'button4': (9 * w / 15, h + 200), 'button5': (9 * w / 15, h + 150), 'button6': (9 * w / 15, h + 150),
-                            'box1': (0, h + h / 8 + 20), 'box2': (180,  h + 145), 'box3': (3 * w / 4, h + 35),
-                            'box4': (3 * w / 4, h + 160), 'font': ('Avenir Next', 15)},
-         }
-        self.posn = SimpleNamespace(**position_dict[self.gui.device])
+        self.posn = SimpleNamespace(**position_dict[orientation])
         
     def add_boxes(self):
       """ add non responsive decoration boxes"""
@@ -686,13 +668,15 @@ class TrainTracks():
       r = self.posn.rackoff
       t = self.posn.rackscale
       tsize = self.gui.SQ_SIZE
+      spc = self.gui.gs.spacing
+      tspc = 8 * spc * tsize
       # position bottomleft of 1st tile w+x, y
       # position of topright last tile w + x + t *(t*tsize+20)
       #position = (w + x + (n % r * (20 + sqsize * self.posn.rackscale)),
       #                  y - n // r * (20 + sqsize * self.posn.rackscale))
       box = self.gui.add_button(text='', title='Tracks',
                                 position=self.posn.box1,
-                                min_size=(r * (t * tsize + 20), 8 / r * (t * tsize + 20)),
+                                min_size=(r * (t * tsize + spc*h), 8 / r * (t * tsize + spc*h)),
                                 fill_color='clear')
       self.gui.set_props(box, font=self.posn.font)
       
@@ -705,32 +689,33 @@ class TrainTracks():
     def set_buttons(self):
       """ install set of active buttons """
       x, y, w, h = self.gui.grid.bbox
+      fontsize = self.gui.get_fontsize()   
       button = self.gui.set_enter('Hint', position=self.posn.button1,
                                   stroke_color='black', fill_color='yellow',
                                   color='black', font=self.posn.font)
       self.edit = self.gui.add_button(text='Edit Mode', title='',
                                       position=self.posn.button2,
-                                      min_size=(80, 32), reg_touch=True,
+                                      min_size=(2*fontsize, fontsize), reg_touch=True,
                                       stroke_color='black', fill_color='orange',
                                       color='black', font=self.posn.font)
       self.identify = self.gui.add_button(text='Identify', title='',
                                           position=self.posn.button3,
-                                          min_size=(100, 32), reg_touch=True,
+                                          min_size=(2*fontsize, fontsize), reg_touch=True,
                                           stroke_color='black', fill_color='orange',
                                           color='black', font=self.posn.font)
       button = self.gui.add_button(text='Solve', title='',
                                    position=self.posn.button4,
-                                   min_size=(100, 32), reg_touch=True,
+                                   min_size=(2*fontsize, fontsize), reg_touch=True,
                                    stroke_color='black', fill_color='orange',
                                    color='black', font=self.posn.font)
       self.save = self.gui.add_button(text='Save', title='',
                                       position=self.posn.button5,
-                                      min_size=(100, 32), reg_touch=True,
+                                      min_size=(2*fontsize, fontsize), reg_touch=True,
                                       stroke_color='black', fill_color='grey',
                                       color='black', font=self.posn.font)
       self.random = self.gui.add_button(text='Random', title='',
                                         position=self.posn.button6,
-                                        min_size=(100, 32), reg_touch=True,
+                                        min_size=(2*fontsize, fontsize), reg_touch=True,
                                         stroke_color='black', fill_color='grey',
                                         color='black', font=self.posn.font)
           
