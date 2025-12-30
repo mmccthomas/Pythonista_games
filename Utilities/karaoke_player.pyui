@@ -1,0 +1,191 @@
+[
+  {
+    "nodes" : [
+      {
+        "nodes" : [
+
+        ],
+        "frame" : "{{28, 14}, {107, 32}}",
+        "class" : "Button",
+        "attributes" : {
+          "action" : "self.select_file",
+          "border_width" : 2,
+          "frame" : "{{329, 251}, {80, 32}}",
+          "title" : "File",
+          "uuid" : "BB1B6444-A695-4C41-9BBF-E06E36C37621",
+          "class" : "Button",
+          "border_color" : "RGBA(0.030660,0.030660,0.030660,1.000000)",
+          "corner_radius" : 0,
+          "name" : "file",
+          "font_size" : 15
+        },
+        "selected" : false
+      },
+      {
+        "nodes" : [
+
+        ],
+        "frame" : "{{302, 14}, {80, 32}}",
+        "class" : "Button",
+        "attributes" : {
+          "action" : "self.play_midi",
+          "border_width" : 2,
+          "frame" : "{{329, 251}, {80, 32}}",
+          "title" : "Play",
+          "uuid" : "AE4A92BC-2496-432C-B11F-ECFD35FACB28",
+          "class" : "Button",
+          "border_color" : "RGBA(0.000000,0.000000,0.000000,1.000000)",
+          "corner_radius" : 0,
+          "name" : "play",
+          "font_size" : 15
+        },
+        "selected" : false
+      },
+      {
+        "nodes" : [
+
+        ],
+        "frame" : "{{397, 14}, {92, 32}}",
+        "class" : "Button",
+        "attributes" : {
+          "action" : "self.stop_midi",
+          "border_width" : 2,
+          "frame" : "{{329, 251}, {80, 32}}",
+          "title" : "Stop",
+          "uuid" : "D6FA4B8C-FEE4-41A9-AEBF-31DFB10A5368",
+          "class" : "Button",
+          "border_color" : "RGBA(0.172170,0.172170,0.172170,1.000000)",
+          "corner_radius" : 0,
+          "name" : "stop",
+          "font_size" : 15
+        },
+        "selected" : false
+      },
+      {
+        "nodes" : [
+
+        ],
+        "frame" : "{{845, 14}, {150, 32}}",
+        "class" : "Label",
+        "attributes" : {
+          "uuid" : "CE36C7C5-2D22-4D14-95BC-D4D58E4599F8",
+          "corner_radius" : 0,
+          "background_color" : "RGBA(0.863208,0.863208,0.863208,1.000000)",
+          "frame" : "{{294, 251}, {150, 32}}",
+          "border_color" : "RGBA(0.094340,0.094340,0.094340,1.000000)",
+          "border_width" : 2,
+          "alignment" : "left",
+          "text" : "Time",
+          "font_name" : "<System>",
+          "class" : "Label",
+          "name" : "current_time",
+          "font_size" : 18
+        },
+        "selected" : false
+      },
+      {
+        "nodes" : [
+
+        ],
+        "frame" : "{{28, 272}, {977, 490}}",
+        "class" : "TextView",
+        "attributes" : {
+          "uuid" : "D0743B8F-4903-45D0-8216-2FC4BAD03DFC",
+          "font_size" : 30,
+          "background_color" : "RGBA(0.666667,1.000000,1.000000,1.000000)",
+          "frame" : "{{269, 167}, {200, 200}}",
+          "editable" : true,
+          "alignment" : "left",
+          "autocorrection_type" : "default",
+          "font_name" : "AlNile-Bold",
+          "spellchecking_type" : "default",
+          "class" : "TextView",
+          "name" : "lyrics",
+          "flex" : "WH"
+        },
+        "selected" : false
+      },
+      {
+        "nodes" : [
+
+        ],
+        "frame" : "{{143, 14}, {151, 32}}",
+        "class" : "Button",
+        "attributes" : {
+          "border_width" : 2,
+          "action" : "self.select_track",
+          "frame" : "{{329, 251}, {80, 32}}",
+          "title" : "Track Notes",
+          "uuid" : "F0F247B8-95FE-46F3-B343-370FC49A6F52",
+          "class" : "Button",
+          "corner_radius" : 0,
+          "border_color" : "RGBA(0.021226,0.021226,0.021226,1.000000)",
+          "name" : "track",
+          "font_size" : 15
+        },
+        "selected" : false
+      },
+      {
+        "nodes" : [
+
+        ],
+        "frame" : "{{28, 54}, {977, 210}}",
+        "class" : "ImageView",
+        "attributes" : {
+          "frame" : "{{462, 334}, {100, 100}}",
+          "class" : "ImageView",
+          "name" : "noteview",
+          "uuid" : "C6ED2BDE-C82A-4DF3-9F81-B119992C8B9D"
+        },
+        "selected" : false
+      },
+      {
+        "nodes" : [
+
+        ],
+        "frame" : "{{506, 14}, {99, 32}}",
+        "class" : "Label",
+        "attributes" : {
+          "name" : "notespan",
+          "frame" : "{{437, 368}, {150, 32}}",
+          "uuid" : "BF93A074-C32A-44B8-88D8-2647A9E53EA8",
+          "class" : "Label",
+          "alignment" : "left",
+          "text" : "Note range",
+          "font_size" : 18,
+          "font_name" : "<System>"
+        },
+        "selected" : false
+      },
+      {
+        "nodes" : [
+
+        ],
+        "frame" : "{{613, 14}, {224, 32}}",
+        "class" : "Label",
+        "attributes" : {
+          "font_size" : 18,
+          "frame" : "{{437, 368}, {150, 32}}",
+          "uuid" : "E80CB7AB-D297-4D5B-B9FE-D84EF3246BC3",
+          "class" : "Label",
+          "alignment" : "left",
+          "text" : "Lyric start",
+          "name" : "starts",
+          "font_name" : "<System>"
+        },
+        "selected" : true
+      }
+    ],
+    "frame" : "{{0, 0}, {1024, 768}}",
+    "class" : "View",
+    "attributes" : {
+      "tint_color" : "RGBA(0.000000,0.478000,1.000000,1.000000)",
+      "enabled" : true,
+      "border_color" : "RGBA(0.000000,0.000000,0.000000,1.000000)",
+      "background_color" : "RGBA(1.000000,1.000000,1.000000,1.000000)",
+      "name" : "Karaoke",
+      "flex" : ""
+    },
+    "selected" : false
+  }
+]
