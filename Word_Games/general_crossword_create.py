@@ -125,26 +125,23 @@ class Cross(PieceWord):
     def box_positions(self):
         # positions of all objects for all devices
         x, y, w, h = self.gui.grid.bbox
-        off = 0
-        position_dict = {'ipad13_landscape': {
-        'button1': (w + off + 35, h), 'button2': (w + off + 150, h), 'button3': (w + off + 265, h),
-        'button4': (w + off + 35, h - 80),
-        'box1': (w + off , y), 'boxsize': (500, 600), 'font': ('Avenir Next', 12)},
-
-        'ipad_landscape': {
-        'button1': (w + off + 70, h), 'button2': (w + off + 210, h), 'button3': (w + off + 300, h),
-        'button4': (w + off + 210, h - 50),
-        'box1': (w + 10 , y), 'boxsize': (500, 600), 'font': ('Avenir Next', 12)},
-        
-        'ipad_mini_landscape': {
-        'button1': (w + off + 40, h), 'button2': (w + off + 180, h), 'button3': (w + off + 270, h),
-        'button4': (w + off + 180, h - 50),
-        'box1': (w + 10 , y), 'boxsize': (500, 530), 'font': ('Avenir Next', 12)}
-        }
-        try:
-            self.posn = SimpleNamespace(**position_dict[self.gui.device])
-        except (KeyError):
+        W, H = self.gui.get_device_screen_size()
+        spc = self.gui.gs.spacing
+        if H > W:
             raise KeyError('Portrait mode  or iphone not supported')
+        else:
+            off = spc*w
+            position_dict = {
+            'button1': (w + off, h),
+            'button2': (w + off + 5*spc*w, h), 
+            'button3': (w + off + 10*spc*w, h),
+            'button4': (w + off, h - 2*spc*h),
+            'box1': (w + off , y),
+            'boxsize': (20*spc+w, 30*spc*h), 
+            'font': ('Avenir Next', self.gui.get_fontsize())}                     
+            
+        self.posn = SimpleNamespace(**position_dict)
+        
 
     def set_buttons(self):
         """ install set of active buttons
@@ -154,13 +151,14 @@ class Cross(PieceWord):
         x, y, w, h = self.gui.grid.bbox
         off = 50
         t = h / self.selection[1]
+        fontsize = self.gui.get_fontsize()
         params = {
             'title': '',
             'stroke_color': 'black',
-            'font': ('Avenir Next', 18),
+            'font': ('Avenir Next', fontsize),
             'reg_touch': True,
             'color': 'black',
-            'min_size': (80, 32)
+            'min_size': (2*fontsize, fontsize)
         }
 
         self.gui.set_enter('Fill',
@@ -171,20 +169,20 @@ class Cross(PieceWord):
                             position=self.posn.button2,
                             fill_color='orange',
                             **{
-                                **params, 'min_size': (80, 32)
+                                **params
                             })
         self.gui.add_button(text='Copy',
                             position=self.posn.button3,
                             fill_color='orange',
                             **{
-                                **params, 'min_size': (80, 32)
+                                **params
                             })
 
         self.gui.add_button(text='Reload',
                             position=self.posn.button4,
                             fill_color='orange',
                             **{
-                                **params, 'min_size': (80, 32)
+                                **params
                             })
         # adjust text size to screen
         fontsize = (W - w) // 28

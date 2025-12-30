@@ -251,26 +251,25 @@ class PieceWord(LetterGame):
     def box_positions(self):
         # positions of all objects for all devices
         x, y, w, h = self.gui.grid.bbox
-        off = 100
-        position_dict = {'ipad13_landscape': {
-        'button1': (w + off + 135, h), 'button2': (w + off + 275, h), 'button3': (w + off + 365, h),
-        'button4': (w + off + 275, h - 80), 'button5': (w + off + 135, h - 80),
-        'box1': (w + off , y), 'boxsize': (500, 600), 'font': ('Avenir Next', 12)},
-
-        'ipad_landscape': {
-        'button1': (w + off + 70, h), 'button2': (w + off + 210, h), 'button3': (w + off + 300, h),
-        'button4': (w + off + 210, h - 50), 'button5': (w + off + 70, h - 50),
-        'box1': (w + 10 , y), 'boxsize': (500, 600), 'font': ('Avenir Next', 12)},
         
-        'ipad_mini_landscape': {
-        'button1': (w + off + 70, h), 'button2': (w + off + 210, h), 'button3': (w + off + 300, h),
-        'button4': (w + off + 210, h - 50), 'button5': (w + off + 70, h - 50),
-        'box1': (w + 10 , y), 'boxsize': (500, 530), 'font': ('Avenir Next', 12)}
-        }
-        try:
-            self.posn = SimpleNamespace(**position_dict[self.gui.device])
-        except (KeyError):
+        W, H = self.gui.get_device_screen_size()
+        spc = self.gui.gs.spacing
+        if H > W:
             raise KeyError('Portrait mode  or iphone not supported')
+        else:
+            off = 4*spc*w
+            position_dict = {
+            'button1': (w + off, h),
+            'button2': (w + off + 5*spc*w, h), 
+            'button3': (w + off + 10*spc*w, h),
+            'button4': (w + off + 5*spc*w, h - 2*spc*h),
+            'button5': (w + off, h - 2*spc*h),
+            'box1': (w + off , y),
+            'boxsize': (20*spc+w, 30*spc*h), 
+            'font': ('Avenir Next', self.gui.get_fontsize())}                     
+            
+        self.posn = SimpleNamespace(**position_dict)
+        
             
     def set_buttons(self):
         """ install set of active buttons
@@ -278,13 +277,14 @@ class PieceWord(LetterGame):
          """
         x, y, w, h = self.gui.grid.bbox
         off = 100
+        fontsize = self.gui.get_fontsize()
         params = {
             'title': '',
             'stroke_color': 'black',
             'font': ('Avenir Next', 18),
             'reg_touch': True,
             'color': 'black',
-            'min_size': (80, 32)
+            'min_size': (2*fontsize, fontsize)
         }
         
         self.gui.set_enter('Fill',
@@ -295,27 +295,27 @@ class PieceWord(LetterGame):
                             position=self.posn.button2,
                             fill_color='orange',
                             **{
-                                **params, 'min_size': (80, 32)
+                                **params
+                               
                             })
         self.gui.add_button(text='Copy',
                             position=self.posn.button3,
                             fill_color='orange',
                             **{
-                                **params, 'min_size': (80, 32)
+                                **params
                             })
 
         self.randomise_button = self.gui.add_button(text='Randomise',
                                                     position=self.posn.button4,
                                                     fill_color='red',
                                                     **{
-                                                        **params, 'min_size':
-                                                        (80, 32)
+                                                        **params                                   
                                                     })
         self.gui.add_button(text='Reload',
                             position=self.posn.button5,
                             fill_color='orange',
                             **{
-                                **params, 'min_size': (80, 32)
+                                **params
                             })
 
         self.wordsbox = self.gui.add_button(
@@ -323,7 +323,7 @@ class PieceWord(LetterGame):
             title='Clues',
             position=self.posn.box1,
             min_size=self.posn.boxsize,
-            font=('Courier New', 14),
+            font=('Courier New', fontsize/2),
             fill_color='black',
         )
         

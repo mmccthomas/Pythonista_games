@@ -27,6 +27,7 @@ image_dict
 
 CMT Apr 2025 removed references to os
 """
+import math
 import pathlib
 from PIL import Image
 import ui
@@ -38,7 +39,7 @@ try:
     from change_screensize import get_screen_size
 except ImportError:
     from scene import get_screen_size
-
+import scene
 
 xsize = 30
 ysize = 20
@@ -48,23 +49,46 @@ IMAGE_NAME = 'image.png'
 
 
 def device_size():
-	w, h = get_screen_size()
-	device = None
-	if w > 1200 and h > 1000:
-		device = 'ipad13_landscape'
-	elif w > 1000 and h > 800:
-		device = 'ipad_landscape'
-	elif w > 800 and h > 1000:
-		device = 'ipad_portrait'
-	elif w > 800 and h < 400:
-		device = 'iphone_landscape'
-	elif w < 400 and h > 800:
-		device = 'iphone_portrait'
-	elif w > 1100 and h > 700:
-		device = 'ipad_mini_landscape'
-	else:
-		device = None
-	return device
+      """ return the closest device type and orientation
+      to current screen size
+      """      
+      def _find_best_fit(target, groups):
+          best_match = None
+          min_distance = float('inf')
+          closest_coord = None
+      
+          for group_name, coords_list in groups.items():
+              for coords in coords_list:
+                  dist = math.dist(coords, target)                  
+                  if dist < min_distance:
+                      min_distance = dist
+                      best_match = group_name
+                      closest_coord = coords                                            
+          return best_match, closest_coord, min_distance
+            
+      devices = {'ipad13_landscape': [(1376, 1032), (1366, 1024)], 
+                 'ipad_landscape': [(1210, 834), (1180, 820), 
+                                    (1112, 834), (1080, 810),
+                                    (1024, 768)],
+                 'iphone_landscape': [(956, 440), (932, 440),
+                                      (926, 428), (896, 414), 
+                                      (852, 393),  (844, 390), 
+                                      (812, 375), (736, 414), 
+                                      (667, 375), (568, 320),
+                                      (480, 320)],
+                 'ipad_mini_landscape': [(1133, 744), (1024, 768)]}
+                  
+      portrait = {device.replace('landscape', 'portrait'): [(y, x) for x, y in sizes]
+                  for device, sizes in devices.items()}                                    
+      # combine dictionaries            
+      devices = devices | portrait
+
+      # convert Size object to integers   
+      size = tuple(map(int, get_screen_size()))      
+      
+      # Execute search
+      device, match, distance = _find_best_fit(size, devices)
+      return device
 
 
 version = "1.0"

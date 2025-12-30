@@ -132,11 +132,11 @@ class OcrCrossword(LetterGame):
         for rect in rectangles:
             x, y, w, h = rect
             x1, y1 = x+w, y+h
-            box = [self.gui.rc_to_pos(H-y*H-1, x*W),
-                   self.gui.rc_to_pos(H-y1*H-1, x*W),
-                   self.gui.rc_to_pos(H-y1*H-1, x1*W),
-                   self.gui.rc_to_pos(H-y*H-1, x1*W),
-                   self.gui.rc_to_pos(H-y*H-1, x*W)]
+            box = [self.gui.rc_to_pos((H-y*H-1, x*W)),
+                   self.gui.rc_to_pos((H-y1*H-1, x*W)),
+                   self.gui.rc_to_pos((H-y1*H-1, x1*W)),
+                   self.gui.rc_to_pos((H-y*H-1, x1*W)),
+                   self.gui.rc_to_pos((H-y*H-1, x*W))]
             self.gui.draw_line(box, **kwargs)
 
     def add_indexes(self):
@@ -155,35 +155,42 @@ class OcrCrossword(LetterGame):
     def box_positions(self):
         # positions of all objects for all devices
         x, y, w, h = self.gui.grid.bbox
-        position_dict = {
-        'ipad13_landscape': {'rackscale': 0.9, 'gridbox': (300, 200),
-        'button1': (w+20, 0), 'button2': (w+20, h/21), 'button3': (w+130, h/21),
-        'button4': (w+20, 3 *h/21), 'button5': (w+110, 3*h/21),
-        'button6': (w+20, 4 *h/21), 'button7': (w+130, 0), 'button8': (w+20, 5*h/21),
-        'button9': (w+150, 5*h/21),   'button10': (w+250, 5*h/21), 'button11': (w+250, 4*h/21),
-        'button12': (w+250, 3*h/21),   'button13': (w+250, 2*h/21),  'button14': (w+250, 1*h/21),
-        'button15': (w+250, 0),
-        'box1': (w+5, 2*h/3-6), 'box2': (w+5, 6*h/21),  'box3': (w+105, 75),'font': ('Avenir Next', 15)},
-
-        'ipad_landscape': {'rackscale': 1.5,  'gridbox': (300, 150),
-        'button1': (w+20, 0), 'button2': (w+20, h/21), 'button3': (w+150, h/21),
-        'button4': (w+20, 3*h/21), 'button5': (w+100, 3*h/21),
-        'button6': (w+20, 4*h/21), 'button7': (w+150, 0), 'button8': (w+20, 5*h/21),
-        'button9': (w+150, 5*h/21),   'button10': (w+250, 5*h/21), 'button11': (w+250, 4*h/21),
-        'button12': (w+250, 3*h/21),   'button13': (w+250, 2*h/21),  'button14': (w+250, 1*h/21),
-        'button15': (w+250, 0),
-        'box1': (w+5, 2*h/3-6), 'box2': (w+5, 6*h/21), 'box3': (w+50, 75), 'font': ('Avenir Next', 12)}
-        }
-        try:
-            self.posn = SimpleNamespace(**position_dict[self.gui.device])
-        except (KeyError):
+        W, H = self.gui.get_device_screen_size()
+        spc = self.gui.gs.spacing
+        if H > W:
             raise KeyError('Portrait mode  or iphone not supported')
-
+        else:
+            position_dict = {'rackscale': 0.9, 
+                             'gridbox': (6*spc*w, 5*spc*h),
+                             'wordsbox': (18*spc*w, 10*spc*h),
+                             'button1': (w+spc*w, 0),
+                             'button2': (w+spc*w, h/21), 
+                             'button3': (w+6*spc*w, h/21),
+                             'button4': (w+spc*w, 3 *h/21), 
+                             'button5': (w+6*spc*w, 3*h/21),
+                             'button6': (w+spc*w, 4 *h/21), 
+                             'button7': (w+6*spc*w, 0), 
+                             'button8': (w+spc*w, 5*h/21),
+                             'button9': (w+6*spc*w, 5*h/21),   
+                             'button10': (w+10*spc*w, 5*h/21), 
+                             'button11': (w+10*spc*w, 4*h/21),
+                             'button12': (w+10*spc*w, 3*h/21),   
+                             'button13': (w+10*spc*w, 2*h/21),  
+                             'button14': (w+10*spc*w, 1*h/21),
+                             'button15': (w+10*spc*w, 0),
+                      
+                             'box2': (w+spc*w, 6*h/21),  
+                             'box3': (w+3*spc*w, 0), # top
+                             'font': ('Avenir Next', 0.75*self.gui.get_fontsize())}        
+        
+        self.posn = SimpleNamespace(**position_dict)
+        
     def add_boxes(self):
         global MSG
         """ add non responsive decoration boxes"""
         x, y, w, h = self.gui.grid.bbox
         tsize = self.posn.rackscale * self.gui.SQ_SIZE
+        fontsize = self.gui.get_fontsize() /2
         #self.wordsbox = self.gui.add_button(text='', title='Words',
         #                    position=self.posn.box1,
         #                    min_size=(5 * tsize+10, tsize+10),
@@ -193,11 +200,12 @@ class OcrCrossword(LetterGame):
                             position=self.posn.box2,
                             min_size=self.posn.gridbox, #min_size=(2* tsize+10, tsize+10),
                             fill_color='black')
-        self.gui.set_props(self.gridbox, font=('Courier New', 10))
+        self.gui.set_props(self.gridbox, font=('Courier New', fontsize))
         self.wordsbox = self.gui.scroll_text_box(x=self.posn.box3[0],
                                                  y=self.posn.box3[1],
-                                                 width=300, height=200,
-                                                 font=('Courier New', 12))
+                                                 width=self.posn.wordsbox[0], height=self.posn.wordsbox[1],
+                                                 font=('Courier New', fontsize))
+         
         msg = self.format_cols(MSG[0], columns=4, width=12)
         self.wordsbox.text=msg
 
@@ -206,19 +214,20 @@ class OcrCrossword(LetterGame):
         Note: **{**params,'min_size': (80, 32)} overrides parameter
          """
         x, y, w, h = self.gui.grid.bbox
-        params = {'title': '', 'stroke_color': 'black', 'font': self.posn.font, 'reg_touch': True, 'color': 'black', 'min_size': (100, 32)}
+        fontsize = self.gui.get_fontsize()
+        params = {'title': '', 'stroke_color': 'black', 'font': self.posn.font, 'reg_touch': True, 'color': 'black', 'min_size': (2*fontsize, fontsize)}
         self.gui.set_enter('Quit', position=self.posn.button7,
                            fill_color='pink', **params)
         self.gui.add_button(text='Fill bottom', position=self.posn.button2,
-                            fill_color='yellow', **{**params,'min_size': (80, 32)})
+                            fill_color='yellow', **{**params})
         self.gui.add_button(text='Fill right', position=self.posn.button3,
                             fill_color='yellow', **params)
         self.gui.add_button(text='Copy Text', position=self.posn.button4,
-                            fill_color='orange', **{**params,'min_size': (80, 32)})
+                            fill_color='orange', **{**params})
         self.gui.add_button(text='Copy grid', position=self.posn.button5,
-                            fill_color='orange', **{**params,'min_size': (80, 32)})
+                            fill_color='orange', **{**params})
         self.gui.add_button(text='Copy both', position=self.posn.button6,
-                            fill_color='orange', **{**params,'min_size': (170, 32)})
+                            fill_color='orange', **{**params,'min_size': (4*fontsize, fontsize)})
         self.gui.add_button(text='Clear', position=self.posn.button1,
                             fill_color='pink', **params)
         self.letters = self.gui.add_button(text='Add letters', position=self.posn.button8,

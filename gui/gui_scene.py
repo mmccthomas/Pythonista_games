@@ -161,15 +161,13 @@ class GameBoard(Scene):
       W, H = get_screen_size()        
       # print(f'\t\t\t\t{int(W)}  x {int(H)}') 
       fontsize = self.get_fontsize()
-      self.msg_label_prompt.text = f'W {int(W)}  x H {int(H)} fontsize: {fontsize}'
+      self.msg_label_prompt.text = f'W {int(W)}  x H {int(H)} fontsize: {fontsize} device:{self.device_size()}'
           
   def device_size(self):
-      """ return the device type and orientation
-      TODO This is not complete, and omits different devices
-      consider getting screen size and computing all parameters as percentage
-      of screen size. this is big job """
-      size = tuple(get_screen_size())
-      """
+      """ return the closest device type and orientation
+      to current screen size
+      Not used in pythonista games code
+      
       H x W for all iphone, ipad devices
       iPhone 16 Pro Max	6.9"	440 × 956
       iPhone 15 Pro and 15 and 16 and 14 Pro	6.1"	393 × 852
@@ -196,33 +194,44 @@ class GameBoard(Scene):
       iPad mini (gen 7, 6)	8.3"	744 × 1133
       iPad Air (gen 3) and iPad Pro 10.5"	10.5"	834 × 1112
       iPad (gen 6, 5) and iPad Pro 9.7", Air 2, Air (gen 1), iPad 4, iPad (gen 3)	9.7"	768 × 1024
-      iPad mini (gen 5, 4, 3, 2)	7.9" iPad mini (gen 1) iPad (gen 2, 1)	9.7" 768 x 1024"""
+      iPad mini (gen 5, 4, 3, 2)	7.9" iPad mini (gen 1) iPad (gen 2, 1)	9.7" 768 x 1024
+      """      
+      def _find_best_fit(target, groups):
+          best_match = None
+          min_distance = float('inf')
+          closest_coord = None
       
-      iphones = [(956, 440), (932, 440), (926, 428), (896, 414), 
-                 (852, 393),  (844, 390), (812, 375), (736, 414), 
-                 (667, 375), (568, 320), (480, 320)]
-      ipads = [(1376, 1032), (1366, 1024), (1210, 834), (1180, 820), 
-               (1112, 834), (1080, 810), (1024, 768)]
-      ipads_mini = [(1133, 744)]
-      match size:
-        case (1366.00, 1024.00) | (1376.0, 1032.0):
-          device = 'ipad13_landscape'
-        case (1024.00, 1366.00) | (1032.0, 1376.0):
-          device = 'ipad13_portrait'
-        case (1112.00, 834.00):
-          device = 'ipad_landscape'
-        case (834.00, 1112.00):
-          device = 'ipad_portrait'
-        case (852.00, 393.00):
-          device = 'iphone_landscape'
-        case (393.00, 852.00):
-          device = 'iphone_portrait'
-        case (1133.0, 744.0) | (1024.0, 768.0):
-          device = 'ipad_mini_landscape'
-        case (744.0, 1133.0) | (768.0, 1024.0):
-          device = 'ipad_mini_portrait'
-        case _:
-          device = 'ipad_landscape'
+          for group_name, coords_list in groups.items():
+              for coords in coords_list:
+                  dist = math.dist(coords, target)                  
+                  if dist < min_distance:
+                      min_distance = dist
+                      best_match = group_name
+                      closest_coord = coords                                            
+          return best_match, closest_coord, min_distance
+            
+      devices = {'ipad13_landscape': [(1376, 1032), (1366, 1024)], 
+                 'ipad_landscape': [(1210, 834), (1180, 820), 
+                                    (1112, 834), (1080, 810),
+                                    (1024, 768)],
+                 'iphone_landscape': [(956, 440), (932, 440),
+                                      (926, 428), (896, 414), 
+                                      (852, 393),  (844, 390), 
+                                      (812, 375), (736, 414), 
+                                      (667, 375), (568, 320),
+                                      (480, 320)],
+                 'ipad_mini_landscape': [(1133, 744), (1024, 768)]}
+                  
+      portrait = {device.replace('landscape', 'portrait'): [(y, x) for x, y in sizes]
+                  for device, sizes in devices.items()}                                    
+      # combine dictionaries            
+      devices = devices | portrait
+
+      # convert Size object to integers   
+      size = tuple(map(int, get_screen_size()))      
+      
+      # Execute search
+      device, match, distance = _find_best_fit(size, devices)
       return device
       
   def grid_sizes(self, device, dimx, dimy):
