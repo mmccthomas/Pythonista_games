@@ -17,7 +17,11 @@ from ui import Path
 import console
 from time import sleep
 import copy
-from scene import Vector2, get_screen_size
+try:
+    from change_screensize import get_screen_size
+except ImportError:
+    from scene import get_screen_size
+from scene import Vector2
 screen_width, screen_height = get_screen_size()
  
 from gui.game_menu import MenuScene
@@ -57,7 +61,6 @@ class ChessGame(gscene.GameBoard):
     self.board = self.gs.board 
     
     self.log_moves = True
-    self.debug = False
     self.straight_lines_only = False
     
     self.SIZE = self.sizex = self.sizey= 8

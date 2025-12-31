@@ -7,7 +7,7 @@ import sys
 import sound
 import random
 from random import uniform as rnd
-from scene import Vector2, get_screen_size
+from scene import Vector2
 from scene import *
 try:
     from change_screensize import get_screen_size

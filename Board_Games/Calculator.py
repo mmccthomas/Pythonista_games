@@ -4,7 +4,10 @@ from __future__ import division
 import ui
 import clipboard
 from console import hud_alert
-
+try:
+    from change_screensize import get_screen_size
+except ImportError:
+    from scene import get_screen_size
 shows_result = False
 
 def button_tapped(sender):
@@ -67,7 +70,7 @@ def copy_action(sender):
 def main():
   v = ui.load_view('Calculator')
   
-  if min(ui.get_screen_size()) >= 768:
+  if min(get_screen_size()) >= 768:
   	# iPad
   	v.frame = (0, 0, 360, 400)
   	v.present('sheet')

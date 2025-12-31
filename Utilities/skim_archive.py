@@ -15,7 +15,10 @@ from time import sleep
 import json
 import ui
 import re
-
+try:
+    from change_screensize import get_screen_size
+except ImportError:
+    from scene import get_screen_size
 BASE_ADDR = 'https://omz-software.com/forum/archive'
 JSON_FILE = 'JSON.json'
 
@@ -62,7 +65,7 @@ class WebSelection():
                             enabled=True,
                             action=self.reset_list)
                            
-        self.w, self.h = ui.get_screen_size()
+        self.w, self.h = get_screen_size()
         self.main = ui.View(frame=(0, 0, self.w, self.h))
         self.main.left_button_items = [lb4, lb3, lb, lb1, lb2]
         self.main.content_size = (self.w / 2, self.h - 120)

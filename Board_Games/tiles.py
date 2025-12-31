@@ -18,6 +18,10 @@ import logging
 import slidingpuzzle as puzz
 import io
 from tile_config import *
+try:
+    from change_screensize import get_screen_size
+except ImportError:
+    from scene import get_screen_size
 sys.path.append('../')
 from gui.game_menu import MenuScene
 

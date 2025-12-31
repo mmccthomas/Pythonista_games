@@ -75,19 +75,28 @@ class DropWord(LetterGame):
     self.load_words(word_length=self.sizex) 
     self.moves = []   
     self.gui.clear_messages() 
-    _, _, w, h = self.gui.grid.bbox 
-    if self.gui.device.endswith('_landscape'):
-       self.gui.set_enter('Undo', position = (w+50, h-150), 
-                          stroke_color='black', 
-                          fill_color='yellow',color='black')       
-    self.gui.set_top('Dropword')
-    self.hintbox = self.gui.add_button(text='', title='Hint word', 
-                          position=(w+50, h-50), 
-                          min_size=(150, 32))                      
-    _ = self.gui.add_button(text='Hint', title='', position=(w+50,h-100),
-                                   min_size=(100, 32), reg_touch=True, 
-                                   stroke_color='black', 
-                                   fill_color='yellow',color='black')                   
+    self.set_buttons()
+    
+  def set_buttons(self):
+      _, _, w, h = self.gui.grid.bbox 
+      W, H = self.gui.get_device_screen_size()
+      fontsize = self.gui.get_fontsize()
+      spc = self.gui.gs.spacing
+      if W > H:
+         self.gui.set_enter('Undo', position = (w+2*spc*w, h-7*spc*h), 
+                            stroke_color='black', 
+                            fill_color='yellow',color='black',
+                            size=(3*fontsize, 1.5*fontsize))       
+      self.gui.set_top('Dropword')
+      self.hintbox = self.gui.add_button(text='', title='Hint word', 
+                            position=(w+2*spc*w, h-2*spc*h), 
+                            font=('Avenir Next', fontsize),
+                            min_size=(6*fontsize, fontsize))                      
+      _ = self.gui.add_button(text='Hint', title='', position=(w+2*spc*h,h-5*spc*h),
+                                     min_size=(3*fontsize, fontsize), reg_touch=True, 
+                                     stroke_color='black', 
+                                     font=('Avenir Next', fontsize),
+                                     fill_color='yellow',color='black')                   
       
 
   def drop_words(self):

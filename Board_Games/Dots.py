@@ -4,7 +4,10 @@ from queue import Queue
 
 import Dots_Boxes.DotAndBoxGame as dg
 from Dots_Boxes.DotAndBoxGame import game
-
+try:
+    from change_screensize import get_screen_size
+except ImportError:
+    from scene import get_screen_size
 from scene import Point
 from collections import Counter
 from time import sleep

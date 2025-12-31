@@ -1,6 +1,9 @@
-from scene import Vector2, get_screen_size
+from scene import Vector2
 import numpy as np
-
+try:
+    from change_screensize import get_screen_size
+except ImportError:
+    from scene import get_screen_size
 COLUMNS = 10
 ROWS = 20
 STARTROW = ROWS - 1

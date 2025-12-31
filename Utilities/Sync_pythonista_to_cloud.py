@@ -18,15 +18,21 @@ import difflib
 import shutil
 from itertools import zip_longest
 import ui
+try:
+    from change_screensize import get_screen_size
+except ImportError:
+    from scene import get_screen_size
 import console
 from objc_util import NSRange, on_main_thread, ObjCClass, ObjCInstance, c_void_p, c
 from datetime import datetime
+import base_path
+base_path.add_paths(__file__)
+from setup_logging import logger, is_debug_level
 
 
 class CompareCloud():
 
     def __init__(self, source):
-        self.debug = False
         self.cloud_base= '/private/var/mobile/Containers/Data/Application/24BEC035-C28E-496A-A41A-CEC669E05513/Documents/'
         #self.cloud_base = '/private/var/mobile/Library/Mobile Documents/iCloud~com~omz-software~Pythonista3/Documents/'
         self.source = source
@@ -186,11 +192,11 @@ class CompareCloud():
                     else:
                         self.diffs = self.show_diffs(src, dest)
                         result_dict[src] = [list(self.diffs)]
-                        if self.debug:
-                            print('#' * 78)
-                            print('found', src)
-                            print('no match')
-                            [print(line) for line in self.diffs]
+                        CR = '\n'
+                        logger.debug('#' * 78)
+                        logger.debug(f'found {src}')
+                        logger.debug('no match')
+                        logger.debug(f'{CR.join([line for line in self.diffs])}')
         # now deal with deleted files
         for dest in self.deleted_files:
             fullpath = Path.joinpath(Path(self.cloud_base), dest)
@@ -255,7 +261,7 @@ class CompareCloud():
         lb4 = ui.ButtonItem(image=ui.Image.named('iob:refresh_32'), enabled=True, action=self.refresh, tint_color='black')
         lb5 = ui.ButtonItem(image=ui.Image.named('emj:Palm_Tree'), enabled=True, action=self.trees, tint_color='black')
 
-        self.w, self.h = ui.get_screen_size()
+        self.w, self.h = get_screen_size()
         self.main = ui.View(frame=(0, 0, self.w, self.h))
         self.main.left_button_items = [lb4, lb5]
         self.main.right_button_items = [rb2, rb3, rb, rb1]
@@ -485,13 +491,12 @@ class CompareCloud():
                     color = colors[1]
 
     def run(self):
-        if self.debug:
+        if is_debug_level():
             self.tree(self.source)
             self.get_new_files()
         self.result_dict = self.compare()
         self.setup_views()
-        if self.debug:
-            print(self.result_dict)
+        logger.debug(self.result_dict)
         self.items = list(self.result_dict.keys())
         self.display()
 

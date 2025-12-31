@@ -9,6 +9,10 @@ import io
 import math
 from time import sleep
 from scene import *
+try:
+    from change_screensize import get_screen_size
+except ImportError:
+    from scene import get_screen_size
 import itertools
 from operator import attrgetter
 import numpy as np

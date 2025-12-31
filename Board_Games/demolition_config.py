@@ -1,4 +1,8 @@
-from scene import Vector2, get_screen_size
+from scene import Vector2
+try:
+    from change_screensize import get_screen_size
+except ImportError:
+    from scene import get_screen_size
 screen_width, screen_height = get_screen_size()
 GRID_POS = Vector2(10, 40)
 GRID_SIZE= 20

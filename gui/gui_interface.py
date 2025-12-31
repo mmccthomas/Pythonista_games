@@ -206,11 +206,13 @@ class Gui():
         self.gs.DIMENSION_X, self.gs.DIMENSION_Y = dimx, dimy
         self.remove_labels()
         GRID_POS, self.gs.SQ_SIZE, self.gs.font_size = self.gs.grid_sizes(self.gs.device, dimx, dimy)
-        self.grid.remove_from_parent()                        
-        self.gs.grid = self.gs.build_background_grid()
-        self.gs.game_field.add_child(self.gs.grid)
-        self.game_field = self.gs.game_field
+        self.grid.remove_from_parent()     
+        self.gs.setup_ui()                  
+
         self.grid = self.gs.grid
+        
+    def remove_extra_grid(self, grid_components):
+        self.gs.remove_extra_grid(grid_components)    
         
     def require_touch_move(self, require=True):
         self.gs.require_touch_move = require
@@ -299,14 +301,19 @@ class Gui():
                    text='button',
                    title='title',
                    position=(100, 100),
-                   min_size=(100, 50),
+                   min_size=None,
                    reg_touch=False,
                    **kwargs):
         # create a gui button that can invoke action if reg_touch is true
+        fontsize = self.get_fontsize()
+        font = ('Avenir Next', fontsize)
+        if min_size is None:
+            min_size = (2*1.2*fontsize, 1.2*fontsize)
         box = BoxedLabel(text=text,
                          title=title,
                          position=position,
                          min_size=min_size,
+                         font=font,
                          parent=self.gs.game_field)
         box.set_index(self.button_index)
         button_name = f'button_{self.button_index}'
@@ -517,7 +524,7 @@ class Gui():
         self.gs.start_menu = menu_dict
         
     def build_extra_grid(self, *args, **kwargs):                         
-        self.gs.build_extra_grid(*args, **kwargs)
+        return self.gs.build_extra_grid(*args, **kwargs)
 
     def draw_line(self, coords, **kwargs):
         self.gs.draw_line(coords, **kwargs)

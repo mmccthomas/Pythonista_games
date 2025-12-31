@@ -131,6 +131,7 @@ class GameBoard(Scene):
     self.background_image = None
     self.grid_label_color = 'white'
     self.grid = None
+    self.msg_label_t = None
     self.grid_fill = 'lightgreen'
     self.grid_stroke_color = None
     self.grid_z_position = 10
@@ -323,6 +324,7 @@ class GameBoard(Scene):
       "parent": self.game_field,
       "z_position": z_position
     }
+    grid_components = []
     anchor = Vector2(0, 0)
     # Building the columns
     for i in range(grids_x):
@@ -330,6 +332,7 @@ class GameBoard(Scene):
       pos = Vector2(offx + i * self.SQ_SIZE * grid_width_x, offy)
       n.position = pos
       n.anchor_point = anchor
+      grid_components.append(n)
     
     # Building the rows
     y = Path.rect(0, 0, self.SQ_SIZE * grids_x * grid_width_x,
@@ -342,7 +345,13 @@ class GameBoard(Scene):
       pos = Vector2(offx, offy + i * self.SQ_SIZE * grid_width_y)
       n.position = pos
       n.anchor_point = anchor
-
+      grid_components.append(n)
+    return grid_components
+    
+  def remove_extra_grid(self, grid_components):
+      for item in grid_components:
+          item.remove_from_parent()
+          
   def two_char_generator(self):
     """
     Generates two-character strings from "A " to "ZZ".
@@ -456,32 +465,29 @@ class GameBoard(Scene):
     return parent
     
   def setup_ui(self, rows=None, columns=None):
-    # every gui has a pause button in top left of screen
-    self.pause_button = SpriteNode('iow:pause_32', position=(32, self.size.h - 36),
-                              parent=self)
+    # allow calling from replace_grid
+    # update LabelNode positions and fonts if present
+    
     self.grid = self.build_background_grid()
     self.game_field.add_child(self.grid)
     self.add_row_column_labels(columns, rows)
     x, y, w, h = self.grid.bbox  # was game_field
+    W, H = get_screen_size()
     # grid is 8.3% of window height
     font = ('Avenir Next', self.font_size)
-    # all location relative to grid
     
-    self.msg_label_t = LabelNode("top", font=font, position=(35, (1 + self.spacing) * h),
-                                 parent=self.game_field)
-    self.msg_label_t.anchor_point = (0, 0)
-    
-    self.msg_label_b = LabelNode("bottom", font=font, position=(0, 0 * self.spacing * h),
-                                 parent=self.game_field)
-    self.msg_label_b.anchor_point = (0, 1)
-    self.msg_label_b2 = LabelNode("bottom2", font=font, position=(0,  -1 * self.spacing * h),
-                                  parent=self.game_field)
-    self.msg_label_b2.anchor_point = (0, 1)
-    self.msg_label_prompt = LabelNode("prompt", font=font, position=(0,  -2 * self.spacing * h),
-                                      parent=self.game_field)
-    self.msg_label_prompt.anchor_point = (0, 1)
+    if not self.msg_label_t:
+        # every gui has a pause button in top left of screen
+        self.pause_button = SpriteNode('iow:pause_32', parent=self)
+        self.msg_label_t = LabelNode("top", parent=self.game_field)                
+        self.msg_label_b = LabelNode("bottom", parent=self.game_field)        
+        self.msg_label_b2 = LabelNode("bottom2", parent=self.game_field)        
+        self.msg_label_prompt = LabelNode("prompt", parent=self.game_field)                
+        self.msg_label_r = LabelNode("right",parent=self.game_field)        
+        self.enter_button = BoxedLabel('Hint', title='', parent=self.game_field)
+        self.buttons[1] = self.enter_button
+        self.buttons[1].set_index(1)                                 
     # position right hand message text and enter button
-    W, H = get_screen_size()
     portrait = H > W
     if portrait:
         pos_button = (x +w-3*self.spacing *w, 
@@ -493,17 +499,27 @@ class GameBoard(Scene):
          pos_button = (1.01*w, 0)
          anchor_point = (0, 0.5)
          r_position = (x+w + self.spacing*w, h/2)
-         
-    self.msg_label_r = LabelNode("right", font=font, position=r_position,
-                                 parent=self.game_field)
+        
+        
+    # recompute all positions relative to grid
+    self.pause_button.position = (32, H - 36)
+    self.msg_label_t.font = font
+    self.msg_label_t.position=(35, (1 + self.spacing) * h)       
+    self.msg_label_t.anchor_point = (0, 0)         
+    self.msg_label_b.font = font
+    self.msg_label_b.position=(0, 0 * self.spacing * h)
+    self.msg_label_b.anchor_point = (0, 1)
+    self.msg_label_b2.font = font                            
+    self.msg_label_b2.position=(0, -1 * self.spacing * h)       
+    self.msg_label_b2.anchor_point = (0, 1) 
+    self.msg_label_prompt.font = font        
+    self.msg_label_prompt.position=(0, -2 * self.spacing * h)
+    self.msg_label_prompt.anchor_point = (0, 1)
+    self.msg_label_r.font = font
+    self.msg_label_r.position=r_position
     self.msg_label_r.anchor_point = anchor_point
-    
-    self.enter_button = BoxedLabel('Hint', '', position=pos_button,
-                                   min_size=(4*self.spacing *w, self.spacing*h),
-                                   parent=self.game_field)
-    self.buttons[1] = self.enter_button
-    self.buttons[1].set_index(1)
     self.enter_button.set_text_props(font=font)
+    self.enter_button.set_props(position=pos_button)
   
   # #########################################################################
   # LINES 
@@ -1108,13 +1124,13 @@ class BoxedLabel():
   """
   
   def __init__(self, text='text', title='boxed_label',
-               min_size=(100, 50), position=(0, 0), parent=None):
+               min_size=(100, 50), position=(0, 0), font=('Avenir Next', 24), parent=None):
       ''' position is rel to grid'''
       self.position = position
       self.parent = parent
       self.size = min_size
       self.gridpos = parent.position
-      self.font = ('Avenir Next', 24)
+      self.font = font
       self.title = title
       self.text = text
       self.index = 1

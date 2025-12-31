@@ -6,10 +6,9 @@ from time import sleep
 import dialogs
 import numpy as np
 import random
+import ui
 from itertools import groupby
-from scene import get_screen_size
 from Letter_game import LetterGame
-import gui.gui_scene as gscene
 from gui.gui_interface import Coord, Squares
 from setup_logging import logger, is_debug_level
 PUZZLELIST = "crossword_puzzles.txt"
@@ -22,6 +21,7 @@ class CrossWord(LetterGame):
         self.first_letter = False
         self.tiles = None
         self.test = test
+        self.hintbutton = None
         self.load_words_from_file(PUZZLELIST, no_strip=True)
         self.selection = self.select_list(self.test)
         if self.selection is False:
@@ -44,39 +44,50 @@ class CrossWord(LetterGame):
         )
         self.set_buttons()
         self.finished = False
+        self.gui.orientation(self.resize)
 
+    def resize(self):
+        # called automatically from gscene when screen size changed
+        self.gui.remove_extra_grid(self.gridlines)
+        self.gui.remove_extra_grid(self.gridbox)
+        self.gui.clear_numbers()
+        self.draw_board()
+        self.set_buttons()
+        
     def set_buttons(self):
         """ install set of active buttons
         Note: **{**params,'min_size': (80, 32)} overrides parameter
          """
-        W, H = self.gui.wh
+        W, H = self.gui.get_device_screen_size()        
         x, y, w, h = self.gui.grid.bbox
-        off = 50
+        spc = self.gui.gs.spacing
+        fontsize = self.gui.get_fontsize()
         params = {
             'title': '',
             'stroke_color': 'black',
-            'font': ('Avenir Next', 18),
+            'font': ('Avenir Next', fontsize),
             'reg_touch': True,
             'color': 'black',
-            'min_size': (80, 32)
+            'min_size': (3*fontsize, fontsize)
         }
         self.gui.set_enter('Check',
-                           position=(w + 20, h),
+                           position=(w + spc*w, h),
                            fill_color='orange',
-                           **params)
-
-        self.gui.add_button(text='Hint',
-                            position=(w + off + 120, h),
-                            fill_color='orange',
-                            **{
-                                **params, 'min_size': (80, 32)
-                            })
-
+                           **{**params, 'size':(3.5*fontsize, 1.5*fontsize)})
+        if not self.hintbutton:            
+            self.hintbutton = self.gui.add_button(text='Hint',
+                                position=(w + 7*spc*w, h),
+                                fill_color='orange',
+                                **params)
+        else:
+            self.gui.set_props(self.hintbutton, position=(w + 7*spc*w, h),
+                                fill_color='orange',
+                                **params)
+        pass
         # adjust text size to screen
-        fontsize = (W - w) // 28
         self.gui.set_moves('\n'.join(self.table),
-                           font=('Ubuntu Mono', fontsize),
-                           position=(w + 10, y),
+                           font=('Ubuntu Mono', 0.75 * fontsize),
+                           position=(w + 0.5*spc*w, y),
                            anchor_point=(0, 0))
 
     def run(self):
@@ -128,6 +139,7 @@ class CrossWord(LetterGame):
 
     def print_squares(self):
         numbers = np.argwhere(self.number_board != 0)
+        fontsize = self.gui.get_fontsize()
         square_list = [
             Squares(tuple(rc),
                     str(self.number_board[tuple(rc)]),
@@ -135,7 +147,7 @@ class CrossWord(LetterGame):
                     z_position=30,
                     alpha=0.1,
                     stroke_color='black',
-                    font=('Marker Felt', 15),
+                    font=('Marker Felt', 0.5*fontsize),
                     text_color='red',
                     text_anchor_point=(-0.9, 0.95)) for rc in numbers
         ]
@@ -183,31 +195,36 @@ class CrossWord(LetterGame):
             board = [row.replace("'", "") for row in frame]
             board = [row.split('/') for row in board]
             self.board = np.array(board)
-            self.decode_filled_board()
-            self.gui.remove_labels()
-            self.gui.replace_grid(*self.board.shape)
-            self.gui.remove_labels()
             self.sizey, self.sizex = self.board.shape
-            self.gui.build_extra_grid(*self.board.shape,
-                                      grid_width_x=1,
-                                      grid_width_y=1,
-                                      color='black',
-                                      line_width=1)
-            self.gui.build_extra_grid(1,
-                                      1,
-                                      grid_width_x=self.board.shape[0],
-                                      grid_width_y=self.board.shape[1],
-                                      color='red',
-                                      line_width=4)
-            self.print_squares()
-            self.length_matrix()
-            self.gui.update(self.board)
+            self.decode_filled_board()
+            self.draw_board()
+            
             self.gui.selection = ''
             return selection
         elif selection == "Cancelled_":
             return False
         else:
             return False
+            
+    def draw_board(self):
+        #self.gui.remove_labels()
+        self.gui.replace_grid(*self.board.shape)
+        self.gui.remove_labels()        
+        self.gridlines = self.gui.build_extra_grid(
+                                  *self.board.shape,
+                                  grid_width_x=1,
+                                  grid_width_y=1,
+                                  color='black',
+                                  line_width=1)
+        self.gridbox = self.gui.build_extra_grid(
+                                  1,
+                                  1,
+                                  grid_width_x=self.board.shape[0],
+                                  grid_width_y=self.board.shape[1],
+                                  color='red',
+                                  line_width=2)
+        self.print_squares()        
+        self.gui.update(self.board)
 
     def get_size(self):
         LetterGame.get_size(self, '15, 15')

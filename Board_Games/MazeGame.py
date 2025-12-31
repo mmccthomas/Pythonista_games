@@ -34,7 +34,6 @@ MAZE_GENERATORS = ['AldousBroder', 'BacktrackingGenerator',
 class MazeTrial():
     def __init__(self):
         """Create, initialize and draw an empty board."""
-        self.debug = False
         self.generator = None
         sizes = {'Very Small':10, 'Small': 15, 'Medium': 30, 'Large': 50, 'SuperLarge': 80}
         select = dialogs.list_dialog('Maze size', ['Very Small', 'Small', 'Medium', 'Large',  'SuperLarge'])
@@ -63,8 +62,8 @@ class MazeTrial():
         self.gui.start_menu = {'New Game': self.restart,
                                'Quit': self.gui.close}
                                
-        self.gui.replace_labels('row', ['' for n in range(self.size)][::-1])
-        self.gui.replace_labels('col', ['' for n in range(self.size)])
+        self.gui.replace_labels('row', [''] * self.size)
+        self.gui.replace_labels('col', [''] * self.size)
         
         self.start = (self.size-1, 0)  # always bottom left
         # random position in top right quadrant
