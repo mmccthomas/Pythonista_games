@@ -13,7 +13,9 @@ import dialogs
 from random import choice
 from copy import deepcopy
 from types import SimpleNamespace
+import logging
 base_path.add_paths(__file__)
+import setup_logging
 from gui.game_menu import MenuScene
 from freecell.klondike_solver import Game, get_solvable, Move, State
 # constants 
@@ -29,7 +31,11 @@ TABLEAU = 6
 TABLEAU_END = 12
 A = Action
 CARD_INDEXES = 'A23456789TJQK'
-
+#logging.basicConfig(
+#    level=logging.INFO, 
+#    format='[%(levelname)s]: %(message)s'
+#    )
+#logger = logging.getLogger(__name__)
 w, h = get_screen_size()
 # w, h = 1112, 834
 # w, h = 852, 393
@@ -46,7 +52,9 @@ elif w == 852:
     # iphone landscape
     cardsize = Size(43, 59)
 
-
+#def is_debug_level():
+#    return logging.getLevelName(logger.getEffectiveLevel()) == 'DEBUG'
+    
 def set_waiting(message='Processing'):
       a = ui.ActivityIndicator()
       a.style = ui.ACTIVITY_INDICATOR_STYLE_WHITE_LARGE      
@@ -99,7 +107,6 @@ class KlondikeGame(Scene):
   """
   def __init__(self):
       """ define newgame with random deck """
-      self.debug_print = True
       self.inbuilt_cards = False
       self.deal = 1
       self.game_history = []
@@ -332,7 +339,7 @@ class KlondikeGame(Scene):
       state is longstring
       print game and move cards
       """
-      if self.debug_print: print('index', index)          
+      logger.debug(f'index {index}')          
       self.game.state = self.game.state.decode(state)
       self.game.state.print_game()
       if self.game.isOver():
@@ -495,7 +502,7 @@ class KlondikeGame(Scene):
           self.game.game_history.pop()
           self.game.state = self.game.state.decode(self.game.game_history[-1])    
           self.score -= 1
-          if self.debug_print: self.game.state.print_game()
+          if is_debug_level(): self.game.state.print_game()
           self.change_card_images(self.game.state.encode())
           self.show_cards()
       except IndexError:
@@ -504,7 +511,7 @@ class KlondikeGame(Scene):
   @ui.in_background
   def move(self, start, end, card):
       """ respond to p|f|c #  for start and end """
-      if self.debug_print: print(start, end)
+      logger.debug(f'{start},  {end}')
         
       x1, x2 = int(start[1]), int(end[1])
       move = None
@@ -520,11 +527,11 @@ class KlondikeGame(Scene):
           case ('t', 't'):
               # deal with single touch, make best move with same src_stack
               if x1 == x2:
-                 if self.debug_print: [print(m) for m in best_moves]
+                 if is_debug_level(): [print(m) for m in best_moves]
                  for move in reversed(valid_moves):                     
-                     if self.debug_print: print('available', move.src_stack, x1+TABLEAU)
+                     logger.debug(f'available {move.src_stack}, {x1+TABLEAU}')
                      if move.src_stack == x1+TABLEAU:
-                        if self.debug_print: print('make move', move)
+                        logger.debug(f'make move {move}')
                         break
               else:   
                   index_from = int(start[3:])
@@ -537,7 +544,7 @@ class KlondikeGame(Scene):
           case ('w', 'f'):
               move = Move(0, 1, -1, x2+FOUNDATION, -1, card)
           case (('s', 'w')| ('s', 's')):
-              if self.debug_print: print('deal')
+              logger.debug('deal')
               self.game.dealstock()
               move = None
           case ('w', 't'):
@@ -545,10 +552,10 @@ class KlondikeGame(Scene):
           case ('f', 't'):
               move = Move(0, x1+FOUNDATION, -1, x2+TABLEAU, -1, card)
       if move:
-            if self.debug_print: print(f'from {x1} to {x2} {move=}')
+            logger.debug(f'from {x1} to {x2} {move=}')
       
-      if self.debug_print: print('move=', move)   
-      if self.debug_print: print(best_moves)
+      logger.debug(f'move= {move}')   
+      logger.debug(f'{best_moves}')
       if move:
          for poss_move in best_moves:
             #only check card and from to stacks, use poss_move to match
@@ -565,7 +572,7 @@ class KlondikeGame(Scene):
                self.game.moves_history.append(move)
            except Exception as e:
                print(e)
-      if self.debug_print: self.game.state.print_game(move)
+      if is_debug_level(): self.game.state.print_game(move)
       longstring = self.game.state.encode()
       self.change_card_images(longstring)
       self.show_cards()
@@ -614,7 +621,9 @@ class KlondikeGame(Scene):
             self.view.close()
 
            
+           
 if __name__ == '__main__':
+    
     run(KlondikeGame(), PORTRAIT, show_fps=False)
 
 

@@ -14,6 +14,7 @@ from objc_util import ObjCClass, get_possible_method_names
 #import inspect
 from time import time
 from collections import Counter
+from setup_logging import logger, is_debug_level
 RED = (1, 0, 0)
 STOCK = 0
 WASTE = 1
@@ -318,7 +319,6 @@ class Game:
 
     def __init__(self):
         self.iteration_counter = 0
-        self.debug = True
         self.use_original = False
         self.no_turn_cards = 3       
         self.game_history = [] 
@@ -328,7 +328,7 @@ class Game:
         self.game_history.append(self.state.encode())
         self.state.uncovered = 7
         self.state.counts = 1
-        if self.debug: print(self.state.print_game())
+        logger.debug(self.state.print_game())
       
     def isOver(self):
         #the game is over if the 4 suit stacks are full with the same color
@@ -541,7 +541,7 @@ class Game:
                 #the first card must be a king
             else:
                 dest_card = s.tableau[move.dest_stack-TABLEAU][-1]
-                #if self.debug: print(f'{card.next_up()=}, {dest_card.face=} , {card.color=},{dest_card.color=}' )
+                # logger.debug(f'{card.next_up()=}, {dest_card.face=} , {card.color=},{dest_card.color=}' )
                 return (card.next_up() == dest_card.face) and (card.color != dest_card.color)
                 #true if the source card's number is lower and if the colors are different
            
@@ -595,7 +595,7 @@ class Game:
         # transfer N cards to waste
         s = self.state
         if not s.stock:
-            if self.debug: print("stock is empty")
+            logger.debug("stock is empty")
             #if the stock is  empty
             s.stock = s.waste[::-1] + s.stock
             [card.set_face_up(False) for card in s.stock]
@@ -669,13 +669,13 @@ class Game:
                 for index in indices:
                     prevMove = self.moves_history[index]
                     if prevMove == move:
-                        if self.debug: print('eliminated move1', move.card)                            
+                        logger.debug(f'eliminated move1 {move.card}')                            
                         return True
                         
                         #if the move is bouncing between the same two builds stacks
                     #if (move.src_stack == prevMove.dest_stack 
                     #       and move.dest_stack == prevMove.src_stack):
-                    #    if self.debug: print('eliminated move2', move.card) 
+                    #    if logger.debug(f'eliminated move2 {move.card}') 
                     #    return True                                
         return False
 
@@ -696,13 +696,13 @@ class Game:
             iteration = 0
             while True:
                 self.dealstock()
-                if self.debug: print('dealt stock', len(self.state.stock), len_stock, self.state.waste[-1])
-                # if self.debug: print(self.state.stock, self.state.waste)
+                logger.debug(f'dealt stock {len(self.state.stock)}, {len_stock}, {self.state.waste[-1]}')
+                # logger.debug(f'{self.state.stock}, {self.state.waste}')
                 self.availableMoves()
                 self.available_moves = self.filter_repetitive(self.available_moves)
                 if len(self.available_moves) > 0:
-                     if self.debug: print('After stack deal')
-                     if self.debug: self.state.print_game()
+                     logger.debug('After stack deal')
+                     if is_debug_level(): self.state.print_game()
                      return True
                 if len(self.state.stock) == len_stock:
                    return False
@@ -731,8 +731,8 @@ class Game:
         self.iteration_counter = 0
         while True:
           self.iteration_counter += 1
-          if self.debug: print('\n')
-          if self.debug: print(f'iteration {self.iteration_counter}')   
+          logger.debug('\n')
+          logger.debug(f'iteration {self.iteration_counter}')   
           
           # if the grid is filled, succeed if every word is valid and otherwise fail
           if self.isOver():
@@ -741,8 +741,7 @@ class Game:
           self.available_moves = self.get_moves()
                                  
           if len(self.available_moves)==0:
-              if self.debug:
-                  print('no more moves')                
+              logger.debug('no more moves')                
               return False
                     
           # if all moves have same priority
@@ -751,16 +750,16 @@ class Game:
             # can solve failures
             # shuffle the moves
             shuffle(self.available_moves)
-          if self.debug: print('Number moves', len(self.available_moves))
+          logger.debug(f'Number moves' {len(self.available_moves)}'')
           
           moves = copy(self.available_moves)
                     
           if len(moves) == 1 or moves[-1].card.face == 'A':
               self.make_move(moves[-1])
-              if self.debug: print(moves[-1])
+              logger.debug(moves[-1])
               self.moves_history.append(moves[-1])     
               self.game_history.append(self.state.encode())
-              if self.debug: self.state.print_game()         
+              if is_debug_level(): self.state.print_game()         
               continue
           else:
               #more than 1
@@ -775,15 +774,15 @@ class Game:
                   scores.append(score)
                   self.state = self.state.decode(previous_state)
                  
-              if self.debug: print('scores:', scores)
-              if self.debug: [print(move) for move in  moves]
+              logger.debug(f'scores:  {scores}')
+              if is_debug_level(): [print(move) for move in  moves]
               move_no = scores.index(max(scores))
               self.state = self.state.decode(initial_state)
               self.make_move(moves[move_no])
-              if self.debug: print('Moved', moves[move_no])
+              logger.debug(f'Moved {moves[move_no]}')
               self.moves_history.append(moves[move_no])
               self.game_history.append(self.state.encode())
-              if self.debug: self.state.print_game()                        
+              if is_debug_level(): self.state.print_game()                        
           
     def iteration_loop(self, depth=0, move=None):        
         # recursive routine to assess score lower down
