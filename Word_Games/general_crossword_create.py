@@ -5,7 +5,6 @@ import numpy as np
 import random
 import pickle
 import dialogs
-from scene import get_screen_size
 from itertools import zip_longest
 from textwrap import wrap
 import matplotlib.colors as mcolors
@@ -158,7 +157,7 @@ class Cross(PieceWord):
             'font': ('Avenir Next', fontsize),
             'reg_touch': True,
             'color': 'black',
-            'min_size': (2*fontsize, fontsize)
+            #'min_size': (2.4*fontsize, 1.2*fontsize)
         }
 
         self.gui.set_enter('Fill',
@@ -168,22 +167,16 @@ class Cross(PieceWord):
         self.gui.add_button(text='Lookup',
                             position=self.posn.button2,
                             fill_color='orange',
-                            **{
-                                **params
-                            })
+                            **params)
         self.gui.add_button(text='Copy',
                             position=self.posn.button3,
                             fill_color='orange',
-                            **{
-                                **params
-                            })
+                            **params)
 
         self.gui.add_button(text='Reload',
                             position=self.posn.button4,
                             fill_color='orange',
-                            **{
-                                **params
-                            })
+                            **params)
         # adjust text size to screen
         fontsize = (W - w) // 28
         self.gui.set_moves('Clues',
@@ -204,7 +197,7 @@ class Cross(PieceWord):
             for coord in unique_words:
                 item = self.gui.get_numbers(coord)
                 item[coord]['text'] = str(self.get_word_obj(coord).index)
-                item[coord]['text_color'] = mcolors.to_rgba('red')
+                item[coord]['text_color'] = mcolors.to_rgba('blue')
                 self.indices[coord] = str(self.get_word_obj(coord).index)
                 self.gui.put_numbers(item)
         except KeyError:

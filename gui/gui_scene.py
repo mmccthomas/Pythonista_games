@@ -410,7 +410,7 @@ class GameBoard(Scene):
                     pos.y + self.DIMENSION_Y * self.SQ_SIZE)
           n.color = self.grid_label_color
           n.font = font          
-          n.anchor_point = (0, 0)
+          n.anchor_point = (0.5, 0)
           n.row_col = 'col'
           self.column_labels.append(n.text)
           
@@ -484,7 +484,8 @@ class GameBoard(Scene):
         self.msg_label_b2 = LabelNode("bottom2", parent=self.game_field)        
         self.msg_label_prompt = LabelNode("prompt", parent=self.game_field)                
         self.msg_label_r = LabelNode("right",parent=self.game_field)        
-        self.enter_button = BoxedLabel('Hint', title='', parent=self.game_field)
+        self.enter_button = BoxedLabel('Hint', title='', 
+           min_size=(2.4*self.font_size, 1.2*self.font_size), parent=self.game_field)
         self.buttons[1] = self.enter_button
         self.buttons[1].set_index(1)                                 
     # position right hand message text and enter button

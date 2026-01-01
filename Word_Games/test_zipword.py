@@ -5,6 +5,7 @@ from copy import deepcopy
 from time import sleep, time
 import numpy as np
 import gc
+import traceback
 obj = None
 
 with open('wordpuzzles.txt', encoding='utf-8') as f:
@@ -14,18 +15,22 @@ names = [word.split('_')[0].replace('-',' ')
          if word.endswith('_frame:\n')]
 
 obj = zip_word.ZipWord(names[-1])   
-obj.debug = False
 for name in reversed(names):        
     obj.test = name
     obj.initialise_board()
     obj.sizey, obj.sizex = len(obj.board), len(obj.board[0])    
     obj.gui.replace_grid(obj.sizey, obj.sizex)
-    t = time()
-    obj.run() 
-    elapsed = time() - t
-    full_squares =  ~np.any(obj.solution_board == ' ')
-    print(f'{name}, complete={full_squares}, no_squares={np.sum(np.char.isalpha(obj.solution_board))} in {elapsed:.2f}secs')
-    #sleep(1)
+    try:
+        t = time()
+        obj.run() 
+        elapsed = time() - t
+        full_squares =  ~np.any(obj.solution_board == ' ')
+        
+        print(f'{name}, complete={full_squares}, no_squares={np.sum(np.char.isalpha(obj.solution_board))} in {elapsed:.2f}secs')
+        #sleep(1)
+    except Exception as e:
+        print (name, traceback.format_exc())
+       
     
 
        

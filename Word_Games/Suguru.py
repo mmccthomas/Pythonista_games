@@ -90,8 +90,8 @@ class Suguru(LetterGame):
     self.num_position = W, 2 * self.gui.gs.spacing * H #nearly top on right
     self.gui.gs.pause_button.position = (32, H - 36)
     self.gui.set_enter(NOTE_text, color='red', fill_color='lightgrey',
-                       font=('Avenir Next', 50))
-                       #position=position_hint)
+                       font=('Avenir Next', 50),
+                       position=position_hint)
     self.gui.set_top(self.gui.get_top())
                      #position=(0, (1 + self.gui.gs.spacing) * h))
     self.gui.set_moves(self.gui.get_moves(),
@@ -417,7 +417,7 @@ class Suguru(LetterGame):
       if self.test is None:
          console.clear()
       self.gui.clear_messages()
-      self.gui.set_enter(NOTE_text, color='red', fill_color='lightgrey')
+      #self.gui.set_enter(NOTE_text, color='red', fill_color='lightgrey')
       self.notes = {}
       self.puzzles_from_file = self.load_puzzles()
       self.select_list(self.test)
@@ -655,10 +655,12 @@ class Suguru(LetterGame):
           if self.hint:
               self.gui.set_enter(NOTE_text,
                                  color='white',
+                                 font=('Avenir Next', 50),
                                  fill_color='red')
           else:
               self.gui.set_enter(NOTE_text.upper(),
                                  color='red',
+                                 font=('Avenir Next', 50),
                                  fill_color='lightgrey')
           return (None, None), None, None
         

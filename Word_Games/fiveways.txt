@@ -1,6 +1,5 @@
 New:
-# compute new puzzle
-
+new_puzzle
 Puzzle1:
 ALPHABET
 AMBUSH

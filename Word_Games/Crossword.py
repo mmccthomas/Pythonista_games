@@ -1,7 +1,6 @@
 # Crossword game
 #
 # file for each puzzle has 2sections , puzzleno_text, and puzzleno_frame
-
 from time import sleep
 import dialogs
 import numpy as np
@@ -53,6 +52,7 @@ class CrossWord(LetterGame):
         self.gui.clear_numbers()
         self.draw_board()
         self.set_buttons()
+        self.gui.gs.print_screen_size()
         
     def set_buttons(self):
         """ install set of active buttons
@@ -73,7 +73,7 @@ class CrossWord(LetterGame):
         self.gui.set_enter('Check',
                            position=(w + spc*w, h),
                            fill_color='orange',
-                           **{**params, 'size':(3.5*fontsize, 1.5*fontsize)})
+                           **params)
         if not self.hintbutton:            
             self.hintbutton = self.gui.add_button(text='Hint',
                                 position=(w + 7*spc*w, h),
@@ -94,9 +94,11 @@ class CrossWord(LetterGame):
         """
     Main method that prompts the user for input
     """
+       
         while True:
             move = self.get_player_move(self.board)
             move = self.process_turn(move, self.board)
+            
             if self.game_over():
                 break
         self.gui.set_message2('')
@@ -147,8 +149,8 @@ class CrossWord(LetterGame):
                     z_position=30,
                     alpha=0.1,
                     stroke_color='black',
-                    font=('Marker Felt', 0.5*fontsize),
-                    text_color='red',
+                    font=('Arial Rounded MT Bold', 0.5*fontsize),
+                    text_color='green',
                     text_anchor_point=(-0.9, 0.95)) for rc in numbers
         ]
         self.gui.add_numbers(square_list, clear_previous=True)
@@ -197,6 +199,7 @@ class CrossWord(LetterGame):
             self.board = np.array(board)
             self.sizey, self.sizex = self.board.shape
             self.decode_filled_board()
+            self.length_matrix()       
             self.draw_board()
             
             self.gui.selection = ''
@@ -209,7 +212,9 @@ class CrossWord(LetterGame):
     def draw_board(self):
         #self.gui.remove_labels()
         self.gui.replace_grid(*self.board.shape)
-        self.gui.remove_labels()        
+        self.gui.remove_labels()       
+        ##self.gui.replace_labels('row', range(self.board.shape[1]))
+        # self.gui.replace_labels('col', range(self.board.shape[0]))
         self.gridlines = self.gui.build_extra_grid(
                                   *self.board.shape,
                                   grid_width_x=1,
@@ -223,7 +228,7 @@ class CrossWord(LetterGame):
                                   grid_width_y=self.board.shape[1],
                                   color='red',
                                   line_width=2)
-        self.print_squares()        
+        self.print_squares()         
         self.gui.update(self.board)
 
     def get_size(self):
@@ -266,8 +271,7 @@ class CrossWord(LetterGame):
     move is coord, new letter, selection_row
     """
         if move:
-            coord, letter, origin = move
-
+            coord, letter, origin = move            
             # self.gui.set_message(f'{origin}>{coord}={letter}')
 
             if letter == 'Enter':
@@ -300,8 +304,10 @@ class CrossWord(LetterGame):
 
             elif letter is None:
                 # guess word
+                pass
                 for word_obj in self.word_locations:
                     if coord in word_obj.coords:
+                        
                         word_guess = dialogs.input_alert(
                             f'Enter word ({word_obj.length} letters)')
                         if len(word_guess) == word_obj.length:

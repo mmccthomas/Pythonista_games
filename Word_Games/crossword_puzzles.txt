@@ -560,3 +560,58 @@ puzzle12_frame:
 'a/#/i/#/u/#/u/#/k/#/a/#/t'
 '26q/u/a/r/r/e/l/#/27e/a/g/l/e'
 'i/#/l/#/e/#/l/#/d/#/s/#/d'
+
+puzzle13_text:
+ACROSS                DOWN
+9  able to play more  1  the whole axial
+   than one musical      portion of an
+   note at the same      animal(4)
+   time(10)           2  a type of large
+10 Electrical            constricting
+   control(6)            snake.(6)
+11 course(4)          3  marshal(7)
+12 a tale told in     4  Andrew short
+   verse.(5)             form(4)
+13 position(6)        5  background
+14 glorious(11)          pictures of a
+17 coronet(5)            computer(12)
+19 bump(5)            6  an exploiter(4)
+21 drugstores(10)     7  factual(10)
+23 defenseless(10)    8  as in recognized,
+24 banners(5)            respected(12)
+26 caustic(5)         15 a published
+27 Personal              statement(12)
+   advertisements in  16 competences(12)
+   a newspaper(11)    18 US car giant
+29 cripple(6)            (abbr)(3)
+31 ducts(5)           20 applicants(10)
+33 an operation that  22 aggravate(3)
+   reverses a         25 smooching(7)
+   previous           28 Apple Music
+   action.(4)            store(6)
+35 ambition(6)        30 a medium-sized
+36 vulnerable(10)        rodent belonging
+                         to the genus
+                         rattus.(4)
+                      32 Rest places(4)
+                      34 demises(4)
+
+
+puzzle13_frame:
+'#/1s/#/2p/#/3s/#/4a/#/5s/#/6u/#/7h/#/8a/#'
+'9p/o/l/y/p/h/o/n/i/c/#/10s/w/i/t/c/h'
+'#/m/#/t/#/e/#/d/#/r/#/e/#/s/#/k/#'
+'11p/a/t/h/#/12r/h/y/m/e/#/13r/a/t/i/n/g'
+'#/#/#/o/#/i/#/#/#/e/#/#/#/o/#/o/#'
+'14m/15a/g/n/i/f/i/16c/e/n/t/#/17c/r/o/w/n'
+'#/n/#/#/#/f/#/a/#/s/#/18g/#/i/#/l/#'
+'19k/n/o/20c/k/#/#/21p/h/a/r/m/a/c/i/e/s'
+'#/o/#/a/#/22i/#/a/#/v/#/c/#/a/#/d/#'
+'23v/u/l/n/e/r/a/b/l/e/#/#/24f/l/a/g/s'
+'#/n/#/d/#/k/#/i/#/r/#/25k/#/#/#/e/#'
+'26a/c/r/i/d/#/27c/l/a/s/s/i/f/28i/e/d/s'
+'#/e/#/d/#/#/#/i/#/#/#/s/#/t/#/#/#'
+'29i/m/p/a/i/30r/#/31t/u/32b/e/s/#/33u/n/34d/o'
+'#/e/#/t/#/a/#/i/#/e/#/i/#/n/#/i/#'
+'35i/n/t/e/n/t/#/36e/n/d/a/n/g/e/r/e/d'
+'#/t/#/s/#/s/#/s/#/s/#/g/#/s/#/s/#'
