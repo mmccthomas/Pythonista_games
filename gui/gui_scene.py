@@ -924,10 +924,12 @@ class GameBoard(Scene):
           y, x = rc[0], rc[1]
           msg = c[2 * x: 2 * x + 2] + r[2 * y:2 * y + 2]
           msg = msg.replace(' ', '')
-          self.enter_label.text = f'{y},{x}__{msg}'
+          self.enter_button.set_text(f'{y},{x}__{msg}')
+
       if self.log_moves:
         if self.q:
           self.q.put(rc)
+          
    
   def touch_ended(self, touch):
     touch_length = time() - self.touch_time
@@ -945,11 +947,12 @@ class GameBoard(Scene):
       self.board[rc[0]][rc[1]] = self.current_player
       if self.q:
         self.q.put(rc)
+
         # print('end',time())
     if self.q and self.log_moves:
       self.q.put(-1)
       if self.debug:
-          self.enter_label.text = 'End'
+          self.enter_button.set_text('End')
       
   def point_to_rc(self, point):
     """ covert touch point to rc tuple """

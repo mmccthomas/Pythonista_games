@@ -164,20 +164,21 @@ class Gui():
                         z_position=10,
                         grid_stroke_color=None):
         if grid is not None:
-            # try:
-            #    image = ui.Image.from_data(grid)
-            #    self.gs.grid_fill = 'clear'
-            #    self.gs.background_image = image
-            # except (Exception) as e:
-            try:
-                image = ui.Image.named(grid)
-                self.gs.grid_fill = 'clear'
-                self.gs.background_image = image
-            except (Exception) as e:
-                print('error in set_grid_colors', e)
-                if grid.startswith('#') or ui.parse_color(grid) != (0.0, 0.0,
-                                                                    0.0, 0.0):
-                    self.gs.grid_fill = grid
+            if isinstance(grid, ui.Image):            
+               image = grid
+               self.gs.grid_fill = 'clear'
+               self.gs.background_image = image
+            
+            elif isinstance(grid, str):
+               
+                   image = ui.Image.named(grid)
+                   self.gs.grid_fill = 'clear'
+                   self.gs.background_image = image
+            else:             
+                   print('error in set_grid_colors', e)
+                   if grid.startswith('#') or ui.parse_color(grid) != (0.0, 0.0,
+                                                                       0.0, 0.0):
+                       self.gs.grid_fill = grid
         self.gs.grid_stroke_color = grid_stroke_color
         self.gs.grid_z_position = z_position
         if highlight is not None:
@@ -604,8 +605,10 @@ class Gui():
     def add_image(self, img, **kwargs):
         """ display an image on the grid. This is included so that the image
       can be diplayed after the gui and grid are initiated """
-
-        background = SpriteNode(Texture(ui.Image.named(img)))
+        if isinstance(img, ui.Image):
+            background = SpriteNode(Texture(img))            
+        else:
+            background = SpriteNode(Texture(ui.Image.named(img)))
         background.size = (self.gs.SQ_SIZE * self.gs.DIMENSION_X,
                            self.gs.SQ_SIZE * self.gs.DIMENSION_Y)
         background.position = (0, 0)
@@ -613,7 +616,10 @@ class Gui():
         for k, v in kwargs.items():
             setattr(background, k, v)
         self.grid.add_child(background)
-
+        
+    def set_board_images(self, image_dict):
+        self.gs.IMAGES = image_dict
+        
     def set_waiting(self, message='Processing'):
         a = ui.ActivityIndicator()
         a.style = ui.ACTIVITY_INDICATOR_STYLE_WHITE_LARGE
