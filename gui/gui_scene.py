@@ -150,6 +150,7 @@ class GameBoard(Scene):
     self.buttons = {}  # bbox: box _obj
     self.long_touch = False  # detects if touch for longer than 1 sec
     self.animation = False
+    self.hover_over = None
     self.orientation = self.print_screen_size            
     self.setup_menus()
         
@@ -866,7 +867,9 @@ class GameBoard(Scene):
       
   # #########################################################################
   # TOUCH 
-  
+  def hover(self):
+    if self.hover_over:
+       self.hover_over()
   def touch_began(self, touch):
     self.touch_time = time()
     self.beep = False
@@ -912,10 +915,13 @@ class GameBoard(Scene):
       sound.play_effect('digital:TwoTone2')
       self.beep = True
       
-    if self.touch_indicator:
-      self.touch_indicator.set_pos(self.point_to_rc(touch.location))
+    if self.touch_indicator:      
       rc = self.point_to_rc(touch.location)
-      if self.debug:
+      img = self.hover()
+      if img:
+          self.touch_indicator.texture = Texture(img)
+      self.touch_indicator.set_pos(self.point_to_rc(touch.location))
+    if self.debug:
           if self.use_alpha:
             c = 'A B C D E F G H I J K L M N O P Q R S T U V W X Y Z '
           else:
@@ -926,7 +932,8 @@ class GameBoard(Scene):
           msg = msg.replace(' ', '')
           self.enter_button.set_text(f'{y},{x}__{msg}')
 
-      if self.log_moves:
+     
+    if self.log_moves:
         if self.q:
           self.q.put(rc)
           

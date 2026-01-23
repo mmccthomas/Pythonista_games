@@ -1,6 +1,9 @@
-# Wordsearch game - a classic
+# Word circle game - a classic
+# Find a random word and N words containing
+# some or all of its letters
+# find also N words for each shorter word
+# click and drag touch to select letters
 import os
-
 from queue import Queue
 from time import sleep
 import ui
@@ -11,7 +14,6 @@ from Letter_game import LetterGame, Player
 import Letter_game as lg
 from gui.gui_interface import Gui
 from setup_logging import logger
-BLOCK = '#'
 SPACE = ' '
 WORDLIST = ["wordlists/letters3_common.txt", "wordlists/words_20000.txt", "wordlists/5000-more-common.txt"]
 GRIDSIZE = '7,7'
@@ -35,7 +37,9 @@ class WordCircle(LetterGame):
       self.gui.set_grid_colors(img)
       self.gui.require_touch_move(False)
       self.gui.allow_any_move(True)
-      self.gui.setup_gui(log_moves=True, grid_stroke_color='clear')
+      self.gui.setup_gui(log_moves=True, 
+                         grid_stroke_color='clear',
+                         hover=self.letters_so_far)
       self.gui.remove_labels()
       
       piece_names = 'abcdefghijklmnopqrstuvwxyz'
@@ -160,24 +164,82 @@ class WordCircle(LetterGame):
           img = ctx.get_image()
       
       return img
+        
+  def letters_so_far(self):
+      # display word so far
+      # need to remove duplicates in sequence run length encoding?
+      img = None
+      if self.coord_list:         
          
+         if -1 in self.coord_list:
+              self.coord_list.remove(-1)  # remove terminator
+         runlengths, startpositions, values = lg.rle(self.coord_list)         
+         vals = values[runlengths > 2]                                        
+         word = [self.get_board_rc(rc, self.board) for rc in vals if self.check_in_board(rc)]
+         word = ''.join(word)
+         word = word.replace(' ', '')    
+         # print(word)
+         if word:
+            word = word.upper() + '\n'
+            rect= ui.measure_string(word, max_width=0, font=('Avenir Next', 50))
+            with ui.ImageContext(*rect) as ctx:                 
+                 ui.draw_string(word, (0,0,*rect), font=('Avenir Next', 50), color='yellow')
+                 img = ctx.get_image()      
+      return img
+          
+  def get_player_move(self, board=None):
+    """Takes in the user's input and performs that move on the board,
+    returns the coordinates of the move
+    Allows for movement over board"""
+    # self.delta_t('start get move')
+    if board is None:
+        board = self.game_board
+    self.coord_list = []
+    # sit here until piece place on board
+    items = 0
+    
+    while items < 1000:  # stop lockup
+      
+      move = self.wait_for_gui()
+      # if items == 0:
+      #     st = time()
+      try:
+        if self.log_moves:
+          self.coord_list.append(move)
+          self.letters_so_far()
+          items += 1
+          if move == -1:
+            # self.delta_t('end get move')
+            return self.coord_list
+        else:
+          break
+      except (Exception) as e:
+        print(traceback.format_exc())
+        print('except,', move, e)
+        self.coord_list.append(move)
+        return self.coord_list
+    return move
+           
   def process_turn(self, move, board):
       """ process the turn
       """
       # lets count no of unique coordinates to see how long on each square
+      vals = []
       try:
           move.pop(-1)  # remove terminator
           # need to remove duplicates in sequence run length encoding?
-          runlengths, startpositions, values = lg.rle(move)
-          vals = values[runlengths > 2]
           
-          word = [self.get_board_rc(rc, self.board) for rc in vals if self.check_in_board(rc)]
-          word = ''.join(word)
-          logger.debug(f'{word}')
-          word = word.replace(' ', '')
-          in_list = word in self.word_selection[len(word)]
-          check = '\t\tValid word' if in_list else '\t\tNot valid'
-          self.gui.set_message(f'Word= {word} {check}')
+          if move:
+            runlengths, startpositions, values = lg.rle(move)
+            vals = values[runlengths > 2]
+            
+            word = [self.get_board_rc(rc, self.board) for rc in vals if self.check_in_board(rc)]
+            word = ''.join(word)
+            logger.debug(f'{word}')
+            word = word.replace(' ', '')
+            in_list = word in self.word_selection[len(word)]
+            check = '\t\tValid word' if in_list else '\t\tNot valid'
+            self.gui.set_message(f'Word= {word} {check}')
       except (IndexError, AttributeError, KeyError):
           """ all_words may not exist or clicked outside box"""
           logger.debug(f'{traceback.format_exc()}')
@@ -188,7 +250,7 @@ class WordCircle(LetterGame):
       word = [self.get_board_rc(rc, self.board) for rc in move if self.check_in_board(rc)]
       selected_word = ''.join(word)
       selected_word = selected_word.replace(' ', '')
-      if self.min_length > len(selected_word) > self.max_length:
+      if self.min_length > len(selected_word) or  len(selected_word) > self.max_length:
           return
       if not selected_word:
           return
@@ -224,7 +286,7 @@ class WordCircle(LetterGame):
       while True:
           length = random.randint(self.min_length, self.max_length)
           word = random.choice(self.word_selection[length])
-          if word not in self.known_words[length] and len(self.known_words[length]) < self.req_size:
+          if (word not in self.known_words[length]) and (len(self.known_words[length]) < self.req_size):
             self.known_words[length].append(word)
             break
       self.print_known_words()
@@ -236,7 +298,7 @@ class WordCircle(LetterGame):
       self.gui.clear_numbers()
       self.gui.clear_messages()
       self.gui.set_top('WordCircle')
-      self.gui.set_enter('Note ', fill_color='clear', font=('Avenir Next', 50))
+      self.gui.set_enter('Hint ', fill_color='clear', font=('Avenir Next', 50))
     
       self.initialise_board()
       self.print_known_words()
