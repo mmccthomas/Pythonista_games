@@ -39,7 +39,7 @@ class WordCircle(LetterGame):
       self.gui.allow_any_move(True)
       self.gui.setup_gui(log_moves=True, 
                          grid_stroke_color='clear',
-                         hover=self.letters_so_far)
+                         hover=self.hover_data)
       self.gui.remove_labels()
       
       piece_names = 'abcdefghijklmnopqrstuvwxyz'
@@ -165,14 +165,13 @@ class WordCircle(LetterGame):
       
       return img
         
-  def letters_so_far(self):
+  def hover_data(self):
       # display word so far
       # need to remove duplicates in sequence run length encoding?
       img = None
-      if self.coord_list:         
-         
+      if self.coord_list:                  
          if -1 in self.coord_list:
-              self.coord_list.remove(-1)  # remove terminator
+             self.coord_list.remove(-1)  # remove terminator
          runlengths, startpositions, values = lg.rle(self.coord_list)         
          vals = values[runlengths > 2]                                        
          word = [self.get_board_rc(rc, self.board) for rc in vals if self.check_in_board(rc)]
@@ -185,40 +184,7 @@ class WordCircle(LetterGame):
             with ui.ImageContext(*rect) as ctx:                 
                  ui.draw_string(word, (0,0,*rect), font=('Avenir Next', 50), color='yellow')
                  img = ctx.get_image()      
-      return img
-          
-  def get_player_move(self, board=None):
-    """Takes in the user's input and performs that move on the board,
-    returns the coordinates of the move
-    Allows for movement over board"""
-    # self.delta_t('start get move')
-    if board is None:
-        board = self.game_board
-    self.coord_list = []
-    # sit here until piece place on board
-    items = 0
-    
-    while items < 1000:  # stop lockup
-      
-      move = self.wait_for_gui()
-      # if items == 0:
-      #     st = time()
-      try:
-        if self.log_moves:
-          self.coord_list.append(move)
-          self.letters_so_far()
-          items += 1
-          if move == -1:
-            # self.delta_t('end get move')
-            return self.coord_list
-        else:
-          break
-      except (Exception) as e:
-        print(traceback.format_exc())
-        print('except,', move, e)
-        self.coord_list.append(move)
-        return self.coord_list
-    return move
+      return img          
            
   def process_turn(self, move, board):
       """ process the turn

@@ -73,7 +73,7 @@ def lprint(seq, n):
 def rle(inarray):
     """ run length encoding. Partial credit to R rle function.
     Multi datatype arrays catered for including non Numpy
-    returns: tuple (runlengths, startpositions, values) """
+    returns: tuple (runlengths, startpositions, values) """    
     ia = np.asarray(inarray)                # force numpy
     n = len(ia)
     if n == 0:
@@ -979,7 +979,6 @@ class LetterGame():
       sleep(0.01)
       if not self.gui.q.empty():
         data = self.gui.q.get(block=False)
-        
         # self.delta_t('get')
         # self.gui.q.task_done()
         if isinstance(data, (tuple, list, int)):
@@ -993,7 +992,11 @@ class LetterGame():
             print(traceback.format_exc())
             print(f'Error in received data {data}  is {e}')
     return coord
-  
+    
+  def hover_data(self):
+    """ override in subclass"""
+    return
+    
   def get_player_move(self, board=None):
     """Takes in the user's input and performs that move on the board,
     returns the coordinates of the move
@@ -1001,7 +1004,7 @@ class LetterGame():
     # self.delta_t('start get move')
     if board is None:
         board = self.game_board
-    coord_list = []
+    self.coord_list = []
     # sit here until piece place on board
     items = 0
     
@@ -1010,21 +1013,21 @@ class LetterGame():
       move = self.wait_for_gui()
       # if items == 0:
       #     st = time()
-      # print('items',items, move)
       try:
         if self.log_moves:
-          coord_list.append(move)
+          self.coord_list.append(move)
+          self.hover_data()
           items += 1
           if move == -1:
             # self.delta_t('end get move')
-            return coord_list
+            return self.coord_list
         else:
           break
       except (Exception) as e:
         print(traceback.format_exc())
         print('except,', move, e)
-        coord_list.append(move)
-        return coord_list
+        self.coord_list.append(move)
+        return self.coord_list
     return move
 
   def quit(self):

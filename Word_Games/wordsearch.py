@@ -1,15 +1,16 @@
- # Wordsearch game - a classic
-import os
+# Wordsearch game - a classic
 from queue import Queue
 from time import sleep
 import random
 import numpy as np
 import traceback
+import ui
 
 from word_square_gen import create_word_search
 from Letter_game import LetterGame, Player
-
+import Letter_game as lg
 from gui.gui_interface import Gui, Squares, Coord
+# from setup_logging import logger
 BLOCK = '#'
 SPACE = ' '
 WORDLIST = "wordsearch_list.txt"
@@ -23,7 +24,6 @@ class WordSearch(LetterGame):
     
     # allows us to get a list of rc locations
     self.log_moves = True
-    self.debug = False
     self.table = None
     self.straight_lines_only = True
     self.load_words_from_file(WORDLIST)
@@ -38,7 +38,7 @@ class WordSearch(LetterGame):
     self.selection = self.select_list()
     self.SIZE = self.get_size()
     self.gui.DIMENSION_Y, self.gui.DIMENSION_X = self.SIZE
-    self.gui.setup_gui(log_moves=True)
+    self.gui.setup_gui(log_moves=True, hover=self.hover_data)
     
     # menus can be controlled by dictionary of labels and functions without parameters
     self.gui.set_pause_menu({'Continue': self.gui.dismiss_menu,
@@ -62,10 +62,10 @@ class WordSearch(LetterGame):
     fontsize = self.gui.get_fontsize()
     if self.gui.device.endswith('_landscape'):
         msg = self.format_cols(display_words, columns=2, width=max_len)
-        self.gui.set_moves(msg, font=('Avenir Next', fontsize), anchor_point=(0,0),position=(w+40,0))
+        self.gui.set_moves(msg, font=('Avenir Next', fontsize), anchor_point=(0, 0), position=(w + 40, 0))
     elif self.gui.device.endswith('_portrait'):
         msg = self.format_cols(display_words, columns=5, width=max_len)
-        self.gui.set_moves(msg, font=('Avenir Next', fontsize), position=(0, h+40) )
+        self.gui.set_moves(msg, font=('Avenir Next', fontsize), position=(0, h + 40))
     self.gui.update(self.board)
     
   def get_size(self):
@@ -147,14 +147,53 @@ class WordSearch(LetterGame):
           return False
         else:
             return False
-              
+ 
+  def hover_data(self):
+      # display word so far
+      # need to remove duplicates in sequence run length encoding
+      img = None
+      if self.coord_list:
+         if -1 in self.coord_list:
+             self.coord_list.remove(-1)  # remove terminator
+         runlengths, startpositions, values = lg.rle(self.coord_list)
+         vals = values[runlengths > 2]
+         word = [self.get_board_rc(rc, self.board) for rc in vals if self.check_in_board(rc)]
+         word = ''.join(word)
+         word = word.replace(' ', '')
+         # print(word)
+         if word:
+            # display the word on a white background offset i y by SQ SIZE
+            # ------------
+            # |word.      |
+            # |-----------|
+            # |.          |
+            # -------------
+            word = word.upper()
+            sq = self.gui.SQ_SIZE
+            w, h = ui.measure_string(word, max_width=0, font=('Avenir Next', sq/1.2))
+            with ui.ImageContext(w, h+2*sq) as ctx:
+                p = ui.Path.rect(0, 0, w, h + 2 * sq)
+                ui.set_color('clear')
+                p.fill()
+            
+                p = ui.Path.rounded_rect(0, 0, w, h, 5)
+                ui.set_color('white')
+                p.fill()
+                ui.set_color('red')
+                p.line_width = 2
+                p.stroke()
+                
+                ui.draw_string(word, (0, 0, w, h), font=('Avenir Next', sq / 1.2), color='red')
+                img = ctx.get_image()
+      return img
+                   
   def match_word(self, move):
     """ match word to move"""
     word = []
     for rc in move:
       rc = Coord(rc)
       if self.check_in_board(rc) and isinstance(rc, tuple):
-        word.append(self.get_board_rc(rc, self.board))        
+        word.append(self.get_board_rc(rc, self.board))
     selected_word = ''.join(word)
     self.gui.clear_numbers(number_list=move)
     for word in self.wordlist:
@@ -242,8 +281,7 @@ class WordSearch(LetterGame):
     
     self.gui.set_message2('Game over')
     self.complete()
-    
-    
+        
   def find_word_np(self, word):
       word = list(word.lower())
       locs = np.argwhere(self.board == word[0])
@@ -252,7 +290,7 @@ class WordSearch(LetterGame):
         all_dirs, indices = self.dirs(self.board, r, c, len(word))
         for dir in all_dirs:
           if len(dir) >= len(word):
-             if all(dir[:len(word)] ==list(word)):
+             if all(dir[:len(word)] == list(word)):
                 return rc, indices
     
   def find_word(self, word):
@@ -264,7 +302,7 @@ class WordSearch(LetterGame):
       word = list(word.lower())
       locs = np.argwhere(self.board == word[0])
       for rc in locs:
-          rc = Coord(rc)            
+          rc = Coord(rc)
           for dir in rc.all_dirs:
               self.moves = [rc]
               rc_next = rc

@@ -920,6 +920,7 @@ class GameBoard(Scene):
       img = self.hover()
       if img:
           self.touch_indicator.texture = Texture(img)
+          self.touch_indicator.anchor_point=(0,0)
       self.touch_indicator.set_pos(self.point_to_rc(touch.location))
     if self.debug:
           if self.use_alpha:
