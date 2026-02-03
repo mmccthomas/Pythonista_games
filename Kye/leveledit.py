@@ -183,7 +183,7 @@ class KLevelEdit:
     def delete_level(self):
         """Delete the current level from this level set."""
         if len(self.levels) == 1:
-            raise RuntimeError, 'only 1 level left!'
+            raise RuntimeError('only 1 level left!')
         rlevel = self.levels.pop(self.curlevel)
         self.add_undo(("droppedlevel", self.curlevel, rlevel))
         self.__mods = self.__mods+1
@@ -247,7 +247,7 @@ class KLevelEdit:
             self.levels.pop(ui[1])
             self.levels.insert(ui[1], ui[2])
         else:
-            raise RuntimeError, "bad undo"
+            raise RuntimeError("bad undo")
         # Update last checkpoint & current # of mods for this revision
         self.__mods_lastcheckpoint = 0
         for u in self.__undohist:
@@ -303,7 +303,7 @@ class KLevelEdit:
         v = self.wall_at(x, y-1) + 2*self.wall_at(x, y+1)
         try:
             n = KLevelEdit.rounded_wall["%d,%d" % (h, v)]
-        except KeyError,e:
+        except KeyError as e:
             n = 5
         self.set_at_simple(x, y, str(n))
 
@@ -323,7 +323,7 @@ class KLevelEdit:
                 return
         try:
             self.set_at_simple(i,j,t)
-        except IndexError, e:
+        except IndexError as e:
             return
         if self.__autoround:
             self.autoround_at(i,j)

@@ -8,6 +8,8 @@ Some optimisation has been made to operate in iPad Portrait mode, but Landscape 
 The games do not autodetect orientation change.
 All games were developed using a 13" Ipad. Most games have automatic detection of device size and orientation
 on startup. Tested using Ipad 13", IPad 10", IPad Mini, IPhone.
+IOS 26 introduces variable screen size. Rhe games will adapt to the current window size on  startup.  Some games do not render very well in portrait mode. You can resize the screen
+to reduce the width and restart the program, which will frequently improve the appearance.
 The  module change_screensize.py should be placed into site-packages (user). It allows creation of a virtual 
 device window, and detection of virtual window size.
 
@@ -15,7 +17,7 @@ The games all use the Scene module, which is a thin wrapper around the Apple UiK
 
 A generic gui framework has been developed to place a grid at maximum size, along with buttons and messages
 
-Style note:
+Style apology:
 Due to the limited debugging in Pythonista, I frequently used a non-preferred way to use list comprehensions
 e.g. [print(x) for x in iterable]
 This is to allow stepping over an iteration loop during debug.
@@ -131,6 +133,15 @@ Wordle clone
 Choose 5 letters based upon scores for previous guess
 
 Entry point : Word_Games/wordle.py
+
+Word Circle
+-----------
+Create words from letters contained in a random 6 letter word.
+Require 8 6-letter words, 8 5-letter words, 8 4-letter words,
+and 8 3-letter words.
+Letters can be used more than once.
+
+Entry point : Word_Games/word circle.py
 
 Quoteword
 ---------
@@ -263,7 +274,7 @@ Entry point : Board_Games/caterpillar.py
 Space Shooter
 -------------
 Modified and improved(?)
-https://gist.github.com/anonymous/a03bfdab757c1d978061
+# https://gist.github.com/anonymous/a03bfdab757c1d978061
 Changed icons, added shields, and quite a bit of refactoring
 
 Entry point : AI_games/a_spaceShooter.py

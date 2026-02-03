@@ -963,7 +963,7 @@ class Game(scene.Scene):
                       if SOUND:
                           try:
                               sound.stop_effect(invader.sound)
-                          except AttributeError:
+                          except (AttributeError, TypeError):
                               pass
                       hit_player_bullets.append(bullet)
                       self.handle_flagship_score()
