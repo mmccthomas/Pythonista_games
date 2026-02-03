@@ -1,0 +1,139 @@
+[
+  {
+    "nodes" : [
+      {
+        "nodes" : [
+
+        ],
+        "frame" : "{{530, 6}, {246, 326}}",
+        "class" : "ScrollView",
+        "attributes" : {
+          "flex" : "WHLB",
+          "frame" : "{{136, 51}, {320, 320}}",
+          "uuid" : "6B38D196-1EBD-45E5-B42D-432B009600C0",
+          "content_height" : 320,
+          "class" : "ScrollView",
+          "content_width" : 320,
+          "name" : "scroll"
+        },
+        "selected" : false
+      },
+      {
+        "nodes" : [
+
+        ],
+        "frame" : "{{6, 346}, {527, 224}}",
+        "class" : "View",
+        "attributes" : {
+          "flex" : "WHRT",
+          "border_width" : 10,
+          "frame" : "{{246, 161}, {100, 100}}",
+          "class" : "View",
+          "corner_radius" : 0,
+          "uuid" : "970F810B-852B-4E00-92D8-C6411ABD20DB",
+          "border_color" : "RGBA(1.000000,0.822222,0.822222,1.000000)",
+          "name" : "custom_view"
+        },
+        "selected" : true
+      },
+      {
+        "nodes" : [
+
+        ],
+        "frame" : "{{6, 248}, {527, 50}}",
+        "class" : "TextView",
+        "attributes" : {
+          "uuid" : "F13D3901-D045-41D1-8DA2-F82AA2A1FEFD",
+          "font_size" : 20,
+          "corner_radius" : 0,
+          "background_color" : "RGBA(0.747642,0.747642,0.747642,1.000000)",
+          "frame" : "{{196, 111}, {200, 200}}",
+          "editable" : true,
+          "border_width" : 1,
+          "alignment" : "left",
+          "autocorrection_type" : "default",
+          "font_name" : "AvenirNext-Regular",
+          "spellchecking_type" : "default",
+          "class" : "TextView",
+          "name" : "input_frame",
+          "flex" : "WRTB"
+        },
+        "selected" : false
+      },
+      {
+        "nodes" : [
+
+        ],
+        "frame" : "{{6, 298}, {527, 50}}",
+        "class" : "ScrollView",
+        "attributes" : {
+          "flex" : "WRTB",
+          "border_width" : 1,
+          "frame" : "{{136, 51}, {320, 320}}",
+          "uuid" : "66021436-3DC7-4C8A-815D-C056C50B06D5",
+          "background_color" : "RGBA(0.875000,0.875000,0.875000,1.000000)",
+          "content_height" : 320,
+          "class" : "ScrollView",
+          "content_width" : 320,
+          "name" : "prediction_frame",
+          "corner_radius" : 0
+        },
+        "selected" : false
+      },
+      {
+        "nodes" : [
+
+        ],
+        "frame" : "{{541, 338}, {235, 237}}",
+        "class" : "TextView",
+        "attributes" : {
+          "uuid" : "42D6232D-8C22-4542-9DE3-E8F39A63318D",
+          "font_size" : 17,
+          "background_color" : "RGBA(1.000000,0.833333,0.500000,1.000000)",
+          "frame" : "{{282, 172}, {200, 200}}",
+          "editable" : false,
+          "alignment" : "left",
+          "autocorrection_type" : "default",
+          "font_name" : "<System>",
+          "spellchecking_type" : "default",
+          "class" : "TextView",
+          "name" : "inventory_frame",
+          "flex" : "WHLT"
+        },
+        "selected" : false
+      },
+      {
+        "nodes" : [
+
+        ],
+        "frame" : "{{6, 6}, {527, 243}}",
+        "class" : "TextView",
+        "attributes" : {
+          "uuid" : "0623E37A-2E74-4306-AB77-97D2F640E1F9",
+          "font_size" : 20,
+          "background_color" : "RGBA(1.000000,1.000000,0.775000,1.000000)",
+          "frame" : "{{282, 172}, {200, 200}}",
+          "editable" : false,
+          "alignment" : "left",
+          "autocorrection_type" : "default",
+          "font_name" : "TimesNewRomanPSMT",
+          "spellchecking_type" : "default",
+          "class" : "TextView",
+          "name" : "output_frame",
+          "flex" : "WHRB"
+        },
+        "selected" : false
+      }
+    ],
+    "frame" : "{{0, 0}, {782, 575}}",
+    "class" : "View",
+    "attributes" : {
+      "enabled" : true,
+      "background_color" : "RGBA(1.000000,1.000000,1.000000,1.000000)",
+      "tint_color" : "RGBA(0.000000,0.478000,1.000000,1.000000)",
+      "border_color" : "RGBA(0.000000,0.000000,0.000000,1.000000)",
+      "flex" : ""
+    },
+    "selected" : false
+  }
+]
