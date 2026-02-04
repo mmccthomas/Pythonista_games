@@ -6,16 +6,16 @@
 # and predictive buttons to select options
 # new code will use adventure classes and functions
 # TextView will receive game output
-# game input will recieve TexField change
+# game input will receive TexField change
 # need to override save and resume to use fixed savefile
-# Chris Thomas Jan 2026
+# Chris Thomas Feb 2026
 
 import ui
 import re
 import os
 import sys
 import pathlib
-from time import sleep, time
+from time import sleep
 from collections import defaultdict
 from operator import attrgetter
 from objc_util import on_main_thread
@@ -36,7 +36,7 @@ class Adventure():
       self.response = None
       self.seed = 0
       self.zoom_level = .25
-      self.delay = .05
+      self.delay = .5
       self.quit_ = False
       self.pause_run = False
       self.input_word = ''
@@ -50,7 +50,7 @@ class Adventure():
       self.load_advent_dat(self.game_)
       self.game_visited_locations = []
       self.load_location_map()
-      self.get_travel_network()
+      # self.get_travel_network()
       self.get_vocabulary(_print=False)
       self.setup_ui_pyui()
       self.set_predict_buttons([('yes', 'black'), ('no', 'black')])
@@ -58,14 +58,13 @@ class Adventure():
       self.run()
 
   def run(self):
-      
       self.game_.start()
       self.output_frame.text += self.capitalize_sentences(self.game_.output)
       self.scroll_to_bottom()
       # self.game_.lamp_turns = 150 # limited power
       if self.walkthru:
           walkthru = pathlib.Path('adventure', 'tests', self.walkthru)
-          self.test(walkthru)
+          self.run_walkthru(walkthru)
       else:
           # respond to gui
           pass
@@ -109,47 +108,40 @@ class Adventure():
           for row in reader:
               self.locations[int(row['ID'])] = {'Label': row['Label'], 'x': float(row['x']), 'y': float(row['y'])}
                  
-  def save_resume(self, words):
+  def trap_save_resume(self, words):
       """ handle save, restore keywords.
+      remove these and implement save and restore
+      this is done to allow use of a single savefile
       """
       match words[0]:
           case 'save':
-              self.save_(None)
+              self.save_game(None)
               return None
           case 'resume':
-              self.restore_(None)
+              self.restore_game(None)
               return None
       return words
-
-  def show_inventory(self):
-      """ display current inventory """
-      max_length = 40
-      inventory = self.game_.inventory
-      if not inventory:
-          return
-      inventory_message = 'INVENTORY\n'
-      msg = []
-      inventory = sorted(inventory, key=attrgetter('inventory_message'))
-      for obj in inventory:
-         inventory_text = obj.inventory_message.capitalize()
-         inventory_names = '/'.join(obj.names)
-         if 'lamp' in inventory_names:
-           inventory_names += f' power {self.game_.lamp_turns}'
-         msg.append(f'{inventory_text} ({inventory_names})')
-         
-      # render as 2 columns , not used
-      for i in range(0, len(msg), 2):
-         row = msg[i:i+2]
-         first_len = len(msg[i])
-         if first_len < max_length:
-            spaces = ' ' * (max_length - first_len)
-         else:
-            spaces = ' '
-         inventory_message += (f"{row[0]:<{max_length}}{spaces}{row[1] if len(row) > 1 else ''}\n")
-         
-      inventory_message = '\n'.join(msg)
-      self.inventory_frame.text = inventory_message
-
+      
+  def save_game(self, send_commander):
+      """ save the game in fixed file,
+      deleting previous version"""
+      self.pause_game(None)
+      savefile = 'temp.pkl'
+      if os.path.exists(savefile):
+          os.remove(savefile)
+      self.game_.t_suspend('save', savefile)
+      self.pause_game(None)
+      self.output_frame.text += 'GAME SAVED\n'
+      
+  def restore_game(self, sender):
+      self.pause_game(None)
+      savefile = 'temp.pkl'
+      self.game_ = self.game_.resume(savefile)
+      self.pause_game(None)
+      self.output_frame.text += 'GAME RESTORED\n'
+      self.send('look')
+      self.show_inventory()
+      
   def capitalize_sentences(self, text):
       # This regex finds the first character of the string OR
       # any character that follows a '.', '!', or '?' and optional whitespace.
@@ -157,12 +149,13 @@ class Adventure():
       text = text.lower()
       return re.sub(r'(^|[.!?]\s+)([a-z])', lambda m: m.group(1) + m.group(2).upper(), text)
          
-  def test(self, walkthru):
+  def run_walkthru(self, walkthru):
       """ iterate through specified walkthru """
       for command in self.get_walkthru(walkthru):
           if self.quit_:
               break
           while self.pause_run:
+              # allow suspend of game with pause button
               sleep(.1)
           self.send(command)
           sleep(self.delay)
@@ -210,11 +203,12 @@ class Adventure():
   def layout(self):
       # 1. Setup Constants
       sidebar_w = self.width * 0.3
+      output_h = self.height * 0.55
       main_w = self.width - sidebar_w
       row_h = 44  # Fixed height for input/prediction bars
       
       # 2. Position Left Column
-      self.output_frame.frame = (0, 0, main_w, self.height * 0.55)
+      self.output_frame.frame = (0, 0, main_w, output_h)
       
       y_offset = self.output_frame.height
       self.input_frame.frame = (0, y_offset, main_w, row_h)
@@ -256,6 +250,11 @@ class Adventure():
          if key.title == 'Enter':
              self.return_key = key
              break
+      for key in self.keyboard.subviews:
+         if key.title == 'Space':
+             self.space_key = key
+             break
+                      
       self.output_frame.autocapitalization_type = ui.AUTOCAPITALIZE_SENTENCES
       self.input_frame.action = self.next_command
       self.prediction_frame.directional_lock_enabled = True
@@ -277,17 +276,29 @@ class Adventure():
                
   def set_predict_buttons(self, matches):
       fontsize = 20
-      x = 5
+      spacing = 8
+      
+      # 1. Calculate the total width of all buttons combined
+      total_content_width = sum((len(word) * fontsize * 0.8) + spacing for word, color in matches)
+      
+      # 2. Determine the starting X (Container width minus content width)
+      # We use max() to ensure it doesn't go off-screen to the left if content is too wide
+      container_width = self.prediction_frame.width
+      start_x = max(spacing, container_width - total_content_width)
+      
+      x = start_x
       for word, color in matches:
-          button = ui.Button(title=word, action=self.select_word)
+          button = ui.Button(title=word, action=self.select_predict_word)
           width = len(word) * fontsize * 0.8
-          button.frame = (x, 10, width, 1.2*fontsize)
+          
+          button.frame = (x, 10, width, 1.2 * fontsize)
           button.font = ('Avenir Next', fontsize)
           button.tint_color = color
           button.border_width = 1
           button.border_color = 'black'
+          
           self.prediction_frame.add_subview(button)
-          x += (width + 5)
+          x += (width + spacing)
       return x
           
   def prediction(self, letters, word_no=0, compass=None):
@@ -301,42 +312,82 @@ class Adventure():
                 'noun': 'blue',
                 'verb': 'green',
                 'snappy_comeback': 'red'}
-      # matches will be a list of word, color tuples
-      if word_no == 0:
-          keys = ['travel', 'verb', 'snappy_comeback']
-      else:
-          keys = ['travel', 'noun', 'snappy_comeback']
-      vocab = [(word, colors[k]) for k in keys for word in self.vocabulary[k]]
-      matches = [(word, color) for word, color in vocab if word.startswith(letters)]
-      matches = sorted(matches, key=lambda x: len(x[0]))
+      # these words will list inventory
+      list_inventory_items = ('detonate', 'devour', 'discard', 'drink', 'drop',
+                              'dump', 'eat', 'extinguish', 'fill', 'ignite',
+                              'light', 'pour', 'rub', 'shake',
+                              'swing', 'throw', 'toss', 'wave')
+      # these words will list objects at location
+      list_objects_here_items = ('attack', 'blast', 'blowup', 'break', 'calm',
+                                 'capture', 'carry', 'catch', 'close', 'disturb',
+                                 'explore', 'feed', 'fight', 'find', 'follow',
+                                 'free', 'get', 'hit', 'keep', 'kill',
+                                 'lock', 'open', 'peruse', 'placate', 'pour', 'read',
+                                 'release', 'rub', 'say', 'shatter', 'sing', 'smash',
+                                 'steal', 'strike', 'take', 'tame', 'tote',
+                                 'turn', 'unlock', 'utter', 'wake')
       if compass:
+         matches = [(dir, colors['travel']) for dir in ['North', 'South', 'East', 'West', 'Up', 'Down']]
          try:
            if self.game_.inventory or self.game_.objects_here:
-              matches = [('Get', colors['verb']), ('Drop', colors['verb'])]
-           else:
-               matches = []
+              matches.extend([('Drop', colors['verb']), ('Get', colors['verb'])])
          except AttributeError:
-             matches = []
-         matches.extend([(dir, colors['travel']) for dir in ['North', 'South', 'East', 'West', 'Up', 'Down']])
-         
-      match self.command_words[0].upper():
-          case 'GET':
-              matches = [(obj.names[0], colors['noun']) for obj in self.game_.objects_here]
-              print(matches)
-          case 'DROP' | 'THROW':
-              matches = [(obj.names[0], colors['noun']) for obj in self.game_.inventory]
-              print(matches)
+             pass
+      elif letters:
+          # matches will be a list of word, color tuples
+          if word_no == 0:
+              keys = ['travel', 'verb', 'snappy_comeback']
+          else:
+              keys = ['travel', 'noun', 'snappy_comeback']
+          vocab = [(word, colors[k]) for k in keys for word in self.vocabulary[k]]
+          matches = [(word, color) for word, color in vocab if word.startswith(letters)]
+          matches = sorted(matches, key=lambda x: len(x[0]))
+      else:
+          match self.command_words[0].lower():
+              case word if word in list_objects_here_items:
+                  matches = [(obj.names[0], colors['noun']) for obj in self.game_.objects_here]
+                  # print(matches)
+              case word if word in list_inventory_items:
+                  matches = [(obj.names[0], colors['noun']) for obj in self.game_.inventory]
+                  # print(matches)
+              case _:
+                  matches = []
       
       width = self.set_predict_buttons(matches)
       self.prediction_frame.content_size = (width, 50)
-          
-  def select_word(self, sender):
-      """ called when pressing match words """
+      
+  def select_predict_word(self, sender):
+      """ called when pressing match word buttons """
       letter = sender.title
       self.input_word = letter.lower()
       self.command_words[self.word_no] = self.input_word
       self.input_frame.text = ' '.join(self.command_words)
-      
+      if self.command_words[0] in ['north', 'south', 'east', 'west', 'up', 'down']:
+         self.button_tapped(self.return_key)
+         return
+      if self.word_no == 0:
+          self.button_tapped(self.space_key)
+      else:
+          self.button_tapped(self.return_key)
+       
+  def show_inventory(self):
+      """ display current inventory """
+      max_length = 40
+      inventory = self.game_.inventory
+      if not inventory:
+          return
+      inventory_message = 'INVENTORY\n'
+      msg = []
+      inventory = sorted(inventory, key=attrgetter('inventory_message'))
+      for obj in inventory:
+         inventory_text = obj.inventory_message.capitalize()
+         inventory_names = '/'.join(obj.names)
+         if 'lamp' in inventory_names:
+             inventory_names += f' power {self.game_.lamp_turns}'
+         msg.append(f'{inventory_text} ({inventory_names})')
+                              
+      self.inventory_frame.text = '\n'.join(msg)
+                   
   def button_tapped(self, sender):
       try:
          letter = sender.title
@@ -355,7 +406,7 @@ class Adventure():
                  self.input_word = ''
                  self.command_words = ['', '']
                  self.word_no = 0
-                 self.prediction('a', 0, compass=True)
+                 self.prediction('', 0, compass=True)
                  self.scroll_to_bottom()
                  
              case 'Del' | '⌫':
@@ -367,7 +418,7 @@ class Adventure():
                      self.command_words[self.word_no] = self.input_word
                  self.input_word = ''
                  self.word_no = 1
-                 self.prediction('a', 1, compass=False)
+                 self.prediction('', 1, compass=False)
 
       except Exception:
           print(traceback.format_exc())
@@ -386,18 +437,16 @@ class Adventure():
       
       self.output_frame.text += f'\n>>> {cmd_text.upper()}\n'
       words = cmd_text.split()
-      words = self.save_resume(words)
-      print('words to send', words)
+      words = self.trap_save_resume(words)
+      # print('words to send', words)
       if words:
           self.game_.do_command(words)
           self.output_frame.text += f'loc({self.game_.loc.n}) {self.capitalize_sentences(self.game_.output)}'
              
           # Immediate UI Updates
           self.game_visited_locations.append(self.game_.loc.n)
-          t = time()
           self.draw_position_on_map(rooms=self.game_visited_locations, blanks=True)
           self.show_inventory()
-          self.inventory_frame.text += f'\n{time()-t:0.3f}s'
           self.scroll_to_bottom()
       
   def create_mask_overlay(self):
@@ -420,6 +469,8 @@ class Adventure():
           base_path.fill()
           ui.set_blend_mode(ui.BLEND_DESTINATION_OUT)
           ui.set_shadow('black', 0, 0, 30)
+          # combine the holes to a single path for speed
+          # fill and blend are slow
           combined_path = ui.Path()
           for _, x, y in location_list:
               combined_path.append_path(ui.Path.oval(x - r, y - r, r * 2, r * 2))
@@ -444,7 +495,7 @@ class Adventure():
                          alignment=ui.ALIGN_LEFT)
         
   def draw_position_on_map(self, rooms, blanks=True):
-      # room_no is a list
+      # rooms is a list
       radius = 10
       r = 15 * radius
       w, h = self.map_frame.width, self.map_frame.height
@@ -491,14 +542,15 @@ class Adventure():
   @on_main_thread
   def scroll_to_bottom(self):
       # Get the total length of the text
-      sleep(0.04)
+      # need this delay to allow content to be updated
+      sleep(0.4)
       self.output_frame.content_offset = (0, self.output_frame.content_size[1]-self.output_frame.height)
             
   def add_buttons(self):
       self.exit = ui.ButtonItem(title='Exit', action=self.quit, tint_color='black')
-      self.pause = ui.ButtonItem(title='Pause', action=self.pause_, tint_color='black')
-      self.save = ui.ButtonItem(title='Save', action=self.save_, tint_color='black')
-      self.restore = ui.ButtonItem(title='Restore', action=self.restore_, tint_color='black')
+      self.pause = ui.ButtonItem(title='Pause', action=self.pause_game, tint_color='black')
+      self.save = ui.ButtonItem(title='Save', action=self.save_game, tint_color='black')
+      self.restore = ui.ButtonItem(title='Restore', action=self.restore_game, tint_color='black')
       self.zoomin = ui.ButtonItem(title='ZoomIn', action=self.zoom, tint_color='black')
       self.zoomout = ui.ButtonItem(title='ZoomOut', action=self.zoom, tint_color='black')
       
@@ -507,7 +559,7 @@ class Adventure():
       self.quit_ = True
       sys.exit()
       
-  def pause_(self, sender):
+  def pause_game(self, sender):
       self.pause_run = not self.pause_run
       self.pause.tint_color = 'red' if self.pause_run else 'black'
    
@@ -515,25 +567,7 @@ class Adventure():
       """ programmatically send text """
       self.command_words = txt.split(' ')
       self.button_tapped(self.return_key)
-      
-  def save_(self, sender):
-      self.pause_(None)
-      savefile = 'temp.pkl'
-      if os.path.exists(savefile):
-          os.remove(savefile)
-      self.game_.t_suspend('save', savefile)
-      self.pause_(None)
-      self.output_frame.text += 'GAME SAVED\n'
-      
-  def restore_(self, sender):
-      self.pause_(None)
-      savefile = 'temp.pkl'
-      self.game_ = self.game_.resume(savefile)
-      self.pause_(None)
-      self.output_frame.text += 'GAME RESTORED\n'
-      self.send('look')
-      self.show_inventory()
-    
+          
   @on_main_thread
   def zoom(self, sender):
       image_w, image_h = self.map_image.size
@@ -542,7 +576,7 @@ class Adventure():
               self.zoom_level -= 0.1
       else:
           self.zoom_level += 0.1
-      print(self.zoom_level)
+      # print(self.zoom_level)
       new_w = int(image_w * self.zoom_level)
       new_h = int(image_h * self.zoom_level)
       self.map_frame.frame = (0, 0, new_w, new_h)
@@ -552,5 +586,5 @@ class Adventure():
 
                                            
 if __name__ == '__main__':
-   Adventure()  # walkthru="walkthrough2.txt")
+   Adventure(walkthru="walkthrough2.txt")
 

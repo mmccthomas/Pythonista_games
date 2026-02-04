@@ -303,6 +303,15 @@ Uses class  Piece in jigsaw_piece.py which could be used for other games.
 
 Entry point: Board_Games/jig_saw_2.py
 
+Adventure
+---------
+Classic adventure game, coded in Python from the original Colossal Caves program
+by Brandon Rhodes.
+I have added a GUI frontend for Pythonista, but left the adventure folder untouched.
+Added Map.JPG and locations.csv to higlight locations.
+
+Entry point: python_adventure/Python_Adventure.py
+
 AI Games
 --------
 I have been experimenting with using Google Gemini AI to create some classic games.
