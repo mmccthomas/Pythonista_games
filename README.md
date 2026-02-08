@@ -35,6 +35,8 @@ For further details on the game see https://en.wikipedia.org/wiki/Kye_(video_gam
 
 Entry point : Kye/Kye.py
 
+<img src="assets/Kye.jpg" alt="App Screenshot" width="500">
+
 Sudoko
 -------
 Both classic, Killer and KenKen are supported.
@@ -42,6 +44,8 @@ The Sudoko solve engine is provided by
 http://norvig.com/sudoku.html
 
 Entry point : Word_Games/Sudoku.py
+
+<img src="assets/sudoku.jpg" alt="App Screenshot" width="500">
 
 Suguru
 ------
@@ -57,6 +61,8 @@ Run Word_Games/test_suguru.py to automate new puzzle creation.
 
 Entry point : Word_Games/Suguru.py
 
+<img src="assets/suguru.jpg" alt="App Screenshot" width="500">
+
 Wordsearch
 ----------
  Another classic game.
@@ -66,6 +72,8 @@ Wordsearch
  
 Entry point : Word_Games/wordsearch.py
 
+<img src="assets/Wordsearch.jpg" alt="App Screenshot" width="500">
+
 Scrabble
 --------
 Classic game, based on ai engine from Murat Sahin scrabble_ai_main
@@ -74,6 +82,8 @@ Option for AI-AI game using 'Complete Game' in Pause Menu
 
 Entry point : Word_Games/Scrabble.py
 
+
+
 ZipWords
 --------
 Crossword grid filled with a selection of words.
@@ -81,6 +91,8 @@ Find the words to fit
 Idea taken from Puzzler magazine
 
 Entry point : Word_Games/Pieceword.py
+
+<img src="assets/Pieceword.jpg" alt="App Screenshot" width="500">
 
 NumberWords
 -----------
@@ -92,11 +104,15 @@ All others are taken from published games in magazines and newspapers.
 
 Entry point : Word_Games/NumberWord.py
 
+<img src="assets/Numberword.jpg" alt="App Screenshot" width="500">
+
 SkelNumbers
 -----------
 A variant of NumberWords when you have to find the blanks also
 
 Entry point : Word_Games/SkelNumbers.py
+
+<img src="assets/SkelNumbers.jpg" alt="App Screenshot" width="500">
 
 Anagram words
 -------------
@@ -104,6 +120,8 @@ Crossword grid filled with a selection of words.
 Find the words to fit
 
 Entry point : Word_Games/anagram_word.py
+
+<img src="assets/Anagram_word.jpg" alt="App Screenshot" width="500">
 
 Pieceword
 ---------
@@ -113,6 +131,8 @@ Touch and dragging tile causes the tiles to swap position
 
 Entry point : Word_Games/PieceWord.py
 
+<img src="assets/Pieceword.jpg" alt="App Screenshot" width="500">
+
 Dropword
 --------
 A crossword filled with a section of words. The black squares have been removed, causing
@@ -121,6 +141,8 @@ to their correct locations
 
 Entry point : Word_Games/Dropword.py
 
+<img src="assets/Dropword.jpg" alt="App Screenshot" width="500">
+
 Krossword
 ---------
 A reverse wordsearch. 
@@ -128,11 +150,14 @@ Place the given words in their correct locations given then starting points
 
 Entry point : Word_Games/KrossWord.py
 
+<img src="assets/Krossword.jpg" alt="App Screenshot" width="500">
+
 Wordle clone
 ------------
 Choose 5 letters based upon scores for previous guess
 
 Entry point : Word_Games/wordle.py
+
 
 Word Circle
 -----------
@@ -142,6 +167,8 @@ and 8 3-letter words.
 Letters can be used more than once.
 
 Entry point : Word_Games/word circle.py
+
+<img src="assets/Wordcircle.jpg" alt="App Screenshot" width="500">
 
 Quoteword
 ---------
@@ -160,6 +187,8 @@ Choose from 3x3 (nos 1-9), 4x4 (nos 1-16) or 5x5 (nos 1-25) if you dare
 
 Entry point: Word_Games/Number_grid.py
 
+<img src="assets/Number grid.jpg" alt="App Screenshot" width="500">
+
 Inequalities
 ------------
 A simple modification to Number Grid.
@@ -167,6 +196,8 @@ Presents a grid with spaces and comparison between some values
 Fill the spaces with unique numbers to satisfy the inequalities.
 
 Entry point: Word_Games/Inequalities.py
+
+<img src="assets/Inequalities.jpg" alt="App Screenshot" width="500">
 
 Crossword
 ---------
@@ -176,6 +207,8 @@ Select in a word to enter letters.
 Buttons 'Check' will check all words, and 'Hint' will fill a random word
 
 Entry point : Word_Games/Crossword.py
+
+<img src="assets/Crossword.jpg" alt="App Screenshot" width="500">
 
 TrainTracks
 -----------
@@ -187,12 +220,16 @@ The solver is taken from https://github.com/ianastewart/tracks with turtle graph
 
 Entry point : Board_Games/TrainTracks.py
 
+<img src="assets/TrainTracks.jpg" alt="App Screenshot" width="500">
+
 Tetris
 ------
 Simple implemation of a classic game. 
 An early attempt by me, could be prettier!
 
 Entry point : Board_Games/tetris.py
+
+<img src="assets/Tetris.jpg" alt="App Screenshot" width="500">
 
 Demolition
 -----------
@@ -201,12 +238,16 @@ Originally programmed on Commodore PET in 1983!
 
 Entry point : Board_Games/demolition.py
 
+<img src="assets/Demolition.jpg" alt="App Screenshot" width="500">
+
 SeaBattle
 ---------
 Modified from Game-Pigeon-Solvers by Kyle Gerner
 https://github.com/k-gerner/Game-Pigeon-Solvers
 
 Entry point : Board_Games/sea_battle/Sea_Battle.py
+
+<img src="assets/Sea_Battle.jpg" alt="App Screenshot" width="500">
 
 Othello
 -------
@@ -215,6 +256,8 @@ Gui interface
 
 Entry point : Board_Games/Othello.py
 
+<img src="assets/Othello.jpg" alt="App Screenshot" width="500">
+
 Connect4
 --------
 Modified from Game-Pigeon-Solvers by Kyle Gerner
@@ -222,11 +265,15 @@ https://github.com/k-gerner/Game-Pigeon-Solvers
 
 Entry point : Board_Games/connect4/Connect4.py
 
+<img src="assets/Connect4.jpg" alt="App Screenshot" width="500">
+
 Minesweeper
 -----------
 Another classic game.
 
 Entry point : Board_Games/MineSweeper.py
+
+<img src="assets/Minesweeper.jpg" alt="App Screenshot" width="500">
 
 Chess (WIP)
 -----------
@@ -235,12 +282,16 @@ Proof of concept, not complete
 
 Entry point : Pychess/chess_gui_scene.py
 
+<img src="assets/Pychess.jpg" alt="App Screenshot" width="500">
+
 Dots
 -----
 Dots and Boxes 
 modified from DotsAndBoxes M Sokhail Zakir/ Ammara Riaz 
 
 Entry point : Board_Games/Dots.py
+
+<img src="assets/Dots.jpg" alt="App Screenshot" width="500">
 
 MazeGame
 --------
@@ -256,6 +307,8 @@ Uses mazelib from https://github.com/john-science/mazelib
 
 Entry point : Board_Games/MazeGame.py
 
+<img src="assets/Maze game.jpg" alt="App Screenshot" width="500">
+
 Tiles
 -----
 Sliding puzzle game
@@ -264,11 +317,15 @@ requires installation of slidingpuzzle from pypi
 
 Entry point : Board_Games/tiles.py
 
+<img src="assets/Tiles.jpg" alt="App Screenshot" width="500">
+
 Caterpillar
 -----------
 a version of Snake modelled on The Very Hungry Caterpillar for my grandchildren
 
 Entry point : Board_Games/caterpillar.py
+
+<img src="assets/Caterpillar.jpg" alt="App Screenshot" width="500">
 
 
 Space Shooter
@@ -279,6 +336,8 @@ Changed icons, added shields, and quite a bit of refactoring
 
 Entry point : AI_games/a_spaceShooter.py
 
+<img src="assets/a_spaceshooter.jpg" alt="App Screenshot" width="500">
+
 Klondike
 --------
 Classic card game known also as Solitaire.
@@ -287,11 +346,15 @@ Drag the cards to new positions or just touch the card to perform best move.
 
 Entry point : Card_Games/Klondike.py
 
+<img src="assets/Klondike.jpg" alt="App Screenshot" width="500">
+
 Freecell
 --------
 Classic solitaire card game.
 Drag the cards to new positions
 Entry point : Card_Games/Freecell.py
+
+<img src="assets/Freecell.jpg" alt="App Screenshot" width="500">
 
 Jigsaw Puzzle
 -------------
@@ -303,6 +366,8 @@ Uses class  Piece in jigsaw_piece.py which could be used for other games.
 
 Entry point: Board_Games/jig_saw_2.py
 
+<img src="assets/Jigsaw.jpg" alt="App Screenshot" width="500">
+
 Adventure
 ---------
 Classic adventure game, coded in Python from the original Colossal Caves program
@@ -311,6 +376,8 @@ I have added a GUI frontend for Pythonista, but left the adventure folder untouc
 Added Map.JPG and locations.csv to higlight locations.
 
 Entry point: python_adventure/Python_Adventure.py
+
+<img src="assets/PyAdventure.jpg" alt="App Screenshot" width="500">
 
 AI Games
 --------
@@ -330,6 +397,8 @@ Uses Apple UiKit for Ocr. Attempts made to read single letters from crossword gr
 experiences crashes sometimes, hence each move is stored in numpy array for instant recovery.
 
 Entry point : Word_Games/scanning/Ocr.py
+
+<img src="assets/OCR.jpg" alt="App Screenshot" width="500">
 
 Pieceword Creator
 -----------------
@@ -361,6 +430,7 @@ Crossword generation and word filling  is contained in Word_Games/crossword_crea
 
 Entry point : Word_Games/general_crossword_create.py
 
+<img src="assets/Genera_crossword_create.jpg" alt="App Screenshot" width="500">.
 
 Notes
 -----
