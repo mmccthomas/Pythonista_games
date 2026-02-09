@@ -32,9 +32,9 @@
           "corner_radius" : 0,
           "uuid" : "970F810B-852B-4E00-92D8-C6411ABD20DB",
           "border_color" : "RGBA(1.000000,0.822222,0.822222,1.000000)",
-          "name" : "custom_view"
+          "name" : "keyboard"
         },
-        "selected" : true
+        "selected" : false
       },
       {
         "nodes" : [
@@ -55,7 +55,7 @@
           "font_name" : "AvenirNext-Regular",
           "spellchecking_type" : "default",
           "class" : "TextView",
-          "name" : "input_frame",
+          "name" : "input",
           "flex" : "WRTB"
         },
         "selected" : false
@@ -75,7 +75,7 @@
           "content_height" : 320,
           "class" : "ScrollView",
           "content_width" : 320,
-          "name" : "prediction_frame",
+          "name" : "prediction",
           "corner_radius" : 0
         },
         "selected" : false
@@ -97,7 +97,7 @@
           "font_name" : "<System>",
           "spellchecking_type" : "default",
           "class" : "TextView",
-          "name" : "inventory_frame",
+          "name" : "inventory",
           "flex" : "WHLT"
         },
         "selected" : false
@@ -119,18 +119,19 @@
           "font_name" : "TimesNewRomanPSMT",
           "spellchecking_type" : "default",
           "class" : "TextView",
-          "name" : "output_frame",
+          "name" : "output",
           "flex" : "WHRB"
         },
-        "selected" : false
+        "selected" : true
       }
     ],
     "frame" : "{{0, 0}, {782, 575}}",
     "class" : "View",
     "attributes" : {
-      "enabled" : true,
       "background_color" : "RGBA(1.000000,1.000000,1.000000,1.000000)",
+      "enabled" : true,
       "tint_color" : "RGBA(0.000000,0.478000,1.000000,1.000000)",
+      "custom_class" : "Gui",
       "border_color" : "RGBA(0.000000,0.000000,0.000000,1.000000)",
       "flex" : ""
     },

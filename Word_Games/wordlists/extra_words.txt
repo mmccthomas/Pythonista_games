@@ -5,6 +5,8 @@ beachhead
 bonemeal
 burnout
 deckchair
+echograms
+eyeshadow
 emoji
 faffs
 fizziness
@@ -19,6 +21,7 @@ jacuzzi
 jacuzzis
 katsu
 makeover
+mochi
 mooli
 newsflash
 oche
@@ -26,6 +29,7 @@ overdub
 pavlova
 polyest
 ponytailed
+quran
 rejigged
 roadie
 samosa

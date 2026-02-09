@@ -193,9 +193,10 @@ class Adventure():
   # -------------------- GUI PROCESSING
   def layout(self):
       # 1. Setup Constants
-      sidebar_w = self.width * 0.3
-      output_h = self.height * 0.55
-      main_w = self.width - sidebar_w
+      print('changing layout')
+      sidebar_w = self.sc_width * 0.3
+      output_h = self.sc_height * 0.55
+      main_w = self.sc_width - sidebar_w
       row_h = 44  # Fixed height for input/prediction bars
       
       # 2. Position Left Column
@@ -208,27 +209,28 @@ class Adventure():
       self.prediction_frame.frame = (0, y_offset, main_w, row_h)
       
       y_offset += row_h
-      self.custom_view.frame = (0, y_offset, main_w, (self.height - y_offset))
+      self.custom_view.frame = (0, y_offset, main_w, (self.sc_height - y_offset))
       
       # 3. Position Right Column (Sidebar)
       self.scroll.frame = (main_w, 0, sidebar_w, self.output_frame.height + (row_h * 2))
       
       # Inventory takes the remaining space on the bottom right
       inv_y = self.scroll.height
-      self.inventory_frame.frame = (main_w, inv_y, sidebar_w, self.height - inv_y)
+      self.inventory_frame.frame = (main_w, inv_y, sidebar_w, self.sc_height - inv_y)
       
   @on_main_thread
   def setup_ui_pyui(self):
-      self.width, self.height = get_screen_size()
+      self.sc_width, self.sc_height = get_screen_size()
       self.frame = ui.load_view('Python_adventure.pyui')
       self.add_buttons()
       self.frame.left_button_items = [self.exit, self.pause, self.save, self.restore]
       self.frame.right_button_items = [self.zoomin, self.zoomout]
       self.frame.name = 'Adventure'
-      self.frame.frame = (0, 0, self.width, self.height)
+      self.frame.frame = (0, 0, self.sc_width, self.sc_height)
       self.frame.flex = 'WH'
       for subview in self.frame.subviews:
           setattr(self, subview.name, self.frame[subview.name])
+      self.frame.layout = self.layout # TODO does this work?
       self.layout()
       # deal with keyboard, tricky to get this positioned correctly
       x, y, w, h = self.custom_view.frame
@@ -262,7 +264,7 @@ class Adventure():
       self.overlay = ui.ImageView(frame=(0, 0, image_w, image_h))
       self.scroll.add_subview(self.map_frame)
       self.map_frame.add_subview(self.overlay)
-      # self.frame.size_to_fit()
+      # self.size_to_fit()
       self.frame.present('popover', popover_location=(0, 0))
           
   def prediction(self, letters, word_no=0, compass=None):
@@ -595,7 +597,31 @@ class Adventure():
       self.scroll.content_size = (new_w, new_h)
       self.scroll.set_needs_display()
 
-                                           
+import ui
+
+class Frame(ui.View):
+    def __init__(self, *args, **kwargs):
+        
+        ui.load_view('Python_adventure.pyui', bindings={'self':self})
+        self.sc_width, self.sc_height = get_screen_size()
+      
+        self.frame = (0, 0, self.sc_width, self.sc_height)  
+        # 1. Create the UI object
+        new_btn = ui.Button(name='dynamic_btn')
+        
+        # 2. Configure its properties
+        new_btn.frame = (50, 50, 200, 40) # (x, y, width, height)
+        new_btn.title = 'I was added via code'
+        new_btn.background_color = 'white'
+        new_btn.action = self.dynamic_action
+        
+        # 3. Add it to the view
+        self.add_subview(new_btn)
+        
+    def dynamic_action(self, sender):
+        print("Dynamic button tapped!")                                           
 if __name__ == '__main__':
-   Adventure(walkthru="walkthrough2.txt")
+   g=Frame()
+   g.present('sheet')
+   #Adventure(walkthru="walkthrough2.txt")
 
