@@ -414,6 +414,8 @@ Resulting puzzle data can be copy/pasted into file piecewords.txt
 
 Entry point : Word_Games/pieceword_create.py
 
+<img src="assets/pieceword_create.jpg" alt="App Screenshot" width="500">
+
 Crossword Creator
 -----------------
 A utility to produce custom crossword puzzles (British or Cryptic style)
@@ -431,7 +433,7 @@ Crossword generation and word filling  is contained in Word_Games/crossword_crea
 
 Entry point : Word_Games/general_crossword_create.py
 
-<img src="assets/Genera_crossword_create.jpg" alt="App Screenshot" width="500">.
+<img src="assets/general_crossword_create.jpg" alt="App Screenshot" width="500">.
 
 Notes
 -----
