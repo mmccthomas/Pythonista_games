@@ -82,7 +82,7 @@ Option for AI-AI game using 'Complete Game' in Pause Menu
 
 Entry point : Word_Games/Scrabble.py
 
-
+<img src="assets/Scrabble.jpg" alt="App Screenshot" width="500">
 
 ZipWords
 --------
@@ -158,6 +158,7 @@ Choose 5 letters based upon scores for previous guess
 
 Entry point : Word_Games/wordle.py
 
+<img src="assets/wordle.jpg" alt="App Screenshot" width="500">
 
 Word Circle
 -----------
