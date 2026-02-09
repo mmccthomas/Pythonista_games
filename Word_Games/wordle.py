@@ -1,208 +1,211 @@
+"""
+keyboard sets _output when return is pressed
+menu gets result through queue and invokes function directly
+fixed issues  by allowing placement of menu and moving keyboard to bottom
+"""
 import random
-import console
 import dialogs
+import sys
 import ui
-
+from objc_util import on_main_thread
 from time import sleep
-from queue import Queue
-from Letter_game import LetterGame, Player
-
-import gui.gui_scene as gscene
-from gui.gui_interface import Gui, Squares
-from setup_logging import logger
-WordleList = ['wordlists/5000-more-common.txt'] 
+from Letter_game import LetterGame
+from Utilities.change_screensize import get_screen_size
+from gui.qwerty_keyboard import QWERTYKeyboard
+from gui.gui_interface import Squares
+# from setup_logging import logger
+WordleList = ['wordlists/5000-more-common.txt']
+# common starting words ['soare', 'roate', 'raise']
+no_letters = 5
+no_tries = 6
 
 
 class Wordle(LetterGame):
   
   def __init__(self):
-    LetterGame.__init__(self)
-    self.first_letter = False
-    self.gui.set_pause_menu({'Continue': self.gui.dismiss_menu, 
-                              'New ....': self.restart,
-                              #'Hint': self.hint,
-                              #'Reveal': self.reveal,
-                              'Quit': self.quit})
-    self.gui.set_start_menu({'New Game': self.restart, 'Quit': self.quit})
-    
+      LetterGame.__init__(self)
+      self.gui.clear_messages()
+      self.gui.set_top('Wordle')
+      self.gui.remove_labels()
+      self.first_letter = False
+      self.gui.set_pause_menu({'Continue': self.gui.dismiss_menu,
+                               'New ....': self.restart,
+                               'Hint': self.hint,
+                               'Reveal': self.reveal,
+                               'Quit': self.quit})
+      self.gui.set_start_menu({'New ....': self.restart,
+                               'Quit': self.quit})
+      x, y, w, h = self.gui.grid.bbox
+      W, H = get_screen_size()
+      self.gui.gs.menu_position = (0.75*W, 0.65*H)
+      self.keyboard = QWERTYKeyboard(display_bar=True,  frame=(w+40, y+4*h/no_letters, W-w-100, 2*h/no_letters))
+      self.gui.v.add_subview(self.keyboard)
+      self.keyboard.set_required_length(no_letters)
+      self.keyboard.q = self.gui.q
+
   def run(self):
-    #LetterGame.run(self)
-    """
-    Main method that prompts the user for input
-    """
-    self.correct_positions = []
-    self.correct_letters = []
-    self.incorrect_letters = []
-    self.possibles = []
     self.row = 0
+    self.initialise_board()
     self.square_list = []
-    self.print_square(1)
-    self.initialise_board()    
-    self.finished = False
-    move = ''
-    while True:
-      self.gui.clear_squares()           
-      self.print_board()
-      self.possibles = self.possible_words(move)
-      move = self.get_player_move(self.board)               
-      move = self.process_turn( move, self.board) 
-      self.print_square(move)
-      self.print_board()
-      self.row += 1  
-      if self.game_over():
-        break                  
+
+    while self.row < self.sizey:
+        # 1. Refresh GUI state
+        self.gui.clear_squares()
+        self.print_board()
+        
+        # 2. Wait for Input (Manual or Menu)
+        # If get_player_move returns None, hint() already handled the logic.
+        move = self.get_player_move(self.board)
+        
+        if move is not None:
+            # Standard keyboard entry path
+            self.process_turn(move, self.board)
+            self.print_square(move)
+            self.row += 1
+            
+        # 3. Check for Win/Loss
+        if self.game_over():
+            break
+
+    # Final cleanup
     self.print_board()
     self.gui.set_message2('')
     self.complete()
-    
+                        
   def get_size(self):
-    LetterGame.get_size(self, '5, 6')
+      LetterGame.get_size(self, f'{no_letters},{no_tries}')
     
   def load_words(self, word_length, file_list=WordleList):
-    LetterGame.load_words(self, word_length, file_list=file_list)
+      LetterGame.load_words(self, word_length, file_list=file_list)
      
   def initialise_board(self):
-    
-    five_letters = [word for word in self.wordlist if len(word) == self.sizex]
-    self.chosen_word = random.choice(five_letters)
-    if self.first_letter:
-      self.board[0][0] = self.chosen_word[0]
-      self.correct_positions = [0]
-    
+      five_letters = [word for word in self.wordlist if len(word) == self.sizex]
+      self.chosen_word = random.choice(five_letters)
+      if self.first_letter:
+          self.board[0][0] = self.chosen_word[0]
+          self.correct_positions = [0]
     
   def print_square(self, moves, color=None):
-    #
-    try: 
-      self.gui.clear_numbers()
-    except (AttributeError):
-      pass
-    
-    r = self.row
-    for c in self.correct_positions:
-      self.square_list.append(Squares((r, c), '', 'green' , z_position=30, alpha = .5)) 
-       
-    for c in self.correct_letters:
-      self.square_list.append(Squares((r, c), '', 'orange' , z_position=30, alpha = .5))
-    
-    self.gui.add_numbers(self.square_list)   
-    return
-  
-  def get_player_move(self, board=None):
-    """Takes in the user's input and performs that move on the board, returns the coordinates of the move
-    Allows for movement over board"""
-    #self.delta_t('start get move')
-    
-    if board is None:
-        board = self.board
-    selected_ok = False
-    #prompt = f"Select from {len(self.possibles)} items"
-    prompt = "Select 5 letters"
-    if len(self.possibles) == 0:
-      raise (IndexError, "possible list is empty")
-    #selection = dialogs.list_dialog(prompt, list(self.possibles))
-    items = sorted(list(self.possibles)) 
-    
-    # first move insert common starting words
-    if len(self.possibles) == len(self.wordlist):
-      items = ['soare', 'roate', 'raise'] + items
-    x, y, w, h = self.gui.grid.bbox 
-    #return selection
-    while self.gui.selection == '':
-      self.gui.input_letters(prompt=prompt, position=(w+150, h/4), items=None, allows_multiple_selection=True)
+      #
+      try:
+          self.gui.clear_numbers()
+      except (AttributeError):
+          pass
       
-      #self.gui.input_text_list(prompt=prompt, items=items, position=(w+250, 0))
-      while self.gui.gui_panel.letter_panel.on_screen:
-          sleep(.2)
-          # deal with pause menu displayed          
-          if self.gui.scene.presented_scene:
-              self.gui.gui_panel.letter_panel.send_to_back()
-          else:
-              self.gui.gui_panel.letter_panel.bring_to_front()
-          try:
-              selection = self.gui.selection.lower()
-              selection_row = self.gui.selection_row                
-          except (AttributeError):  # got a list
-              selection = ''.join(self.gui.selection)
-              selection_row = self.gui.selection_row
-          except (Exception) as e:
-              print(e)
-              print(traceback.format_exc())              
-      self.gui.selection = ''              
-      # print('letter ', selection)
-      if len(selection) == self.sizex:
-         return selection #, selection_row
-      
-    
-  def process_turn(self, move, board):
-    """ process the turn
-    """
-    if self.row == self.sizey:
-        self.game_over()
-    if move:
       r = self.row
-      # TODO modify to take account of double letter. correct position can getcounted twice
-      self.correct_positions = {c for c in range(len(move)) if move[c] == self.chosen_word[c]}
-      self.correct_letters = {c for c in range(len(move)) if move[c] in self.chosen_word}
-      self.correct_letters = self.correct_letters - self.correct_positions
+      for c in self.correct_positions:
+          self.square_list.append(Squares((r, c), '', 'green', z_position=30, alpha=0.5))
+         
+      for c in self.correct_letters:
+          self.square_list.append(Squares((r, c), '', 'orange', z_position=30, alpha=0.5))
       
-      self.incorrect_letters = [c for c in range(len(move)) if move[c] not in self.chosen_word]     
-      
-      for c in range(self.sizex):
-        board[r][c] = move[c]     
-      
+      self.gui.add_numbers(self.square_list)
+      return
+ 
+  def get_player_move(self, board=None):
+    self.turn_processed = False 
+    self.keyboard.set_display(f"Select {no_letters} letters")
+
+    while len(self.keyboard._output) < no_letters:
+        sleep(0.1)
+        
+        # 1. Check if Hint/Menu handled the turn
+        if self.turn_processed:
+            self.gui.dismiss_menu()
+            return None 
+
+        # 2. Update keyboard visibility based on menu state
+        if self.gui.v.scene.presented_scene is not None:
+            self.wait_for_gui()
+        else:            
+            # Use the keyboard's internal output to detect completion
+            if len(self.keyboard._output) == no_letters:
+                break
+                
+    move = ''.join(self.keyboard._output)
+    self.keyboard.reset_output()
     return move
     
-  def possible_words(self, move):
-    if self.possibles == []:
-      possibles = self.wordset
-    else:
-      possibles = self.possibles
+  def process_turn(self, move, board):
+    """ allows for duplicate letters """
+    r = self.row
+    move = move.lower()
+    target = self.chosen_word.lower()
+    
+    # Initialize result sets
+    self.correct_positions = set() # Green
+    self.correct_letters = set()   # Orange
+    self.incorrect_letters = set() # Gray
+    
+    # Track available letters in target for Orange logic
+    target_pool = list(target)
+    
+    # First Pass: Find Greens
+    for i in range(self.sizex):
+        if move[i] == target[i]:
+            self.correct_positions.add(i)
+            target_pool[i] = None # Mark as consumed
+            board[r][i] = move[i]
 
-    #Sublist = words where character in position matches known
-    if move:
-      for c in self.correct_positions:        
-        incorrect_words = {word for word in self.correct_words if move[c] != word[c]}
-        self.correct_words = self.correct_words - incorrect_words
-      for c in self.incorrect_letters:        
-        incorrect_words = {word for word in self.correct_words if move[c] in word}
-        self.correct_words = self.correct_words - incorrect_words
-    elif self.first_letter == True:       
-      incorrect_words = {word for word in possibles if self.board[0][0] != word[0]}
-      self.correct_words = possibles - incorrect_words
-    else:
-      self.correct_words = possibles
-      
-    try:
-      self.correct_words.remove(move)
-    except (ValueError, KeyError):
-      pass
-       
-    return self.correct_words
-     
+    # Second Pass: Find Oranges (remaining matches)
+    for i in range(self.sizex):
+        if i in self.correct_positions:
+            continue
+            
+        if move[i] in target_pool:
+            self.correct_letters.add(i)
+            # Remove ONLY one instance of the letter from the pool
+            target_pool[target_pool.index(move[i])] = None
+        else:
+            self.incorrect_letters.add(i)
+        
+        board[r][i] = move[i]
+    self.gui.update(self.board)
+    return move       
+         
   def game_over(self):
-    if self.row == self.sizey:
+      if self.row == self.sizey:
+          dialogs.hud_alert(f' Word was {self.chosen_word}', duration=3)
+          self.gui.set_message2(f' Word was {self.chosen_word}')
+          return True
+      if len(list(set(self.correct_positions))) == self.sizex:
+          dialogs.hud_alert(f' Well done, you found  {self.chosen_word}', duration=3)
+          self.gui.set_message2(f' Well done, you found  {self.chosen_word}')
+          return True
+          
+  @on_main_thread       
+  def hint(self):
+    self.gui.dismiss_menu()
+    # Logic to find a hint word
+    five_letters = [word for word in self.wordlist if len(word) == self.sizex]
+    random.shuffle(five_letters)            
+    hint_word = next((w for w in five_letters if any(a == b for a, b in zip(w, self.chosen_word))), None)
+    
+    if hint_word:        
+        # Process the turn immediately
+        self.process_turn(hint_word, self.board)
+        self.print_square(hint_word)
+        self.print_board()
+        self.row += 1
+        
+        # Critical: Tell the get_player_move loop to stop waiting
+        self.turn_processed = True        
+                
+  def reveal(self):
+      self.process_turn(self.chosen_word, self.board)
+      self.print_square(self.chosen_word)       
+      self.print_board()
       dialogs.hud_alert(f' Word was {self.chosen_word}', duration=3)
-      self.gui.set_message2(f' Word was {self.chosen_word}')      
-      return True
-    if len(list(set(self.correct_positions))) == self.sizex:
-      dialogs.hud_alert(f' Well done, you found  {self.chosen_word}', duration=3)
-      self.gui.set_message2(f' Well done, you found  {self.chosen_word}')
-      return True  
+      self.gui.set_message2(f' Word was {self.chosen_word}')
+      self.turn_processed = True   
       
-  def restart(self):
-    self.gui.close()
-    self.finished = False
+if __name__ == '__main__':
     g = Wordle()
     g.run()
-            
-    
-if __name__ == '__main__':
-  g = Wordle()
-  g.run()
-  while(True):
-    quit = g.wait()
-    if quit:
-      break
+    while True:
+        quit = g.wait()
+        if quit:
+            break
 
 
 
