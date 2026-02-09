@@ -47,6 +47,8 @@ This worked pretty well 'out of the box'.
 Simply needed to replace block graphics with sprite images.
 Plays surprisingly well after all these years!
 
+<img src="../assets/Pong.jpg" alt="App Screenshot" width="500">
+
 Tetris
 ------
 Proof of concept but not bad. 
@@ -56,6 +58,8 @@ Galaxians (invaders_ai)
 ---------
 Replaced sprites but otherwise untouched.
 Quite suitable for more enhancements
+<img src="../assets/Galaxians.jpg" alt="App Screenshot" width="500">
+
 
 Flappy
 ------
@@ -73,6 +77,8 @@ I was interested in Pythonista for wireframe graphics, and Gemini AI rose to the
 I improved the shape of the turret and attempted to get the rotation of the tank barrel correct.
 Its still not right - challenge!
 
+<img src="../assets/Battlezone.jpg" alt="App Screenshot" width="500">
+
 Four-in-a-Row
 -------------
 Completely produced by Gemini, including good minmax algorithm.
@@ -84,11 +90,14 @@ A proof of concept.
 Improved the lander wireframe and added rotation buttons.
 Could be much improved 
 
+<img src="../assets/Lunar Lander.jpg" alt="App Screenshot" width="500">
+
 Missile Command
 ---------------
 A decent working game.
 added sprites for cities, player missile and bases.
 
+<img src="../assets/Missile command.jpg" alt="App Screenshot" width="500">
 
 Pool
 ----
@@ -101,6 +110,7 @@ changed random positioning by shuffling only the locations leaving id and colour
 
 It would be interesting to create striped ball colours.
 
+<img src="../assets/Pool_ai.jpg" alt="App Screenshot" width="500">
 
 Rubik
 -----
@@ -112,6 +122,7 @@ The main issue with the AI produced image was that the faces were scrambled.
 Some serious debugging required to solve.
 Front face and back face rotation are not yet correct.
 
+<img src="../assets/Rubik .jpg" alt="App Screenshot" width="500">
 
 Tank
 ----
@@ -119,6 +130,7 @@ A very simple overhead tank battle in a maze.
 Lots of changes to graphics and ai movement.
 Not that interesting a game - unfortunately.
 
+<img src="../assets/Tank.jpg" alt="App Screenshot" width="500">
 
 Final observations.
 -------------------
