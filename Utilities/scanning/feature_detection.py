@@ -3,12 +3,15 @@ import numpy as np
 from PIL import Image, ImageDraw, ImageColor
 import os
 import math
-from time import time
+from operator import attrgetter
+# from time import time
 import console
 import cProfile
 import matplotlib.pyplot as plt
-from itertools import cycle, islice, dropwhile
+import matplotlib.colors as mcolors
+from itertools import cycle
 import logging
+
 
 logging.basicConfig(
     level=logging.INFO,
@@ -18,19 +21,52 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)  # Set root logger level to DEBUG
 
+
 def get_distance(p1, p2):
-        """Calculates Euclidean distance: sqrt((x2-x1)^2 + (y2-y1)^2)"""
-        return math.sqrt((p1[0] - p2[0])**2 + (p1[1] - p2[1])**2)
-        
+    """Calculates Euclidean distance: sqrt((x2-x1)^2 + (y2-y1)^2)"""
+    return math.sqrt((p1[0] - p2[0])**2 + (p1[1] - p2[1])**2)
+
+                
 def is_debug_level():
     return logging.getLevelName(logger.getEffectiveLevel()) == 'DEBUG'
 
-class dotdict(dict):
-    """dot.notation access to dictionary attributes"""
-    __getattr__ = dict.get
-    __setattr__ = dict.__setitem__
-    __delattr__ = dict.__delitem__
-    
+
+def test_plot(coords):
+    plt.plot(coords[:, 0], coords[:, 1],
+             color='red',
+             linewidth=3)
+    plt.axis('equal')
+    plt.show()
+
+        
+class Shape():
+    # container for generic shape
+    def __init__(self, centroid, circularity, coordinates, perimeter):
+         
+       self.centroid = (int(centroid[0]), int(centroid[1]))
+       self.perimeter = int(perimeter)
+       self.circularity = round(circularity, 3)
+       self.is_circle = 0.7 < circularity < 1.3  # Threshold for "roundness"
+       self.coordinates = coordinates
+       self.no_points = len(coordinates)
+       self.image = None
+       self.description = ''
+       self.quadrant = ''
+       self.image_size = (0, 0)
+       self.color_names = ''
+       self.shape = 'shape'
+       if self.is_circle:
+           self.shape = 'circle'
+       if self.circularity == 10:
+           self.shape = 'rounded rectangle'
+       if self.circularity == -10:
+           self.shape = 'rectangle'
+                
+    def __repr__(self):
+        return (f'{self.quadrant.capitalize()} {self.color_names} '
+                f'{self.shape.capitalize()}@{self.centroid} ({self.no_points}points)')
+
+                                
 class FeatureExtract():
     """ returns self.img_array, self.edges"""
     def __init__(self, image_path, output_dir='output',
@@ -241,13 +277,12 @@ class FeatureExtract():
         
         return edges
 
-    def crop_image(self, points):       
+    def crop_image(self, points):
                         
         # Create a mask for the polygon region
         mask = Image.new('L', self.img.size, 0)
         boundary = [tuple(p) for p in points]
         ImageDraw.Draw(mask).polygon(boundary, outline=255, fill=255)
-        mask_array = np.array(mask)        
         
         # Method 2: Crop to bounding box of the polygon
         x_coords = points[:, 0]
@@ -265,11 +300,94 @@ class FeatureExtract():
         cropped_rgba_array[:, :, 3] = cropped_mask_array
         
         result_cropped = Image.fromarray(cropped_rgba_array)
-                
-        # logger.debug(f"Cropped image size: {result_cropped.size}")                  
+        
+        # logger.debug(f"Cropped image size: {result_cropped.size}")
         return result_cropped
+
+    def get_dominant_colors(self, image, k=3, iterations=10):
+        """ AI generated """
+        # Load image and resize for performance
+        img = image.resize((100, 100))
+        img_array = np.array(img)[:, :, :3]  # remove alpha
+        pixels = img_array.reshape(-1, 3).astype(float)
         
+        # K-Means Implementation
+        # Initialize centroids randomly from the existing pixels
+        centroids = pixels[np.random.choice(pixels.shape[0], k, replace=False)]
+    
+        for _ in range(iterations):
+            # Calculate Euclidean distance between pixels and centroids
+            # (N, 1, 3) - (1, k, 3) -> (N, k, 3) -> distance (N, k)
+            distances = np.linalg.norm(pixels[:, np.newaxis] - centroids, axis=2)
+            
+            # Assign each pixel to the closest centroid
+            labels = np.argmin(distances, axis=1)
+            
+            # Move centroids to the mean of their assigned pixels
+            new_centroids = np.array([pixels[labels == i].mean(axis=0)
+                                     if np.any(labels == i) else centroids[i]
+                                     for i in range(k)])
+            
+            if np.allclose(centroids, new_centroids):
+                break
+            centroids = new_centroids
+    
+        # Calculate percentages
+        counts = np.bincount(labels, minlength=k)
+        percentages = counts / len(pixels)
         
+        # Sort by dominance
+        indices = np.argsort(percentages)[::-1]
+        return centroids[indices], percentages[indices]
+
+    def closest_colors(self, image):
+        """ find the closest colour names to the image
+        use k-clustering to identify major colour areas
+        """
+        def hex_to_rgb(value):
+            value = value.lstrip('#')
+            return tuple(int(value[i:i+2], 16) for i in (0, 2, 4))
+
+        def find_closest_colourname(rgb):
+            # Find the name with the smallest Euclidean distance to the RGB value
+            best_name = min(colordict.keys(),
+               key=lambda name: np.linalg.norm(np.array(rgb) - np.array(hex_to_rgb(colordict[name]))))
+            return best_name
+            
+        # colordict = mcolors.TABLEAU_COLORS  # a curated list of colors
+        colordict = mcolors.CSS4_COLORS  # a curated list of colors
+ 
+        top_colors, weights = self.get_dominant_colors(image, k=3)
+        
+        closest_name = []
+        for i, (color, weight) in enumerate(zip(top_colors, weights)):
+            name = find_closest_colourname(color)
+            closest_name.append(name)
+            # logger.debug(f"{i+1}. {name}: {weight*100:.1f}% (RGB: {color.astype(int)})")
+        # filter black
+        closest_name = [name for name in closest_name if name != 'black']
+        return '/'.join(closest_name)
+
+    def quadrant(self, coord):
+        """returns quadrant of cood in image """
+        w, h = self.img.size
+        x, y = coord
+        if x < 0.45 * w:
+            x_quad = 'left'
+        elif x > 0.55 * w:
+            x_quad = 'right'
+        else:
+            x_quad = 'centre'
+        
+        if y < 0.45 * h:
+            y_quad = 'top'
+        elif y > 0.55 * h:
+            y_quad = 'bottom'
+        else:
+            y_quad = 'centre'
+        return y_quad, x_quad
+
+                  
 class LineDetector(FeatureExtract):
     """Extends FeatureExtract to add line detection capability."""
     def __init__(self, image_path=None, output_dir='output',
@@ -1212,6 +1330,7 @@ class ArcDetector(FeatureExtract):
         Image.fromarray(output_img).save(marked_filename)
         logger.debug(f"Saved: {marked_filename}")
 
+
 class ContourDetector(FeatureExtract):
     """Extends FeatureExtract to add contour detection capability."""
     def __init__(self, image_path=None, output_dir='output',
@@ -1228,35 +1347,33 @@ class ContourDetector(FeatureExtract):
     def find_contours_numpy(self, img):
         """Scans the image to find all external contours."""
         img_binary = (img > 220).astype(np.uint8)
-        #img_binary = self.detect_edges(img)
-        #img_binary = (img_binary > 10).astype(np.uint8)
+        # img_binary = self.detect_edges(img)
+        # img_binary = (img_binary > 10).astype(np.uint8)
         plt.figure(figsize=(8, 8))
         plt.imshow(img_binary, cmap='gray', interpolation='nearest')
         plt.show()
         # Define colors for different contours
         colors = ['cyan', 'lime', 'red']
-        
-        
+                
         visited = np.zeros_like(img_binary, dtype=bool)
         # first white pixel
-        white = np.max(img)
-        r_start, c_start = tuple(np.min(np.argwhere(img_binary==1), axis=0))
+        r_start, c_start = tuple(np.min(np.argwhere(img_binary == 1), axis=0))
         contours = []
         colors = ['cyan', 'lime', 'red']
-        i=0
-        for r in range(r_start,img_binary.shape[0]):
-            for c in range(c_start,img_binary.shape[1]):
+        i = 0
+        for r in range(r_start, img_binary.shape[0]):
+            for c in range(c_start, img_binary.shape[1]):
                 if img_binary[r, c] == 1 and not visited[r, c]:
                     # External boundary check: pixel to the left should be 0
                     if c == 0 or img_binary[r, c-1] == 0:
                         cnt = self.trace_contour(img_binary, (r, c), visited)
                         
-                        contour_l =np.min(cnt, axis=0)
-                        contour_t =np.max(cnt, axis=0)
+                        contour_l = np.min(cnt, axis=0)
+                        contour_t = np.max(cnt, axis=0)
                         contour_area = np.prod(contour_t - contour_l)
                         scaled_contour_area = contour_area / img.size
                         if len(cnt) > 100 and scaled_contour_area > 0.015:
-                            #reduce number of points
+                            # reduce number of points
                             cnt = cnt[::20]
                             contours.append(cnt)
                             self.plot_contour(cnt, color=colors[i % len(colors)])
@@ -1266,7 +1383,6 @@ class ContourDetector(FeatureExtract):
     def trace_contour(self, img, start_pixel, visited_mask):
         """Moore-Neighbor Tracing algorithm to follow a boundary."""
         contour = []
-        white = np.max(img)
         current_pixel = start_pixel
         # Initial 'back' pixel is the one to the left of start
         back_pixel = (start_pixel[0], start_pixel[1] - 1)
@@ -1290,7 +1406,7 @@ class ContourDetector(FeatureExtract):
                 neighbor = neighbors[idx]
                 
                 # Check bounds and if it's a foreground pixel
-                if (0 <= neighbor[0] < img.shape[0] and 
+                if (0 <= neighbor[0] < img.shape[0] and
                     0 <= neighbor[1] < img.shape[1]):
                     if img[neighbor] == 1:
                         # Update back_pixel to the last background pixel checked
@@ -1305,7 +1421,7 @@ class ContourDetector(FeatureExtract):
         binary = (dilated == 255).astype(int)
         
         # We will use a standard connected component labeling logic.
-        # Since we can't use scipy, we use an iterative approach that 
+        # Since we can't use scipy, we use an iterative approach that
         # minimizes Python overhead by processing blocks.
         
         # 1. Labeling (Iterative Propagation)
@@ -1321,7 +1437,8 @@ class ContourDetector(FeatureExtract):
             # We check 8-way neighbors
             for dr in [-1, 0, 1]:
                 for dc in [-1, 0, 1]:
-                    if dr == 0 and dc == 0: continue
+                    if dr == 0 and dc == 0:
+                        continue
                     
                     # Create shifted views
                     # (Same logic as our dilation/perimeter code)
@@ -1358,7 +1475,7 @@ class ContourDetector(FeatureExtract):
         for label in valid_labels:
             # np.argwhere is vectorized and much faster than manual loops
             coords = np.argwhere(labels == label)
-            #sorted_points = self.greedy_path(coords) #self.sort_outline_points(coords)
+            # sorted_points = self.greedy_path(coords) #self.sort_outline_points(coords)
             features.append(coords)
             
         return features
@@ -1366,16 +1483,16 @@ class ContourDetector(FeatureExtract):
     def filter_features(self, features, img_size, decimate=50):
         filtered_features = []
         for feature in features:
-             feature_bl = np.min(feature, axis=0)                      
-             feature_tr = np.max(feature, axis=0)
-             feature_area = np.prod(feature_tr - feature_bl)                                                                        
-             scaled_contour_area = feature_area / img_size
-             if scaled_contour_area >= 0.015:
-               decimated = feature[::decimate]
-               sorted = self.sort_outline_points(decimated)
-               
-               filtered_features.append(sorted)               
-        return filtered_features     
+            feature_bl = np.min(feature, axis=0)
+            feature_tr = np.max(feature, axis=0)
+            feature_area = np.prod(feature_tr - feature_bl)
+            scaled_contour_area = feature_area / img_size
+            if scaled_contour_area >= 0.015:
+                decimated = feature[::decimate]
+                sorted = self.sort_outline_points(decimated)
+                
+                filtered_features.append(sorted)
+        return filtered_features
                                                                
     def sort_outline_points(self, points):
         if not points:
@@ -1399,15 +1516,16 @@ class ContourDetector(FeatureExtract):
         return sorted_path
         
     def plot_contour(self, contour, color):
-        plot_data = np.vstack([contour, contour[0]]) 
-        plt.plot(plot_data[:, 1], plot_data[:, 0], 
-        color=color, 
-        linewidth=3)
+        plot_data = np.vstack([contour, contour[0]])
+        plt.plot(plot_data[:, 1], plot_data[:, 0],
+                 color=color,
+                 linewidth=3)
        
         plt.title("NumPy Manual Contour Tracing", fontsize=14)
-        #plt.legend()
+        # plt.legend()
         plt.axis('off')
-        plt.show() 
+        plt.show()
+
 
 class FastContourDetector(FeatureExtract):
     """Extends FeatureExtract to add contour detection capability
@@ -1426,10 +1544,10 @@ class FastContourDetector(FeatureExtract):
     Fast contour detection using parallel labeling approach.
     Pure numpy implementation - no scipy required.
     Much faster than sequential Moore-Neighbor tracing for multiple contours.
-    """            
+    """
     def label_connected_components(self, binary_img):
         """
-        Two-pass connected component labeling algorithm (8-connectivity).        
+        Two-pass connected component labeling algorithm (8-connectivity).
         Args:
             binary_img: Binary image (0s and 1s)
             
@@ -1494,7 +1612,7 @@ class FastContourDetector(FeatureExtract):
                         label_map[root] = new_label
                     labels[i, j] = label_map[root]
         
-        return labels, new_label
+        return labels, new_label        
     
     def binary_erosion(self, img: np.ndarray) -> np.ndarray:
         """
@@ -1515,12 +1633,12 @@ class FastContourDetector(FeatureExtract):
             img[1:-1, 1:-1] &
             img[0:-2, 0:-2] & img[0:-2, 1:-1] & img[0:-2, 2:] &
             img[1:-1, 0:-2] &                    img[1:-1, 2:] &
-            img[2:, 0:-2]   & img[2:, 1:-1]   & img[2:, 2:]
+            img[2:, 0:-2]   & img[2:, 1:-1] & img[2:, 2:]
         )
         
         return eroded
     
-    def find_all_contours(self, min_contour_length = 4, max_contour_length = None):
+    def find_all_contours(self, min_contour_length=4, max_contour_length=None):
         """
         Find all contours in a binary image using parallel labeling.
         
@@ -1528,7 +1646,7 @@ class FastContourDetector(FeatureExtract):
             min_contour_length: Minimum number of pixels to be considered a contour
             max_contour_length: Maximum number of pixels to be considered a contour
         Returns:
-            List of contours, where each contour is an Nx2 array of (row, col) coordinates            
+            List of contours, where each contour is an Nx2 array of (row, col) coordinates
         
         """
         # Ensure binary image (0 and 1)
@@ -1552,7 +1670,7 @@ class FastContourDetector(FeatureExtract):
             # Get all boundary pixels for this component
             component_boundary = (labeled_img == label_id) & (boundaries == 1)
             boundary_coords = np.column_stack(np.where(component_boundary))
-            boundary_coords = np.fliplr(boundary_coords) # swap x and y
+            boundary_coords = np.fliplr(boundary_coords)  # swap x and y
             if len(boundary_coords) < min_contour_length:
                 continue
             if max_contour_length and len(boundary_coords) > max_contour_length:
@@ -1561,7 +1679,7 @@ class FastContourDetector(FeatureExtract):
         
         return contours
     
-    def find_all_contours_ordered(self, min_contour_length = 4, max_contour_length=None):
+    def find_all_contours_ordered(self, min_contour_length=4, max_contour_length=None):
         """
         Find all contours with ordered boundary pixels (proper chain).
         Slower than find_all_contours but gives contours in tracing order.
@@ -1585,7 +1703,7 @@ class FastContourDetector(FeatureExtract):
             if len(ordered) > 0:
                ordered_contours.append(ordered)
         
-        return ordered_contours    
+        return ordered_contours
 
     def _order_contour_points(self, points, threshold=1.0):
         if len(points) <= 1:
@@ -1635,57 +1753,15 @@ class FastContourDetector(FeatureExtract):
         # filter non closed arcs
         dist_to_start = np.sum(np.abs(current - start_point))
         if dist_to_start > threshold:
-            return []    
+            return []
         return ordered[:points_placed]
-    
-
-    def is_rounded_rectangle(self,points, tolerance=0.05):
-        # 1. Center the data
-        center = np.mean(points, axis=0)
-        pts_centered = points - center
-        
-        # 2. Get the bounding box dimensions
-        w = np.ptp(pts_centered[:, 0])
-        h = np.ptp(pts_centered[:, 1])
-        
-        # 3. Calculate "Symmetry"
-        # A rounded rectangle should be symmetric across both axes
-        # We flip points into the first quadrant to overlay all corners
-        quadrant_points = np.abs(pts_centered)
-        
-        # 4. Check against a "Theoretical" rounded rectangle
-        # We estimate 'r' by finding the distance from the furthest 
-        # point to the bounding box corner
-        corner_point = np.array([w/2, h/2])
-        dist_to_corner = np.linalg.norm(quadrant_points - corner_point, axis=1)
-        
-        # In a perfect rectangle, min dist is 0. 
-        # In a rounded one, the min distance will be r * (2 - sqrt(2)) approx.
-        # We look for a consistent "arc" signature in the corner points
-        corner_mask = (quadrant_points[:, 0] > w/4) & (quadrant_points[:, 1] > h/4)
-        corner_radii = np.std(dist_to_corner[corner_mask])
-        
-        # If the standard deviation of distances in the corner is low, 
-        # it's a consistent arc.
-        return corner_radii < tolerance
-    
-
-
-
-    def is_rounded_rectangle2(self, coords, tolerance=0):
-        """
-        Detect if coordinates form a rounded rectangle at any angle using only numpy.
-        
-        Parameters:
-        coords: numpy array of shape (N, 2) with x,y coordinates
-        """
-        if len(coords) < 10:
-            return False
-        
+            
+    def pca(self, coords):
+        """ unrotate a shape using Principal_Component_Analysis"""
         # Center the coordinates
         centroid = coords.mean(axis=0)
         centered = coords - centroid
-        
+       
         # Use PCA to find principal axes
         cov_matrix = np.cov(centered.T)
         eigenvalues, eigenvectors = np.linalg.eig(cov_matrix)
@@ -1697,7 +1773,20 @@ class FastContourDetector(FeatureExtract):
         
         # Rotate points to align with principal axes
         rotated = centered @ eigenvectors
+        return rotated, eigenvalues
         
+    def is_rounded_rectangle(self, coords, tolerance=0):
+        """
+        Detect if coordinates form a rounded rectangle at any angle using only numpy.
+        
+        Parameters:
+        coords: numpy array of shape (N, 2) with x,y coordinates
+        """
+        rectangle = False
+        if len(coords) < 10:
+            return False, False
+        
+        rotated, eigenvalues = self.pca(coords)
         # Get bounding box in rotated coordinates
         x_min, y_min = rotated.min(axis=0)
         x_max, y_max = rotated.max(axis=0)
@@ -1705,7 +1794,7 @@ class FastContourDetector(FeatureExtract):
         height = y_max - y_min
         
         if width == 0 or height == 0:
-            return False
+            return False, False
         
         # 1. Check edge alignment in rotated coordinates
         edge_threshold = 0.1 * min(width, height)
@@ -1719,44 +1808,47 @@ class FastContourDetector(FeatureExtract):
         edge_ratio = edge_points / len(coords)
         
         # Most points should be near edges
+        # if so it must be a rectangle
         if edge_ratio < 0.7:
-            return False
-        
+            return False, False
+        else:
+            rectangle = True
         # 2. Check corners for rounding
         corner_threshold = 0.2 * min(width, height)
         corners_rounded = 0
-        
-        corners = [
-            (x_min, y_min), (x_max, y_min),
-            (x_max, y_max), (x_min, y_max)
-        ]
-        
-        for cx, cy in corners:
-            # Count points near corner in rotated space
-            distances = np.sqrt((rotated[:, 0] - cx)**2 + (rotated[:, 1] - cy)**2)
-            very_close = np.sum(distances < corner_threshold * 0.3)
-            somewhat_close = np.sum(distances < corner_threshold)
-            
-            # Rounded corners have points nearby but not at exact corner
-            if somewhat_close > 0 and very_close < somewhat_close * 0.5:
-                corners_rounded += 1
+                
+        # try a different routine
+        # find radius of end
+        # find if all coordinates to left of radius are close to circle
+        radius_l = x_min + height / 2
+        radius_r = x_max - height/2
+        # slice left coordinates
+        left_end = rotated[rotated[:, 0] < radius_l]
+        right_end = rotated[rotated[:, 0] > radius_r]
+        distances_l = np.sqrt((left_end[:, 0] - radius_l)**2 + left_end[:, 1]**2)
+        total_l = distances_l - height / 2
+        close_l = np.all(total_l < corner_threshold)
+        distances_r = np.sqrt((right_end[:, 0] - radius_r)**2 + right_end[:, 1]**2)
+        total_r = (distances_r - height / 2)
+        close_r = np.all(total_r < corner_threshold)
+        corners_rounded = 2*close_l + 2*close_r
         
         # 3. Check aspect ratio
         aspect_ratio = max(width, height) / min(width, height)
         
         # 4. Check eigenvalue ratio (should be significantly different for rectangles)
         eigenvalue_ratio = eigenvalues[0] / eigenvalues[1] if eigenvalues[1] > 0 else 0
-        
+        is_rectangle = (rectangle and
+                           edge_ratio > 0.7 and
+                           aspect_ratio < 20 and
+                           eigenvalue_ratio > 1.5)  # Rectangle has directional variance
         # At least 3 corners rounded, good edge alignment
-        is_rounded_rect = (corners_rounded >= 3 and 
-                           edge_ratio > 0.7 and 
-                           aspect_ratio < 10 and
+        is_rounded_rect = (corners_rounded >= 3 and
+                           edge_ratio > 0.7 and
+                           aspect_ratio < 20 and
                            eigenvalue_ratio > 1.5)  # Rectangle has directional variance
         
-        return is_rounded_rect
-
-
-
+        return is_rounded_rect, is_rectangle
 
     def analyze_shapes(self, features):
         results = []
@@ -1783,17 +1875,18 @@ class FastContourDetector(FeatureExtract):
             if span < 1:
                circularity = 1 - span
             else:
-               circularity = 0                        
-            if self.is_rounded_rectangle2(pixels, tolerance=0.05):
-               circularity = 10   
-            results.append(dotdict({
-                "centroid": (int(centroid[0]), int(centroid[1])),
-                "no_points": int(area),
-                "perimeter": int(perimeter),
-                "circularity": round(circularity, 3),
-                "is_circle": 0.7 < circularity < 1.3,  # Threshold for "roundness"
-                "coordinates": pixels
-            }))
+               circularity = 0
+            rounded_rectangle, rectangle = self.is_rounded_rectangle(pixels, tolerance=0.05)
+            if rounded_rectangle:
+               circularity = 10
+            elif rectangle:
+                circularity = -10
+            results.append(Shape(
+                centroid=(int(centroid[0]), int(centroid[1])),
+                perimeter=int(perimeter),
+                circularity=round(circularity, 3),
+                coordinates=pixels
+            ))
         return results
 
     def estimate_perimeter(self, pixels):
@@ -1812,9 +1905,9 @@ class FastContourDetector(FeatureExtract):
         
         # 2. Check 4-way neighbors by shifting the grid
         # We look for pixels that are True, but have a False neighbor
-        up    = grid[:-2, 1:-1]
-        down  = grid[2:, 1:-1]
-        left  = grid[1:-1, :-2]
+        up = grid[:-2, 1:-1]
+        down = grid[2:, 1:-1]
+        left = grid[1:-1, :-2]
         right = grid[1:-1, 2:]
         center = grid[1:-1, 1:-1]
         
@@ -1836,7 +1929,7 @@ class FastContourDetector(FeatureExtract):
             output_img = Image.fromarray(self.img_array)
             draw = ImageDraw.Draw(output_img)
             
-            logger.debug("Detected contours:")            
+            logger.debug("Detected contours:")
             
             color_iter = cycle([
                 (0, 255, 0),    # Green
@@ -1851,26 +1944,26 @@ class FastContourDetector(FeatureExtract):
 
             if shapes:
                 for shape in shapes:
-                   contour = shape.coordinates                   
+                   contour = shape.coordinates
                    color = 'red' if shape.is_circle else 'green'
                    if color is None:
                       color = next(color_iter)
-                   #contour = np.fliplr(contour)
+                   # contour = np.fliplr(contour)
                    # Draw each segment
                    total_length = 0
-                   p0 = contour[0]                
+                   p0 = contour[0]
                    for p1 in contour[1:]:
                        draw.line([tuple(p0), tuple(p1)], fill=color, width=linewidth)
                        p0 = p1
                        total_length += get_distance(p0, p1)
-            else:    
+            else:
                 for contour in contours:
                     if color is None:
                        color = next(color_iter)
-                    #contour = np.fliplr(contour)
+                    # contour = np.fliplr(contour)
                     # Draw each segment
                     total_length = 0
-                    p0 = contour[0]                
+                    p0 = contour[0]
                     for p1 in contour[1:]:
                         draw.line([tuple(p0), tuple(p1)], fill=color, width=linewidth)
                         p0 = p1
@@ -1878,7 +1971,7 @@ class FastContourDetector(FeatureExtract):
                 
                 # Print line info
                 
-                #logger.debug(f"{contour[0]} {len(contour):<10} {total_length:<15.1f}")
+                # logger.debug(f"{contour[0]} {len(contour):<10} {total_length:<15.1f}")
             
             # Save marked image
             marked_filename = os.path.join(self.output_dir, 'contours_detected.png')
@@ -1891,23 +1984,23 @@ class FastContourDetector(FeatureExtract):
             logger.debug(f"Saved edge image: {edge_filename}")
             
     def filter_duplicates(self, shapes, threshold=5.0):
-        """ removes shapes with same centroid, leaving the largest 
-        shape is {'centroid': (1594, 176), 'no_points': 230, 'perimeter': 230, 'circularity': 0.055, 'is_circle': False} """        
+        """ removes shapes with same centroid, leaving the largest
+        shape is {'centroid': (1594, 176), 'no_points': 230, 'perimeter': 230, 'circularity': 0.055, 'is_circle': False} """
     
         if not shapes:
             return []
     
         # Sort by size descending so the largest version of a shape is encountered first
         # This makes the comparison logic much cleaner
-        sorted_shapes = sorted(shapes, key=lambda x: x['no_points'], reverse=True)
+        sorted_shapes = sorted(shapes, key=attrgetter('no_points'), reverse=True)
         unique_shapes = []
     
         for s in sorted_shapes:
             is_duplicate = False
-            c1 = s['centroid']
+            c1 = s.centroid
             
             for u in unique_shapes:
-                c2 = u['centroid']
+                c2 = u.centroid
                 # Euclidean distance: sqrt((x2-x1)^2 + (y2-y1)^2)
                 dist = math.sqrt((c1[0] - c2[0])**2 + (c1[1] - c2[1])**2)
                 
@@ -1919,64 +2012,332 @@ class FastContourDetector(FeatureExtract):
                 unique_shapes.append(s)
                 
         return unique_shapes
+        
+    def calculate_shape_features(self, coords):
+        """Calculate geometric features to identify the shape
+        produced by Claude Sonnet 4.5."""
+        x, y = coords[:, 0], coords[:, 1]
+        # Center the data
+        x_center = np.mean(x)
+        y_center = np.mean(y)
+        x_centered = x - x_center
+        y_centered = y - y_center
+        
+        # Calculate distances from center
+        distances = np.sqrt(x_centered**2 + y_centered**2)
+        
+        # Calculate angles
+        angles = np.arctan2(y_centered, x_centered)
+        
+        # Sort by angle to analyze shape progression
+        sorted_indices = np.argsort(angles)
+        sorted_distances = distances[sorted_indices]
+        sorted_angles = angles[sorted_indices]
+        sorted_x = x_centered[sorted_indices]
+        sorted_y = y_centered[sorted_indices]
+        
+        # Feature 1: Coefficient of variation of distances (for circle detection)
+        distance_std = np.std(distances)
+        distance_mean = np.mean(distances)
+        cv_distance = distance_std / distance_mean if distance_mean > 0 else 0
+        
+        # Feature 2: Aspect ratio (width to height ratio)
+        width = np.max(x) - np.min(x)
+        height = np.max(y) - np.min(y)
+        aspect_ratio = width / height if height > 0 else 0
+        
+        # Feature 3: Smoothness - check for corners (rectangles have sharp transitions)
+        # Calculate second derivative approximation (curvature)
+        # Use larger window to reduce noise sensitivity
+        window = 10
+        if len(sorted_x) > 2 * window:
+            # Calculate tangent directions using centered differences
+            tangent_angles = []
+            for i in range(window, len(sorted_x) - window):
+                dx = sorted_x[i + window] - sorted_x[i - window]
+                dy = sorted_y[i + window] - sorted_y[i - window]
+                tangent_angles.append(np.arctan2(dy, dx))
+            
+            tangent_angles = np.array(tangent_angles)
+            angle_changes = np.abs(np.diff(tangent_angles))
+            # Wrap around for angles near ±π
+            angle_changes = np.minimum(angle_changes, 2*np.pi - angle_changes)
+        else:
+            dx = np.diff(sorted_x)
+            dy = np.diff(sorted_y)
+            angles_diff = np.arctan2(dy, dx)
+            angle_changes = np.abs(np.diff(angles_diff))
+            angle_changes = np.minimum(angle_changes, 2*np.pi - angle_changes)
+        
+        max_angle_change = np.max(angle_changes)
+        mean_angle_change = np.mean(angle_changes)
+        # Std of angle changes - high for rectangles (concentrated corners)
+        std_angle_change = np.std(angle_changes)
+        
+        # Feature 4: Test for four-fold symmetry (rectangles)
+        # Check if distances are consistent within quadrants
+        quadrant_distances = []
+        for i in range(4):
+            angle_start = -np.pi + i * np.pi/2
+            angle_end = -np.pi + (i+1) * np.pi/2
+            mask = (sorted_angles >= angle_start) & (sorted_angles < angle_end)
+            if np.sum(mask) > 0:
+                quadrant_distances.append(np.mean(sorted_distances[mask]))
+        
+        if len(quadrant_distances) == 4:
+            quadrant_std = np.std(quadrant_distances)
+            quadrant_variation = quadrant_std / np.mean(quadrant_distances)
+        else:
+            quadrant_variation = 0
+        
+        # Feature 5: Bounding box area vs actual area (rectangularity test)
+        # Approximate area using shoelace formula
+        area_shoelace = 0.5 * np.abs(np.sum(sorted_x[:-1] * sorted_y[1:] - sorted_x[1:] * sorted_y[:-1]))
+        area_bbox = width * height
+        area_ratio = area_shoelace / area_bbox if area_bbox > 0 else 0
+        
+        # Feature 6: Check for corner detection
+        # In rectangles, there should be 4 points with high curvature
+        # Find peaks in angle changes
+        threshold = np.percentile(angle_changes, 95)
+        num_corners = np.sum(angle_changes > threshold)
+        
+        # Feature 7: Teardrop detection - check for asymmetry in end radii
+        # Better approach: measure the vertical extent (height) at each end
+        # rather than radial distance from center
+        
+        # Divide shape into segments along x-axis
+        x_min_val, x_max_val = np.min(x), np.max(x)
+        x_range = x_max_val - x_min_val
+        
+        # Left 10% of x range (left end)
+        left_threshold = x_min_val + 0.1 * x_range
+        left_end_mask = x <= left_threshold
+        
+        # Right 10% of x range (right end)
+        right_threshold = x_max_val - 0.1 * x_range
+        right_end_mask = x >= right_threshold
+        
+        # Measure vertical extent at each end
+        if np.sum(left_end_mask) > 0:
+            left_y_values = y[left_end_mask]
+            left_end_height = np.max(left_y_values) - np.min(left_y_values)
+        else:
+            left_end_height = 0
+        
+        if np.sum(right_end_mask) > 0:
+            right_y_values = y[right_end_mask]
+            right_end_height = np.max(right_y_values) - np.min(right_y_values)
+        else:
+            right_end_height = 0
+        
+        # Calculate end height ratio (larger / smaller)
+        if left_end_height > 0 and right_end_height > 0:
+            end_height_ratio = max(left_end_height, right_end_height) / min(left_end_height, right_end_height)
+            end_height_asymmetry = abs(left_end_height - right_end_height) / max(left_end_height, right_end_height)
+        else:
+            end_height_ratio = 1.0
+            end_height_asymmetry = 0.0
+        
+        # Also keep the original radial measurements as backup
+        # Divide the shape into left and right halves
+        x_mid = (x_max_val + x_min_val) / 2
+        
+        # Left half
+        left_mask = x < x_mid
+        left_distances = distances[left_mask]
+        left_radius_mean = np.mean(left_distances) if len(left_distances) > 0 else 0
+        
+        # Right half
+        right_mask = x >= x_mid
+        right_distances = distances[right_mask]
+        right_radius_mean = np.mean(right_distances) if len(right_distances) > 0 else 0
+        
+        radius_asymmetry = abs(left_radius_mean - right_radius_mean) / max(left_radius_mean, right_radius_mean) if max(left_radius_mean, right_radius_mean) > 0 else 0
+        
+        return {
+            'cv_distance': cv_distance,
+            'aspect_ratio': aspect_ratio,
+            'max_angle_change': max_angle_change,
+            'mean_angle_change': mean_angle_change,
+            'std_angle_change': std_angle_change,
+            'quadrant_variation': quadrant_variation,
+            'area_ratio': area_ratio,
+            'num_corners': num_corners,
+            'width': width,
+            'height': height,
+            'mean_distance': distance_mean,
+            'radius_asymmetry': radius_asymmetry,
+            'end_height_ratio': end_height_ratio,
+            'end_height_asymmetry': end_height_asymmetry,
+            'left_end_height': left_end_height,
+            'right_end_height': right_end_height,
+            'left_radius_mean': left_radius_mean,
+            'right_radius_mean': right_radius_mean
+        }
+        
+    def identify_teardrop(self, features, min_size_ratio=0.003, stats=False):
+        """Identify the a teardrop based on calculated features.
+        modified from AI Claude Sonnet 4.5 code to only find
+        teardrop of large enough size"""
+        
+        cv = features['cv_distance']
+        aspect_ratio = features['aspect_ratio']
+        max_angle = features['max_angle_change']
+        std_angle = features['std_angle_change']
+        area_ratio = features['area_ratio']
+        num_corners = features['num_corners']
+        end_height_ratio = features['end_height_ratio']
+        end_height_asymmetry = features['end_height_asymmetry']
+        radius_asymmetry = features['radius_asymmetry']
+        area = features['width'] * features['height']
+        image_area = np.prod(self.img_array.shape[:2])
+        image_area_ratio = area / image_area
+        if stats:
+            print("\n" + "="*70)
+            print("SHAPE IDENTIFICATION USING NUMPY")
+            print("="*70)
+            print("\nGeometric Features Calculated:")
+            print(f"  {'Feature':<30} {'Value':<15} {'Interpretation'}")
+            print(f"  {'-'*30} {'-'*15} {'-'*25}")
+            print(f"  {'Coefficient of Variation':<30} {cv:.4f}{'':>11} {'Distance consistency'}")
+            print(f"  {'Aspect Ratio (W/H)':<30} {aspect_ratio:.4f}{'':>11} {'Shape elongation'}")
+            print(f"  {'Max Angle Change':<30} {max_angle:.4f}{'':>11} {'Corner sharpness'}")
+            print(f"  {'Std Angle Change':<30} {std_angle:.4f}{'':>11} {'Curvature variance'}")
+            print(f"  {'Image Area Ratio (Shape/BBox)':<30} {image_area_ratio:.4f}{'':>11} {'Space filling'}")
+            print(f"  {'Area Ratio (Shape/BBox)':<30} {area_ratio:.4f}{'':>11} {'Space filling'}")
+            print(f"  {'Number of Corners':<30} {num_corners:<15} {'Sharp transitions'}")
+            print(f"  {'End Height Ratio':<30} {end_height_ratio:.4f}{'':>11} {'End asymmetry'}")
+            print(f"  {'End Height Asymmetry %':<30} {end_height_asymmetry:.4f}{'':>11} {'Vertical extent diff'}")
+            print(f"  {'Radius Asymmetry':<30} {radius_asymmetry:.4f}{'':>11} {'Left vs Right'}")
+            print(f"  {'Left End Height':<30} {features['left_end_height']:.2f}{'':>11}")
+            print(f"  {'Right End Height':<30} {features['right_end_height']:.2f}{'':>11}")
+            print(f"  {'Width':<30} {features['width']:.2f}{'':>11}")
+            print(f"  {'Height':<30} {features['height']:.2f}{'':>11}")
+            
+            print("\n" + "-"*70)
+            print("CLASSIFICATION LOGIC:")
+            print("-"*70)
+        
+        # Decision thresholds
+        # Rectangles have very high std (concentrated corners at 90 degrees) and high area ratio
+        RECTANGLE_STD_ANGLE_THRESHOLD = 0.5  # Very high std indicates 4 concentrated corners
+        MINIMUM_AREA_RATIO = min_size_ratio
+        ELLIPSE_ASPECT_THRESHOLD = 1.5
+        # Teardrop has asymmetric ends - use vertical height measurements
+        TEARDROP_HEIGHT_RATIO_THRESHOLD = 1.5  # One end at least 50% taller than the other
+        TEARDROP_HEIGHT_ASYMMETRY_THRESHOLD = 0.20  # At least 20% difference in end heights
+        
+        # Classify
+        # Teardrop: elongated with asymmetric end heights
+        is_teardrop = (image_area_ratio > MINIMUM_AREA_RATIO and
+                        aspect_ratio > ELLIPSE_ASPECT_THRESHOLD and
+                       std_angle < RECTANGLE_STD_ANGLE_THRESHOLD and
+                       (end_height_ratio > TEARDROP_HEIGHT_RATIO_THRESHOLD or
+                        end_height_asymmetry > TEARDROP_HEIGHT_ASYMMETRY_THRESHOLD))                
 
+        if stats:
+            print("\nTeardrop Test:")
+            print(f"  • Image Area ratio? area_ratio = {image_area_ratio:.4f} > {MINIMUM_AREA_RATIO}")
+            print(f"  • Elongated? aspect_ratio = {aspect_ratio:.4f} > {ELLIPSE_ASPECT_THRESHOLD} = {aspect_ratio > ELLIPSE_ASPECT_THRESHOLD}")
+            print(f"  • Smooth curves? std_angle = {std_angle:.4f} < {RECTANGLE_STD_ANGLE_THRESHOLD} = {std_angle < RECTANGLE_STD_ANGLE_THRESHOLD}")
+            print(f"  • Asymmetric end heights? end_height_ratio = {end_height_ratio:.4f} > {TEARDROP_HEIGHT_RATIO_THRESHOLD} = {end_height_ratio > TEARDROP_HEIGHT_RATIO_THRESHOLD}")
+            print(f"  • OR end_height_asymmetry = {end_height_asymmetry:.4f} > {TEARDROP_HEIGHT_ASYMMETRY_THRESHOLD} = {end_height_asymmetry > TEARDROP_HEIGHT_ASYMMETRY_THRESHOLD}")
+            print(f"  → Is Teardrop: {is_teardrop}")
+                        
+            print("\n" + "="*70)
+            print("FINAL IDENTIFICATION:")
+            print("="*70)
+        
+        if is_teardrop:
+            shape = "TEARDROP"
+            reasoning = [
+                f"Significantly elongated (aspect ratio {aspect_ratio:.2f}:1)",
+                f"Asymmetric ends: height ratio = {end_height_ratio:.2f}:1",
+                f"Left end height: {features['left_end_height']:.1f}, Right end height: {features['right_end_height']:.1f}",
+                f"One end is {end_height_asymmetry:.1%} larger than the other",
+                f"Smooth, continuous curves (std angle = {std_angle:.4f})",
+                "Rounded at one end, more pointed at the other"
+            ]
+        
+        else:
+            shape = "UNKNOWN/IRREGULAR"
+            reasoning = ["Shape doesn't match standard geometric forms"]
+        if stats:
+            print(f"\n✓ Shape Identified: {shape}\n")
+            print("Reasoning:")
+            for i, reason in enumerate(reasoning, 1):
+                print(f"  {i}. {reason}")
+            
+            print("\n" + "="*70 + "\n")
+        
+        return shape
+    
 
 def get_shapes(file_path):
-    image_path = file_path    
+    image_path = file_path
     output_dir = 'output'
-    canny_low = 0.5 # Lower = more edges (more noise)
-    canny_high = 0.2 # Lower = more edges (more noise)
-    min_contour_length=130                                                          
-    max_contour_length=None
+    canny_low = 0.5  # Lower = more edges (more noise)
+    canny_high = 0.2  # Lower = more edges (more noise)
+    min_contour_length = 100
+    max_contour_length = None
     
     image_process = FeatureExtract(image_path, output_dir,
                                    canny_low, canny_high)
     
-    detector = FastContourDetector(image_process=image_process)        
+    detector = FastContourDetector(image_process=image_process)
     logger.debug("Finding ordered contours...")
     ordered_contours = detector.find_all_contours_ordered(min_contour_length,
                                                           max_contour_length)
     shapes = detector.analyze_shapes(ordered_contours)
-    shapes = detector.filter_duplicates(shapes)
+    shapes = detector.filter_duplicates(shapes, threshold=10)
     contours = [shape.coordinates for shape in shapes]
     detector.plot_contours(contours, shapes=shapes, linewidth=8)
     logger.debug(f"Found {len(ordered_contours)} ordered contours")
     
     logger.debug(f"Found {len(contours)} filtered contours")
     for i, shape in enumerate(shapes):
+        rotated, eigenvalues = detector.pca(shape.coordinates)
+        features = detector.calculate_shape_features(rotated)
+        if detector.identify_teardrop(features, stats=False) == 'TEARDROP':
+            shape.shape = 'teardrop'
         image = image_process.crop_image(shape.coordinates)
-        shape['image'] = image
-        shape['image_size'] = image.size
-        logger.debug(f"{i}: {shape.centroid=}, {shape.perimeter=}, {shape.circularity=}, {shape.is_circle=} {shape.image_size=}")            
+        shape.image = image
+        shape.image_size = image.size
+        shape.color_names = image_process.closest_colors(image)
+        shape.quadrant = '_'.join(image_process.quadrant(shape.centroid))
+        shape.description = f"{shape.quadrant} {shape.color_names} {shape.shape}"
+        logger.debug(f'{shape.circularity}')
+        logger.debug(f"{i}: {shape}")
         image.show()
-    marked_filename = os.path.join(output_dir, 'contours_detected.png')
+    # marked_filename = os.path.join(output_dir, 'contours_detected.png')
     # console.quicklook(marked_filename)
-    
     return shapes
-                                                                                                             
+    
+                                                                                                                                                                                                                          
 def main():
 
     image_path = 'pinball3.png'
-    min_radius = 15      # Smallest circle to detect
-    max_radius = 120     # Largest circle to detect
-    line_threshold = 100
-    circle_threshold = 20     # Adaptive (recommended)
-    arc_threshold = 18
-    min_dist = 100
-    min_arc_angle = 60     # At least 60Â° arc
-    max_arc_angle = 330    # Up to 330Â° (almost complete)
-    max_coverage = 0.5     # Max 90% complete to be an arc
+    # min_radius = 15      # Smallest circle to detect
+    # max_radius = 120     # Largest circle to detect
+    # line_threshold = 100
+    # circle_threshold = 20     # Adaptive (recommended)
+    # arc_threshold = 18
+    # min_dist = 100
+    # min_arc_angle = 60     # At least 60Â° arc
+    # max_arc_angle = 330    # Up to 330Â° (almost complete)
+    # max_coverage = 0.5     # Max 90% complete to be an arc
     output_dir = 'output'
     canny_low = 0.5
     canny_high = 0.2
-    min_line_length = 150
-    max_line_gap = 10
+    # min_line_length = 150
+    # max_line_gap = 10
 
     # canny_low=0.05,    # Lower = more edges (more noise)
     # canny_high=0.15    # Lower = more edges (more noise)
     image_process = FeatureExtract(image_path, output_dir,
                                    canny_low, canny_high)
-    """                              
+    """
     detector = LineDetector(image_process=image_process)
                          
     lines = detector.extract_lines(min_line_length, max_line_gap, threshold=line_threshold)
@@ -2010,9 +2371,9 @@ def main():
     detector.plot_arcs(arcs)
     logger.debug(f'Arc detection: {time()-t:.2f}s')
     """
-    detector = FastContourDetector(image_process=image_process)        
+    detector = FastContourDetector(image_process=image_process)
     logger.debug("Finding ordered contours...")
-    ordered_contours = detector.find_all_contours_ordered(min_contour_length=130, 
+    ordered_contours = detector.find_all_contours_ordered(min_contour_length=130,
                                                           max_contour_length=None)
     shapes = detector.analyze_shapes(ordered_contours)
     shapes = detector.filter_duplicates(shapes)
@@ -2025,39 +2386,42 @@ def main():
         image = image_process.crop_image(shape.coordinates)
         shape['image'] = image
         shape['image_size'] = image.size
-        logger.debug(f"{i}: {shape.centroid=}, {shape.perimeter=}, {shape.circularity=}, {shape.is_circle=} {shape.image_size=}")            
+        logger.debug(f"{i}: {shape.centroid=}, {shape.perimeter=}, {shape.circularity=}, {shape.is_circle=} {shape.image_size=}")
         image.show()
     marked_filename = os.path.join(output_dir, 'contours_detected.png')
     console.quicklook(marked_filename)
+    
     
     return shapes
     
     
 if __name__ == '__main__':
-   get_shapes('pinball3.png' )
-   #main()
-   # cProfile.run('main()', sort='cumulative')
+   #for i in range(1,7):
+   #   get_shapes(f'pinball{i}.png' )
+   # main()
+   cProfile.run('get_shapes("pinball1.png")', sort='cumulative')
 """
 Common Issues
 “No circles detected”
-	1.	Check edge image: output/edges.png
-	•	Are circle edges visible?
-	•	If not, adjust canny_low and canny_high
-	2.	Lower threshold: Try threshold=5
-	3.	Adjust radius range to match your circles
-	4.	Check image quality (blur, noise, occlusion)
+  1.  Check edge image: output/edges.png
+  • Are circle edges visible?
+  • If not, adjust canny_low and canny_high
+  2.  Lower threshold: Try threshold=5
+  3.  Adjust radius range to match your circles
+  4.  Check image quality (blur, noise, occlusion)
 “Too many circles detected”
-	1.	Raise threshold: Try threshold=15 or higher
-	2.	Increase min_dist
-	3.	Narrow radius range
-	4.	Improve edge detection (higher Canny thresholds)
+  1.  Raise threshold: Try threshold=15 or higher
+  2.  Increase min_dist
+  3.  Narrow radius range
+  4.  Improve edge detection (higher Canny thresholds)
 “Circles in wrong locations”
-	•	Edge detection may be finding other circular features
-	•	Check edges.png to verify circle edges are clean
-	•	Adjust Canny parameters for better edge quality
+  • Edge detection may be finding other circular features
+  • Check edges.png to verify circle edges are clean
+  • Adjust Canny parameters for better edge quality
 Performance Notes
 Circle detection is computationally intensive:
-	•	Time increases with: (max_radius - min_radius) × num_edge_points
-	•	For large images or wide radius ranges, expect 10-60 seconds
-	•	The vectorized implementation is already optimized
+  • Time increases with: (max_radius - min_radius) × num_edge_points
+  • For large images or wide radius ranges, expect 10-60 seconds
+  • The vectorized implementation is already optimized
 """
+
