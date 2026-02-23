@@ -1,0 +1,518 @@
+[
+  {
+    "nodes" : [
+      {
+        "nodes" : [
+
+        ],
+        "frame" : "{{622, 604}, {206, 32}}",
+        "class" : "Button",
+        "attributes" : {
+          "border_width" : 2,
+          "action" : "self.commit",
+          "frame" : "{{472, 368}, {80, 32}}",
+          "title" : "Commit",
+          "uuid" : "1C904CCE-397E-4102-A38E-08C7D8C20C3C",
+          "class" : "Button",
+          "corner_radius" : 0,
+          "border_color" : "RGBA(0.155660,0.155660,0.155660,1.000000)",
+          "name" : "commit",
+          "font_size" : 15
+        },
+        "selected" : false
+      },
+      {
+        "nodes" : [
+
+        ],
+        "frame" : "{{602, 464}, {139, 32}}",
+        "class" : "Label",
+        "attributes" : {
+          "border_width" : 1,
+          "name" : "radius",
+          "corner_radius" : 0,
+          "frame" : "{{437, 368}, {150, 32}}",
+          "border_color" : "RGBA(0.000000,0.000000,0.000000,1.000000)",
+          "uuid" : "107D7EC2-D03D-44A0-AEB0-961A61FABD72",
+          "class" : "Label",
+          "alignment" : "left",
+          "text" : "radius",
+          "font_size" : 18,
+          "font_name" : "<System>"
+        },
+        "selected" : false
+      },
+      {
+        "nodes" : [
+
+        ],
+        "frame" : "{{6, 6}, {588, 756}}",
+        "class" : "ImageView",
+        "attributes" : {
+          "border_width" : 1,
+          "frame" : "{{462, 334}, {100, 100}}",
+          "tint_color" : "RGBA(0.146226,0.146226,0.146226,1.000000)",
+          "border_color" : "RGBA(1.000000,0.525926,0.288889,1.000000)",
+          "corner_radius" : 0,
+          "class" : "ImageView",
+          "uuid" : "F358E090-BB4F-4AEC-A028-67E00A73DA4B",
+          "name" : "image"
+        },
+        "selected" : false
+      },
+      {
+        "nodes" : [
+
+        ],
+        "frame" : "{{601, 197}, {410, 29}}",
+        "class" : "SegmentedControl",
+        "attributes" : {
+          "border_width" : 1,
+          "flex" : "LR",
+          "segments" : "Outline|Bumper|Flipper|Wall|Switch|None",
+          "frame" : "{{452, 370}, {120, 29}}",
+          "action" : "self.change_type",
+          "class" : "SegmentedControl",
+          "uuid" : "66C35EC5-0757-4F6E-9F92-16F8D4622ADC",
+          "corner_radius" : 0,
+          "border_color" : "RGBA(0.000000,0.000000,0.000000,1.000000)",
+          "name" : "item_type"
+        },
+        "selected" : false
+      },
+      {
+        "nodes" : [
+
+        ],
+        "frame" : "{{602, 6}, {61, 32}}",
+        "class" : "Label",
+        "attributes" : {
+          "border_width" : 1,
+          "name" : "shape_number",
+          "corner_radius" : 0,
+          "frame" : "{{437, 368}, {150, 32}}",
+          "border_color" : "RGBA(0.205189,0.205189,0.205189,1.000000)",
+          "uuid" : "41806B72-3F03-4E7A-8EFA-1E5F1277751F",
+          "class" : "Label",
+          "alignment" : "left",
+          "text" : "No",
+          "font_size" : 18,
+          "font_name" : "<System>"
+        },
+        "selected" : false
+      },
+      {
+        "nodes" : [
+
+        ],
+        "frame" : "{{602, 55}, {195, 32}}",
+        "class" : "Label",
+        "attributes" : {
+          "border_width" : 1,
+          "name" : "shape_name",
+          "corner_radius" : 0,
+          "frame" : "{{437, 368}, {150, 32}}",
+          "border_color" : "RGBA(0.238208,0.238208,0.238208,1.000000)",
+          "uuid" : "F813CE08-AE84-48F5-BE1C-9FABC3748627",
+          "class" : "Label",
+          "alignment" : "left",
+          "text" : "Label",
+          "font_size" : 18,
+          "font_name" : "<System>"
+        },
+        "selected" : false
+      },
+      {
+        "nodes" : [
+
+        ],
+        "frame" : "{{665, 6}, {346, 32}}",
+        "class" : "Label",
+        "attributes" : {
+          "uuid" : "EE14101B-9E3A-445D-A57A-1F63AB54B773",
+          "corner_radius" : 0,
+          "frame" : "{{437, 368}, {150, 32}}",
+          "border_color" : "RGBA(0.183962,0.183962,0.183962,1.000000)",
+          "border_width" : 1,
+          "tint_color" : "RGBA(1.000000,1.000000,1.000000,1.000000)",
+          "alignment" : "left",
+          "text" : "Label",
+          "font_name" : "<System>",
+          "class" : "Label",
+          "name" : "description",
+          "font_size" : 18
+        },
+        "selected" : false
+      },
+      {
+        "nodes" : [
+
+        ],
+        "frame" : "{{601, 266}, {150, 32}}",
+        "class" : "Label",
+        "attributes" : {
+          "border_width" : 1,
+          "name" : "object_type",
+          "corner_radius" : 0,
+          "frame" : "{{437, 368}, {150, 32}}",
+          "border_color" : "RGBA(0.021226,0.021226,0.021226,1.000000)",
+          "uuid" : "3161315F-CD86-4A48-9BD5-590F5A53EA70",
+          "class" : "Label",
+          "alignment" : "left",
+          "text" : "type",
+          "font_size" : 18,
+          "font_name" : "<System>"
+        },
+        "selected" : false
+      },
+      {
+        "nodes" : [
+
+        ],
+        "frame" : "{{603, 115}, {194, 32}}",
+        "class" : "Label",
+        "attributes" : {
+          "border_width" : 1,
+          "corner_radius" : 0,
+          "font_name" : "<System>",
+          "frame" : "{{437, 368}, {150, 32}}",
+          "border_color" : "RGBA(0.106132,0.106132,0.106132,1.000000)",
+          "uuid" : "3161315F-CD86-4A48-9BD5-590F5A53EA70",
+          "class" : "Label",
+          "alignment" : "left",
+          "text" : "location",
+          "name" : "location",
+          "font_size" : 18
+        },
+        "selected" : false
+      },
+      {
+        "nodes" : [
+
+        ],
+        "frame" : "{{603, 379}, {150, 32}}",
+        "class" : "Label",
+        "attributes" : {
+          "border_width" : 1,
+          "corner_radius" : 0,
+          "font_name" : "<System>",
+          "frame" : "{{437, 368}, {150, 32}}",
+          "border_color" : "RGBA(0.082547,0.082547,0.082547,1.000000)",
+          "uuid" : "3161315F-CD86-4A48-9BD5-590F5A53EA70",
+          "class" : "Label",
+          "alignment" : "left",
+          "text" : "No coords",
+          "name" : "no_coords",
+          "font_size" : 18
+        },
+        "selected" : false
+      },
+      {
+        "nodes" : [
+
+        ],
+        "frame" : "{{769, 379}, {200, 34}}",
+        "class" : "Slider",
+        "attributes" : {
+          "flex" : "W",
+          "continuous" : true,
+          "action" : "self.decimate_coordinates",
+          "frame" : "{{412, 367}, {200, 34}}",
+          "uuid" : "32964D68-1147-4B30-822F-DF6C88DE4422",
+          "class" : "Slider",
+          "value" : 0.5,
+          "name" : "decimate"
+        },
+        "selected" : false
+      },
+      {
+        "nodes" : [
+
+        ],
+        "frame" : "{{602, 306}, {331, 32}}",
+        "class" : "TextField",
+        "attributes" : {
+          "uuid" : "14F41904-7C07-465E-9B08-230476EF43BC",
+          "corner_radius" : 0,
+          "frame" : "{{412, 368}, {200, 32}}",
+          "border_color" : "RGBA(0.103774,0.103774,0.103774,1.000000)",
+          "border_width" : 1,
+          "alignment" : "left",
+          "autocorrection_type" : "default",
+          "placeholder" : "name",
+          "font_name" : "<System>",
+          "spellchecking_type" : "default",
+          "class" : "TextField",
+          "name" : "object_name",
+          "font_size" : 17
+        },
+        "selected" : false
+      },
+      {
+        "nodes" : [
+
+        ],
+        "frame" : "{{769, 354}, {150, 24}}",
+        "class" : "Label",
+        "attributes" : {
+          "font_size" : 18,
+          "frame" : "{{437, 368}, {150, 32}}",
+          "uuid" : "813D07DB-8550-4D75-AC1A-49D657E11CDE",
+          "class" : "Label",
+          "alignment" : "left",
+          "text" : "Label",
+          "name" : "decimate_indicator",
+          "font_name" : "<System>"
+        },
+        "selected" : false
+      },
+      {
+        "nodes" : [
+
+        ],
+        "frame" : "{{954, 55}, {57, 45}}",
+        "class" : "Button",
+        "attributes" : {
+          "border_width" : 1,
+          "action" : "self.next_shape",
+          "image_name" : "iob:arrow_right_a_256",
+          "frame" : "{{472, 368}, {80, 32}}",
+          "title" : "Next",
+          "uuid" : "B0F5B8F9-D383-4A6B-A8FC-94F146DD52E5",
+          "class" : "Button",
+          "corner_radius" : 0,
+          "border_color" : "RGBA(0.000000,0.000000,0.000000,1.000000)",
+          "name" : "next",
+          "font_size" : 15
+        },
+        "selected" : false
+      },
+      {
+        "nodes" : [
+
+        ],
+        "frame" : "{{864, 604}, {81, 32}}",
+        "class" : "Button",
+        "attributes" : {
+          "border_width" : 2,
+          "action" : "self.reset_json",
+          "frame" : "{{472, 368}, {80, 32}}",
+          "title" : "reset json",
+          "uuid" : "7FF3ACAB-01C0-4EDC-8400-1EF1EBFD2C23",
+          "class" : "Button",
+          "corner_radius" : 0,
+          "border_color" : "RGBA(0.000000,0.000000,0.000000,1.000000)",
+          "name" : "reset",
+          "font_size" : 15
+        },
+        "selected" : true
+      },
+      {
+        "nodes" : [
+
+        ],
+        "frame" : "{{811, 45}, {122, 123}}",
+        "class" : "ImageView",
+        "attributes" : {
+          "border_width" : 1,
+          "frame" : "{{462, 334}, {100, 100}}",
+          "border_color" : "RGBA(0.235849,0.235849,0.235849,1.000000)",
+          "corner_radius" : 0,
+          "class" : "ImageView",
+          "uuid" : "F1E64426-35E5-42C1-A744-7F60DE164A07",
+          "name" : "shape_image"
+        },
+        "selected" : false
+      },
+      {
+        "nodes" : [
+
+        ],
+        "frame" : "{{954, 115}, {57, 45}}",
+        "class" : "Button",
+        "attributes" : {
+          "border_width" : 1,
+          "action" : "self.previous_shape",
+          "image_name" : "iob:arrow_left_a_256",
+          "frame" : "{{472, 368}, {80, 32}}",
+          "title" : "Previous",
+          "uuid" : "B0F5B8F9-D383-4A6B-A8FC-94F146DD52E5",
+          "class" : "Button",
+          "corner_radius" : 0,
+          "border_color" : "RGBA(0.000000,0.000000,0.000000,1.000000)",
+          "name" : "previous",
+          "font_size" : 15
+        },
+        "selected" : false
+      },
+      {
+        "nodes" : [
+
+        ],
+        "frame" : "{{602, 432}, {60, 32}}",
+        "class" : "Label",
+        "attributes" : {
+          "font_size" : 18,
+          "frame" : "{{437, 368}, {150, 32}}",
+          "uuid" : "F5B81542-0759-49D5-AB9B-3517C2DB767B",
+          "class" : "Label",
+          "alignment" : "left",
+          "text" : "Radius",
+          "name" : "label3",
+          "font_name" : "<System>"
+        },
+        "selected" : false
+      },
+      {
+        "nodes" : [
+
+        ],
+        "frame" : "{{821, 432}, {56, 32}}",
+        "class" : "Label",
+        "attributes" : {
+          "font_size" : 18,
+          "frame" : "{{437, 368}, {150, 32}}",
+          "uuid" : "97F4E2A5-922E-4C40-8767-A70A6EE00A18",
+          "class" : "Label",
+          "alignment" : "left",
+          "text" : "Score",
+          "name" : "label4",
+          "font_name" : "<System>"
+        },
+        "selected" : false
+      },
+      {
+        "nodes" : [
+
+        ],
+        "frame" : "{{602, 511}, {91, 32}}",
+        "class" : "Label",
+        "attributes" : {
+          "font_size" : 18,
+          "frame" : "{{437, 368}, {150, 32}}",
+          "uuid" : "565B7264-2402-4DA3-94F5-D454C6E1036C",
+          "class" : "Label",
+          "alignment" : "left",
+          "text" : "Bounce",
+          "name" : "action",
+          "font_name" : "<System>"
+        },
+        "selected" : false
+      },
+      {
+        "nodes" : [
+
+        ],
+        "frame" : "{{821, 464}, {62, 110}}",
+        "class" : "TableView",
+        "attributes" : {
+          "uuid" : "4347FFEB-C602-40F6-A491-7B1E7335DC7F",
+          "corner_radius" : 0,
+          "background_color" : "RGBA(1.0, 1.0, 1.0, 1.0)",
+          "frame" : "{{412, 284}, {200, 200}}",
+          "data_source_items" : "0\n10\n20\n25\n30\n50\n100\n250\n500\n1000",
+          "data_source_number_of_lines" : 3,
+          "border_width" : 3,
+          "border_color" : "RGBA(0.051887,0.051887,0.051887,1.000000)",
+          "data_source_delete_enabled" : false,
+          "data_source_font_size" : 12,
+          "row_height" : 44,
+          "class" : "TableView",
+          "name" : "score",
+          "flex" : "WH"
+        },
+        "selected" : false
+      },
+      {
+        "nodes" : [
+
+        ],
+        "frame" : "{{602, 346}, {149, 32}}",
+        "class" : "Label",
+        "attributes" : {
+          "font_size" : 18,
+          "frame" : "{{437, 368}, {150, 32}}",
+          "uuid" : "7D65AA8A-2BD1-4315-BE7F-17C77B04F4D8",
+          "class" : "Label",
+          "alignment" : "left",
+          "text" : "No points",
+          "name" : "label2",
+          "font_name" : "<System>"
+        },
+        "selected" : false
+      },
+      {
+        "nodes" : [
+
+        ],
+        "frame" : "{{603, 176}, {408, 13}}",
+        "class" : "Label",
+        "attributes" : {
+          "name" : "label5",
+          "frame" : "{{437, 368}, {150, 32}}",
+          "uuid" : "57D731BB-ED59-41A6-AA93-9E81FF145A39",
+          "class" : "Label",
+          "alignment" : "left",
+          "text" : "",
+          "background_color" : "RGBA(1.000000,0.155556,0.155556,1.000000)",
+          "font_size" : 18,
+          "font_name" : "<System>"
+        },
+        "selected" : false
+      },
+      {
+        "nodes" : [
+
+        ],
+        "frame" : "{{603, 542}, {200, 32}}",
+        "class" : "TextField",
+        "attributes" : {
+          "uuid" : "2FE219B1-7F38-434A-94CE-83893BBE5A72",
+          "corner_radius" : 0,
+          "frame" : "{{412, 368}, {200, 32}}",
+          "border_color" : "RGBA(0.000000,0.000000,0.000000,1.000000)",
+          "border_width" : 1,
+          "alignment" : "left",
+          "autocorrection_type" : "default",
+          "action" : "",
+          "font_name" : "<System>",
+          "spellchecking_type" : "default",
+          "class" : "TextField",
+          "name" : "bounce",
+          "font_size" : 17
+        },
+        "selected" : false
+      },
+      {
+        "nodes" : [
+
+        ],
+        "frame" : "{{865, 663}, {80, 32}}",
+        "class" : "Button",
+        "attributes" : {
+          "action" : "self.run_action",
+          "frame" : "{{472, 368}, {80, 32}}",
+          "tint_color" : "RGBA(1.000000,1.000000,1.000000,1.000000)",
+          "title" : "Play game",
+          "uuid" : "80C1B240-1118-467E-AF99-5FAF3A21F8D3",
+          "class" : "Button",
+          "background_color" : "RGBA(0.000000,0.000000,0.000000,1.000000)",
+          "name" : "run",
+          "font_size" : 15
+        },
+        "selected" : false
+      }
+    ],
+    "frame" : "{{0, 0}, {1024, 768}}",
+    "class" : "View",
+    "attributes" : {
+      "name" : "",
+      "enabled" : true,
+      "background_color" : "RGBA(1.000000,1.000000,1.000000,1.000000)",
+      "tint_color" : "RGBA(0.000000,0.478000,1.000000,1.000000)",
+      "border_color" : "RGBA(0.000000,0.000000,0.000000,1.000000)",
+      "flex" : ""
+    },
+    "selected" : false
+  }
+]

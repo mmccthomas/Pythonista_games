@@ -1,0 +1,545 @@
+[
+  {
+    "nodes" : [
+      {
+        "nodes" : [
+
+        ],
+        "frame" : "{{747, 378}, {206, 32}}",
+        "class" : "Button",
+        "attributes" : {
+          "uuid" : "1C904CCE-397E-4102-A38E-08C7D8C20C3C",
+          "corner_radius" : 0,
+          "background_color" : "RGBA(0.000000,0.000000,0.000000,1.000000)",
+          "frame" : "{{472, 368}, {80, 32}}",
+          "tint_color" : "RGBA(1.000000,1.000000,1.000000,1.000000)",
+          "border_width" : 2,
+          "border_color" : "RGBA(0.155660,0.155660,0.155660,1.000000)",
+          "title" : "Fetch",
+          "action" : "self.fetch_shapes",
+          "class" : "Button",
+          "name" : "fetch",
+          "font_size" : 15
+        },
+        "selected" : false
+      },
+      {
+        "nodes" : [
+
+        ],
+        "frame" : "{{6, 6}, {588, 756}}",
+        "class" : "ImageView",
+        "attributes" : {
+          "border_width" : 1,
+          "frame" : "{{462, 334}, {100, 100}}",
+          "tint_color" : "RGBA(0.146226,0.146226,0.146226,1.000000)",
+          "border_color" : "RGBA(1.000000,0.525926,0.288889,1.000000)",
+          "corner_radius" : 0,
+          "class" : "ImageView",
+          "uuid" : "F358E090-BB4F-4AEC-A028-67E00A73DA4B",
+          "name" : "image"
+        },
+        "selected" : false
+      },
+      {
+        "nodes" : [
+
+        ],
+        "frame" : "{{602, 6}, {61, 32}}",
+        "class" : "Label",
+        "attributes" : {
+          "border_width" : 1,
+          "name" : "shape_number",
+          "class" : "Label",
+          "frame" : "{{437, 368}, {150, 32}}",
+          "border_color" : "RGBA(0.205189,0.205189,0.205189,1.000000)",
+          "text" : "No",
+          "alignment" : "left",
+          "corner_radius" : 0,
+          "uuid" : "41806B72-3F03-4E7A-8EFA-1E5F1277751F",
+          "font_size" : 18,
+          "font_name" : "<System>"
+        },
+        "selected" : false
+      },
+      {
+        "nodes" : [
+
+        ],
+        "frame" : "{{775, 77}, {151, 32}}",
+        "class" : "TextField",
+        "attributes" : {
+          "uuid" : "14F41904-7C07-465E-9B08-230476EF43BC",
+          "corner_radius" : 0,
+          "frame" : "{{412, 368}, {200, 32}}",
+          "border_color" : "RGBA(0.103774,0.103774,0.103774,1.000000)",
+          "border_width" : 1,
+          "alignment" : "left",
+          "autocorrection_type" : "default",
+          "text" : "0.5",
+          "placeholder" : "",
+          "font_name" : "<System>",
+          "spellchecking_type" : "default",
+          "class" : "TextField",
+          "name" : "canny_high",
+          "font_size" : 17
+        },
+        "selected" : false
+      },
+      {
+        "nodes" : [
+
+        ],
+        "frame" : "{{602, 307}, {165, 32}}",
+        "class" : "TextField",
+        "attributes" : {
+          "uuid" : "14F41904-7C07-465E-9B08-230476EF43BC",
+          "corner_radius" : 0,
+          "frame" : "{{412, 368}, {200, 32}}",
+          "border_color" : "RGBA(0.103774,0.103774,0.103774,1.000000)",
+          "border_width" : 1,
+          "alignment" : "left",
+          "autocorrection_type" : "default",
+          "text" : "10",
+          "placeholder" : "",
+          "font_name" : "<System>",
+          "spellchecking_type" : "default",
+          "class" : "TextField",
+          "name" : "min_spacing",
+          "font_size" : 17
+        },
+        "selected" : false
+      },
+      {
+        "nodes" : [
+
+        ],
+        "frame" : "{{602, 77}, {160, 32}}",
+        "class" : "TextField",
+        "attributes" : {
+          "uuid" : "14F41904-7C07-465E-9B08-230476EF43BC",
+          "corner_radius" : 0,
+          "frame" : "{{412, 368}, {200, 32}}",
+          "border_color" : "RGBA(0.103774,0.103774,0.103774,1.000000)",
+          "border_width" : 1,
+          "alignment" : "left",
+          "autocorrection_type" : "default",
+          "text" : "0.2",
+          "placeholder" : "",
+          "font_name" : "<System>",
+          "spellchecking_type" : "default",
+          "class" : "TextField",
+          "name" : "canny_low",
+          "font_size" : 17
+        },
+        "selected" : false
+      },
+      {
+        "nodes" : [
+
+        ],
+        "frame" : "{{602, 241}, {165, 32}}",
+        "class" : "TextField",
+        "attributes" : {
+          "uuid" : "14F41904-7C07-465E-9B08-230476EF43BC",
+          "corner_radius" : 0,
+          "frame" : "{{412, 368}, {200, 32}}",
+          "border_color" : "RGBA(0.103774,0.103774,0.103774,1.000000)",
+          "border_width" : 1,
+          "alignment" : "left",
+          "autocorrection_type" : "default",
+          "text" : "50",
+          "placeholder" : "",
+          "font_name" : "<System>",
+          "spellchecking_type" : "default",
+          "class" : "TextField",
+          "name" : "min_contour_length",
+          "font_size" : 17
+        },
+        "selected" : false
+      },
+      {
+        "nodes" : [
+
+        ],
+        "frame" : "{{775, 241}, {165, 32}}",
+        "class" : "TextField",
+        "attributes" : {
+          "uuid" : "14F41904-7C07-465E-9B08-230476EF43BC",
+          "corner_radius" : 0,
+          "frame" : "{{412, 368}, {200, 32}}",
+          "border_color" : "RGBA(0.103774,0.103774,0.103774,1.000000)",
+          "border_width" : 1,
+          "alignment" : "left",
+          "autocorrection_type" : "default",
+          "text" : "None",
+          "placeholder" : "",
+          "font_name" : "<System>",
+          "spellchecking_type" : "default",
+          "class" : "TextField",
+          "name" : "max_contour_length",
+          "font_size" : 17
+        },
+        "selected" : false
+      },
+      {
+        "nodes" : [
+
+        ],
+        "frame" : "{{602, 46}, {150, 32}}",
+        "class" : "Label",
+        "attributes" : {
+          "name" : "label1",
+          "frame" : "{{437, 368}, {150, 32}}",
+          "uuid" : "7F490A43-E371-4128-B724-2B36941C50C3",
+          "class" : "Label",
+          "alignment" : "left",
+          "text" : "Canny Low",
+          "font_size" : 18,
+          "font_name" : "<System>"
+        },
+        "selected" : false
+      },
+      {
+        "nodes" : [
+
+        ],
+        "frame" : "{{775, 46}, {150, 32}}",
+        "class" : "Label",
+        "attributes" : {
+          "font_name" : "<System>",
+          "frame" : "{{437, 368}, {150, 32}}",
+          "uuid" : "7F490A43-E371-4128-B724-2B36941C50C3",
+          "class" : "Label",
+          "alignment" : "left",
+          "text" : "Canny High",
+          "name" : "label1",
+          "font_size" : 18
+        },
+        "selected" : false
+      },
+      {
+        "nodes" : [
+
+        ],
+        "frame" : "{{603, 211}, {164, 32}}",
+        "class" : "Label",
+        "attributes" : {
+          "font_name" : "<System>",
+          "frame" : "{{437, 368}, {150, 32}}",
+          "uuid" : "7F490A43-E371-4128-B724-2B36941C50C3",
+          "class" : "Label",
+          "alignment" : "left",
+          "text" : "Min Contour Length",
+          "name" : "label1",
+          "font_size" : 18
+        },
+        "selected" : false
+      },
+      {
+        "nodes" : [
+
+        ],
+        "frame" : "{{775, 211}, {165, 32}}",
+        "class" : "Label",
+        "attributes" : {
+          "font_name" : "<System>",
+          "frame" : "{{437, 368}, {150, 32}}",
+          "uuid" : "7F490A43-E371-4128-B724-2B36941C50C3",
+          "class" : "Label",
+          "alignment" : "left",
+          "text" : "Max Contour Length",
+          "name" : "label1",
+          "font_size" : 18
+        },
+        "selected" : false
+      },
+      {
+        "nodes" : [
+
+        ],
+        "frame" : "{{602, 274}, {164, 32}}",
+        "class" : "Label",
+        "attributes" : {
+          "font_name" : "<System>",
+          "frame" : "{{437, 368}, {150, 32}}",
+          "uuid" : "7F490A43-E371-4128-B724-2B36941C50C3",
+          "class" : "Label",
+          "alignment" : "left",
+          "text" : "Min Spacing",
+          "name" : "label1",
+          "font_size" : 18
+        },
+        "selected" : false
+      },
+      {
+        "nodes" : [
+
+        ],
+        "frame" : "{{756, 347}, {207, 32}}",
+        "class" : "Label",
+        "attributes" : {
+          "font_name" : "<System>",
+          "frame" : "{{437, 368}, {150, 32}}",
+          "uuid" : "7F490A43-E371-4128-B724-2B36941C50C3",
+          "class" : "Label",
+          "alignment" : "left",
+          "text" : "Process New Values",
+          "name" : "label1",
+          "font_size" : 18
+        },
+        "selected" : false
+      },
+      {
+        "nodes" : [
+
+        ],
+        "frame" : "{{615, 385}, {34, 34}}",
+        "class" : "Label",
+        "attributes" : {
+          "uuid" : "582416B5-8348-40A5-AEA7-6297D28DC0BE",
+          "corner_radius" : 0,
+          "background_color" : "RGBA(1.000000,-0.022222,-0.022222,1.000000)",
+          "frame" : "{{437, 368}, {150, 32}}",
+          "tint_color" : "RGBA(1.000000,-0.022222,-0.022222,1.000000)",
+          "border_width" : 2,
+          "border_color" : "RGBA(0.113208,0.113208,0.113208,1.000000)",
+          "alignment" : "left",
+          "text" : " ",
+          "font_name" : "<System>",
+          "class" : "Label",
+          "name" : "processed",
+          "font_size" : 18
+        },
+        "selected" : false
+      },
+      {
+        "nodes" : [
+
+        ],
+        "frame" : "{{603, 338}, {92, 32}}",
+        "class" : "Label",
+        "attributes" : {
+          "font_size" : 18,
+          "frame" : "{{437, 368}, {150, 32}}",
+          "uuid" : "40B33B0E-77E8-49D9-9086-53B1336D5186",
+          "class" : "Label",
+          "alignment" : "left",
+          "text" : "Processed",
+          "name" : "label2",
+          "font_name" : "<System>"
+        },
+        "selected" : false
+      },
+      {
+        "nodes" : [
+
+        ],
+        "frame" : "{{602, 444}, {93, 32}}",
+        "class" : "Label",
+        "attributes" : {
+          "font_size" : 18,
+          "frame" : "{{437, 368}, {150, 32}}",
+          "uuid" : "F28E1BDD-7EF8-4633-9279-E17965517C77",
+          "class" : "Label",
+          "alignment" : "left",
+          "text" : "Shapes",
+          "name" : "label3",
+          "font_name" : "<System>"
+        },
+        "selected" : false
+      },
+      {
+        "nodes" : [
+
+        ],
+        "frame" : "{{615, 484}, {34, 34}}",
+        "class" : "Label",
+        "attributes" : {
+          "uuid" : "582416B5-8348-40A5-AEA7-6297D28DC0BE",
+          "corner_radius" : 0,
+          "background_color" : "RGBA(1.000000,-0.022222,-0.022222,1.000000)",
+          "frame" : "{{437, 368}, {150, 32}}",
+          "tint_color" : "RGBA(1.000000,-0.022222,-0.022222,1.000000)",
+          "border_width" : 2,
+          "border_color" : "RGBA(0.000000,0.000000,0.000000,1.000000)",
+          "alignment" : "left",
+          "text" : " ",
+          "font_name" : "<System>",
+          "class" : "Label",
+          "name" : "shapes",
+          "font_size" : 18
+        },
+        "selected" : false
+      },
+      {
+        "nodes" : [
+
+        ],
+        "frame" : "{{747, 486}, {193, 32}}",
+        "class" : "Label",
+        "attributes" : {
+          "border_width" : 1,
+          "font_size" : 18,
+          "class" : "Label",
+          "frame" : "{{437, 368}, {150, 32}}",
+          "border_color" : "RGBA(0.000000,0.000000,0.000000,1.000000)",
+          "text" : "shapes",
+          "alignment" : "left",
+          "corner_radius" : 0,
+          "uuid" : "8AA1BB9B-3FAC-4C83-8676-D0C445F8E908",
+          "name" : "no_shapes",
+          "font_name" : "<System>"
+        },
+        "selected" : false
+      },
+      {
+        "nodes" : [
+
+        ],
+        "frame" : "{{897, 6}, {106, 32}}",
+        "class" : "Button",
+        "attributes" : {
+          "uuid" : "508D1891-2334-49F5-ACB2-45C52C5E2ADA",
+          "corner_radius" : 0,
+          "background_color" : "RGBA(0.134434,0.134434,0.134434,1.000000)",
+          "frame" : "{{472, 368}, {80, 32}}",
+          "tint_color" : "RGBA(1.000000,1.000000,1.000000,1.000000)",
+          "border_width" : 1,
+          "border_color" : "RGBA(0.000000,0.000000,0.000000,1.000000)",
+          "title" : "File",
+          "action" : "self.select_file",
+          "class" : "Button",
+          "name" : "select_file",
+          "font_size" : 15
+        },
+        "selected" : false
+      },
+      {
+        "nodes" : [
+
+        ],
+        "frame" : "{{775, 307}, {165, 32}}",
+        "class" : "TextField",
+        "attributes" : {
+          "uuid" : "14F41904-7C07-465E-9B08-230476EF43BC",
+          "corner_radius" : 0,
+          "frame" : "{{412, 368}, {200, 32}}",
+          "border_color" : "RGBA(0.103774,0.103774,0.103774,1.000000)",
+          "border_width" : 1,
+          "alignment" : "left",
+          "autocorrection_type" : "default",
+          "text" : "1000",
+          "placeholder" : "",
+          "font_name" : "<System>",
+          "spellchecking_type" : "default",
+          "class" : "TextField",
+          "name" : "edge_tries",
+          "font_size" : 17
+        },
+        "selected" : false
+      },
+      {
+        "nodes" : [
+
+        ],
+        "frame" : "{{776, 274}, {164, 32}}",
+        "class" : "Label",
+        "attributes" : {
+          "font_size" : 18,
+          "frame" : "{{437, 368}, {150, 32}}",
+          "uuid" : "7F490A43-E371-4128-B724-2B36941C50C3",
+          "class" : "Label",
+          "alignment" : "left",
+          "text" : "Edge tries",
+          "name" : "label10",
+          "font_name" : "<System>"
+        },
+        "selected" : false
+      },
+      {
+        "nodes" : [
+
+        ],
+        "frame" : "{{679, 147}, {200, 34}}",
+        "class" : "Slider",
+        "attributes" : {
+          "action" : "self.set_canny",
+          "flex" : "W",
+          "border_width" : 1,
+          "frame" : "{{412, 367}, {200, 34}}",
+          "uuid" : "7E5F5717-5B6E-4B46-9030-D2C8BC23E6CC",
+          "class" : "Slider",
+          "value" : 0.10000000000000001,
+          "corner_radius" : 0,
+          "border_color" : "RGBA(0.101415,0.101415,0.101415,1.000000)",
+          "name" : "canny"
+        },
+        "selected" : false
+      },
+      {
+        "nodes" : [
+
+        ],
+        "frame" : "{{679, 117}, {138, 31}}",
+        "class" : "Label",
+        "attributes" : {
+          "font_name" : "<System>",
+          "frame" : "{{437, 368}, {150, 32}}",
+          "uuid" : "F28E1BDD-7EF8-4633-9279-E17965517C77",
+          "class" : "Label",
+          "alignment" : "left",
+          "text" : "Canny",
+          "font_size" : 18,
+          "name" : "canny_val"
+        },
+        "selected" : false
+      },
+      {
+        "nodes" : [
+
+        ],
+        "frame" : "{{747, 447}, {200, 29}}",
+        "class" : "SegmentedControl",
+        "attributes" : {
+          "class" : "SegmentedControl",
+          "frame" : "{{452, 370}, {120, 29}}",
+          "uuid" : "B785350A-580E-48B1-AB54-D2C1A5FEB56E",
+          "segments" : "1|2|3|4|5",
+          "name" : "size_reduction",
+          "flex" : "LR"
+        },
+        "selected" : false
+      },
+      {
+        "nodes" : [
+
+        ],
+        "frame" : "{{747, 418}, {150, 32}}",
+        "class" : "Label",
+        "attributes" : {
+          "name" : "label4",
+          "frame" : "{{437, 368}, {150, 32}}",
+          "uuid" : "3D7FC733-15AC-49D1-A5FA-FFB06AC15B09",
+          "class" : "Label",
+          "alignment" : "left",
+          "text" : "Image reduction",
+          "font_size" : 18,
+          "font_name" : "<System>"
+        },
+        "selected" : false
+      }
+    ],
+    "frame" : "{{0, 0}, {1024, 768}}",
+    "class" : "View",
+    "attributes" : {
+      "name" : "",
+      "enabled" : true,
+      "tint_color" : "RGBA(0.000000,0.478000,1.000000,1.000000)",
+      "border_color" : "RGBA(0.000000,0.000000,0.000000,1.000000)",
+      "background_color" : "RGBA(1.000000,1.000000,1.000000,1.000000)",
+      "flex" : ""
+    },
+    "selected" : false
+  }
+]
