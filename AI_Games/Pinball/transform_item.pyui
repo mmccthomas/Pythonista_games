@@ -1,0 +1,198 @@
+[
+  {
+    "nodes" : [
+      {
+        "nodes" : [
+
+        ],
+        "frame" : "{{20, 10}, {216, 32}}",
+        "class" : "Label",
+        "attributes" : {
+          "name" : "label_angles",
+          "frame" : "{{125, 134}, {150, 32}}",
+          "uuid" : "0653C87F-F716-4E32-BA60-ECF20893A242",
+          "class" : "Label",
+          "alignment" : "left",
+          "text" : "Rotation Angle CCW",
+          "font_size" : 18,
+          "font_name" : "<System>"
+        },
+        "selected" : false
+      },
+      {
+        "nodes" : [
+
+        ],
+        "frame" : "{{20, 100}, {150, 32}}",
+        "class" : "Label",
+        "attributes" : {
+          "name" : "label_orient",
+          "frame" : "{{125, 134}, {150, 32}}",
+          "uuid" : "EB08D41E-8FCB-4099-8E19-5A0F77129465",
+          "class" : "Label",
+          "alignment" : "left",
+          "text" : "Mirror",
+          "font_size" : 18,
+          "font_name" : "<System>"
+        },
+        "selected" : false
+      },
+      {
+        "nodes" : [
+
+        ],
+        "frame" : "{{20, 40}, {360, 40}}",
+        "class" : "SegmentedControl",
+        "attributes" : {
+          "action" : "self.segment_changed",
+          "flex" : "LR",
+          "segments" : "0|45|90|135|180|225|270|315",
+          "frame" : "{{140, 136}, {120, 29}}",
+          "class" : "SegmentedControl",
+          "uuid" : "F13E038A-7DA8-4DC9-8504-FF191DC8396B",
+          "name" : "Angle"
+        },
+        "selected" : false
+      },
+      {
+        "nodes" : [
+
+        ],
+        "frame" : "{{20, 130}, {360, 40}}",
+        "class" : "SegmentedControl",
+        "attributes" : {
+          "action" : "self.segment_changed",
+          "flex" : "LR",
+          "segments" : "None|Vertical|Horizontal",
+          "frame" : "{{140, 136}, {120, 29}}",
+          "uuid" : "13AB07ED-72B5-4991-A2F8-B6C961A6A20E",
+          "class" : "SegmentedControl",
+          "name" : "Orientation"
+        },
+        "selected" : false
+      },
+      {
+        "nodes" : [
+
+        ],
+        "frame" : "{{304, 88}, {76, 32}}",
+        "class" : "Button",
+        "attributes" : {
+          "action" : "self.segment_changed",
+          "border_width" : 2,
+          "frame" : "{{160, 134}, {80, 32}}",
+          "tint_color" : "RGBA(0.000000,0.000000,0.000000,1.000000)",
+          "title" : "Cancel",
+          "uuid" : "0AAD3378-B4F9-4520-B974-239B476B6BB4",
+          "class" : "Button",
+          "corner_radius" : 0,
+          "border_color" : "RGBA(0.242925,0.242925,0.242925,1.000000)",
+          "name" : "Cancel",
+          "font_size" : 15
+        },
+        "selected" : false
+      },
+      {
+        "nodes" : [
+
+        ],
+        "frame" : "{{20, 201}, {354, 29}}",
+        "class" : "SegmentedControl",
+        "attributes" : {
+          "action" : "self.segment_changed",
+          "flex" : "LR",
+          "segments" : "x1|x0.25|x0.5|x0.67|x1.24|x1.5|x2",
+          "frame" : "{{140, 136}, {120, 29}}",
+          "uuid" : "005CE42B-56B0-4749-AFA0-1B0CDDF8C0AF",
+          "class" : "SegmentedControl",
+          "name" : "Scale"
+        },
+        "selected" : false
+      },
+      {
+        "nodes" : [
+
+        ],
+        "frame" : "{{20, 170}, {150, 32}}",
+        "class" : "Label",
+        "attributes" : {
+          "name" : "Scale",
+          "frame" : "{{125, 134}, {150, 32}}",
+          "uuid" : "93BFAAEE-D5C5-42EC-8C8A-921D9691CF1D",
+          "class" : "Label",
+          "alignment" : "left",
+          "text" : "Scale",
+          "font_size" : 18,
+          "font_name" : "<System>"
+        },
+        "selected" : false
+      },
+      {
+        "nodes" : [
+
+        ],
+        "frame" : "{{20, 258}, {374, 40}}",
+        "class" : "SegmentedControl",
+        "attributes" : {
+          "action" : "self.segment_changed",
+          "flex" : "LR",
+          "segments" : "None|Red|Blue|Green|Purple|Cyan|Yellow",
+          "frame" : "{{140, 136}, {120, 29}}",
+          "uuid" : "E6A4CAFE-2B7A-40EE-B8F8-A656C21A2D32",
+          "class" : "SegmentedControl",
+          "name" : "Colour"
+        },
+        "selected" : false
+      },
+      {
+        "nodes" : [
+
+        ],
+        "frame" : "{{20, 229}, {150, 32}}",
+        "class" : "Label",
+        "attributes" : {
+          "name" : "label2",
+          "frame" : "{{125, 134}, {150, 32}}",
+          "uuid" : "4A51F0B1-20C3-4FF3-B15D-BCDE8A38C573",
+          "class" : "Label",
+          "alignment" : "left",
+          "text" : "Colour",
+          "font_size" : 18,
+          "font_name" : "<System>"
+        },
+        "selected" : false
+      },
+      {
+        "nodes" : [
+
+        ],
+        "frame" : "{{209, 88}, {80, 32}}",
+        "class" : "Button",
+        "attributes" : {
+          "action" : "self.segment_changed",
+          "border_width" : 2,
+          "frame" : "{{160, 134}, {80, 32}}",
+          "title" : "Delete",
+          "uuid" : "EB7BD6FF-3CE1-457C-A923-479D65446B46",
+          "class" : "Button",
+          "corner_radius" : 0,
+          "border_color" : "RGBA(0.000000,0.000000,0.000000,1.000000)",
+          "name" : "Delete",
+          "font_size" : 15
+        },
+        "selected" : false
+      }
+    ],
+    "frame" : "{{0, 0}, {400, 300}}",
+    "class" : "View",
+    "attributes" : {
+      "name" : "Transform",
+      "enabled" : true,
+      "border_color" : "RGBA(0.000000,0.000000,0.000000,1.000000)",
+      "background_color" : "RGBA(1.000000,1.000000,1.000000,1.000000)",
+      "tint_color" : "RGBA(0.000000,0.478000,1.000000,1.000000)",
+      "flex" : ""
+    },
+    "selected" : false
+  }
+]

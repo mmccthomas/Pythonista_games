@@ -6,11 +6,13 @@ from numpy.lib.stride_tricks import sliding_window_view
 from PIL import Image, ImageDraw
 import os
 import math
+from scene import Rect
 from operator import attrgetter
-import console
 import matplotlib.pyplot as plt
 import matplotlib.colors as mcolors
+import colorsys
 from itertools import cycle
+from copy import copy
 import logging
 
 
@@ -41,7 +43,9 @@ def test_plot(coords):
 
         
 class Shape():
-    # container for generic shape
+    """container for generic shape
+    coordinates are always centred on shape rectangle centre
+    """
     
     def __init__(self, centroid, circularity, coordinates, perimeter):
          
@@ -57,22 +61,216 @@ class Shape():
        self.image_size = (0, 0)
        self.color_names = ''
        self.shape = 'shape'
+       self.sprite_name = None
        self.pivot = None
        self.length = 0
        self.radius = None
+       self.node = None  # holds sprite
        if self.is_circle:
            self.shape = 'circle'
        if self.circularity == 10:
            self.shape = 'rounded rectangle'
        if self.circularity == -10:
            self.shape = 'rectangle'
-       if self.is_circle:            
-            self.radius =  int(np.mean(np.linalg.norm(coordinates - np.array(self.centroid), axis=1))) 
+       if self.is_circle:
+           self.radius = int(np.mean(np.linalg.norm(coordinates - np.array(self.centroid), axis=1)))
+            
     def __repr__(self):
         return (f'{self.quadrant.capitalize()} {self.color_names} '
                 f'{self.shape.capitalize()}@{self.centroid} ({self.no_points}points)')
+                
+    def set_centroid(self, new_centroid):
+        # translate coordinates around new centroid newcentroid is an x,y tuple
+        self.coordinates = self.coordinates + np.array(new_centroid)
+        self.centroid = new_centroid
+               
+    def shift(self):
+        """move coordinates to centre of image"""
+        return self.coordinates - np.array(self.centroid) + np.array(self.image.size) // 2
+            
+    def recentre(self):
+        """move coordinates to centre around (0,0)"""
+        self.coordinates = self.coordinates - self.bbox.center()
+        return self.coordinates
+       
+    def mirror(self, axis='vertical'):
+        """
+        Mirror the shape horizontally or vertically.
+        
+        Args:
+            axis: 'vertical' mirrors left<->right, 'horizontal' mirrors top<->bottom
+        
+        Returns:
+            Tuple of (mirrored PIL image, mirrored coordinates as numpy array)
+        """
+        if self.image is None:
+            raise ValueError("Shape has no image to mirror.")
+    
+        img_w, img_h = self.image.size
+    
+        if axis == 'vertical':
+            mirrored_image = self.image.transpose(Image.FLIP_LEFT_RIGHT)
+            mirrored_coords = self.coordinates.copy()
+            mirrored_coords[:, 0] = -self.coordinates[:, 0]
+    
+        elif axis == 'horizontal':
+            mirrored_image = self.image.transpose(Image.FLIP_TOP_BOTTOM)
+            mirrored_coords = self.coordinates.copy()
+            mirrored_coords[:, 1] = -self.coordinates[:, 1]
+    
+        else:
+            raise ValueError("axis must be 'vertical' or 'horizontal'.")
+    
+        return mirrored_image, mirrored_coords
 
-                                
+    def rotate(self, angle, expand=True):
+        """
+        Rotate the shape by a given angle around the shape's centroid.
+        
+        Args:
+            angle:  Degrees to rotate counter-clockwise.
+            expand: If True, expand the image canvas to fit the rotated content.
+                    If False, keep the original canvas (may clip corners).
+        
+        Returns:
+            Tuple of (rotated PIL image, rotated coordinates as numpy array)
+        """
+        if self.image is None:
+            raise ValueError("Shape has no image to rotate.")
+    
+        img_w, img_h = self.image.size
+        cx, cy = self.bbox.center()  # self.centroid
+    
+        # PIL rotates counter-clockwise; we match that convention
+        # rotates around image centre
+        rotated_image = self.image.rotate(
+            angle,
+            center=(img_w/2, img_h/2),
+            expand=expand,
+            resample=Image.BICUBIC
+        )
+    
+        # Build the rotation matrix (counter-clockwise, degrees -> radians)
+        theta = np.radians(angle)
+        cos_t, sin_t = np.cos(theta), np.sin(theta)
+        rotation_matrix = np.array([[cos_t, -sin_t],
+                                    [sin_t,  cos_t]])
+    
+        # Translate coords so centroid is the origin, rotate, translate back
+        shifted = self.coordinates - np.array([cx, cy])
+        rotated_coords = (rotation_matrix @ shifted.T).T + np.array([cx, cy])
+    
+        # If expand=True PIL shifts the image origin; we must apply the same offset
+        if expand:
+            new_w, new_h = rotated_image.size
+            # offset = np.array([(new_w - img_w) / 2, (new_h - img_h) / 2])
+            # rotated_coords += offset
+    
+        return rotated_image, rotated_coords.astype(int)
+        
+    def get_copy(self):
+        return copy(self)
+
+    def change_dominant_color(self, target_hue_deg, target_sat=None, target_lightness=None):
+        """0: Red, 30: Orange, 60: Yellow, 90: Chartreuse Green,
+        120: Green, 150: Spring Green, 180: Cyan,
+        210: Azure, 240: Blue, 270: Violet/Purple,
+        300: Magenta, 330: Rose
+        """
+        # 1. Load image and convert to RGBA
+        img = self.image.convert('RGBA')
+        data = np.array(img)
+        
+        # Split channels
+        r, g, b, a = data[:, :, 0], data[:, :, 1], data[:, :, 2], data[:, :, 3]
+        
+        # 2. Convert RGB to HSV
+        # We normalize RGB to 0-1 for colorsys
+        vfunc = np.vectorize(colorsys.rgb_to_hsv)
+        h, s, v = vfunc(r/255.0, g/255.0, b/255.0)
+    
+        # 3. Detect Dominant Hue
+        # We only look at pixels that aren't transparent
+        opaque_mask = a > 0
+        if not np.any(opaque_mask):
+            return "No opaque pixels found."
+        
+        # Find the average hue of the opaque pixels
+        dominant_hue = np.median(h[opaque_mask])
+        
+        # Find the average saturation of the opaque pixels
+        dominant_saturation = np.median(s[opaque_mask])
+        
+        # Find the average lightness of the opaque pixels
+        dominant_lightness = np.median(v[opaque_mask])
+        
+        # 4. Apply the Shift
+        # target_hue_deg should be 0-360 (e.g., 120 for Green, 240 for Blue)
+        target_hue = target_hue_deg / 360.0
+        shift = target_hue - dominant_hue
+        
+        # Apply shift and keep within 0-1 range
+        h_new = (h + shift) % 1.0
+        
+        if target_sat:
+            # target_sat should be 0-1
+            # target_sat = target_sat / 360.0
+            shift = target_sat - dominant_saturation
+        
+            # Apply shift and keep within 0-1 range
+            s_new = (s + shift) % 1.0
+        else:
+            s_new = dominant_saturation
+            
+        if target_lightness:
+            # target_sat should be 0-1
+            # target_sat = target_sat / 360.0
+            shift = target_lightness - dominant_lightness
+            # Apply shift and keep within 0-1 range
+            v_new = (v + shift) % 1.0
+        else:
+            v_new = dominant_lightness
+            
+        # 5. Convert back to RGB
+        vfunc_back = np.vectorize(colorsys.hsv_to_rgb)
+        r_new, g_new, b_new = vfunc_back(h_new, s_new, v_new)
+        
+        # Reconstruct the image array
+        new_data = np.stack([(r_new*255).astype(np.uint8),
+                             (g_new*255).astype(np.uint8),
+                             (b_new*255).astype(np.uint8),
+                             a], axis=-1)
+        return Image.fromarray(new_data, 'RGBA')
+
+    def scale_path(self, scale_factor):
+        """
+        Reduces or enlarges a closed path relative to its center.
+        
+        Parameters:
+            scale_factor (float): Factor to scale by (e.g., 0.5 to halve the size).
+        """
+        # 1. Calculate the centroid (mean of all points)
+        centroid = np.mean(self.coordinates, axis=0)
+        
+        # 2. Shift points to origin, scale, and shift back
+        scaled_points = (self.coordinates - centroid) * scale_factor + centroid
+        self.coordinates = scaled_points
+        return scaled_points
+     
+    @property
+    def bbox(self):
+        return self.get_bounding_box()
+        
+    def get_bounding_box(self):
+       """ Computes x, y, w, h from a numpy array of  coordinates.
+       """
+       min_xy = np.min(self.coordinates, axis=0)
+       max_xy = np.max(self.coordinates, axis=0)
+       # Compute width and height
+       wh = max_xy - min_xy
+       return Rect(*min_xy, *wh)
+
+                                                                                                                                              
 class FeatureExtract():
     """ returns self.img_array, self.edges"""
     def __init__(self, image_path, output_dir='output',
@@ -234,15 +432,15 @@ class FeatureExtract():
         def dilate(confirmed):
             result = np.copy(confirmed)
             # Cardinal directions
-            result[1:, :]  |= confirmed[:-1, :]  # Shift Down
+            result[1:, :] |= confirmed[:-1, :]  # Shift Down
             result[:-1, :] |= confirmed[1:, :]   # Shift Up
-            result[:, 1:]  |= confirmed[:, :-1]  # Shift Right
+            result[:, 1:] |= confirmed[:, :-1]  # Shift Right
             result[:, :-1] |= confirmed[:, 1:]   # Shift Left
             
             # Diagonals
-            result[1:, 1:]   |= confirmed[:-1, :-1]
-            result[1:, :-1]  |= confirmed[:-1, 1:]
-            result[:-1, 1:]  |= confirmed[1:, :-1]
+            result[1:, 1:] |= confirmed[:-1, :-1]
+            result[1:, :-1] |= confirmed[:-1, 1:]
+            result[:-1, 1:] |= confirmed[1:, :-1]
             result[:-1, :-1] |= confirmed[1:, 1:]
             
             return result
@@ -256,8 +454,8 @@ class FeatureExtract():
         edge_try = 0
         while edge_try < edge_tries:
             # 1. Find all neighbors of currently confirmed strong pixels
-            # We shift the image in all 8 directions to simulate the 3x3 window                        
-            neighbors = dilate(confirmed)                        
+            # We shift the image in all 8 directions to simulate the 3x3 window
+            neighbors = dilate(confirmed)
             # 2. A weak pixel becomes confirmed if it touches a confirmed neighbor
             new_confirmations = weak_mask & neighbors & ~confirmed
             
@@ -274,8 +472,7 @@ class FeatureExtract():
         result = np.zeros_like(image)
         result[confirmed] = strong
         return result
-        
-    
+            
     def canny_edge_detection(self, image, low_threshold=0.05, high_threshold=0.15, edge_tries=100):
         """Perform Canny edge detection."""
         logger.debug("  Applying Gaussian blur...")
@@ -290,7 +487,7 @@ class FeatureExtract():
         logger.debug("  Double threshold...")
         thresholded, weak, strong = self.double_threshold(suppressed, low_threshold, high_threshold)
         
-        logger.debug("  Edge tracking...")                
+        logger.debug("  Edge tracking...")
         edges = self.edge_tracking(thresholded, weak, strong, edge_tries=edge_tries)
         return edges
 
@@ -1123,7 +1320,7 @@ class FastContourDetector(FeatureExtract):
                            std_angle < RECTANGLE_STD_ANGLE_THRESHOLD,
                            any((end_height_ratio > TEARDROP_HEIGHT_RATIO_THRESHOLD,
                                 end_height_asymmetry > TEARDROP_HEIGHT_ASYMMETRY_THRESHOLD))
-                          ))
+                           ))
 
         if stats:
             logger.debug("\nTeardrop Test:")
@@ -1165,10 +1362,11 @@ class FastContourDetector(FeatureExtract):
     def process_teardrop(self, shape):
         """ find the pivot and length of a teardrop"""
         # unrotate the shape to centre on 0,0 in E-W direction
+        
         rotated, eigenvalues, eigenvectors, centroid = self.pca(shape.coordinates)
         features = self.calculate_shape_features(rotated)
+        
         if self.identify_teardrop(features, stats=False) == 'TEARDROP':
-         
             shape.shape = 'teardrop'
             # compute pivot from radius of thicker end
             max_width = max(features['left_end_height'], features['right_end_height'])
@@ -1181,6 +1379,8 @@ class FastContourDetector(FeatureExtract):
             shape.pivot = self.inverse_pca(xy, eigenvectors, centroid)[0].astype(int)
             # length from pivot to thinner end
             shape.length = int(features['width'] - np.abs(x1))
+            return True
+        return False
 
 
 def get_shapes(file_path):
@@ -1215,11 +1415,8 @@ def get_shapes(file_path):
         shape.quadrant = '_'.join(image_process.quadrant(shape.centroid))
         shape.description = f"{shape.quadrant} {shape.color_names} {shape.shape}"
         logger.debug(f"{i}: {shape}")
-        image.show()
+        # image.show()
     detector.plot_contours(shapes, color=None, linewidth=10)
-    marked_filename = os.path.join(output_dir, 'contours_detected.png')
-    #console.quicklook(marked_filename)
-    
     return shapes
     
                                                                                                                                                                                                                           
@@ -1228,10 +1425,10 @@ def main():
 
         
 if __name__ == '__main__':
-   #for i in range(7,8):
+   # for i in range(7,8):
    #   shapes = get_shapes(f'pinball{i}.png')
    # main()
-   # 
+   #
    import cProfile
    cProfile.run('get_shapes("pinball7.png")', sort='cumulative')
 """
