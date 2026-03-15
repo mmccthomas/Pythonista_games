@@ -1,14 +1,15 @@
 # classes and movement for pinball
 # computations only, no gui elements
 import numpy as np
-from scene import Vector2, Rect
-import matplotlib.colors as mcolors
+from scene import Point, Rect
 import math
 import ui
 import base_path
+base_path.add_paths(__file__)
 from Utilities.dotdict import DotDict
 LEFT = 1
 RIGHT = -1
+
 
 def get_bounding_box(coords):
     """ Computes x, y, w, h from a numpy array of  coordinates.
@@ -24,7 +25,7 @@ class Wall:
 
     def __init__(self, name, centroid, coordinates, inside_wall=True):
         self.name = name
-        self.centroid = Vector2(*centroid)
+        self.centroid = Point(*centroid)
         self.coordinates = coordinates
         self.node = None
         self.inside_wall = inside_wall
@@ -42,14 +43,167 @@ class Wall:
         path.close()
         self.path = path
         return path
-        
 
+    def find_triangle_vertices_batched(self):
+        """Find the 3 dominant vertices from a rounded triangle's coordinates
+        Attempt to identify touch on longest side of sling."""
+    
+        coords = np.asarray(self.coordinates)
+        n = len(coords)
+        best_area = 0
+        best_trio = None
+    
+        for i in range(n):
+            p1 = coords[i]
+            # Remaining points to avoid redundant calculations
+            others = coords[i + 1:]
+            if len(others) < 2:
+                continue
+    
+            # Vectors from p1 to all other points
+            # Shape: (m, 2) where m = n-(i+1)
+            diffs = others - p1
+    
+            # Outer product to get all pairs of cross products
+            # cross = x1*y2 - y1*x2
+            x = diffs[:, 0]
+            y = diffs[:, 1]
+    
+            # Vectorized 2D cross product for all pairs (j, k)
+            # Using broadcasting: (m, 1) and (1, m)
+            areas = np.abs(np.outer(x, y) - np.outer(y, x)) / 2
+    
+            max_idx = np.argmax(areas)
+            current_max = areas.flat[max_idx]
+    
+            if current_max > best_area:
+                best_area = current_max
+                # map flat index back to the 'others' array
+                j_rel, k_rel = np.unravel_index(max_idx, areas.shape)
+                best_trio = (p1, others[j_rel], others[k_rel])
+    
+        return best_trio
+
+    def segment_length(self, p1, p2):
+        return np.linalg.norm(np.array(p2) - np.array(p1))
+
+    def point_to_segment_distance(self, point, p1, p2):
+        """Shortest distance from a point to a line segment."""
+        point, p1, p2 = map(np.array, [point, p1, p2])
+        seg = p2 - p1
+        t = np.clip(np.dot(point - p1, seg) / np.dot(seg, seg), 0, 1)
+        closest = p1 + t * seg
+        return np.linalg.norm(point - closest)
+
+    def touched_longest_side(self, touch_point, tolerance=10.0):
+        """
+        Returns True if touch_point is on the longest side of the triangle.
+    
+        coords      - list of (x, y) tuples forming the rounded triangle
+        touch_point - (x, y) where the object made contact
+        tolerance   - max distance to consider "touching" a side
+        """
+        v1, v2, v3 = self.find_triangle_vertices_batched()
+    
+        sides = [(v1, v2), (v2, v3), (v1, v3)]
+        lengths = [self.segment_length(*s) for s in sides]
+        longest_side = sides[np.argmax(lengths)]
+    
+        distances = [self.point_to_segment_distance(touch_point, *s) for s in sides]
+        closest_side_idx = np.argmin(distances)
+    
+        is_longest = np.array_equal(
+            sides[closest_side_idx][0], longest_side[0]
+        ) and np.array_equal(sides[closest_side_idx][1], longest_side[1])
+        is_touching = distances[closest_side_idx] <= tolerance
+    
+        return is_longest and is_touching
+
+    def get_plunger_channel(self,  x_tolerance=3):
+        """ Attempt to identify plunger channel
+        coords: Numpy array of [x, y] points of the table outline.
+        relative to centre of outline
+        x_tolerance: Max pixels x can drift while still being 'vertical'.
+        """
+        coords = self.coordinates
+        # 1. Isolate the right-side points
+        x_outer = np.max(coords[:, 0])
+        right_points = coords[coords[:, 0] > (x_outer - x_tolerance)]
+        
+        # 2. Sort by Y descending (bottom to top)
+        # Note: In most image systems, 'bottom' is the HIGHEST Y value.
+        sorted_pts = right_points[right_points[:, 1].argsort()[::-1]]
+        # 2. Calculate horizontal differences between consecutive points
+        if len(sorted_pts) > 1:
+            x_diffs = np.diff(sorted_pts[:, 0])  # Check difference in X coordinates
+            # Get indices where points are vertically aligned within tolerance
+            # We add 1 to include the 'neighbor' point that matched the criteria
+            match_indices = np.where(np.abs(x_diffs) < x_tolerance)[0]
+            if match_indices.size > 0:
+                # Combine the indices to get all points involved in the matches
+                all_indices = np.unique(np.concatenate([match_indices, match_indices + 1]))
+                y_subset = sorted_pts[all_indices]
+                y_min = np.min(y_subset[:, 1])
+                y_max = np.max(y_subset[:, 1])
+            else:
+               # Handle case where no points match tolerance
+               y_min, y_max = None, None
+        else:
+            # Handle case with 0 or 1 point
+            y_min, y_max = None, None
+                            
+        # 1. Define the expected lane width (approximate)
+        # Most plunger lanes are very narrow.
+        expected_width_range = (12 * 2, 12 * 3)  # pixels, adjust based on image scale
+        
+        # 2. Search for points that fall within the same Y-range
+        # but are next to the left of our outer wall.
+        # 1. Filter for points within the vertical bounds and to the left of x_outer        
+        mask = (
+            (coords[:, 1] >= y_min) & 
+            (coords[:, 1] <= y_max) & 
+            (coords[:, 0] <= x_outer -10) # Adjust '10' based on your noise level
+        )
+        left_points = coords[mask]
+
+        # 2. Find the maximum x-coordinate among those left points
+        # This represents the "inner wall" surface immediately adjacent to x_outer
+        if left_points.size > 0:
+            x_inner_edge = np.max(left_points[:, 0])
+            
+            # 3. Extract only the points that sit on that specific edge
+            inner_wall_candidates = left_points[left_points[:, 0] == x_inner_edge]
+        else:
+             inner_wall_candidates = np.array([])
+        
+        # no inner wall found, use default
+        if len(inner_wall_candidates) == 0:
+            x_inner = x_outer - expected_width_range[0]
+        else:
+            # 3. Find the most frequent X-coordinate in this subset (the inner wall)
+            values, counts = np.unique(inner_wall_candidates[:, 0], return_counts=True)
+            max_index = np.argmax(counts)
+            # Return the value at that index
+            x_inner = values[max_index]
+        
+        results = DotDict({
+            "x_range": (x_inner, x_outer),
+            "x_min": x_inner,
+            "y_min": y_min,
+            "height": (y_max - y_min),
+            "width": x_outer - x_inner,
+            "rect": Rect(x_inner, y_min, x_outer - x_inner, y_max - y_min)
+        })
+        self.plunger_channel = results.rect
+        return results                     
+                                                
+                                                                                                
 
 class Switch:
 
     def __init__(self, name, centroid, coordinates, action, score):
         self.name = name
-        self.centroid = Vector2(*centroid)
+        self.centroid = Point(*centroid)
         self.coordinates = coordinates
         self.score = score
         self.action = action
@@ -75,17 +229,17 @@ class Flipper:
     def __init__(self, name, centroid, pivot,
                  length, coordinates,
                  min_angle=-20, max_angle=30):
-        # pivot is a Vector2 . pivot.x is negative for left flipper, positive for right
+        # pivot is a Point . pivot.x is negative for left flipper, positive for right
         # TODO, lose side and just use pivot offset
         # lose all the inversions
         self.name = name
-        self.pivot_offset = pivot # scalr x1 along x along flipper x axis
+        self.pivot_offset = pivot  # scalr x1 along x along flipper x axis
         
         self.length = length
         self.inside_wall = True
-        self.centroid = Vector2(*centroid)
+        self.centroid = Point(*centroid)
         # world coordinates
-        self.pivot = np.array(self.centroid + self.pivot_offset) 
+        self.pivot = np.array(self.centroid + self.pivot_offset)
         self.bounce = 1.2
         
         self.is_active = False
@@ -97,28 +251,17 @@ class Flipper:
         self.pos = self.bbox.center()
         self.original_coordinates = np.copy(coordinates)  # ADD THIS
         self.original_center = np.array(centroid)  # ADD THIS
-        
-        # pivot is an offset from centroid along the x-axis of the unrotated
-        # flipper.  Convert to an absolute world-space position so the rest of
-        # the code can treat self.pivot as a plain (x, y) coordinate.
-        centroid_arr = np.array(centroid, dtype=float)
-        pivot_offset = pivot  # lies on x-axis
-        #self.pivot = centroid_arr + pivot_offset              # world-space pivot
 
         self.length = length
-        # colour of flipper
-        colordict = mcolors.CSS4_COLORS  # a curated list of colors
-        colour_name = name.split(' ')[1]
-        first_colour = colour_name.split('/')[0]
-        self.color = 'red' #colordict[first_colour]
+        self.color = 'red'
         
         # Initial angle: direction from centroid to world-space pivot
         dx, dy = self.pivot - self.original_center
-        self.initial_angle = 0 #-math.degrees(math.atan2(dy, dx))
+        self.initial_angle = 0  # -math.degrees(math.atan2(dy, dx))
         self.rotation = 0
         # Angle limits are always expressed as offsets from initial_angle.
         # side flips the direction of travel so left and right behave the same.
-        self.side = 2 * (pivot.x < 0) - 1 # +/- 1
+        self.side = 2 * (pivot.x < 0) - 1  # +/- 1
         self.min_angle = self.initial_angle + min_angle * self.side
         self.max_angle = self.initial_angle + max_angle * self.side
         self.angle = self.min_angle
@@ -134,7 +277,7 @@ class Flipper:
         self.path = path
         return path
         
-    def rotate_object_(self,theta):
+    def rotate_object_(self, theta):
         """
         Rotate an object around a pivot point.
         
@@ -153,7 +296,7 @@ class Flipper:
         cos_t = np.cos(theta)
         sin_t = np.sin(theta)
         R = np.array([[cos_t, -sin_t],
-                      [ sin_t,  cos_t]])
+                      [sin_t,  cos_t]])
         
         x1 = self.pivot_offset[0]
         x0, y0 = self.original_center
@@ -169,12 +312,8 @@ class Flipper:
         perim_rel_pivot = centre_rel_pivot + self.original_coordinates          # (N, 2)
         new_perim_world = (R @ perim_rel_pivot.T).T + pivot_world  # (N, 2) world coords
     
-        # Express perimeter relative to new centre
-        new_perim_rel_centre = new_perim_world - new_centre
+        return new_centre, new_perim_world
     
-        return new_centre, new_perim_world 
-    
-
     def rotate_object(self, theta):
         """
         Rotates an object around a pivot offset (x1, 0) relative to its center.
@@ -219,9 +358,8 @@ class Flipper:
 
         # always update, even though it takes time (<100us)
         self.node.rotation = np.radians(self.angle)
-        new_centre, new_perim = self.rotate_object(np.radians(self.angle))        
+        new_centre, new_perim = self.rotate_object(np.radians(self.angle))
         self.coordinates = new_perim
- 
  
     def rotation_matrix_(self, angle_rad: float) -> np.ndarray:
         c, s = np.cos(angle_rad), np.sin(angle_rad)
@@ -233,7 +371,7 @@ class Flipper:
         return centre + R @ (point - centre)
     
     def pivot_correction_translation_(self, pivot: np.ndarray, centre: np.ndarray,
-                                     angle_rad: float) -> np.ndarray:
+                                      angle_rad: float) -> np.ndarray:
         """
         Returns the translation vector T such that, after rotating all flipper
         points around `centre` by `angle_rad`, adding T keeps `pivot` stationary.
@@ -250,11 +388,11 @@ class Flipper:
         return pivot - pivot_rotated
     
     def transform_perimeter_(self,
-                            perimeter: np.ndarray,        # (N, 2) array of points
-                            centre: np.ndarray,           # rotation centre
-                            pivot: np.ndarray,            # stationary pivot point
-                            angle_rad: float
-                            ) -> tuple[np.ndarray, np.ndarray]:
+                             perimeter: np.ndarray,        # (N, 2) array of points
+                             centre: np.ndarray,           # rotation centre
+                             pivot: np.ndarray,            # stationary pivot point
+                             angle_rad: float
+                             ) -> tuple[np.ndarray, np.ndarray]:
         """
         Rotate all perimeter points around `centre`, then translate so `pivot`
         stays fixed.
@@ -277,19 +415,19 @@ class Flipper:
         # For the right flipper, we flip the X direction
         tip_x = self.pivot.x + math.cos(rad) * self.length * self.side
         tip_y = self.pivot.y + math.sin(rad) * self.length * self.side
-        return self.pivot, Vector2(tip_x, tip_y)       
+        return self.pivot, Point(tip_x, tip_y)
 
     def compute_anchor_point(self):
-        # set anchor point of spritenode to pivot       
+        # set anchor point of spritenode to pivot
         x1 = self.pivot_offset.x  # Your offset in pixels
-        w = self.node.bbox.width       
+        w = self.node.bbox.width
         # Calculate the normalized anchor point
         # (0.5, 0.5) is the default center
-        new_anchor_x = 0.5 + (x1 / w)        
-        self.node.anchor_point = (new_anchor_x, 0.5)        
-        # Now, moving the sprite back to center 
+        new_anchor_x = 0.5 + (x1 / w)
+        self.node.anchor_point = (new_anchor_x, 0.5)
+        # Now, moving the sprite back to center
         #  changing the anchor shifts its visual position
-        self.node.position = Vector2(self.centroid.x + x1, self.centroid.y)
+        self.node.position = Point(self.centroid.x - x1, self.centroid.y)
 
     
 class Bumper:
@@ -386,78 +524,13 @@ class Ball:
             point = self.pos + self.radius * self.vel / magnitude
         return point
         
-    def get_plunger_channel(self, coords, x_tolerance=3):
-        """ Attempt to identify plunger channel
-        coords: Numpy array of [x, y] points of the table outline.
-        relative to centre of outline
-        x_tolerance: Max pixels x can drift while still being 'vertical'.
-        """
-        # 1. Isolate the right-side points
-        x_outer = np.max(coords[:, 0])
-        right_points = coords[coords[:, 0] > (x_outer - x_tolerance)]
-        
-        # 2. Sort by Y descending (bottom to top)
-        # Note: In most image systems, 'bottom' is the HIGHEST Y value.
-        sorted_pts = right_points[right_points[:, 1].argsort()[::-1]]
-        # 2. Calculate horizontal differences between consecutive points
-        if len(sorted_pts) > 1:
-            x_diffs = np.diff(sorted_pts[:, 0])  # Check difference in X coordinates
-            # Get indices where points are vertically aligned within tolerance
-            # We add 1 to include the 'neighbor' point that matched the criteria
-            match_indices = np.where(np.abs(x_diffs) < x_tolerance)[0]
-            if match_indices.size > 0:
-                # Combine the indices to get all points involved in the matches
-                all_indices = np.unique(np.concatenate([match_indices, match_indices + 1]))
-                y_subset = sorted_pts[all_indices]
-                y_min = np.min(y_subset[:, 1])
-                y_max = np.max(y_subset[:, 1])
-            else:
-               # Handle case where no points match tolerance
-               y_min, y_max = None, None
-        else:
-            # Handle case with 0 or 1 point
-            y_min, y_max = None, None
-                            
-        # 1. Define the expected lane width (approximate)
-        # Most plunger lanes are very narrow.
-        expected_width_range = (self.radius * 2, self.radius * 6)  # pixels, adjust based on image scale
-        
-        # 2. Search for points that fall within the same Y-range
-        # but are slightly to the left of our outer wall.
-        inner_wall_candidates = coords[
-               (coords[:, 1] >= y_min)
-             & (coords[:, 1] <= y_max)
-             & (coords[:, 0] > x_outer - expected_width_range[1])
-             & (coords[:, 0] < x_outer - 10)  # At least 10px to the left
-        ]
-        # no inner wall found, use default
-        if len(inner_wall_candidates) == 0:
-            x_inner = x_outer - expected_width_range[1]
-        else:
-            # 3. Find the most frequent X-coordinate in this subset (the inner wall)
-            values, counts = np.unique(inner_wall_candidates[:, 0], return_counts=True)
-            max_index = np.argmax(counts)
-            # Return the value at that index
-            x_inner = values[max_index]
-        
-        results = DotDict({
-            "x_range": (x_inner, x_outer),
-            "x_min": x_inner,
-            "y_min": y_min,
-            "height": (y_max - y_min),
-            "width": x_outer - x_inner,
-            "rect": Rect(x_inner, y_min, x_outer - x_inner, y_max - y_min)
-        })
-        #need                
-        self.plunger_channel = results.rect
-        return results
+    
 
                 
 class Physics():
     def __init__(self, ball, walls, flippers, bumpers, switches, parent):
        self.score = 0
-       self.timer = .02
-       self.gravity = np.array([0, -0.1])
+       self.gravity = np.array([0, -0.25])
        # self.image = pinball_image
        self.ball = ball
        self.walls = walls
@@ -470,41 +543,36 @@ class Physics():
        self.plunger_rect = Rect(0, 0, 1, 1)
        self.ball_ready = False
         
-    def update(self, dt):
+    def update(self, dt):                
+        self.ball.vel = self.ball.vel + self.gravity
+        self.ball.pos = self.ball.pos + self.ball.vel
+        self.ball.update()
+        # 1. Reset if out of bounds
+        min_y = [wall.bbox.translate(*self.parent.origin) for wall in self.walls if not wall.inside_wall][0][1] + 10
+        if self.ball.touch_point()[1] < min_y:
+            self.emit_ball()
+        # 2. reset if in pluger going down
+        p = Point(*self.ball.touch_point())
+        in_box = self.plunger_rect.contains_point(p)
+        if in_box and (self.ball.vel[1] < 0):
+            self.emit_ball()
+                              
+        for flipper in self.flippers:
+            flipper.update()
         
-        self.timer -= dt
-        if self.timer <= 0:
-            self.timer = .02
+        for flipper in self.flippers:
+            self.collide_flipper(flipper)
+                
+        for wall in self.walls:
+            self.collide_wall(wall)
 
-            self.ball.vel = self.ball.vel + self.gravity
-            self.ball.pos = self.ball.pos + self.ball.vel
-            self.ball.update()
-            # 1. Reset if out of bounds
-            min_y = [wall.bbox.translate(*self.parent.origin) for wall in self.walls if not wall.inside_wall][0][1] + 10
-            if self.ball.touch_point()[1] < min_y:
-                self.emit_ball()
-            # 2. reset if in pluger going down
-            p = Vector2(*self.ball.touch_point())
-            in_box = self.plunger_rect.contains_point(p)
-            if in_box and (self.ball.vel[1] < 0):
-                self.emit_ball()
-                                  
-            for flipper in self.flippers:
-                flipper.update()
-            
-            for flipper in self.flippers:
-                self.collide_flipper(flipper)
+        for bumper in self.bumpers:
+            self.collide_bumper(bumper)
                     
-            for wall in self.walls:
-                self.collide_wall(wall)
- 
-            for bumper in self.bumpers:
-                self.collide_bumper(bumper)
-                        
-            for switch in self.switches:
-                self.collide_switch(switch)
-                                
-            self.score_node.text = f'SCORE: {self.score}'
+        for switch in self.switches:
+            self.collide_switch(switch)
+                            
+        self.score_node.text = f'SCORE: {self.score}'
                      
     def hit_test(self, path, point, inside=True):
         """
@@ -701,9 +769,10 @@ class Physics():
             if not switch.logged:
                switch.logged = True
                try:
-                 switch.action()
-               except TypeError as e:
-                   print(f'action {switch.action} is missing {e}')
+                   switch.action(switch)
+               except TypeError:
+                   pass
+                   # print(f'action {switch.action} is missing {e}')
           else:
               switch.logged = False
               
@@ -711,22 +780,22 @@ class Physics():
         self.ball.place_start()
         self.ball.pos = self.ball.start_pos
         self.ball_ready = True
-        #self.paused = True
+        # self.paused = True
         self.ball.update()
               
     def touch_start(self, touch):
         # modify to emit ball
         if self.plunger_rect.contains_point(touch.location) and self.ball_ready:
            self.ball.pos = self.plunger_rect.center()
-           self.paused = True
+           #self.paused = True
            self.y_start = touch.location.y
         elif touch.location.x < self.size.w / 2:
             for flipper in self.flippers:
-                if flipper.side == LEFT:            
+                if flipper.side == LEFT:
                     flipper.is_active = True
         else:
             for flipper in self.flippers:
-                if flipper.side == RIGHT:            
+                if flipper.side == RIGHT:
                     flipper.is_active = True
 
     def touch_end(self, touch):
@@ -736,13 +805,10 @@ class Physics():
            if self.y_start:
                touch_length = self.y_start - touch.location.y
                ratio = touch_length / plunger.height
-               self.ball.vel = np.array([5, 40 * ratio])
+               self.ball.vel = np.array([0, 80 * ratio])
+               # self.parent.send_message(f'{self.ball.vel[1]}')
                self.paused = False
                self.ball_ready = False
            
         for flipper in self.flippers:
             flipper.is_active = False
-    
-        
-
-                 

@@ -1,21 +1,80 @@
-# read a spritesheet (irregular) and extract coordinates of each sprite
-# they are ordered in y then x
-# need to loose sort so that small differences in y do not affect order
-# rather than calling pinball.py, i have extracted the ball physics from that module
-# for save and load
-# extract important details of placed objects
-# id, object name, placed centroid, rotation, mirror
-# id is simply used to ensure objects are unique
-
-# affects triangle etc
-# adjust SpriteNode anchor point
-
+"""
 # TODO list
-# modify ball emit to use touch pojnt on ball to get strength
+# positioning not quite correct when size changes between sessions
+# added did change size. objects correct, outline not correct
+# consider whether to implement horizontal slingshot
 
+
+   Combined Pinball Editor and Player
+   
+   Structure notes:
+    
+   There are two classes
+   ProcessShapes
+   PinballCreate
+   
+   also uses
+   ball_physics.py
+   feature_detection.py
+   identify_shapes.py
+   
+   
+   4 outlines are coded in outline_set.json along with bespoke backgrounds
+   Ensure that the bottom of plunger channel is square
+
+   shapes are extracted from two or more sprite sheets. Not all items on the sheets are used.
+   
+   Claude AI recommended a lookup catalogue for shape fingerprint
+   A parameter in get_shapes_identified allows viewing and naming of sprites
+   name each shape and assign to wall, bumper, flipper, guide, sling or switch
+   The catalogue stores shape names and a digest of the shape coordinates
+
+   if sprites are renamed, sprite_fingerprints.json will need to be modified
+   this can be done manually
+   
+   save and load:
+   extract important details of placed objects
+   id, object name, placed centroid, scale, rotation, mirror, colour
+   id is simply used to ensure objects are unique
+
+   sprite names have been changed to be consistent:
+   all begin with: guide sling guide wall switch button bumper flipper
+   switch and button action are generated from sprite_name
+   for switches and buttons, action is name after 'button' or 'switch'
+   
+   actions can access physics methods and receive switch object,
+   e.g. allow deflection under some conditions (see def arrow(self, switch))
+
+   all images stored in Shapes are on transparent background of size to allow rotation
+
+Design Notes:
+2. Active Scoring Objects
+These are "hot" components that react physically when struck.
+• Pop Bumpers: Circular mushrooms that kick the ball away with high force when touched. Usually found in groups of three.
+• Slingshots: The triangular bumpers located just above the flippers. They kick the ball horizontally to keep it in play.
+• Spinners: Metal gates on a hinge that spin rapidly when hit, often used to build up "multipliers" or "miles."
+• Drop Targets: Rectangular targets that physically retract into the playfield when hit. Clearing a bank of these often awards a bonus or opens a path.
+That image shows a vibrant, somewhat stylized table layout. Based on standard pinball conventions, here is how those specific objects would likely react when the ball interacts with them:
+1. The Launch and Lower Playfield
+• The Plunger (Bottom Right): You’d pull this back to launch the ball up the right-hand Shooter Lane. The ball would then travel around the top arc (the Orbit) to enter the playfield.
+• Flippers (Bottom Center): These are your primary controllers. You'd trigger them to hit the ball back up the table. In this specific design, they look positioned to easily feed the ball toward the central star target.
+• Slingshots (The Black Triangular Blocks): Located just above the flippers, these usually have "kick" solenoids. If the ball hits the side of these, they will fire the ball horizontally with high velocity toward the opposite side of the table.
+2. Mid-Field Interaction
+• The Blue Bumpers/Rails: The long blue diagonal pieces appear to be Static Rails or Passive Bumpers. They likely guide the ball toward the center or provide a solid surface for the ball to ricochet off of to reach the upper targets.
+• The Center Star Disc: This is a classic "Bash Toy" or Target Disc. In many games, hitting this might rotate the disc, light up a letter, or add a multiplier to your score.
+• Orange Arrows: These are Roll-over Indicators. They tell the player where to aim. If the ball rolls over the light at the tip of the arrow, it usually triggers a specific game mode or "locks" a ball for multiball.
+3. The Upper Scoring Zone
+• Pop Bumpers (Small Circular Studs): The yellow, orange, and light blue circles spread across the top are likely Pop Bumpers. When touched, they would "pop" (kick) the ball away in a random direction, racking up quick points.
+• The "Sun" Target (Top Center): The large pink and white circular object at the very top functions as a Top Bumper or a Sinkhole. If it's a hole, the ball would drop in, trigger a "Mystery Bonus," and then be kicked back out onto the playfield.
+• Rollover Lanes (Points 10, 25, 50): At the very top, these three lanes award points based on which one the ball rolls through. Usually, if you light up all three, you get a "Bonus X" multiplier.
+4. The "Danger" Zones
+• Outlanes (Far Left and Right): The narrow paths on the outer edges (marked with the blue and red triangles) are the "drains." If the ball enters these, it's usually gone unless you have a "Kickback" activated.
+• Inlanes: The paths directly next to the black slingshots are "safe" lanes that roll the ball cleanly down to your flipper for a controlled shot.
+
+"""
 from PIL import Image
 import numpy as np
-from scene import Rect, Texture, SpriteNode, ShapeNode, Scene, run, LabelNode, Vector2, Touch, Point
+from scene import Texture, SpriteNode, ShapeNode, Scene, run, LabelNode, Touch, Point, Action
 import matplotlib.pyplot as plt
 import io
 import ui
@@ -23,16 +82,17 @@ import re
 import uuid
 import json
 import console
+import dialogs
 from time import time, sleep
+from change_screensize import get_screen_size
+
 import base_path
 base_path.add_paths(__file__)
 from Utilities.scanning.feature_detection import FeatureExtract, FastContourDetector, Shape
+from gui.custom_ui import TickedSliderView
 from ball_physics import Physics, Wall, Flipper, Ball, Bumper, Switch
-
-# take a spritesheet and decode the sprites
-selected_outline = 'outline1'
-mirror_lr = '\u21c4'
-mirror_up = '\u2144'
+from identify_shapes import register_sprites, load_catalogue, identify_shape, list_registered_sprites
+from identify_shapes import remove_from_catalogue
 
 
 def pil_to_ui(img):
@@ -40,354 +100,285 @@ def pil_to_ui(img):
         img.save(bIO, "png")
         return ui.Image.from_data(bIO.getvalue())
 
-
-def plot_outline(coordinates, invert=True):
-    # This is used during debug to plot and minimise outline points
-    # x, y measured from top left, so invert y
-    if invert:
-        points = coordinates * np.array([1, -1])
-    else:
-        points = coordinates
-    plt.cla()
-    # Create the scatter plot
-    plt.scatter(points[:, 0], points[:, 1], color='blue')
-    
-    # Label each point with its index number
-    # enumerate gives both the index (i) and the coordinates (x, y)
-    for i, (x, y) in enumerate(points):
-        plt.annotate(
-            str(i),                      # The text to display (index)
-            (x, y),                      # The point to label
-            textcoords="offset points",  # Position the text relative to the point
-            xytext=(0, 10),              # Offset of 10 points above the point
-            ha='center'                  # Horizontal alignment
-        )
-    plt.axis('equal')
-    plt.minorticks_on()
-    plt.xlabel('X coordinate')
-    plt.ylabel('Y coordinate')
-    plt.title('Plot of Points with Index Labels')
-    plt.grid(True)
-    plt.show()
-
-
-def rotate_flipper(detector, image_process, shape):
-    """ Process the flipper image. rotate it to lie on x axis
-        extract pivot offset from centre of image """
-    image = image_process.crop_image(shape.coordinates)
-    # deal with flipper make it horizontal
-    shape.coordinates, _, eigenvectors, shape.centroid = detector.pca(shape.coordinates)
-    angle = np.arctan2(eigenvectors[1, 0], eigenvectors[0, 0])
-    shape.image = image.rotate(np.degrees(angle), expand=True)
-    
-    features = detector.calculate_shape_features(shape.coordinates)
-    # compute pivot from radius of thicker end
-    max_width = max(features['left_end_height'], features['right_end_height'])
-    x1 = features['width'] / 2 - max_width / 2
-    if features['left_end_height'] > features['right_end_height']:
-        x1 = -x1
-    shape.pivot = Point(x1, 0)  # rel to centre
-    # length from pivot to thinner end
-    shape.length = int(features['width'] - np.abs(x1))
-
-                        
-def extract_shapes(image_path, canny_low, canny_high, edge_tries, size_reduction):
-    image_process = FeatureExtract(
-        image_path, None, canny_low, canny_high, edge_tries, size_reduction
-    )
-    # edges = image_process.edges
-    # pil_image = Image.fromarray(edges.astype(np.uint8))
-    # pil_image.show()
-    detector = FastContourDetector(image_process=image_process)
-
-    contours = detector.find_all_contours_ordered(100, None)
-    shapes = detector.analyze_shapes(contours)
-    shapes = detector.filter_duplicates(shapes, threshold=10)
+                
+class ProcessShapes():
+    def __init__(self, outline_name):
+        # take a spritesheet and decode the sprites
+        # sprite names should begin with one of
+        # flipper, guide, sling, wall, bumper, button, switch
+        self.outline_name = outline_name
+                
+        self.WALL_SPRITES = {'guide_l': 1, 'guide_r': 1, 'sling_l': 1.1, 'sling_r': 1.1, 'wall short_h': 1,
+                             'guide_r2': 1,  'wall_2': 1,
+                             'wall_1': 1, 'wall grey_vert': 1, 'wall half_round': 1.2, 'wall_3': 1}
+        self.SWITCH_SPRITES = ['button x5', 'button x3', 'button x2',
+                               'switch vert', 'button red', 'button hole',
+                               'switch arrow', 'switch yellow_arrow',
+                               'button again', 'button blue_sparkle',
+                               'button orange_trapeze', 'button triangle']
+                         
+        self.BUMPER_SPRITES = {'bumper x30': (1.1, 30), 'bumper x10': (1.1, 10),
+                               'bumper x20': (1.1, 20), 'bumper star': (1.0, 50),
+                               'bumper yellow_x50': (1.1, 50),
+                               'bumper sparkle': (1.0, 10),
+                               'bumper blue_x25': (1.1, 25),
+                               'bumper red_x100': (1.1, 100)}
+        self.FLIPPER_SPRITES = {'flipper_l': 1, 'flipper_r': 1}
         
-    for i, shape in enumerate(shapes):
-        is_teardrop = detector.process_teardrop(shape)
-        if is_teardrop:
-           # deal with flipper left, make it horizontal
-           rotate_flipper(detector, image_process, shape)
+        self.shapes = self.get_shapes_identified(registration_mode=False)
+        self.outline = self.make_outline(outline_name)
+    
+    def build_physics_objects(self, placed_shapes, switch_callbacks):
+        """
+        Translate editor Shape objects into physics objects.
+        score_callbacks: dict mapping sprite_name -> callable, supplied by the Scene.
+        Returns walls, flippers, bumpers, switches — no Scene dependencies.
+        """
+                 
+        walls = []
+        switches = []
+        bumpers = []
+        flippers = []
+        
+        for shape in placed_shapes:
+         
+            name = shape.sprite_name
+            
+            if name in self.WALL_SPRITES:
+                wall = Wall(shape.description, shape.centroid, shape.coordinates)
+                wall.bounce = self.WALL_SPRITES[name]
+                walls.append(wall)
+                
+            elif name in self.SWITCH_SPRITES:
+                switch = Switch(shape.description, shape.centroid, shape.coordinates,
+                                action=switch_callbacks.get(name, None), score=0)
+                switch.angle = shape.angle
+                switch.inside_wall = True
+                switches.append(switch)
+            elif name in self.BUMPER_SPRITES:
+                bounce, score = self.BUMPER_SPRITES[name]
+                bumper = Bumper(shape.description, shape.centroid, shape.radius,
+                                score, bounce)
+                bumpers.append(bumper)
+                
+            elif name in self.FLIPPER_SPRITES:
+                flipper = Flipper(shape.description, shape.centroid, shape.pivot,
+                                  shape.length, shape.coordinates,
+                                  min_angle=0)
+                flippers.append(flipper)
+                
+        return walls, flippers, bumpers, switches
+            
+    def get_shapes_identified(self, registration_mode: bool = False) -> list:
+        """
+        Extract shapes and identify them via fingerprints.
+    
+        Set registration_mode=True on first run (or when spritesheet changes)
+        to interactively name each sprite and save fingerprints.
+        Subsequent runs use the saved catalogue automatically.
+        """
+        NAME = "isolated-pinball-elements.png"
+        NAME2 = 'pinball_parts2.png'
+        list_registered_sprites()
+        all_shapes = []
+        for name in [NAME, NAME2]:
+            shapes = self.extract_shapes(name, 0.1, 0.2, 2000, 4)
+            all_shapes.extend(shapes)
+        t = time()
+        if registration_mode:
+            catalogue = register_sprites(all_shapes)
         else:
-            image = image_process.crop_image(shape.coordinates)
-            shape.image = image
-        shape.image_size = image.size
-        shape.color_names = image_process.closest_colors(image)
-        shape.quadrant = "_".join(image_process.quadrant(shape.centroid))
-        shape.description = f"{shape.quadrant} {shape.color_names} {shape.shape}"
-        # recentre to centre of shape and invert y since Scene uses 0,0 as bottom left
-        # whereas shapes are referenced to top left
-        shape.coordinates = shape.recentre().astype(int) * [1, -1]
-        shape.coordinates = shape.coordinates[::10]
-    return shapes
-
-
-def transparent_rect(shape):
-    """take a shape, paste its irregular image into rectangular image on transparent background"""
-    combined_img = Image.new("RGBA", shape.image.size, (0, 0, 0, 0))
-    # Paste the irregular image onto the background
-    # x, y = int(shape.image_size[0] / 2), int(shape.image_size[1] / 2)
-    combined_img.paste(shape.image, (0, 0), shape.image)
-    return combined_img
-
-
-def get_shapes():
-    NAME = "pinball-elements.png"
-    NAME = "isolated-pinball-elements.png"
-
-    sprite_names = {
-        "guide_r": 2, "guide_l": 3, "wall_1": 4, "sling_r": 5,
-        "bumper x30": 6, "bumper x20": 7,  "bumper x10": 8,
-        "flipper_l": 9, "short_wall_h": 10,
-        "bumper star": 11,  "flipper_r": 12, "half round": 13,
-        "red_button": 17, "grey wall vert": 18,  "button 2x": 19,
-        "button 3x": 21, "button 5x": 22, "switch vert": 24,
-        "hole black": 27,
-    }
-
-    shapes = extract_shapes(NAME, 0.1, 0.2, 2000, 4)
-    filtered_shapes = []
-    for i, shape in enumerate(shapes):
-        if i in sprite_names.values():
-            filtered_shapes.append(shape)
-            shape.sprite_name = {v: k for k, v in sprite_names.items()}[i]
-            # make all coordinates relative to (0,0) centre of bounding box
-            # shape.coordinates = shape.recentre()
-            # shape.image.show()
-            # When creating the shape
-            shape.original_image = shape.image.copy()
-            shape.original_coords = shape.coordinates.copy()
-    shape = next(shape for shape in filtered_shapes if shape.sprite_name == "sling_r")
-    shape.triangle_vertices = find_triangle_vertices_batched(shape.coordinates)
-
-    # replicate right slingshot
-    new_shape = shape.get_copy()
-    new_shape.sprite_name = "sling_l"
-    new_shape.image, new_shape.coordinates = new_shape.mirror("vertical")
-    new_shape.triangle_vertices = find_triangle_vertices_batched(new_shape.coordinates)
-    # new_shape.image.show()
-    filtered_shapes.append(new_shape)
-    return filtered_shapes
-
-
-# dictionary to hold outline coordinates, background image and scale
-outlines = {'outline1': {'coords': np.array(
-                                   [[269, 18], [301, 19], [333, 24], [365, 34],
-                                    [389, 45], [410, 56], [428, 70], [445, 85],
-                                    [461, 101], [475, 119], [487, 139], [498, 160],
-                                    [508, 190], [515, 222], [517, 254], [517, 286],
-                                    [518, 318], [530, 338], [541, 359], [553, 379],
-                                    [565, 400], [565, 784], [542, 784],
-                                    [534, 784], [534, 416], [529, 412], [521, 412],
-                                    [518, 416], [517, 441], [514, 631], [498, 647],
-                                    [354, 795], [203, 795], [59, 644],
-                                    [44, 626], [44, 242],
-                                    [48, 210], [56, 178], [67, 151], [79, 131],
-                                    [92, 112], [106, 94], [122, 78], [140, 64],
-                                    [159, 51], [180, 40], [209, 29], [241, 21]]),
-                         'image': 'Desert.png',
-                         'scale': 1.1},
-            'outline2': {'coords': np.array(
-                                [[56, 34], [407, 34], [428, 43], [436, 64],
-                                 [436, 442], [434, 469], [428, 481], [407, 481],
-                                 [400, 471], [401, 444], [401, 309], [402, 282],
-                                 [402, 66], [397, 66], [397, 165], [396, 408],
-                                 [395, 489], [394, 516], [391, 543], [379, 558],
-                                 [359, 568], [332, 573], [305, 579], [278, 585],
-                                 [251, 591], [224, 593], [197, 593], [170, 590],
-                                 [143, 584], [116, 578], [89, 572], [62, 567],
-                                 [44, 556], [33, 538], [32, 511], [31, 484],
-                                 [31, 403], [30, 376], [30, 160], [29, 133],
-                                 [29, 79], [32, 52], [45, 38]]),
-                         'image': 'Space.png',
-                         'scale': 1.5},
-            'outline3': {'coords': np.array(
-                                [[238, 28], [253, 29], [268, 30], [283, 33],
-                                 [298, 38], [313, 43], [323, 48], [332, 54],
-                                 [341, 60], [350, 66], [358, 73], [365, 81],
-                                 [372, 89], [379, 97], [385, 106], [391, 115],
-                                 [396, 125], [401, 138], [406, 153], [409, 168],
-                                 [411, 183], [412, 198], [412, 529], [376, 529],
-                                 [376, 518], [376, 488], [376, 169], [364, 169],
-                                 [364, 488], [362, 488], [261, 552], [249, 557],
-                                 [234, 557], [219, 557], [204, 557], [99, 495],
-                                 [90, 489], [81, 483], [74, 475], [70, 461],
-                                 [70, 446], [70, 431], [70, 416], [74, 402],
-                                 [81, 394], [88, 386], [96, 379], [103, 371],
-                                 [111, 364], [118, 356], [122, 344], [123, 329],
-                                 [119, 315], [113, 306], [106, 298], [98, 291],
-                                 [91, 283], [83, 276], [77, 267], [74, 252],
-                                 [74, 237], [74, 222], [74, 207], [74, 192],
-                                 [75, 177], [78, 162], [81, 147], [87, 132],
-                                 [92, 121], [97, 111], [103, 102], [110, 94],
-                                 [116, 85], [124, 78], [131, 70], [140, 64],
-                                 [148, 57], [158, 52], [167, 46], [179, 41],
-                                 [194, 36], [209, 32], [224, 29]]),
-                         'image': 'Undersea.PNG',
-                         'scale': 1.5},
-            'outline4': {'coords': np.array(
-                               [[308, 25], [360, 25], [412, 25], [464, 27],
-                                [516, 38], [562, 56], [596, 74], [625, 97],
-                                [652, 122], [676, 150], [696, 182], [714, 219],
-                                [729, 271], [735, 323], [735, 1035], [673, 1035],
-                                [673, 311], [662, 259], [644, 216], [624, 184],
-                                [599, 157], [573, 171], [593, 204], [614, 235],
-                                [631, 279], [637, 331], [637, 747], [616, 778],
-                                [356, 1040], [308, 1040],
-                                [178, 910], [15, 708],
-                                [15, 344], [18, 292], [29, 240], [47, 195],
-                                [66, 162], [88, 132], [114, 106], [143, 83],
-                                [174, 62], [214, 44], [265, 30]]),
-                         'image': 'Fairground.png',
-                         'scale': 0.9}
-            }
-
-               
-def get_centre_line(coords, top=True):
-    if top:
-        y = np.max(coords[:, 1])
-    else:
-        y = np.min(coords[:, 1])
+            catalogue = load_catalogue()
+            if not catalogue:
+                print('No fingerprint catalogue found — run with registration_mode=True first.')
+                return []
     
-    top_points = coords[np.abs(coords[:, 1] - y) <= 2]
-    # 3. Calculate the center (mean of x, keep max_y)
-    center_x = np.mean(top_points[:, 0])
-    return center_x
-     
-               
-def make_outline(points, name, image_name, scale):
-    # make a dummy shape
-    shape = Shape(centroid=(0, 0), circularity=0, coordinates=points, perimeter=1)
-    shape.sprite_name = name
-    shape.scale_path(scale)
-    # just to get image
-    f = FeatureExtract(image_name, canny_low=.8, canny_high=.8, edge_tries=1)
-    bbox = shape.bbox
-    # need to centre coordinates in image
-    coord_centre = bbox.center()
-    image_centre = Point(f.img.width/2, f.img.height/2)
-    diff = image_centre - coord_centre
-    shifted_coords = shape.coordinates + diff
-    shape.image = f.img
-    shape.image = f.crop_image(shifted_coords)
-    # need to move coordinates to centre of image
-    shape.recentre()
-    # invert y since PIL coordinates are. from topleft, whereas scen is bottomleft
-    shape.coordinates = shape.coordinates * [1, -1]
-    return shape
-
-  
-def find_triangle_vertices_batched(coords):
-    """Find the 3 dominant vertices from a rounded triangle's coordinates."""
-
-    coords = np.asarray(coords)
-    n = len(coords)
-    best_area = 0
-    best_trio = None
-
-    for i in range(n):
-        p1 = coords[i]
-        # Remaining points to avoid redundant calculations
-        others = coords[i + 1:]
-        if len(others) < 2:
-            continue
-
-        # Vectors from p1 to all other points
-        # Shape: (m, 2) where m = n-(i+1)
-        diffs = others - p1
-
-        # Outer product to get all pairs of cross products
-        # cross = x1*y2 - y1*x2
-        x = diffs[:, 0]
-        y = diffs[:, 1]
-
-        # Vectorized 2D cross product for all pairs (j, k)
-        # Using broadcasting: (m, 1) and (1, m)
-        areas = np.abs(np.outer(x, y) - np.outer(y, x)) / 2
-
-        max_idx = np.argmax(areas)
-        current_max = areas.flat[max_idx]
-
-        if current_max > best_area:
-            best_area = current_max
-            # map flat index back to the 'others' array
-            j_rel, k_rel = np.unravel_index(max_idx, areas.shape)
-            best_trio = (p1, others[j_rel], others[k_rel])
-
-    return best_trio
-
-
-def segment_length(p1, p2):
-    return np.linalg.norm(np.array(p2) - np.array(p1))
-
-
-def point_to_segment_distance(point, p1, p2):
-    """Shortest distance from a point to a line segment."""
-    point, p1, p2 = map(np.array, [point, p1, p2])
-    seg = p2 - p1
-    t = np.clip(np.dot(point - p1, seg) / np.dot(seg, seg), 0, 1)
-    closest = p1 + t * seg
-    return np.linalg.norm(point - closest)
-
-
-def touched_longest_side(coords, touch_point, tolerance=10.0):
-    """
-    Returns True if touch_point is on the longest side of the triangle.
-
-    coords      - list of (x, y) tuples forming the rounded triangle
-    touch_point - (x, y) where the object made contact
-    tolerance   - max distance to consider "touching" a side
-    """
-    v1, v2, v3 = find_triangle_vertices_batched(coords)
-
-    sides = [(v1, v2), (v2, v3), (v1, v3)]
-    lengths = [segment_length(*s) for s in sides]
-    longest_side = sides[np.argmax(lengths)]
-
-    distances = [point_to_segment_distance(touch_point, *s) for s in sides]
-    closest_side_idx = np.argmin(distances)
-
-    is_longest = np.array_equal(
-        sides[closest_side_idx][0], longest_side[0]
-    ) and np.array_equal(sides[closest_side_idx][1], longest_side[1])
-    is_touching = distances[closest_side_idx] <= tolerance
-
-    return is_longest and is_touching
-
-
-def draw_(coords):
-    # Draw coords
-    path = ui.Path()
-    path.line_width = 3
-    path.move_to(*coords[0])
-    [path.line_to(*p) for p in coords[1:]]
-    path.close()
-    return path
+        identified = []
+        unrecognised = []
     
+        for shape in all_shapes:
+            name = identify_shape(shape, catalogue)
+            if name:
+                shape.sprite_name = name
+                identified.append(shape)
+            else:
+                unrecognised.append(shape)
+        print(f'identify time {(time()-t)*1000:.2f}ms')
+        if unrecognised:
+            print(f'Warning: {len(unrecognised)} shapes were not recognised.')
+            print('  Re-run with registration_mode=True to add them.')
     
+        return identified
+        
+    def extract_shapes(self, image_path, canny_low, canny_high, edge_tries, size_reduction):
+        image_process = FeatureExtract(
+            image_path, None, canny_low, canny_high, edge_tries, size_reduction
+        )
+        # edges = image_process.edges
+        # pil_image = Image.fromarray(edges.astype(np.uint8))
+        # pil_image.show()
+        detector = FastContourDetector(image_process=image_process)
+    
+        contours = detector.find_all_contours_ordered(100, None)
+        shapes = detector.analyze_shapes(contours)
+        shapes = detector.filter_duplicates(shapes, threshold=10)
+            
+        for i, shape in enumerate(shapes):
+            is_teardrop = detector.process_teardrop(shape)
+            if is_teardrop:
+               # deal with flipper left, make it horizontal
+               self.rotate_flipper(detector, image_process, shape)
+            else:
+                shape.image = image_process.crop_image(shape.coordinates)
+                # put image onto square transparent background
+                # this allows it to rotate without size change
+                image = shape.transparent_rect()
+                shape.set_image(image)
+            shape.color_names = image_process.closest_colors(image)
+            shape.quadrant = "_".join(image_process.quadrant(shape.centroid))
+            shape.description = f"{shape.quadrant} {shape.color_names} {shape.shape}"
+            # recentre to centre of shape and invert y since Scene uses 0,0 as bottom left
+            # whereas shapes are referenced to top left
+            shape.set_coordinates(shape.recentre().astype(int) * [1, -1])
+            # decimate since we dont need so many points
+            shape.set_coordinates(shape.coordinates[::10])
+        return shapes
+        
+    def get_outlines(self):
+        # dictionary to hold outline coordinates, background image and scale
+        with open('outline_set.json', 'r') as f:
+            outlines = json.load(f)
+        return outlines
+        
+    def make_outline(self, outline_name):
+        """ process shape data for the selected outline """
+        outlines = self.get_outlines()
+        self.outlines = list(outlines)
+        points = outlines[outline_name]['coords']
+        image_name = outlines[outline_name]['image']
+        # scale not used
+        # scale = outlines[outline_name]['scale']
+        
+        # make a dummy shape
+        shape = Shape(centroid=(0, 0), circularity=0, coordinates=np.array(points), perimeter=1)
+        outline_size = shape.bbox.size
+        w, h = get_screen_size()
+        # fit outline to screen vertical
+        scale = 1.00 * h / outline_size.height
+        shape.sprite_name = 'outline'
+        shape.scale_path(scale)
+        # just to get image
+        f = FeatureExtract(image_name, canny_low=.8, canny_high=.8, edge_tries=1)
+        bbox = shape.bbox
+        # need to centre coordinates in image
+        coord_centre = bbox.center()
+        image_centre = Point(f.img.width/2, f.img.height/2)
+        diff = image_centre - coord_centre
+        shifted_coords = shape.coordinates + diff
+        shape.image = f.img
+        shape.set_image(f.crop_image(shifted_coords))
+        # need to move coordinates to centre of image
+        shape.recentre()
+        # invert y since PIL coordinates are from topleft, whereas scene is bottomleft
+        shape.set_coordinates(shape.coordinates * [1, -1])
+        return shape
+                            
+    def plot_outline(self, coordinates, invert=True):
+        # This is used during debug to plot and minimise outline points
+        # x, y measured from top left, so invert y
+        if invert:
+            points = coordinates * np.array([1, -1])
+        else:
+            points = coordinates
+        plt.cla()
+        # Create the scatter plot
+        plt.scatter(points[:, 0], points[:, 1], color='blue')
+        
+        # Label each point with its index number
+        # enumerate gives both the index (i) and the coordinates (x, y)
+        for i, (x, y) in enumerate(points):
+            plt.annotate(
+                str(i),                      # The text to display (index)
+                (x, y),                      # The point to label
+                textcoords="offset points",  # Position the text relative to the point
+                xytext=(0, 10),              # Offset of 10 points above the point
+                ha='center'                  # Horizontal alignment
+            )
+        plt.axis('equal')
+        plt.minorticks_on()
+        plt.xlabel('X coordinate')
+        plt.ylabel('Y coordinate')
+        plt.title('Plot of Points with Index Labels')
+        plt.grid(True)
+        plt.show()
+    
+    def rotate_flipper(self, detector, image_process, shape):
+        """ Process the flipper image. rotate it to lie on x axis
+            extract pivot offset from centre of image """
+        shape.image = image_process.crop_image(shape.coordinates)
+        # deal with flipper make it horizontal
+        shape.coordinates, _, eigenvectors, shape.centroid = detector.pca(shape.coordinates)
+        angle = np.arctan2(eigenvectors[1, 0], eigenvectors[0, 0])
+        
+        shape.image = shape.transparent_rect()
+        shape.set_image(shape.image.rotate(np.degrees(angle), expand=True))
+        
+        features = detector.calculate_shape_features(shape.coordinates)
+        # compute pivot from radius of thicker end
+        max_width = max(features['left_end_height'], features['right_end_height'])
+        x1 = features['width'] / 2 - max_width / 2
+        if features['left_end_height'] > features['right_end_height']:
+            x1 = -x1
+        shape.pivot = Point(x1, 0)  # rel to centre
+        # length from pivot to thinner end
+        shape.length = int(features['width'] - np.abs(x1))
+                                                              
+    def get_centre_line(self, coords, top=True):
+        if top:
+            y = np.max(coords[:, 1])
+        else:
+            y = np.min(coords[:, 1])
+        
+        top_points = coords[np.abs(coords[:, 1] - y) <= 2]
+        # 3. Calculate the center (mean of x, keep max_y)
+        center_x = np.mean(top_points[:, 0])
+        return center_x
+                                    
+
+# ---------------Scene class
+        
 class PinballCreate(Scene):
- 
+    
     def setup(self):
+        self.paused = True
         self.placed_shapes = []
         self.placed_objects = {}
-        
-        self.shapes = get_shapes()
-        
+        self.processed = ProcessShapes('outline4')
+        self.shapes = self.processed.shapes
+        self.outline_name = self.processed.outline_name
         w, h = self.size
-        self.origin = Point(int(w / 3), int(h / 2))
+        self.origin = Point(int(2 * w / 5), int(h / 2))
         self.palette_x = 0.95 * w
-        self.grid = 50
+        self.grid_spacing = 50
         self.grid_snap = 5
         self.last_tap_time = 0
         self.double_tap_threshold = 0.3  # Seconds
         self.in_double_tap = False
-        self.place_outline()
+        self.place_outline(self.processed.outline)
         self.create_scroll_palette()
         self.place_buttons()
         self.play = False
         self.edit = True
-                
+        
+        self.message = LabelNode(text='message',
+                                 position=(self.grid_box.bbox.max_x, 20),
+                                 anchor_point=(0, 0),
+                                 parent=self)
+        self.restore(None)
+        
+    def send_message(self, text):
+        self.message.text = text
+        
     def place_buttons(self):
         # Create a native UI button
         def add_button(title, rect, image=None, action=None, color='cyan'):
@@ -407,84 +398,59 @@ class PinballCreate(Scene):
                 return btn
             except AttributeError:
                 print('no view yet')
-        add_button(' Save', 100, 'iow:ios7_upload_outline_256', self.save)
-        add_button(' Load', 150, 'iow:ios7_download_outline_256', self.restore)
-        add_button(' Play', 200, None, self.play_mode)
-        add_button(' Edit', 250, None, self.edit_mode)
+        add_button(' Save', (30, 10, 50, 50), 'iow:ios7_upload_outline_256', self.save)
+        add_button(' Load', (70, 10, 50, 50), 'iow:ios7_download_outline_256', self.restore)
+        add_button(' Play', (30, 60, 50, 50), None, self.play_mode)
+        add_button(' Edit', (70, 60, 50, 50), None, self.edit_mode)
+        add_button(' Outline', (30, 110, 100, 50), None, self.select)
         
-    def play_mode(self, sender):
-        # Hide the sidebar when playing
-        if hasattr(self, 'scroll_container'):
-            self.scroll_container.hidden = True
-        
-        self.grid_box.alpha = 0
-        self.set_objects()
-        self.score = 0
-        self.set_score_node()
-        self.physics = Physics(self.ball, self.walls, self.flippers, self.bumpers, self.switches, self)
-        try:
-            self.physics.score_node = self.score_node
-            self.physics.plunger_rect = self.plunger_rect
-            self.play = True
-            self.physics.emit_ball()
-        except AttributeError as e:
-            print('play mode', e)
-            
-    def edit_mode(self, sender):
-        # Hide the sidebar when playing
-        if hasattr(self, 'scroll_container'):
-            self.scroll_container.hidden = False
-        self.play = False
-        self.score_node.remove_from_parent()
-        self.ball.node.remove_from_parent()
-        self.grid_box.alpha = 0.8
-         
-    def recentre(self, coords):
-        return coords - np.mean(coords, axis=0)
-        
-    def dots(self, shape,  size=10):
-        # useful to visualse if coordinates are aligned with sprites
-        coords = shape.coordinates.copy()
-        coords = coords + shape.centroid
-        for coord in coords:
-            ShapeNode(path=ui.Path.oval(-size/2, -size/2, size, size),
-                      position=coord, fill_color="red", parent=self)
-        ShapeNode(path=ui.Path.oval(-5, -5, 10, 10),
-                  position=shape.centroid, fill_color="green", parent=self)
-    
-        combined_img = transparent_rect(shape)
-        self.outline.centroid = self.origin
-        self.outline.node = SpriteNode(Texture(pil_to_ui(combined_img)),
-                                       position=self.origin,
-                                       parent=self)
-        
-        # Plunger and Grid setup remains relative to self.origin...
-        self.grid_box = self.build_grid()
-                                                                                                                                                
-    def place_outline(self):
-        # select and place outline
-        w, h = self.size
-        outline_coords = outlines[selected_outline]['coords']
-        image_file = outlines[selected_outline]['image']
-        scale = outlines[selected_outline]['scale']
-        
-        self.outline = make_outline(outline_coords, selected_outline, image_file, scale)
-        combined_img = transparent_rect(self.outline)
+    def build_grid(self, alpha=0.8):
+        """ define a grid to overlay on top of everything else
+        allow offset to place grid at centre of square (e.g. go game)"""
+        spc = self.grid_spacing
+        grids_x = round(self.outline.bbox.width / spc)
+        grids_y = round(self.outline.bbox.height / spc)
+
+        with ui.ImageContext(grids_x * spc, grids_y * spc) as ctx:
+            ui.set_color('lightgrey')
+            for i in range(grids_y):
+                # horizontal rectangle
+                ui.Path.rect(0, i * spc, grids_x * spc, spc).stroke()
+            for i in range(grids_x):
+                # Vertical rectangle
+                ui.Path.rect(i * spc, 0, spc, grids_y * spc).stroke()
                         
-        self.outline.centroid = self.origin
+            img = ctx.get_image()
+            
+        return SpriteNode(Texture(img),
+                          position=self.origin,
+                          alpha=alpha,
+                          parent=self)
+ 
+    def set_score_node(self):
+        # Draw Score
+        self.score_node = LabelNode(text=f'SCORE: {self.score}',
+                                    font=('Helvetica', 30),
+                                    color='white',
+                                    position=(self.grid_box.bbox.max_x, self.size.height-100),
+                                    anchor_point=(0, 0),
+                                    z_position=10,
+                                    parent=self)
+                                    
+    def draw_(self, coords):
+        # Draw coords
+        path = ui.Path()
+        path.line_width = 3
+        path.move_to(*coords[0])
+        [path.line_to(*p) for p in coords[1:]]
+        path.close()
+        return path
         
-        ShapeNode(path=draw_(self.outline.coordinates*[1, -1]),
-                  position=self.outline.centroid,
-                  z_position=10,
-                  fill_color="clear",
-                  stroke_color="green",
-                  parent=self)
-        self.outline.node = SpriteNode(Texture(pil_to_ui(combined_img)),
-                                       position=self.origin,
-                                       parent=self)
+    def place_plunger(self):
+        """ define plunger box and place plunger image"""
         # place the plunger image
-        b = Ball()
-        plunger = b.get_plunger_channel(self.outline.coordinates)
+        outline_wall = Wall('outline', self.outline.centroid, self.outline.coordinates, inside_wall=False)
+        plunger = outline_wall.get_plunger_channel()
         plunger_image = ui.Image.named('Plunger.jpeg')
         w, h = plunger_image.size
         
@@ -495,6 +461,7 @@ class PinballCreate(Scene):
         self.plunger_texture = Texture(plunger_image)
         position = self.origin + xy
         self.plunger_rect = plunger.rect.translate(*self.origin)
+        self.plunger_y_scale = y_scale
         
         self.plunger = SpriteNode(self.plunger_texture,
                                   x_scale=x_scale, y_scale=y_scale,
@@ -502,61 +469,66 @@ class PinballCreate(Scene):
                                   z_position=100,
                                   position=position,
                                   parent=self)
-        ShapeNode(ui.Path.rect(*self.plunger_rect),
-                  stroke_color='white',
-                  fill_color='clear',
-                  z_position=100,
-                  position=self.plunger_rect.center(),
-                  parent=self)
+        
+        self.plunger_outline = ShapeNode(ui.Path.rect(*self.plunger_rect),
+                                         stroke_color='white',
+                                         fill_color='clear',
+                                         z_position=100,
+                                         position=self.plunger_rect.center(),
+                                         parent=self)
+                              
+    def place_outline(self, outline):
+        # select and place outline
+        w, h = self.size
+                
+        self.outline = outline
+        self.outline.centroid = self.origin
+        combined_image = self.outline.transparent_rect()
+        self.outline_path = ShapeNode(path=self.draw_(self.outline.coordinates*[1, -1]),
+                                      position=self.outline.centroid,
+                                      z_position=10,
+                                      fill_color="clear",
+                                      stroke_color="green",
+                                      parent=self)
+        self.outline_node = SpriteNode(Texture(pil_to_ui(combined_image)),
+                                       position=self.origin,
+                                       parent=self)
+        self.place_plunger()
         self.grid_box = self.build_grid()
-        self.placed_shapes.append(self.outline)
-        
-    def spawn_from_tray(self, sender):
-        """Callback when an item in the tray is tapped."""
-        template = sender.shape_template
-        new_shape = template.get_copy()
-        
-        # Place it at the screen center for the user to then drag
-        spawn_pos = self.origin
-        
-        combined_img = transparent_rect(new_shape)
-        sprite = SpriteNode(Texture(pil_to_ui(combined_img)), position=spawn_pos)
-        new_shape.node = sprite
-        new_shape.centroid = spawn_pos
-        new_shape.unique_id = str(uuid.uuid1())
-        self.add_child(sprite)
-        self.selected_shape = new_shape
-        self.placed_shapes.append(new_shape)
-        self.store(new_shape)
+        # self.placed_shapes.append(self.outline)
 
     def create_scroll_palette(self):
-        sidebar_w = 240
+        sidebar_w = 200
         screen_w, screen_h = self.size
         
         self.scroll_container = ui.ScrollView()
-        self.scroll_container.frame = (self.palette_x - sidebar_w, 0, sidebar_w, screen_h - 100)
+        self.scroll_container.frame = (self.palette_x - sidebar_w, 0, sidebar_w, screen_h - 20)
         self.scroll_container.background_color = (0.4, 0.4, 0.4, 0.7)
         
         y_offset = 10
         item_h = 100  # Increased height to fit text
-        
-        sprite_order = ["flipper_l", "flipper_r", "guide_l", "guide_r",
-                        "sling_l", "sling_r", "bumper x30", "bumper x20",
-                        "bumper x10", "button 5x", "button 3x", "button 2x",
-                        "bumper star", "short_wall_h", "wall_1",
-                        "grey wall vert", "half round", "switch vert",
-                        "red_button", "hole black"]
+        # Arrangement of shapes in palette
+        # The defined order of categories (the first word in the sprite name)
+        category_order = ["flipper", "guide", "sling", "bumper", "wall", "button", "switch"]
 
-        sorted_shapes = (shape for order in sprite_order
-                         for shape in self.shapes
-                         if shape.sprite_name == order)
+        # Sort the shapes based on the index of their first word in the category_order list
+        def get_shape_priority(shape):
+            # 1. Extract the prefix (e.g., "flipper" from "flipper_l")
+            prefix = re.split(r'[_ ]', shape.sprite_name)[0]
+            
+            # 2. Return the index if found, otherwise put it at the end
+            if prefix in category_order:
+                return category_order.index(prefix)
+            return len(category_order)
         
+        sorted_shapes = sorted(self.shapes, key=get_shape_priority)
+               
         for shape in sorted_shapes:
             # 1. Create a container for this specific item
             container = ui.View(frame=(0, y_offset, sidebar_w, item_h))
             
             # 2. Setup the Sprite Image (Original Colors)
-            ui_img = pil_to_ui(transparent_rect(shape)).with_rendering_mode(ui.RENDERING_MODE_ORIGINAL)
+            ui_img = pil_to_ui(shape.image).with_rendering_mode(ui.RENDERING_MODE_ORIGINAL)
             
             # The button acts as the visual sprite
             btn = ui.Button(frame=(10, 5, sidebar_w - 20, 65))
@@ -601,14 +573,11 @@ class PinballCreate(Scene):
 
     def toggle_tray(self, sender):
         """Animates the tray sliding in and out."""
-        sidebar_w = 120
+        sidebar_w = 200
         screen_w = self.size.w
         
-        # Check current state
-        is_hidden = self.scroll_container.frame.x >= screen_w
-        
         def animations():
-            if is_hidden:
+            if self.scroll_container.hidden:
                 # Slide In
                 self.scroll_container.frame = (self.palette_x - sidebar_w, 0, sidebar_w, self.size.h - 100)
                 self.tray_button.frame = (self.palette_x - sidebar_w - 45, 10, 40, 40)
@@ -620,7 +589,126 @@ class PinballCreate(Scene):
                 self.tray_button.image = ui.Image.named('iow:chevron_left_32')
                 
         ui.animate(animations, duration=0.3)
-                
+        self.scroll_container.hidden = not self.scroll_container.hidden
+        
+    def select(self, sender):
+        selection = dialogs.list_dialog(title='Select Outline', items=self.processed.outlines)
+        if selection:
+            self.outline_name = selection
+            self.remove_placed_shapes()
+            self.restore(None)
+            self.refresh_layout()
+            
+    def remove_placed_shapes(self):
+        for shape in self.placed_shapes:
+            shape.node.remove_from_parent()
+        self.placed_shapes = []
+               
+    def play_mode(self, sender):
+        """ switch to play mode
+        construct physics objects, initialise score
+        and clean up editor
+       
+        switch_callbacks are the word following switch or button
+        e.g. button x3 calls self.x3 """
+         
+        switch_callbacks = {}
+        for shape in self.placed_shapes:
+            # forget parameters after 2nd
+            # a, b, *_  unpacks a tuple of any length and discards 3rd onwards
+            shape_type, param, *_ = re.split(r'[_ ]', shape.sprite_name)
+            if shape_type in ['switch', 'button']:
+                action = getattr(self, param, None)  # set None if not found
+                switch_callbacks[shape.sprite_name] = action
+        
+        outline_wall = Wall('outline', self.outline.centroid, self.outline.coordinates, inside_wall=False)
+        walls, flippers, bumpers, switches = self.processed.build_physics_objects(self.placed_shapes, switch_callbacks)
+        
+        walls.insert(0, outline_wall)
+        # Wire Scene nodes — stays in PinballCreate
+        for flipper, shape in zip(flippers,
+                                  [s for s in self.placed_shapes
+                                   if s.sprite_name in self.processed.FLIPPER_SPRITES]):
+            flipper.node = shape.node
+            flipper.compute_anchor_point()
+            
+        self.ball = Ball(parent=self)
+        self.ball.draw_()
+        self.ball.node = SpriteNode(Texture('pzl:BallGray'),
+                                    z_position=95,
+                                    size=(self.ball.radius*2, self.ball.radius*2),
+                                    parent=self)
+        self.score = 0
+        self.set_score_node()
+        self.physics = Physics(self.ball, walls, flippers, bumpers, switches, self)
+        
+        # Hide the sidebar when playing and hide grid
+        if hasattr(self, 'scroll_container'):
+            self.scroll_container.hidden = True
+        self.grid_box.alpha = 0
+        
+        try:
+            self.physics.score_node = self.score_node
+            self.physics.plunger_rect = self.plunger_rect
+            self.play = True
+            self.paused = False
+            self.physics.emit_ball()
+        except AttributeError as e:
+            print('play mode', e)
+            
+    def edit_mode(self, sender):
+        # Hide the sidebar when playing
+        if hasattr(self, 'scroll_container'):
+            self.scroll_container.hidden = False
+        self.play = False
+        if hasattr(self, 'score_node'):
+            self.score_node.remove_from_parent()
+        if hasattr(self, 'ball'):
+           self.ball.node.remove_from_parent()
+        self.grid_box.alpha = 0.8
+         
+    def recentre(self, coords):
+        return coords - np.mean(coords, axis=0)
+        
+    def dots(self, shape,  size=10):
+        # useful to visualse if coordinates are aligned with sprites
+        coords = shape.coordinates.copy()
+        coords = coords + shape.centroid
+        for coord in coords:
+            ShapeNode(path=ui.Path.oval(-size/2, -size/2, size, size),
+                      position=coord, fill_color="red", parent=self)
+        ShapeNode(path=ui.Path.oval(-5, -5, 10, 10),
+                  position=shape.centroid, fill_color="green", parent=self)
+        
+        self.outline.node = SpriteNode(Texture(pil_to_ui(shape.image)),
+                                       position=self.origin,
+                                       parent=self)
+        
+        # Plunger and Grid setup remains relative to self.origin...
+        self.grid_box = self.build_grid()
+                                                                                                                                                                                                                                                                                                       
+    def spawn_from_tray(self, sender):
+        """Callback when an item in the tray is tapped."""
+        
+        z_order = {"flipper": 90, "sling": 50, "bumper": 30,
+                   "button": 50, "switch": 50}
+        template = sender.shape_template
+        new_shape = template.get_copy()
+        
+        # Place it at the screen center for the user to then drag
+        spawn_pos = self.origin
+        
+        sprite = SpriteNode(Texture(pil_to_ui(new_shape.image)), position=spawn_pos)
+        base_name = re.split(r'[_ ]', new_shape.sprite_name)[0]
+        sprite.z_position = z_order.get(base_name, 10)
+        new_shape.node = sprite
+        new_shape.centroid = spawn_pos
+        new_shape.unique_id = str(uuid.uuid1())
+        self.add_child(sprite)
+        self.selected_shape = new_shape
+        self.placed_shapes.append(new_shape)
+        self.store(new_shape, position=spawn_pos)
+
     def redraw(self):
         
         # remove the sprites
@@ -645,14 +733,18 @@ class PinballCreate(Scene):
         self.save(None)
         
     def restore(self, sender):
+        z_order = {"flipper": 90, "sling": 50, "bumper": 30,
+                   "button": 50, "switch": 50, "hole": 50,
+                   "red": 50}
         try:
-            with open(f'{selected_outline}.json', 'r') as f:
+            with open(f'{self.outline_name}.json', 'r') as f:
                 self.placed_objects = json.load(f)
-        except FileNotFoundError:
-           console.hud_alert(f'File {selected_outline}.json not found')
+        except (FileNotFoundError, json.JSONDecodeError):
+           console.hud_alert(f'File {self.outline_name}.json not found')
            return
+        self.send_message(f'Read {len(self.placed_objects)} items')
         # now decode placed objects
-        # remove the sprites
+        # remove the existing sprites
         for placed in self.placed_shapes:
            if not placed.sprite_name.startswith('outline'):
               placed.node.remove_from_parent()
@@ -661,52 +753,82 @@ class PinballCreate(Scene):
         
         for unique_id, object_data in self.placed_objects.items():
            # get shape from the palette which matches name
-           palette_shape = next(shape
-                                for shape in self.shapes
-                                if shape.sprite_name == object_data['name'])
+           try:
+               for shape in self.shapes:
+                  if shape.sprite_name == object_data['name']:
+                     palette_shape = shape
+                     break
+               else:
+                   continue
+           except StopIteration:
+              raise RuntimeError(f'{object_data["name"]} not found in self.shapes')
+              
            try:
                shape = palette_shape.get_copy()
                if 'rotation' in object_data:
                    shape.image, shape.coordinates = shape.rotate(int(object_data['rotation']))
+                   shape.set_image(shape.image)
+                   
                if 'mirror' in object_data:
                    shape.image, shape.coordinates = shape.mirror(object_data['mirror'].lower())
-               if 'colour' in object_data:
-                   shape.image = shape.change_dominant_color(object_data['colour'])
+                   shape.set_image(shape.image)
+                   
                if 'scale' in object_data:
                    w, h = shape.image.size
                    scale = object_data['scale']
                    shape.image = shape.image.resize((int(scale * w), int(scale * h)))
+                   shape.set_image(shape.image)
                    shape.scale_path(scale)
+                   
+               if 'colour' in object_data:
+                   if object_data['colour'] is None:
+                      lum = None
+                      hue = None
+                   elif object_data['colour'] == 360:
+                      lum = 0.25
+                      hue = object_data['colour'] % 360
+                   else:
+                      lum = None
+                      hue = object_data['colour']
+                   
+                   shape.image = shape.recolor_image(target_hue=hue, target_lum=lum)
+                   
+               position = (object_data['position'][0] * self.size.w,
+                           object_data['position'][1] * self.size.h)
+               sprite = SpriteNode(Texture(pil_to_ui(shape.image)))
                
-               combined_img = transparent_rect(shape)
-               sprite = SpriteNode(Texture(pil_to_ui(combined_img)))
-               sprite.position = object_data['position']
-               shape.centroid = object_data['position']
+               # allow sprite types have different z order
+               base_name = re.split(r'[_ ]', shape.sprite_name)[0]
+               sprite.z_position = z_order.get(base_name, 10)
+               
+               sprite.position = position
+               shape.centroid = position
                shape.unique_id = unique_id
                shape.node = sprite
                self.add_child(sprite)
                self.placed_shapes.append(shape)
            except Exception as e:
-               print(f'Exception {e} from reading json')
-               
-        # self.redraw()
+               print(f'Exception in restoring {str(e)} {unique_id} {object_data["name"]}')
         
     def save(self, sender):
         """ save basic information about objects
         id, object name, centroid, rotation, mirror, colour, scale"""
                 
-        with open(f'{selected_outline}.json', 'w') as f:
+        with open(f'{self.outline_name}.json', 'w') as f:
             json.dump(self.placed_objects, f, indent=2)
     
     def store(self, shape, **kwargs):
-        # Use the hex address as the unique key
+        """ Update placed_objects and save """
+        
+        # positions are fraction of self.size
         shape_id = getattr(shape, 'unique_id', hex(id(shape)))
     
         # If the shape isn't in our tracking dict yet, initialize it
         if shape_id not in self.placed_objects:
             self.placed_objects[shape_id] = {
                 'name': shape.sprite_name,
-                'position': list(shape.centroid)
+                'position': [round(shape.centroid.x / self.size.w, 3),
+                             round(shape.centroid.y / self.size.h, 3)]
             }
         
         # Update only the changed metadata
@@ -714,12 +836,14 @@ class PinballCreate(Scene):
             for key, value in kwargs.items():
                 # Convert Point to list if position is being updated
                 if key == 'position':
-                    self.placed_objects[shape_id][key] = [float(value.x), float(value.y)]
+                    self.placed_objects[shape_id][key] = [round(value.x / self.size.w, 3),
+                                                          round(value.y / self.size.h, 3)]
                 else:
                     self.placed_objects[shape_id][key] = value
         self.save(None)
         
-    def snap(self, point):
+    def _snap(self, point):
+        """ snap point to defined grid spacing """
         # 1. Calculate the distance from the origin
         rel_x, rel_y = point - self.origin
                
@@ -730,28 +854,34 @@ class PinballCreate(Scene):
         # 3. Re-apply the fixed point offset
         return Point(snapped_rel_x, snapped_rel_y) + self.origin
 
-    def on_double_tap_(self, touch):
-        placed = self.get_shape_at(touch.location)
-        self.transform(placed)
-                
+    def _on_double_tap(self, touch, shape):
+        """ open transform view """
+        self.selected_shape = shape
+        self.transform(self.selected_shape)
+        self.in_double_tap = True
+               
     def remove_shape(self, shape):
         """Clean helper to delete a shape from all tracking lists and the screen."""
         if shape in self.placed_shapes:
             self.placed_shapes.remove(shape)
-        self.placed_objects.pop(hex(id(self.selected_shape)), None)
+        self.placed_objects.pop(shape.unique_id, None)
         if shape.node:
             shape.node.remove_from_parent()
         self.selected_shape = None
         self.save(None)
         
     def _get_shape_at(self, location):
-        """Helper to find a placed shape at a specific point."""
+        """Helper to find a placed shape at a specific point.
+        to make selection better, reduce bbox towards centre"""
         for placed in self.placed_shapes:
-            if not placed.sprite_name.startswith('outline') and placed.node.bbox.contains_point(location):
+            bbox = placed.node.bbox
+            # sprite is always square
+            inset = bbox.w / 3
+            if not placed.sprite_name.startswith('outline') and placed.node.bbox.inset(inset, inset).contains_point(location):
                 return placed
         return None
 
-    def draw_guide_line(self, pos, target_pos):
+    def _draw_guide_line(self, pos, target_pos):
         """Draws a temporary crosshair or alignment line between two points
         horizontal line shows vertical alignment
         vertical line shows centre line.
@@ -759,7 +889,7 @@ class PinballCreate(Scene):
         # Remove previous guide if it exists
         if hasattr(self, 'active_guide') and self.active_guide:
             self.active_guide.remove_from_parent()
-        if target_pos: 
+        if target_pos:
             # 1. Calculate the midpoint
             mid_x = (pos.x - target_pos.x) / 2
             
@@ -772,83 +902,26 @@ class PinballCreate(Scene):
             # Draw the vertical line from the midpoint
             path.move_to(mid_x, y)
             path.line_to(mid_x, -y)
-            node = ShapeNode(path, parent=self)            
+            node = ShapeNode(path, parent=self)
             node.position = target_pos
             node.stroke_color = "green" if y == 0 else "white"
-            node.anchor_point = (pos.x <= target_pos.x, pos.y >= target_pos.y)            
+            node.anchor_point = (pos.x <= target_pos.x, pos.y >= target_pos.y)
         else:
             # Create the a cross path
             path = ui.Path()
-            path.move_to(-100, 0)                        
+            path.move_to(-100, 0)
             path.line_to(100, 0)
             path.move_to(0, -100)
-            path.line_to(0, 100)            
+            path.line_to(0, 100)
             node = ShapeNode(path, parent=self)
             node.position = pos
             node.anchor_point = (0.5, 0.5)
             node.stroke_color = 'white'
-        node.line_width = 2            
+        node.line_width = 2
         self.active_guide = node
         self.active_guide.z_position = 100  # Ensure it's above sprites
-        
-    def on_double_tap(self, touch, shape):
-        self.selected_shape = shape
-        self.selected_shape.node.position = touch.location
-        self.transform(self.selected_shape)
-        self.in_double_tap = True
-
-    def touch_began(self, touch):
-        if self.play:
-            self.start_touch_y = touch.location.y
-            return self.physics.touch_start(touch)
-
-        self.selected_shape = None
-        self.in_double_tap = False
-        current_time = time()
-        
-        # Only check placed shapes now, as palette is handled by UI buttons
-        clicked_shape = self._get_shape_at(touch.location)
-        if clicked_shape:
-            if current_time - self.last_tap_time < self.double_tap_threshold:
-                self.on_double_tap(touch, clicked_shape)
-                self.last_tap_time = 0
-            else:
-                self.selected_shape = clicked_shape
-                self.last_tap_time = current_time
-            
-    def touch_moved(self, touch):
-        if self.play:
-            y_diff = self.start_touch_y - touch.location.y
-            self.plunger.y_scale = y_diff / self.plunger_rect.height
-            self.plunger.texture = self.plunger_texture
-        elif self.selected_shape:
-            new_pos = Point(*self.snap(touch.location))
-            self.selected_shape.node.position = new_pos
-            self.predict_alignment()
-                        
-    def touch_ended(self, touch):
-        if self.play:
-            self.physics.touch_end(touch)
-            self.plunger.y_scale = 1/3
-            return
-
-        if not self.selected_shape or self.in_double_tap:
-            return
-        try:
-            self.active_guide.remove_from_parent()
-        except AttributeError:
-            pass
-        # Check if dropped on the Play Surface
-        if touch.location.x < self.grid_box.bbox.max_x:
-            snapped_pos = self.snap(touch.location)
-            self.selected_shape.node.position = snapped_pos
-            self.selected_shape.centroid = snapped_pos
-            self.store(self.selected_shape, position=snapped_pos)
-        else:
-            # Dropped in dead space outside grid
-            self.remove_shape(self.selected_shape)
                 
-    def predict_alignment(self):
+    def _predict_alignment(self):
         """ decide if there is a similar item at similar level
         limit this to similar types, e.g. wall, guide, flipper etc"""
         if not self.selected_shape:
@@ -874,6 +947,7 @@ class PinballCreate(Scene):
                 continue
                 
             other_centroid = Point(*other.centroid)
+            # returns euclidean distance between 2 Point objects
             dist = abs(other_centroid - mirrored_target)
             
             # 2. Check if within search radius
@@ -900,163 +974,338 @@ class PinballCreate(Scene):
         # 4. Draw guide for the "Best Fit" (the first item in sorted list)
         if sorted_shapes:
             best_fit = sorted_shapes[0]
-            self.draw_guide_line(new_pos, Point(*best_fit.centroid))
+            self._draw_guide_line(new_pos, Point(*best_fit.centroid))
         else:
-            self.draw_guide_line(new_pos, None)   
+            self._draw_guide_line(new_pos, None)
         return sorted_shapes
-                   
+        
+    # --------------- Transform Panel
+       
     def transform(self, shape):
-        ui.load_view("transform_item.pyui").present("sheet")
+        """ open transform view and initialise sliders
+        This has been coded explicitly rather than pyui to permit simpler
+        use of TickedSliderView class"""
+        COLOUR_NAMES = [
+                       "Red", "Vermilion", "Orange", "Golden Amber",
+                       "Yellow", "Neon Lime", "Bright Chartreuse", "Leaf Green",
+                       "Green", "Emerald", "Malachite Mint", "Aquamarine",
+                       "Cyan", "Cerulean Blue", "Azure Ocean", "Sapphire",
+                       "Blue", "Indigo", "Deep Violet", "Amethyst",
+                       "Magenta", "Hot Pink", "Raspberry Rose", "Crimson", "Black"
+                   ]
+        self.colour_dict = {value: colour for colour, value in zip(COLOUR_NAMES, range(0, 375, 15))}
+        
+        # set transform panel manually
+        self.transform_view = ui.View(frame=(5, 5, 420, 420))
+        angle = TickedSliderView(min_val=0, max_val=360,
+                                 num_ticks=24, major_ticks_every=3,
+                                 labels=np.arange(0, 405, 45),
+                                 action=self.angle_action,
+                                 name='ticked_angle_slider',
+                                 frame=(5, 36, 410, 77),
+                                 color='red')
+        self.transform_view.add_subview(angle)
+        
+        scale = TickedSliderView(min_val=0.5, max_val=2.0,
+                                 num_ticks=15, major_ticks_every=5,
+                                 labels=np.round(np.linspace(0.5, 2.0, 16), 1),
+                                 name='ticked_scale_slider',
+                                 action=self.scale_action,
+                                 frame=(5, 210, 410, 77),
+                                 color='blue')
+        self.transform_view.add_subview(scale)
+        
+        colour = TickedSliderView(min_val=0, max_val=360,
+                                  num_ticks=24, major_ticks_every=4,
+                                  labels=['R', 'Y', 'G', 'Cy', 'B', 'Ma', 'BL'],
+                                  action=self.colour_action,
+                                  name='ticked_colour_slider',
+                                  frame=(5, 310, 410, 77),
+                                  color='green')
+        self.transform_view.add_subview(colour)
+        
+        mirror = ui.SegmentedControl(name='Orientation',
+                                     segments=['None', 'Vertical', 'Horizontal'],
+                                     action=self.mirror_action,
+                                     frame=(5, 150, 410, 40))
+        self.transform_view.add_subview(mirror)
+        
+        self.transform_view.add_subview(ui.Button(
+             name='Delete',
+             title='Delete',
+             action=self.delete_action,
+             frame=(209, 6, 80, 32)))
+                
+        self.transform_view.add_subview(ui.Button(
+            name='Cancel',
+            title='Cancel',
+            action=self.cancel_action,
+            frame=(304, 6, 80, 32)))
+                
+        self.transform_view.add_subview(ui.Label(text='Mirror', frame=(5, 120, 150, 32)))
+        
+        # initialise angle, colour and scale
+        shape_id = getattr(shape, 'unique_id', hex(id(shape)))
+        if shape_id in self.placed_objects:
+            existing_angle = self.placed_objects[shape_id].get('rotation', 0)
+            angle.value = existing_angle
+            angle.set_text(f'Rotation Angle CCW  {existing_angle}deg')
+            
+            existing_colour = self.placed_objects[shape_id].get('colour', 0)
+            colour.value = existing_colour
+            colour.set_text(f'Colour {self.colour_dict[existing_colour]}')
+            
+            existing_scale = self.placed_objects[shape_id].get('scale', 1)
+            scale.value = existing_scale
+            scale.set_text(f'Scale x{round(existing_scale, 1)}')
     
-    def segment_changed(self, sender):
-        # This function triggers whenever a user taps a segment or cancel
-        # it is used to transform a placed shape
+        self.transform_view.set_needs_display()
+        self.transform_view.present("popover")
+    
+    def scale_action(self, sender):
+        self.send_message(f'{sender.name} {sender.value}')
         shape = self.selected_shape
         if not shape:
             return
         self.in_double_tap = False
-        if sender.name == "Cancel":
-            sender.superview.close()
-            return
-            
-        if sender.name == "Delete":
-            self.remove_shape(shape)
-            sender.superview.close()
-            return
-            
-        value = sender.segments[sender.selected_index]
-        shape.sprite_name = f"{shape.sprite_name}"
-        match sender.name:
-            case "Angle":
-                angle = int(value)
-                shape_id = getattr(shape, 'unique_id', hex(id(shape)))
-                
-                # If the shape is in our tracking dict, get existing angle
-                if shape_id in self.placed_objects:
-                    existing_angle = self.placed_objects[shape_id].get('rotation', 0)
-                    angle -= existing_angle
-                    
-                shape.image, shape.coordinates = shape.rotate(angle)
-                self.store(shape, rotation=angle)
+        
+        scale = round(sender.value, 1)
+        
+        sender.set_text(f'Scale x{scale}')
+        calc_scale = scale / shape.scale
+        w, h = shape.image.size
+        shape.image = shape.image.resize((int(calc_scale * w), int(calc_scale * h)),
+                                         resample=Image.BICUBIC)
+        shape.scale_path(calc_scale)
+        shape.scale = scale
 
-            case "Orientation":
-                shape.image, shape.coordinates = shape.mirror(value.lower())
-                self.store(shape, mirror=value.lower())
-            case "Colour":
-                colours = {
-                    "Red": 0, "Green": 120, "Blue": 240,
-                    "Purple": 300, "Cyan": 180, "Yellow": 60,
-                    "Orange": 30, "Chartreuse Green": 90,
-                    "Spring Green": 150, "Azure": 210, "Rose": 330,
-                }
-                shape.image = shape.change_dominant_color(colours[value])
-                self.store(shape, colour=colours[value])
-
-            case "Scale":
-                scale = float(value.removeprefix("x"))
-                w, h = shape.image.size
-                shape.image = shape.image.resize((int(scale * w), int(scale * h)))
-                shape.scale_path(scale)
-                self.store(shape, scale=scale)
+        self.store(shape, scale=scale)
         # Update the visual node without creating a new one
         shape.image_size = shape.image.size
-        combined_img = transparent_rect(shape)
-        shape.node.texture = Texture(pil_to_ui(combined_img))
-        # just save the state
-        self.save(None)
+        shape.node.texture = Texture(pil_to_ui(shape.image))
         
-    def build_grid(self):
-        """ define a grid to overlay on top of everything else
-        allow offset to place grid at centre of square (e.g. go game)"""
-        bbox = self.outline.bbox
-                               
-        grids_x = round(bbox.width / self.grid)
-        grids_y = round(bbox.height / self.grid)
+    def angle_action(self, sender):
+        self.send_message(f'{sender.name} {sender.value}')
+        shape = self.selected_shape
+        self.in_double_tap = False
+        if not shape:
+            return
 
-        with ui.ImageContext(grids_x * self.grid, grids_y * self.grid) as ctx:
-            ui.set_color('lightgrey')
-            for i in range(grids_y):
-               # horizontal rectangle
-               ui.Path.rect(0, i * self.grid, grids_x * self.grid, self.grid).stroke()
-            for i in range(grids_x):
-               # Vertical rectangle
-               ui.Path.rect(i * self.grid, 0, self.grid, grids_y * self.grid).stroke()
-                        
-            img = ctx.get_image()
-            
-        return SpriteNode(Texture(img),
-                          position=self.origin,
-                          alpha=0.8,
-                          parent=self)
+        angle = round(sender.value)
+        sender.set_text(f'Rotation Angle CCW  {angle}deg')
+        
+        # gets original angle from shape
+        shape.image, shape.coordinates = shape.rotate(angle)
+        self.store(shape, rotation=angle)
+        # Update the visual node without creating a new one
+        shape.node.texture = Texture(pil_to_ui(shape.image))
+                
+    def colour_action(self, sender):
+        shape = self.selected_shape
+        self.in_double_tap = False
+        if not shape:
+            return
+ 
+        colour_no = round(sender.value, 0)
+        
+        # change to black. 0.25 is above lum threshokd of 0.2
+        target_lum = 0.25 if colour_no == 360 else 0.95
+        target_hue = colour_no % 360
+        sender.set_text(f'Colour {self.colour_dict[colour_no]}')
+        shape.image = shape.recolor_image(target_hue, target_lum=target_lum)
+        self.store(shape, colour=colour_no)
+        # Update the visual node without creating a new one
+        shape.node.texture = Texture(pil_to_ui(shape.image))
     
-    # ------------------------------------- Play section
+    def delete_action(self, sender):
+        shape = self.selected_shape
+        if not shape:
+            return
+        self.remove_shape(shape)
+        sender.superview.close()
+        
+    def cancel_action(self, sender):
+        sender.superview.close()
+          
+    def mirror_action(self, sender):
+        """This function triggers whenever a user taps a tranform control or cancel
+        it is used to transform a placed shape """
+        
+        shape = self.selected_shape
+        if not shape:
+            return
+        self.in_double_tap = False
+        
+        value = sender.segments[sender.selected_index]
+        if value != 'None':
+            shape.image, shape.coordinates = shape.mirror(value.lower())
+            self.store(shape, mirror=value.lower())
+            # Update the visual node without creating a new one
+            shape.image_size = shape.image.size
+            shape.node.texture = Texture(pil_to_ui(shape.image))
+
+    # -----------Touch Operation
+    def _plunger_action(self, direction, y_loc=0):
+        """ animate plunger compression and release """
+        y_scale = self.plunger_y_scale
+        scale_action = Action.scale_y_to(y_scale, 0.2)
+        top_of_plunger = self.plunger_rect.height / 3 + self.plunger_rect.min_y
+        
+        if direction == 'compress':
+            # diff from top of plunger image
+            y_diff = top_of_plunger - y_loc
+            ratio = 1 - 3 * y_diff / self.plunger_rect.height
+            self.plunger.y_scale = abs(ratio) * y_scale
+        else:
+            scale_action = Action.scale_y_to(y_scale, 0.2)
+            self.plunger.run_action(scale_action)
+            
+    def touch_began(self, touch):
+        if self.play:
+            self.start_touch_y = touch.location.y
+            return self.physics.touch_start(touch)
+
+        self.selected_shape = None
+        self.in_double_tap = False
+        current_time = time()
+        
+        # Only check placed shapes now, as palette is handled by UI buttons
+        clicked_shape = self._get_shape_at(touch.location)
+        if clicked_shape:
+            if current_time - self.last_tap_time < self.double_tap_threshold:
+                self._on_double_tap(touch, clicked_shape)
+                self.last_tap_time = 0
+            else:
+                self.selected_shape = clicked_shape
+                self.last_tap_time = current_time
+                            
+    def touch_moved(self, touch):
+        if self.play:
+            self.ball.pos = touch.location
+            self.ball.update()
+            self._plunger_action('compress', touch.location.y)
+            
+        elif self.selected_shape:
+            new_pos = Point(*self._snap(touch.location))
+            self.selected_shape.node.position = new_pos
+            self._predict_alignment()
+                        
+    def touch_ended(self, touch):
+        if self.play:
+            self.physics.touch_end(touch)
+            self._plunger_action('expand')
+            return
+
+        if not self.selected_shape or self.in_double_tap:
+            return
+        try:
+            self.active_guide.remove_from_parent()
+        except AttributeError:
+            pass
+        # Check if dropped on the Play Surface
+        if touch.location.x < self.grid_box.bbox.max_x:
+            snapped_pos = self._snap(touch.location)
+            self.selected_shape.node.position = snapped_pos
+            self.selected_shape.centroid = snapped_pos
+            self.store(self.selected_shape, position=snapped_pos)
+        else:
+            # Dropped in dead space outside grid
+            self.remove_shape(self.selected_shape)
+  
+    def did_change_size(self):
+        
+        w, h = get_screen_size()
+        self.send_message(f'changing size {int(w)}. {int(h)}')
+        # 1. Update the origin (anchor point for the table)
+        self.origin = Point(int(w / 2.5), int(h / 2))
+        
+        # 2. Update the sidebar/tray position
+        self.palette_x = 0.95 * w
+        if hasattr(self, 'scroll_container'):
+            sidebar_w = 200
+            # If tray is currently open, snap it to the new right edge
+            if not self.scroll_container.hidden:
+                self.scroll_container.frame = (self.palette_x - sidebar_w, 0, sidebar_w, h - 20)
+                self.tray_button.frame = (self.palette_x - sidebar_w - 45, 10, 40, 40)
+            else:
+                self.scroll_container.frame = (w, 0, sidebar_w, h - 20)
+                self.tray_button.frame = (w - 45, 10, 40, 40)
+    
+        # 3. Refresh the board layout
+        self.refresh_layout()
+    
+    def refresh_layout(self):
+        w, h = get_screen_size()
+        # Reposition the outline sprite and grid
+        for object in [self.outline_path,  self.outline_node,
+                       self.plunger_outline, self.plunger,
+                       self.grid_box]:
+            object.remove_from_parent()
+        self.outline = self.processed.make_outline(self.outline_name)
+        # rebuild the outline, plunger and grid
+        self.place_outline(self.outline)
+        # Reposition all placed objects based on their stored relative positions
+        for shape in self.placed_shapes:
+            shape_id = shape.unique_id
+            if shape_id in self.placed_objects:
+                rel_pos = self.placed_objects[shape_id]['position']
+                # Re-calculate absolute position based on new screen size
+                new_pos = Point(rel_pos[0] * w, rel_pos[1] * h)
+                
+                shape.centroid = new_pos
+                shape.node.position = new_pos
+            
+    # ------------------------------------- Play section -------
     
     def update(self):
         if self.play:
-           self.physics.update(self.dt)
-                                 
-    def set_objects(self):
-        # Process placed shapes
-        # --------------- Define shape properties
-        shapes = self.placed_shapes
-        # list of shapes decoded as wall and its bounce value
-        # for switches, define actions
-        wall_list = {'guide_l': 1, 'guide_r': 1, 'sling_l': 1.1, 'sling_r': 1.1, 'short_wall_h': 1,
-                     'wall_1': 1, 'grey wall vert': 1, 'half round': 1.2}
-        switch_list = {'button 5x': 'x5', 'button 3x': 'x3', 'button 2x': 'x2',
-                       'switch vert': None, 'red_button': None, 'hole black': None}
-        bumper_list = {'bumper x30': (1.2, 30), 'bumper x10': (1.2, 10), 'bumper x20': (1.2, 20), 'bumper star': (1.3, 50)}
-        flipper_list = {'flipper_l': 1, 'flipper_r': 1}
+            self.physics.update(self.dt)
            
-        self.walls = [Wall('outline', self.outline.centroid, self.outline.coordinates, inside_wall=False)]
-        self.switches = []
-        self.bumpers = []
-        self.flippers = []
+    # ---------Switch actions    
+              
+    def x2(self, switch):
+        self.score *= 2
         
-        for shape in shapes:
-            # keep coordinates relative to centroid       
-            if shape.sprite_name in wall_list:
-                           
-                wall = Wall(f'{shape.description}', shape.centroid, shape.coordinates)
-                wall.bounce = wall_list[shape.sprite_name]
-                self.walls.append(wall)
-            elif shape.sprite_name in switch_list:
-                
-                switch = Switch(f'{shape.description}', shape.centroid, shape.coordinates,
-                                switch_list[shape.sprite_name], score=0)
-                self.switches.append(switch)
-            elif shape.sprite_name in bumper_list:
-                bounce, score = bumper_list[shape.sprite_name]
-                bumper = Bumper(f'{shape.description}', shape.centroid, shape.radius,
-                                score, bounce)
-                self.bumpers.append(bumper)
-            elif shape.sprite_name in flipper_list:
-                flipper = Flipper(f'{shape.description}', shape.centroid, shape.pivot,
-                                  shape.length, shape.coordinates,
-                                  min_angle=-25)
-                flipper.node = shape.node
-                flipper.compute_anchor_point()
-                self.flippers.append(flipper)
+    def x3(self, switch):
+        self.score *= 3
         
-        self.ball = Ball(parent=self)
-        self.ball.draw_()
-        self.ball.node = SpriteNode(Texture('pzl:BallGray'),
-                                    z_position=10,
-                                    size=(self.ball.radius*2, self.ball.radius*2),
-                                    parent=self)
+    def x5(self, switch):
+        self.score *= 5
+        
+    def hole(self, switch):
+        self.score += 100
+        # trap ball for 1 second
+        # self.ball.vel = [0, 0]
+        self.physics.ball.pos = switch.centroid
+        self.ball.node.alpha = 0
+        self.paused = True
+        sleep(1)
+        self.paused = False
+        self.ball.node.alpha = 1
+                        
+    def red(self, switch):
+        self.score += 10
+        
+    def vert(self, switch):
+        self.score += 10
+        
+    def again(self, switch):
+       self.physics.emit_ball()
+       
+    def arrow(self, switch):
+      # make the arrow block if ball direction not in  arrow direction
+      self.send_message('roll over arrow')
+      # for arrow, left is 0 , 270 is vertical
+      # need up to be 90 for vertical
+      vx, vy = self.physics.ball.vel
+      ball_angle = np.degrees(np.arctan2(vy, vx))
+      switch_angle = (switch.angle - 180) % 360
+      if abs(ball_angle - switch_angle) > 20:
+          self.physics.collide_wall(switch)
+                                           
                                     
-    def set_score_node(self):
-        # Draw Score
-        self.score_node = LabelNode(text=f'SCORE: {self.score}',
-                                    font=('Helvetica', 30),
-                                    color='white',
-                                    position=(100, self.size.height-100),
-                                    z_position=10,
-                                    parent=self)
-
 # ------------------ testing functions
-
-                
+                                
 def test_place_flippers(game):
     # move flipper left and right
     icons = list(game.palette_rects)
@@ -1093,9 +1342,13 @@ def test_play(game):
 def test_rotate(game):
    # grab centre shape and rotate it
    game.touch_began(Touch(*game.origin, 0, 0, 1))
+   shape = game.selected_shape
+   game.transform(shape)
    # sleep(0.1)
    # game.touch_began(Touch(*game.origin, 0, 0, 1))
-   image, coordinates = game.selected_shape.rotate(int(90))
+   shape.image, shape.coordinates = game.selected_shape.rotate(int(90))
+   shape.image, shape.coordinates = game.selected_shape.rotate(int(135))
+   shape.image, shape.coordinates = game.selected_shape.rotate(int(45))
    pass
 
 
@@ -1109,18 +1362,21 @@ def test_move(game):
 
                 
 if __name__ == "__main__":
-    
+    # processed = ProcessShapes('outline3')
     game = PinballCreate()
     #
     # game.setup()
     # test_place_flippers(game)
     #
-    # 
-    #,game.restore(None)
+    #
+    #
+    # game.select(None)
+    # game.restore(None)
+    
+    # game.colour_action(None)
     # test_rotate(game)
     # game.play_mode(None)
     # test_play(game)
     # test_move(game)
     pass
     run(game)
-    

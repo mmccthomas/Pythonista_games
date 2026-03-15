@@ -1,0 +1,183 @@
+{
+  "39046af4-1cc7-11f1-91b6-213e26bc6142": {
+    "name": "flipper_r",
+    "position": [
+      0.451,
+      0.163
+    ]
+  },
+  "4bda45cc-1cc7-11f1-91b6-213e26bc6142": {
+    "name": "wall short_h",
+    "position": [
+      0.272,
+      0.666
+    ],
+    "rotation": 45
+  },
+  "57b3fba4-1cc7-11f1-91b6-213e26bc6142": {
+    "name": "wall short_h",
+    "position": [
+      0.261,
+      0.563
+    ],
+    "scale": 0.67,
+    "colour": 180,
+    "rotation": 45
+  },
+  "5b122456-1cc7-11f1-91b6-213e26bc6142": {
+    "name": "wall short_h",
+    "position": [
+      0.506,
+      0.563
+    ],
+    "scale": 0.67,
+    "colour": 180,
+    "rotation": 135
+  },
+  "80e70d50-1d34-11f1-9452-5348f96eddb5": {
+    "name": "wall short_h",
+    "position": [
+      0.301,
+      0.617
+    ],
+    "colour": 180,
+    "scale": 0.67,
+    "rotation": 45
+  },
+  "efa357ee-1d34-11f1-9452-5348f96eddb5": {
+    "name": "wall short_h",
+    "position": [
+      0.257,
+      0.754
+    ],
+    "rotation": 45
+  },
+  "b8b17984-1d37-11f1-8d9c-5f6ded9faa81": {
+    "name": "wall short_h",
+    "position": [
+      0.502,
+      0.754
+    ],
+    "rotation": 135
+  },
+  "7bb2850c-1d3a-11f1-8d9c-5f6ded9faa81": {
+    "name": "wall short_h",
+    "position": [
+      0.502,
+      0.666
+    ],
+    "rotation": 135
+  },
+  "1deee03e-1d51-11f1-b057-8b5a23a39591": {
+    "name": "sling_r",
+    "position": [
+      0.506,
+      0.295
+    ],
+    "colour": 180
+  },
+  "70e52640-1d60-11f1-adc8-f90ad3e2c2c9": {
+    "name": "wall short_h",
+    "position": [
+      0.466,
+      0.612
+    ],
+    "scale": 0.67,
+    "colour": 180,
+    "rotation": 135
+  },
+  "059b791c-1d82-11f1-a555-95cbf7e226ad": {
+    "name": "bumper sparkle",
+    "position": [
+      0.381,
+      0.798
+    ],
+    "colour": 300,
+    "scale": 1.33
+  },
+  "1de7d4e8-1d82-11f1-a555-95cbf7e226ad": {
+    "name": "bumper yellow_x50",
+    "position": [
+      0.491,
+      0.871
+    ]
+  },
+  "22492cb2-1d82-11f1-a555-95cbf7e226ad": {
+    "name": "bumper blue_x25",
+    "position": [
+      0.378,
+      0.92
+    ]
+  },
+  "295a4d88-1d82-11f1-a555-95cbf7e226ad": {
+    "name": "bumper x10",
+    "position": [
+      0.268,
+      0.876
+    ],
+    "scale": 0.75
+  },
+  "3ad5c0ec-1d82-11f1-a555-95cbf7e226ad": {
+    "name": "sling_r",
+    "position": [
+      0.253,
+      0.295
+    ],
+    "mirror": "vertical",
+    "colour": 180
+  },
+  "469b55a4-1d82-11f1-a555-95cbf7e226ad": {
+    "name": "guide_r",
+    "position": [
+      0.531,
+      0.28
+    ],
+    "scale": 1.33
+  },
+  "5d6a6784-1d82-11f1-a555-95cbf7e226ad": {
+    "name": "guide_r",
+    "position": [
+      0.231,
+      0.275
+    ],
+    "mirror": "vertical",
+    "scale": 1.33
+  },
+  "7bfdc456-1d9c-11f1-9096-11b17b68b984": {
+    "name": "bumper x30",
+    "position": [
+      0.385,
+      0.598
+    ]
+  },
+  "e4886336-1e15-11f1-b2bd-05b9ac3d7b46": {
+    "name": "button red",
+    "position": [
+      0.249,
+      0.461
+    ]
+  },
+  "e6aaf8fe-1e15-11f1-b2bd-05b9ac3d7b46": {
+    "name": "button hole",
+    "position": [
+      0.513,
+      0.49
+    ]
+  },
+  "8ac2a764-1e1d-11f1-b2bd-05b9ac3d7b46": {
+    "name": "flipper_l",
+    "position": [
+      0.308,
+      0.163
+    ]
+  },
+  "abc93088-1e2f-11f1-a061-cf7648ab7c44": {
+    "name": "switch arrow",
+    "position": [
+      0.634,
+      0.485
+    ],
+    "rotation": 270,
+    "scale": 0.67
+  }
+}

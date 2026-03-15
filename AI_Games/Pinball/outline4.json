@@ -1,0 +1,271 @@
+{
+  "1747b790-1bdc-11f1-aea9-77b38b4515d2": {
+    "name": "bumper x30",
+    "position": [
+      247.0,
+      486.0
+    ]
+  },
+  "1967abfc-1bdc-11f1-aea9-77b38b4515d2": {
+    "name": "bumper x30",
+    "position": [
+      517.0,
+      491.0
+    ]
+  },
+  "20171bae-1bdc-11f1-aea9-77b38b4515d2": {
+    "name": "sling_r",
+    "position": [
+      467.0,
+      246.0
+    ]
+  },
+  "eea48e00-1f21-11f1-8beb-cd91ea3a4891": {
+    "name": "flipper_l",
+    "position": [
+      0.327,
+      0.192
+    ]
+  },
+  "efa57210-1f21-11f1-8beb-cd91ea3a4891": {
+    "name": "flipper_r",
+    "position": [
+      0.425,
+      0.192
+    ]
+  },
+  "f0b618f8-1f21-11f1-8beb-cd91ea3a4891": {
+    "name": "sling_r",
+    "position": [
+      0.502,
+      0.368
+    ],
+    "colour": 0
+  },
+  "f18e4048-1f21-11f1-8beb-cd91ea3a4891": {
+    "name": "sling_r",
+    "position": [
+      0.253,
+      0.368
+    ],
+    "mirror": "vertical",
+    "colour": 0
+  },
+  "1bcb4bf8-1f22-11f1-8beb-cd91ea3a4891": {
+    "name": "wall short_h",
+    "position": [
+      0.202,
+      0.71
+    ],
+    "rotation": 0
+  },
+  "4b9bb7fa-1f22-11f1-8beb-cd91ea3a4891": {
+    "name": "bumper yellow_x50",
+    "position": [
+      0.458,
+      0.93
+    ]
+  },
+  "4c4b1e70-1f22-11f1-8beb-cd91ea3a4891": {
+    "name": "bumper blue_x25",
+    "position": [
+      0.275,
+      0.93
+    ]
+  },
+  "69085514-1f22-11f1-8beb-cd91ea3a4891": {
+    "name": "wall short_h",
+    "position": [
+      0.228,
+      0.51
+    ],
+    "rotation": 135,
+    "colour": 0
+  },
+  "6929543a-1f22-11f1-8beb-cd91ea3a4891": {
+    "name": "wall short_h",
+    "position": [
+      0.539,
+      0.51
+    ],
+    "rotation": 45,
+    "colour": 0
+  },
+  "9c642fc8-1f22-11f1-8beb-cd91ea3a4891": {
+    "name": "wall short_h",
+    "position": [
+      0.484,
+      0.222
+    ],
+    "rotation": 45,
+    "colour": 360
+  },
+  "aa990e10-1f22-11f1-8beb-cd91ea3a4891": {
+    "name": "wall short_h",
+    "position": [
+      0.261,
+      0.227
+    ],
+    "rotation": 135,
+    "colour": 360
+  },
+  "cbe7e8f2-1f22-11f1-8beb-cd91ea3a4891": {
+    "name": "button red",
+    "position": [
+      0.182,
+      0.802
+    ],
+    "colour": 300
+  },
+  "cc57d8d8-1f22-11f1-8beb-cd91ea3a4891": {
+    "name": "button red",
+    "position": [
+      0.227,
+      0.802
+    ],
+    "colour": 180
+  },
+  "cc8fbb40-1f22-11f1-8beb-cd91ea3a4891": {
+    "name": "button red",
+    "position": [
+      0.268,
+      0.802
+    ],
+    "colour": 60
+  },
+  "cd25c784-1f22-11f1-8beb-cd91ea3a4891": {
+    "name": "button red",
+    "position": [
+      0.313,
+      0.802
+    ],
+    "colour": 300
+  },
+  "cd5dc990-1f22-11f1-8beb-cd91ea3a4891": {
+    "name": "button red",
+    "position": [
+      0.356,
+      0.803
+    ],
+    "colour": 180
+  },
+  "cdb6bbfe-1f22-11f1-8beb-cd91ea3a4891": {
+    "name": "button red",
+    "position": [
+      0.403,
+      0.802
+    ],
+    "colour": 60
+  },
+  "da2e7494-1f22-11f1-8beb-cd91ea3a4891": {
+    "name": "button red",
+    "position": [
+      0.51,
+      0.802
+    ],
+    "colour": 135
+  },
+  "da824aa6-1f22-11f1-8beb-cd91ea3a4891": {
+    "name": "button red",
+    "position": [
+      0.555,
+      0.802
+    ],
+    "colour": 60
+  },
+  "dad8d3da-1f22-11f1-8beb-cd91ea3a4891": {
+    "name": "button red",
+    "position": [
+      0.457,
+      0.802
+    ],
+    "colour": 300
+  },
+  "7436772c-1f27-11f1-8beb-cd91ea3a4891": {
+    "name": "bumper red_x100",
+    "position": [
+      0.37,
+      0.925
+    ]
+  },
+  "5dd2b8e6-1fd7-11f1-bb3c-85afc3727a76": {
+    "name": "bumper x30",
+    "position": [
+      0.44,
+      0.485
+    ],
+    "colour": 285
+  },
+  "4ce0c340-1fe9-11f1-8c68-539c650b1001": {
+    "name": "bumper x30",
+    "position": [
+      0.334,
+      0.485
+    ]
+  },
+  "dc24cfa0-1ffe-11f1-adc3-cb1c0cf61242": {
+    "name": "wall short_h",
+    "position": [
+      0.523,
+      0.707
+    ],
+    "scale": 0.9500000178813934,
+    "rotation": 0,
+    "colour": 0.0
+  },
+  "80de4da4-2064-11f1-8654-bba0a8f85906": {
+    "name": "bumper star",
+    "position": [
+      0.389,
+      0.656
+    ],
+    "scale": 1.0,
+    "colour": 165.0,
+    "rotation": 0
+  },
+  "5d831bf2-20ad-11f1-94b9-85945b2f012f": {
+    "name": "wall short_h",
+    "position": [
+      0.213,
+      0.295
+    ],
+    "rotation": 135,
+    "colour": 360.0
+  },
+  "71a5bf18-20ad-11f1-94b9-85945b2f012f": {
+    "name": "wall short_h",
+    "position": [
+      0.187,
+      0.383
+    ],
+    "rotation": 90,
+    "colour": 360.0
+  },
+  "80ea9804-20ad-11f1-94b9-85945b2f012f": {
+    "name": "wall short_h",
+    "position": [
+      0.535,
+      0.295
+    ],
+    "rotation": 45,
+    "colour": 360.0
+  },
+  "904df7a0-20ad-11f1-94b9-85945b2f012f": {
+    "name": "wall short_h",
+    "position": [
+      0.561,
+      0.378
+    ],
+    "rotation": 90,
+    "colour": 360.0
+  },
+  "aea0acce-20ae-11f1-94b9-85945b2f012f": {
+    "name": "switch arrow",
+    "position": [
+      0.586,
+      0.871
+    ],
+    "rotation": 315,
+    "colour": 30.0
+  }
+}
