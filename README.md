@@ -1,7 +1,7 @@
 Pythonista Games
 ----------------
 
-This is a series of python word and board games to operate on the iPad using the excellent Pythonista app.
+This is a series of Python word and board games to operate on the iPad using the excellent Pythonista app.
 
 In general, the games do not work well on iPhone due to smaller screen area and the restrictions of touch interface.
 Some optimisation has been made to operate in iPad Portrait mode, but Landscape is generally preferred.
@@ -99,7 +99,7 @@ NumberWords
 Crossword grid filled with a selection of words.
 Find the letter linked to each number.
 Idea taken from Puzzler magazine
-The first puzzles are randomly genererated and may not include all letters.
+The first puzzles are randomly generated and may not include all letters.
 All others are taken from published games in magazines and newspapers.
 
 Entry point : Word_Games/NumberWord.py
@@ -225,7 +225,7 @@ Entry point : Board_Games/TrainTracks.py
 
 Tetris
 ------
-Simple implemation of a classic game. 
+Simple implementation of a classic game. 
 An early attempt by me, could be prettier!
 
 Entry point : Board_Games/tetris.py
@@ -374,7 +374,7 @@ Adventure
 Classic adventure game, coded in Python from the original Colossal Caves program
 by Brandon Rhodes.
 I have added a GUI frontend for Pythonista, but left the adventure folder untouched.
-Added Map.JPG and locations.csv to higlight locations.
+Added Map.JPG and locations.csv to highlight locations.
 
 Entry point: python_adventure/Python_Adventure.py
 
